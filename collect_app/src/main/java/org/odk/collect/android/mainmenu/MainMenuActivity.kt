@@ -14,7 +14,7 @@ import org.odk.collect.android.activities.ActivityUtils
 import org.odk.collect.android.activities.CrashHandlerActivity
 import org.odk.collect.android.activities.FirstLaunchActivity
 import org.odk.collect.android.injection.DaggerUtils
-import org.odk.collect.android.pkl.CobaLogin
+import org.odk.collect.android.pkl.CobaLoginJuga
 import org.odk.collect.android.projects.ProjectSettingsDialog
 import org.odk.collect.android.utilities.ThemeUtils
 import org.odk.collect.androidshared.ui.FragmentFactoryBuilder
@@ -57,7 +57,7 @@ class MainMenuActivity : LocalizedActivity() {
 
         if (!currentProjectViewModel.hasCurrentProject()) {
             super.onCreate(null)
-            ActivityUtils.startActivityAndCloseAllOthers(this, CobaLogin::class.java)
+            ActivityUtils.startActivityAndCloseAllOthers(this, CobaLoginJuga::class.java)
             return
         } else {
             this.supportFragmentManager.fragmentFactory = FragmentFactoryBuilder()
@@ -76,10 +76,9 @@ class MainMenuActivity : LocalizedActivity() {
                 .build()
 
             super.onCreate(savedInstanceState)
-
-            setContent{
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    Text(text = "Hello World!")
+            setContent { 
+                Surface (modifier = Modifier.fillMaxSize()){
+                    Text(text = "Coba Login Juga di Main Menu")
                 }
             }
         }
