@@ -9,10 +9,10 @@ import androidx.compose.ui.unit.sp
 import org.odk.collect.android.R
 
 val PoppinsFontFamily = FontFamily(
-    Font(R.font.poppins),
-    Font(R.font.poppins_medium, FontWeight.Medium),
-    Font(R.font.poppins_light, FontWeight.Light),
-    Font(R.font.poppins_bold, FontWeight.Bold)
+        Font(R.font.poppins),
+        Font(R.font.poppins_medium, FontWeight.Medium),
+        Font(R.font.poppins_light, FontWeight.Light),
+        Font(R.font.poppins_bold, FontWeight.Bold)
 )
 
 val poppins_reguler = Font(R.font.poppins)
