@@ -1,4 +1,4 @@
-package org.odk.collect.android.pkl.ui.screen
+package com.polstat.pkl.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -43,7 +43,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import org.odk.collect.android.pkl.ui.theme.*
+import com.polstat.pkl.ui.theme.PklPrimary300
+import com.polstat.pkl.ui.theme.PklPrimary700
+import com.polstat.pkl.ui.theme.PoppinsFontFamily
+import com.polstat.pkl.ui.theme.*
 
 @Preview(showBackground = true)
 @Composable
@@ -68,7 +71,7 @@ fun ListRuta() {
                     )
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = Primary1,
+                    containerColor = PklPrimary700,
                     titleContentColor = Color.White,
                 ),
                 navigationIcon = {
@@ -117,7 +120,7 @@ fun ListRuta() {
                         .padding(innerPadding)
                         .fillMaxWidth()
                         .height(40.dp)
-                        .background(Primary2),
+                        .background(PklPrimary300),
                     Arrangement.SpaceAround,
                     Alignment.CenterVertically,
                 ) {
@@ -175,7 +178,7 @@ fun ListRuta() {
                 modifier = Modifier
                     .padding(all = 16.dp),
                 onClick = { /*TODO*/ },
-                containerColor = Primary2
+                containerColor = PklPrimary300
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
