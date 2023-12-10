@@ -39,11 +39,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.polstat.pkl.R
 import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary
@@ -62,7 +64,7 @@ fun ListBSScreen() {
                 modifier = Modifier.shadow(10.dp),
                 title = {
                     Text(
-                        text = "List Blok Sensus",
+                        text = stringResource(R.string.title_list_bs),
                         fontFamily = PoppinsFontFamily,
                         fontWeight = FontWeight.Medium,
                         fontSize = 20.sp,
@@ -74,7 +76,7 @@ fun ListBSScreen() {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             tint = Color.White,
-                            contentDescription = "Back Icon",
+                            contentDescription = stringResource(R.string.back_icon),
                             modifier = Modifier.size(25.dp)
                         )
                     }
@@ -89,7 +91,7 @@ fun ListBSScreen() {
                             Icon(
                                 imageVector = Icons.Filled.Sync,
                                 tint = Color.White,
-                                contentDescription = "Sync Icon",
+                                contentDescription = stringResource(R.string.sync_icon),
                                 modifier = Modifier.size(25.dp)
                             )
                         }
@@ -123,7 +125,7 @@ private fun BlokSensus() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Blok Sensus " + "444A",
+                    text = stringResource(R.string.blok_sensus) + "444A",
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(horizontal = 8.dp),
                     color = Color.DarkGray
@@ -137,7 +139,7 @@ private fun BlokSensus() {
                 ) {
                     Row {
                         Text(
-                            text = "Kec. " + "Batu" + ", Kel. " + "Oro-Oro Ombo",
+                            text = stringResource(R.string.kec) + "Batu" + stringResource(R.string.kel) + "Oro-Oro Ombo",
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(start = 8.dp),
                             color = Color.DarkGray
@@ -153,34 +155,36 @@ private fun BlokSensus() {
                     }
                 }
             }
-            Row (horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 20.dp)) {
+            Row (horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 20.dp)) {
                 Column () {
                     if (status === "Proses Listing") {
-                        Text(text = "Proses\nListing", softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 15.sp)
+                        Text(text = stringResource(R.string.proses_n_listing), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 15.sp)
                     } else {
-                        Text(text = "Proses\nListing", softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp)
+                        Text(text = stringResource(R.string.proses_n_listing), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp)
                     }
 
                 }
                 Column () {
                     if (status === "Listing Selesai") {
-                        Text(text = "Listing\nSelesai", softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 15.sp)
+                        Text(text = stringResource(R.string.listing_n_selesai), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 15.sp)
                     } else {
-                        Text(text = "Listing\nSelesai", softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp)
+                        Text(text = stringResource(R.string.listing_n_selesai), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp)
                     }
                 }
                 Column () {
                     if (status === "Telah Disampel") {
-                        Text(text = "Telah\nDisampel", softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 15.sp)
+                        Text(text = stringResource(R.string.telah_n_disampel), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 15.sp)
                     } else {
-                        Text(text = "Telah\nDisampel", softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp)
+                        Text(text = stringResource(R.string.telah_n_disampel), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp)
                     }
                 }
                 Column () {
                     if (status === "Sampel Terkirim") {
-                        Text(text = "Sampel\nTerkirim", softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 15.sp)
+                        Text(text = stringResource(R.string.sampel_n_terkirim), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 15.sp)
                     } else {
-                        Text(text = "Sampel\nTerkirim", softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp)
+                        Text(text = stringResource(R.string.sampel_n_terkirim), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp)
                     }
                 }
             }
@@ -195,14 +199,14 @@ private fun BlokSensus() {
                     Column (modifier = Modifier.padding(start = 20.dp)) {
                         Row {
                             Text(
-                                text = "Rekapitulasi",
+                                text = stringResource(R.string.rekapitulasi),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = Color.Gray
                             )
                         }
                         Row {
                             Text(
-                                text = "Jumlah Rumah Tangga: ",
+                                text = stringResource(R.string.jmlRT),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
                                 color = Color.Gray
@@ -216,7 +220,7 @@ private fun BlokSensus() {
                         }
                         Row {
                             Text(
-                                text = "Jumlah Rumah Tangga dengan ART Z: ",
+                                text = stringResource(R.string.jmlRTZ),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
                                 color = Color.Gray
@@ -230,7 +234,7 @@ private fun BlokSensus() {
                         }
                         Row (modifier = Modifier.padding(top = 10.dp)) {
                             Text(
-                                text = "Gen Z dalam Satu Blok Sensus",
+                                text = stringResource(R.string.genz_satuBS),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
                                 color = Color.Gray
@@ -238,7 +242,7 @@ private fun BlokSensus() {
                         }
                         Row {
                             Text(
-                                text = "Jumlah Gen Z: ",
+                                text = stringResource(R.string.jml_genz),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
                                 color = Color.Gray
@@ -252,7 +256,7 @@ private fun BlokSensus() {
                         }
                         Row {
                             Text(
-                                text = "Jumlah Gen Z Dewasa: ",
+                                text = stringResource(R.string.genz_dewasa),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
                                 color = Color.Gray
@@ -266,7 +270,7 @@ private fun BlokSensus() {
                         }
                         Row (modifier = Modifier.padding(bottom = 10.dp)) {
                             Text(
-                                text = "Jumlah Gen Z Anak: ",
+                                text = stringResource(R.string.genz_anak),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
                                 color = Color.Gray
@@ -281,7 +285,7 @@ private fun BlokSensus() {
                     }
                     Column (modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                         Row {
-                            Text(text = "Total", fontFamily = PoppinsFontFamily, fontSize = 15.sp)
+                            Text(text = stringResource(R.string.total), fontFamily = PoppinsFontFamily, fontSize = 15.sp)
                         }
                         Row {
                             Text(text = "3", style = MaterialTheme.typography.headlineLarge, color = PklPrimary, fontWeight = FontWeight.Bold)
@@ -303,7 +307,7 @@ private fun BlokSensus() {
                 ) {
                     Icon(
                         imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                        contentDescription = "Toggle",
+                        contentDescription = stringResource(R.string.toggle),
                         tint = Color.Black,
                         modifier = Modifier
                             .clickable {
@@ -317,7 +321,7 @@ private fun BlokSensus() {
                             contentPadding = PaddingValues(10.dp),
                             modifier = Modifier.padding(horizontal = 2.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)) {
-                            Text("Lihat Ruta", fontFamily = PoppinsFontFamily, fontSize = 15.sp)
+                            Text(stringResource(R.string.lihat_ruta), fontFamily = PoppinsFontFamily, fontSize = 15.sp)
                         }
                         if (status === "Sampel Terkirim") {
                             Button(onClick = {},
@@ -325,7 +329,7 @@ private fun BlokSensus() {
                                 contentPadding = PaddingValues(10.dp),
                                 modifier = Modifier.padding(horizontal = 2.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)) {
-                                Text("Lihat Sampel", fontFamily = PoppinsFontFamily, fontSize = 15.sp)
+                                Text(stringResource(R.string.lihat_sampel), fontFamily = PoppinsFontFamily, fontSize = 15.sp)
                             }
                         }
                     }
