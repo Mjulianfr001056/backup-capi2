@@ -21,16 +21,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -64,7 +64,6 @@ import com.polstat.pkl.ui.theme.PklQuaternary
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.ui.theme.typography
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Nim(
     nimState: TextFieldState = remember { NimState() },
@@ -72,7 +71,7 @@ fun Nim(
     onImeAction: () -> Unit = {}
 ) {
     Column {
-        val characterCount = remember { mutableStateOf(0) }
+        val characterCount = remember { mutableIntStateOf(0) }
 
         OutlinedTextField(
             value = nimState.text,
@@ -80,7 +79,7 @@ fun Nim(
                 if (it.matches(Regex("\\d*"))) {
                     if (it.length <= 9) {
                         nimState.text = it
-                        characterCount.value = it.length
+                        characterCount.intValue = it.length
                     }
                 }
             },
@@ -100,10 +99,10 @@ fun Nim(
                         nimState.enableShowErrors()
                     }
                 },
-            colors = outlinedTextFieldColors(
-                unfocusedBorderColor = PklQuaternary,
-//                    textColor = PklPrimary900,
-                cursorColor = PklPrimary900
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedTextColor = PklPrimary900,
+                focusedTextColor = PklPrimary900,
+                cursorColor = PklPrimary900,
             ),
             textStyle = typography.bodyMedium,
             isError = nimState.showErrors(),
@@ -126,7 +125,7 @@ fun Nim(
                 color = PklQuaternary
             )
             Text(
-                text = "${characterCount.value}/9",
+                text = "${characterCount.intValue}/9",
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.W600,
                 fontSize = 10.sp,
@@ -136,7 +135,6 @@ fun Nim(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Password(
     label: String,
@@ -147,37 +145,43 @@ fun Password(
 ) {
     Column {
         val showPassword = rememberSaveable { mutableStateOf(false) }
-        OutlinedTextField(value = passwordState.text, onValueChange = {
-            passwordState.text = it
-            passwordState.enableShowErrors()
-        }, modifier = modifier
-            .fillMaxWidth()
-            .padding(all = 0.dp)
-            .onFocusChanged { focusState ->
-                passwordState.onFocusChange(focusState.isFocused)
-                if (!focusState.isFocused) {
-                    passwordState.enableShowErrors()
-                }
-            }, textStyle = TextStyle(
-            fontFamily = PoppinsFontFamily,
-            fontWeight = FontWeight.W400,
-            fontSize = 14.sp,
-            lineHeight = 20.sp,
-            letterSpacing = 0.25.sp,
-        ), label = {
-            Text(
-                text = label,
-                style = typography.titleSmall,
-                color = if (passwordState.showErrors()) PklPrimary900 else PklQuaternary
-            )
-        }, colors = outlinedTextFieldColors(
-            unfocusedBorderColor = PklQuaternary,
-//            textColor = PklPrimary900,
-            cursorColor = PklPrimary900
-        ),
+        OutlinedTextField(
+            value = passwordState.text,
+            onValueChange = {
+                passwordState.text = it
+                passwordState.enableShowErrors() },
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(all = 0.dp)
+                .onFocusChanged {
+                    focusState -> passwordState.onFocusChange(focusState.isFocused)
+                    if (!focusState.isFocused) {
+                        passwordState.enableShowErrors()
+                    } },
+            textStyle = TextStyle(
+                fontFamily = PoppinsFontFamily,
+                fontWeight = FontWeight.W400,
+                fontSize = 14.sp,
+                lineHeight = 20.sp,
+                letterSpacing = 0.25.sp),
+            label = {
+                Text(
+                    text = label,
+                    style = typography.titleSmall,
+                    color = if (passwordState.showErrors()) PklPrimary900 else PklQuaternary
+                ) },
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedTextColor = PklPrimary900,
+                focusedTextColor = PklPrimary900,
+                cursorColor = PklPrimary900,
+                ),
             trailingIcon = {
                 if (showPassword.value) {
-                    IconButton(onClick = { showPassword.value = false }) {
+                    IconButton(
+                        onClick = {
+                            showPassword.value = false
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.Filled.Visibility,
                             contentDescription = stringResource(id = R.string.hide_password),
@@ -185,25 +189,33 @@ fun Password(
                         )
                     }
                 } else {
-                    IconButton(onClick = { showPassword.value = true }) {
+                    IconButton(
+                        onClick = {
+                            showPassword.value = true
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.Filled.VisibilityOff,
                             contentDescription = stringResource(id = R.string.show_password),
                             modifier = Modifier.size(15.dp)
                         )
                     }
-                }
-            }, visualTransformation = if (showPassword.value) {
-                VisualTransformation.None
-            } else {
-                PasswordVisualTransformation()
-            }, isError = passwordState.showErrors(), supportingText = {
+                } },
+            visualTransformation =
+                if (showPassword.value) VisualTransformation.None
+                else PasswordVisualTransformation(),
+            isError = passwordState.showErrors(),
+            supportingText = {
                 passwordState.getError()?.let { error -> TextFieldError(textError = error) }
-            }, keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = imeAction, keyboardType = KeyboardType.Password
-            ), keyboardActions = KeyboardActions(onDone = {
-                onImeAction()
-            }), singleLine = true
+                             },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = imeAction,
+                keyboardType = KeyboardType.Password),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    onImeAction()
+                }),
+            singleLine = true
         )
         Text(
             text = stringResource(id = R.string.wajib),
@@ -228,7 +240,7 @@ fun LogoTitle() {
             modifier = Modifier.size(100.dp, 100.dp)
         )
         Spacer(modifier = Modifier.width(5.dp))
-        Column() {
+        Column {
             Text(
                 text = stringResource(id = R.string.capi),
                 fontFamily = PoppinsFontFamily,
@@ -259,9 +271,6 @@ fun LogoTitle() {
     }
 }
 
-/**
- * To be removed when [TextField]s support error
- */
 @Composable
 fun TextFieldError(textError: String) {
     Row(modifier = Modifier.fillMaxWidth()) {
