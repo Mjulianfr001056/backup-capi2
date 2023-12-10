@@ -10,7 +10,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
+import com.polstat.pkl.navigation.AppNavHost
 import com.polstat.pkl.ui.theme.Capi63Theme
+import com.polstat.pkl.ui.viewmodel.LoginViewModel
 
 class CapiFirstActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,7 +26,9 @@ class CapiFirstActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Text(text ="Coba login juga tapi beda module")
+                    val navController = rememberNavController()
+                    val loginViewModel: LoginViewModel = viewModel() // Create an instance of LoginViewModel
+                    AppNavHost(navController = navController, loginViewModel = loginViewModel)
                 }
             }
         }

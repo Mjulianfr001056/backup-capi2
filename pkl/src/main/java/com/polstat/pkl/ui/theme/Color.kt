@@ -10,6 +10,7 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
+val PklPrimary900 = Color(0xFF951A2E)
 val PklPrimary700 = Color(0XFFC4314E)
 val PklPrimary300 = Color(0xFFD93F57)
 val PklPrimary100 = Color(0xFFF7A180)
@@ -28,3 +29,5 @@ val PklPrimary = Color(0xFF951A2E)
 val PklSecondary = Color(0xFF011f4B)
 val PklAccent = Color(0xFFF58020)
 val PklBase = Color(0xFFFFFAE6)
+
+val PklQuaternary = Color(0xFF777777)
