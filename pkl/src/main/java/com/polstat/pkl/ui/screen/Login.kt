@@ -26,9 +26,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,7 +64,6 @@ import com.polstat.pkl.ui.theme.PklQuaternary
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.ui.theme.typography
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Nim(
     nimState: TextFieldState = remember { NimState() },
@@ -100,10 +99,10 @@ fun Nim(
                         nimState.enableShowErrors()
                     }
                 },
-            colors = outlinedTextFieldColors(
-                unfocusedBorderColor = PklQuaternary,
-//                    textColor = PklPrimary900,
-                cursorColor = PklPrimary900
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedTextColor = PklPrimary900,
+                focusedTextColor = PklPrimary900,
+                cursorColor = PklPrimary900,
             ),
             textStyle = typography.bodyMedium,
             isError = nimState.showErrors(),
@@ -136,7 +135,6 @@ fun Nim(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Password(
     label: String,
@@ -170,11 +168,12 @@ fun Password(
                 style = typography.titleSmall,
                 color = if (passwordState.showErrors()) PklPrimary900 else PklQuaternary
             )
-        }, colors = outlinedTextFieldColors(
-            unfocusedBorderColor = PklQuaternary,
-//            textColor = PklPrimary900,
-            cursorColor = PklPrimary900
-        ),
+        }, colors = OutlinedTextFieldDefaults.colors(
+            unfocusedTextColor = PklPrimary900,
+            focusedTextColor = PklPrimary900,
+            cursorColor = PklPrimary900,
+        )
+            ,
             trailingIcon = {
                 if (showPassword.value) {
                     IconButton(onClick = { showPassword.value = false }) {
