@@ -71,6 +71,7 @@ android {
     buildFeatures {
         viewBinding true
         buildConfig true
+        compose true
     }
 
     defaultConfig {
@@ -218,6 +219,12 @@ android {
         xmlReport true
     }
     namespace 'org.odk.collect.android'
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.4.8'
+    }
 }
 
 configurations.all {
@@ -230,11 +237,25 @@ configurations.all {
         // Newer Jackson versions cannot be ued until Collect minSDK >= 26 (https://github.com/FasterXML/jackson-databind#android)
         force 'com.fasterxml.jackson.core:jackson-databind:2.13.5'
     }
-    
+
     transitive = true
 }
 
 dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+    implementation 'androidx.activity:activity-compose:1.7.0'
+    implementation platform('androidx.compose:compose-bom:2023.08.00')
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.ui:ui-graphics'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    implementation 'androidx.compose.material3:material3'
+    implementation project(':pkl')
+    androidTestImplementation platform('androidx.compose:compose-bom:2023.08.00')
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+    debugImplementation 'androidx.compose.ui:ui-test-manifest'
     repositories {
         mavenLocal() // Only used for javarosa_local dependency
     }
@@ -301,7 +322,7 @@ dependencies {
     implementation Dependencies.squareup_okhttp
     implementation Dependencies.squareup_okhttp_tls
     implementation Dependencies.burgstaller_okhttp_digest
-    
+
     implementation Dependencies.persian_joda_time
     implementation Dependencies.myanmar_calendar
     implementation Dependencies.bikram_sambat
