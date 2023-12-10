@@ -98,7 +98,7 @@ fun LoginScreen(navController: NavHostController, loginViewModel: LoginViewModel
                         })
                         // Menangani state dari login
                         loginState?.let {
-                            if (it.nim != null && it.nim != "") {
+                            if (it.nim != "") {
                                 navController.navigate("success")
                             }
 

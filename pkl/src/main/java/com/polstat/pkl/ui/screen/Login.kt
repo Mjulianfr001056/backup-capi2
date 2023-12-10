@@ -153,11 +153,12 @@ fun Password(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(all = 0.dp)
-                .onFocusChanged {
-                    focusState -> passwordState.onFocusChange(focusState.isFocused)
+                .onFocusChanged { focusState ->
+                    passwordState.onFocusChange(focusState.isFocused)
                     if (!focusState.isFocused) {
                         passwordState.enableShowErrors()
-                    } },
+                    }
+                },
             textStyle = TextStyle(
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.W400,
