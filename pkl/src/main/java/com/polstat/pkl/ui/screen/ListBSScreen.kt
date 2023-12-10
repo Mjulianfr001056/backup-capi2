@@ -107,7 +107,7 @@ fun ListBSScreen() {
 
 @Composable
 private fun BlokSensus() {
-    var expanded by remember { mutableStateOf(true) }
+    var expanded by remember { mutableStateOf(false) }
     var status by remember { mutableStateOf("Sampel Terkirim") }
 
     Box(
