@@ -53,13 +53,13 @@ class SwipeHandler(context: Context, generalSettings: Settings) {
         override fun onShowPress(e: MotionEvent) = Unit
         override fun onLongPress(e: MotionEvent) = Unit
 
-        override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+        override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
             // The onFling() captures the 'up' event so our view thinks it gets long pressed. We don't want that, so cancel it.
             view?.cancelLongPress()
             return false
         }
 
-        override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+        override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
             if (view == null) {
                 return false
             }
@@ -81,7 +81,7 @@ class SwipeHandler(context: Context, generalSettings: Settings) {
                     return false
                 }
 
-                val diffX = abs(e1!!.x - e2.x)
+                val diffX = abs(e1.x - e2.x)
                 val diffY = abs(e1.y - e2.y)
 
                 if (view != null && canScrollVertically() && getGestureAngle(diffX, diffY) > 30) {
