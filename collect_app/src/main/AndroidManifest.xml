@@ -80,6 +80,9 @@
         <activity
             android:name=".pkl.CobaLoginJuga"
             android:exported="false" />
+        <activity
+            android:name=".pkl.IsiRumahTanggaActivity"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
