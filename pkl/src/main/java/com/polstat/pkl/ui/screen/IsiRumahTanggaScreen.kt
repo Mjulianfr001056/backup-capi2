@@ -1,4 +1,4 @@
-package org.odk.collect.android.pkl.ui
+package com.polstat.pkl.ui.screen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
@@ -20,17 +19,13 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -43,14 +38,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 val PklPrimary700 = Color(0XFFC4314E)
 val PklPrimary300 = Color(0xFFD93F57)
@@ -89,143 +81,134 @@ fun IsiRumahTanggaScreen(
     var alamat by rememberSaveable { mutableStateOf("") }
     var selectedGenZOption by rememberSaveable { mutableStateOf(genZOptions[0]) }
 
-    Surface(
-        color = PklBase,
-        modifier = Modifier
+    Scaffold(
+        topBar = {
+            IsiRumahTanggaTopBar()
+        },
+        modifier = Modifier.fillMaxSize()
+    ) { paddingValues ->
+        Box(modifier = Modifier
+            .padding(paddingValues)
             .fillMaxSize()
-    ) {
-        Scaffold(
-            topBar = {
-                IsiRumahTanggaTopBar()
-            },
-            modifier = Modifier.fillMaxSize()
-        ) { paddingValues ->
-            Box(modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-                .background(color = PklBase)
+            .background(color = PklBase)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(15.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
-                Column(
+                Card(
+                    border = BorderStroke(1.dp, PklSecondary),
+                    colors = CardDefaults.cardColors(
+                        containerColor = PklBase
+                    ),
+                    shape = RectangleShape,
                     modifier = Modifier
-                        .padding(15.dp)
-                        .verticalScroll(rememberScrollState())
+                        .fillMaxWidth()
                 ) {
-                    Card(
-                        border = BorderStroke(1.dp, PklSecondary),
-                        colors = CardDefaults.cardColors(
-                            containerColor = PklBase
-                        ),
-                        shape = RectangleShape,
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
                             .fillMaxWidth()
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(15.dp)
-                        ) {
-                            Text(
-                                text = "Isian Listing Ruta Terakhir"
-                            )
-                            
-                            Spacer(modifier = Modifier.padding(10.dp))
-                            
-                            Text(
-                                text = "No. Segmen: $noSegmen | No. BF: $noBangunanFisik | No. BS: $noBangunanSensus"
-                            )
-                        }
-                    }
-                    
-                    InputNomor(
-                        value = noSegmen,
-                        onValueChange = { noSegmen = it },
-                        label = { Text(text = "1. Nomor Segmen") },
-                        onIncrement = { noSegmen = increment(noSegmen) },
-                        onDecrement = { noSegmen = decrement(noSegmen) }
-                    )
-
-                    Spacer(modifier = Modifier.padding(10.dp))
-
-                    InputNomor(
-                        value = noBangunanFisik,
-                        onValueChange = { noBangunanFisik = it },
-                        label = { Text(text = "2. Nomor Urut Bangunan Fisik") },
-                        onIncrement = { noBangunanFisik = increment(noBangunanFisik) },
-                        onDecrement = { noBangunanFisik = decrement(noBangunanFisik) }
-                    )
-
-                    Spacer(modifier = Modifier.padding(10.dp))
-
-                    InputNomor(
-                        value = noBangunanSensus,
-                        onValueChange = { noBangunanSensus = it },
-                        label = { Text(text = "3. Nomor Urut Bangunan Sensus") },
-                        onIncrement = { noBangunanSensus = increment(noBangunanSensus) },
-                        onDecrement = { noBangunanSensus = decrement(noBangunanSensus) }
-                    )
-
-                    Spacer(modifier = Modifier.padding(10.dp))
-
-                    InputNomor(
-                        value = noUrutRuta,
-                        onValueChange = { noUrutRuta = it },
-                        label = { Text(text = "4. Nomor Urut Rumah Tangga") },
-                        onIncrement = { noUrutRuta = increment(noUrutRuta) },
-                        onDecrement = { noUrutRuta = decrement(noUrutRuta) }
-                    )
-
-                    Spacer(modifier = Modifier.padding(10.dp))
-
-                    TextField(
-                        value = namaKepalaRuta,
-                        onValueChange = { namaKepalaRuta = it },
-                        label = { Text(text = "5. Nama Kepala Rumah Tangga") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color.Transparent,
-                            focusedIndicatorColor = PklPrimary700,
-                            unfocusedIndicatorColor = PklAccent
-                        ),
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            imeAction = ImeAction.Next
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.padding(10.dp))
-
-                    TextField(
-                        value = alamat,
-                        onValueChange = { alamat = it },
-                        label = { Text(text = "6. Alamat") },
-                        singleLine = false,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color.Transparent,
-                            focusedIndicatorColor = PklPrimary700,
-                            unfocusedIndicatorColor = PklAccent
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.padding(10.dp))
-
-                    Column(
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                            .padding(15.dp)
                     ) {
                         Text(
-                            text = "7. Keberadaan Gen Z dan Orang Tua",
-                            style = TextStyle.Default.copy(
-                                fontSize = 16.sp
-                            )
+                            text = "Isian Listing Ruta Terakhir"
                         )
 
-                        RadioButtons(
-                            options = genZOptions,
-                            selectedOption = selectedGenZOption,
-                            onOptionSelected = { option -> selectedGenZOption = option }
+                        Spacer(modifier = Modifier.padding(10.dp))
+
+                        Text(
+                            text = "No. Segmen: $noSegmen | No. BF: $noBangunanFisik | No. BS: $noBangunanSensus"
                         )
                     }
+                }
+
+                InputNomor(
+                    value = noSegmen,
+                    onValueChange = { noSegmen = it },
+                    label = { Text(text = "1. Nomor Segmen") },
+                    onIncrement = { noSegmen = increment(noSegmen) },
+                    onDecrement = { noSegmen = decrement(noSegmen) }
+                )
+
+                Spacer(modifier = Modifier.padding(10.dp))
+
+                InputNomor(
+                    value = noBangunanFisik,
+                    onValueChange = { noBangunanFisik = it },
+                    label = { Text(text = "2. Nomor Urut Bangunan Fisik") },
+                    onIncrement = { noBangunanFisik = increment(noBangunanFisik) },
+                    onDecrement = { noBangunanFisik = decrement(noBangunanFisik) }
+                )
+
+                Spacer(modifier = Modifier.padding(10.dp))
+
+                InputNomor(
+                    value = noBangunanSensus,
+                    onValueChange = { noBangunanSensus = it },
+                    label = { Text(text = "3. Nomor Urut Bangunan Sensus") },
+                    onIncrement = { noBangunanSensus = increment(noBangunanSensus) },
+                    onDecrement = { noBangunanSensus = decrement(noBangunanSensus) }
+                )
+
+                Spacer(modifier = Modifier.padding(10.dp))
+
+                InputNomor(
+                    value = noUrutRuta,
+                    onValueChange = { noUrutRuta = it },
+                    label = { Text(text = "4. Nomor Urut Rumah Tangga") },
+                    onIncrement = { noUrutRuta = increment(noUrutRuta) },
+                    onDecrement = { noUrutRuta = decrement(noUrutRuta) }
+                )
+
+                Spacer(modifier = Modifier.padding(10.dp))
+
+                TextField(
+                    value = namaKepalaRuta,
+                    onValueChange = { namaKepalaRuta = it },
+                    label = { Text(text = "5. Nama Kepala Rumah Tangga") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.Transparent,
+                        focusedIndicatorColor = PklPrimary700,
+                        unfocusedIndicatorColor = PklAccent
+                    ),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Next
+                    )
+                )
+
+                Spacer(modifier = Modifier.padding(10.dp))
+
+                TextField(
+                    value = alamat,
+                    onValueChange = { alamat = it },
+                    label = { Text(text = "6. Alamat") },
+                    singleLine = false,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.Transparent,
+                        focusedIndicatorColor = PklPrimary700,
+                        unfocusedIndicatorColor = PklAccent
+                    )
+                )
+
+                Spacer(modifier = Modifier.padding(10.dp))
+
+                Column(
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = "7. Keberadaan Gen Z dan Orang Tua"
+                    )
+
+                    RadioButtons(
+                        options = genZOptions,
+                        selectedOption = selectedGenZOption,
+                        onOptionSelected = { option -> selectedGenZOption = option }
+                    )
                 }
             }
         }
@@ -347,6 +330,9 @@ fun increment(input: String): String {
 fun decrement(input: String): String {
     val numericPart = input.filter { it.isDigit() }
     val number = numericPart.toInt()
+    if (number < 1) {
+        return input
+    }
     val formattedNumber = String.format("%0${numericPart.length}d", number - 1)
     return input.replaceFirst(numericPart, formattedNumber)
 }
