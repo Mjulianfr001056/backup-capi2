@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
+import com.polstat.pkl.CapiFirstActivity
 import org.odk.collect.android.R
 import org.odk.collect.android.activities.ActivityUtils
 import org.odk.collect.android.activities.CrashHandlerActivity
@@ -46,8 +47,13 @@ class MainMenuActivity : LocalizedActivity() {
     private lateinit var currentProjectViewModel: CurrentProjectViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        //Membuat Splash Screen
         initSplashScreen()
 
+        /*
+        Kalau aplikasinya sempat crash, kita akan menampilkan CrashHandlerActivity
+        dan menghapus semua activity yang ada di stack.
+         */
         CrashHandler.getInstance(this)?.also {
             if (it.hasCrashed(this)) {
                 super.onCreate(null)
@@ -65,16 +71,15 @@ class MainMenuActivity : LocalizedActivity() {
 
         if (!currentProjectViewModel.hasCurrentProject()) {
             super.onCreate(null)
-            ActivityUtils.startActivityAndCloseAllOthers(this, CobaLoginJuga::class.java)
 
             // ini kodingan buat konek ke central
-            val settingsJson = appConfigurationGenerator.getAppConfigurationAsJsonWithServerDetails(
-                "https://0793-103-171-161-174.ngrok-free.app/v1/key/sJa3lXXUe4IskXpX68BGzUQtCMv10MRXBoZ1UEmnntiRSbJ2XjUU4bbmuCrvc7RZ/projects/2",
-                "",
-                ""
-            )
-            projectCreator.createNewProject(settingsJson)
-            ActivityUtils.startActivityAndCloseAllOthers(this, MainMenuActivity::class.java)
+//            val settingsJson = appConfigurationGenerator.getAppConfigurationAsJsonWithServerDetails(
+//                "https://0793-103-171-161-174.ngrok-free.app/v1/key/sJa3lXXUe4IskXpX68BGzUQtCMv10MRXBoZ1UEmnntiRSbJ2XjUU4bbmuCrvc7RZ/projects/2",
+//                "",
+//                ""
+//            )
+//            projectCreator.createNewProject(settingsJson)
+//            ActivityUtils.startActivityAndCloseAllOthers(this, MainMenuActivity::class.java)
 
             return
         } else {
@@ -94,11 +99,12 @@ class MainMenuActivity : LocalizedActivity() {
                 .build()
 
             super.onCreate(savedInstanceState)
-            setContent {
-                Surface (modifier = Modifier.fillMaxSize()){
-                    Text(text = "Coba Login Juga di Main Menu")
-                }
-            }
+            ActivityUtils.startActivityAndCloseAllOthers(this, CapiFirstActivity::class.java)
+//            setContent {
+//                Surface (modifier = Modifier.fillMaxSize()){
+//                    Text(text = "Coba Login Juga di Main Menu")
+//                }
+//            }
         }
     }
 
