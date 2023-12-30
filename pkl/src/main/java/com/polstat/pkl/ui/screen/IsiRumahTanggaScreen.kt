@@ -26,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -43,6 +44,12 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.polstat.pkl.navigation.Capi63Screen
+import com.polstat.pkl.ui.theme.Capi63Theme
+import com.polstat.pkl.ui.theme.PklPrimary900
 
 val PklPrimary700 = Color(0XFFC4314E)
 val PklPrimary300 = Color(0xFFD93F57)
@@ -69,7 +76,8 @@ fun IsiRumahTanggaScreen(
     initialNoSegmen: String = "S001",
     initialNoBangunanFisik: String = "001",
     initialNoBangunanSensus: String = "001",
-    initialNoUrutRuta: String = "001"
+    initialNoUrutRuta: String = "001",
+    navController: NavHostController
 ) {
     val genZOptions = listOf("Ya", "Tidak")
 
@@ -83,7 +91,7 @@ fun IsiRumahTanggaScreen(
 
     Scaffold(
         topBar = {
-            IsiRumahTanggaTopBar()
+            IsiRumahTanggaTopBar(navController = navController)
         },
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
@@ -299,17 +307,27 @@ fun InputNomor(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IsiRumahTanggaTopBar() {
+fun IsiRumahTanggaTopBar(navController: NavHostController) {
     TopAppBar(
         title = {
             Text(
                 text = "ISI RUMAH TANGGA",
-                color = PklBase
+                color = Color.White
             )
         },
-        colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = PklPrimary700),
+        colors = TopAppBarDefaults.mediumTopAppBarColors(
+            containerColor = PklPrimary900
+        ),
         navigationIcon = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(
+                onClick = {
+                    navController.navigate(Capi63Screen.ListRuta.route){
+                        popUpTo(Capi63Screen.ListRuta.route){
+                            inclusive = true
+                        }
+                    }
+                }
+            ) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = null,
@@ -337,8 +355,19 @@ fun decrement(input: String): String {
     return input.replaceFirst(numericPart, formattedNumber)
 }
 
-@Preview(showSystemUi = true, showBackground = true)
+@Preview
 @Composable
 fun IsiRumahTanggaPreview() {
-    IsiRumahTanggaScreen()
+    val navController = rememberNavController()
+
+    Capi63Theme {
+        Surface (
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            IsiRumahTanggaScreen(
+                navController = navController
+            )
+        }
+    }
 }

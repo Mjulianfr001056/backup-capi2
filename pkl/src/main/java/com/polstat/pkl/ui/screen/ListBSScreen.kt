@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -44,6 +45,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary
@@ -52,7 +57,7 @@ import com.polstat.pkl.ui.theme.PoppinsFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListBSScreen() {
+fun ListBSScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -70,7 +75,15 @@ fun ListBSScreen() {
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(
+                        onClick = {
+                            navController.navigate(Capi63Screen.Sampling.route){
+                                popUpTo(Capi63Screen.Sampling.route){
+                                    inclusive = true
+                                }
+                            }
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             tint = Color.White,
@@ -98,13 +111,19 @@ fun ListBSScreen() {
             )
         },
         content = { innerPadding ->
-            ListBS(Modifier.padding(innerPadding))
+            ListBS(
+                navController = navController,
+                modifier = Modifier.padding(innerPadding)
+            )
         },
     )
 }
 
 @Composable
-private fun BlokSensus() {
+private fun BlokSensus(
+    onLihatRutaClicked: () -> Unit,
+    onLihatSampleClicked: () -> Unit
+) {
     var expanded by remember { mutableStateOf(false) }
     var status by remember { mutableStateOf("Sampel Terkirim") }
 
@@ -153,7 +172,9 @@ private fun BlokSensus() {
                     }
                 }
             }
-            Row (horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 20.dp)) {
+            Row (horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 20.dp)) {
                 Column () {
                     if (status === "Proses Listing") {
                         Text(text = "Proses\nListing", softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 15.sp)
@@ -312,7 +333,9 @@ private fun BlokSensus() {
                             .padding(16.dp)
                     )
                     Row(){
-                        Button(onClick = {},
+                        Button(onClick = {
+                            onLihatRutaClicked()
+                        },
                             shape = MaterialTheme.shapes.small,
                             contentPadding = PaddingValues(10.dp),
                             modifier = Modifier.padding(horizontal = 2.dp),
@@ -320,7 +343,9 @@ private fun BlokSensus() {
                             Text("Lihat Ruta", fontFamily = PoppinsFontFamily, fontSize = 15.sp)
                         }
                         if (status === "Sampel Terkirim") {
-                            Button(onClick = {},
+                            Button(onClick = {
+                                onLihatSampleClicked()
+                            },
                                 shape = MaterialTheme.shapes.small,
                                 contentPadding = PaddingValues(10.dp),
                                 modifier = Modifier.padding(horizontal = 2.dp),
@@ -336,7 +361,10 @@ private fun BlokSensus() {
 }
 
 @Composable
-private fun ListBS(modifier: Modifier = Modifier) {
+private fun ListBS(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     val itemCount = 2
 
     LazyColumn (
@@ -346,7 +374,12 @@ private fun ListBS(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top){
         items(itemCount) {
-            BlokSensus()
+            BlokSensus(
+                onLihatRutaClicked = {
+                    navController.navigate("list_ruta")
+                },
+                onLihatSampleClicked = {}
+            )
         }
     }
 }
@@ -355,6 +388,12 @@ private fun ListBS(modifier: Modifier = Modifier) {
 @Composable
 fun PreviewListBSScreen() {
     Capi63Theme {
-        ListBSScreen()
+        Surface (
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            val navController = rememberNavController()
+            ListBSScreen(navController)
+        }
     }
 }

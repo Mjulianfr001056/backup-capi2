@@ -18,23 +18,26 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -43,19 +46,34 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklBase
-import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.ui.theme.PklPrimary900
+import com.polstat.pkl.ui.theme.PoppinsFontFamily
 
-@Preview(showBackground = true)
+@Preview
 @Composable
-fun BerandaScreenPreview(){
-    BerandaScreen()
+fun BerandaScreenPreview() {
+    Capi63Theme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            val navController = rememberNavController()
+            BerandaScreen(navController)
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BerandaScreen(){
+fun BerandaScreen(navController: NavHostController){
+    var showMenu by remember {
+        mutableStateOf(false)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -73,7 +91,9 @@ fun BerandaScreen(){
                 ),
                 actions = {
                     IconButton(
-                        onClick = { /* Handle navigation icon click */ }
+                        onClick = {
+                            showMenu = !showMenu
+                        }
                     ) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
@@ -81,81 +101,47 @@ fun BerandaScreen(){
                             tint = Color.White,
                             modifier = Modifier.size(25.dp)
                         )
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = {
+                                showMenu = false
+                            },
+                            modifier = Modifier.background(Color.White)
+                        ) {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = "Panduan Bagi PPL",
+                                        color = Color.Gray
+                                    )
+                                },
+                                onClick = { /*TODO*/ }
+                            )
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = "Pengaturan",
+                                        color = Color.Gray
+                                    )
+                                },
+                                onClick = { /*TODO*/ }
+                            )
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = "Keluar",
+                                        color = Color.Gray
+                                    )
+                                },
+                                onClick = { /*TODO*/ }
+                            )
+                        }
                     }
                 }
             )
         },
         bottomBar = {
-            BottomAppBar(
-                containerColor = PklPrimary900,
-                modifier = Modifier.height(64.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Column{
-                        IconButton(
-                            onClick = { /* Handle navigation icon click */ }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.List,
-                                contentDescription = "Sampling",
-                                tint = Color.White,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        Text(
-                            text = "Listing",
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 10.sp,
-                            color = Color.White,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
-                    }
-                    Column {
-                        IconButton(
-                            onClick = { /* Handle navigation icon click */ }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Home,
-                                contentDescription = "Beranda",
-                                tint = Color.White,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        Text(
-                            text = "Beranda",
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 10.sp,
-                            color = Color.White,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
-                    }
-                    Column {
-                        IconButton(
-                            onClick = { /* Handle navigation icon click */ }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.DateRange,
-                                contentDescription = "Kuesioner",
-                                tint = Color.White,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        Text(
-                            text = "Kuesioner",
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 10.sp,
-                            color = Color.White,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
-                    }
-                }
-            }
+            BottomBar(navController = navController)
         }
     ) {innerPadding ->
         Column(
@@ -168,7 +154,7 @@ fun BerandaScreen(){
             // First Card
             Card(
                 modifier = Modifier
-                    .padding(10.dp)
+                    .padding(16.dp)
                     .shadow(8.dp)
                     .fillMaxWidth(),
                 colors = CardDefaults.cardColors(

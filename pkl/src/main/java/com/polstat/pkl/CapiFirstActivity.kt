@@ -24,8 +24,11 @@ class CapiFirstActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    val loginViewModel: LoginViewModel = viewModel() // Create an instance of LoginViewModel
-                    AppNavHost(navController = navController, loginViewModel = loginViewModel)
+                    val loginViewModel: LoginViewModel = viewModel()
+                    AppNavHost(
+                        navController = navController,
+                        loginViewModel = loginViewModel
+                    )
                 }
             }
         }
