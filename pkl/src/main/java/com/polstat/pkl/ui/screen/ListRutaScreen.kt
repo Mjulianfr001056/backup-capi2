@@ -1,10 +1,11 @@
-package org.odk.collect.android.pkl.ui.screen
+package com.polstat.pkl.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,6 +24,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -43,17 +45,32 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import org.odk.collect.android.pkl.ui.theme.*
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.polstat.pkl.navigation.Capi63Screen
+import com.polstat.pkl.ui.theme.*
+import com.polstat.pkl.ui.theme.PklPrimary300
+import com.polstat.pkl.ui.theme.PklPrimary700
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun ListRutaPreview() {
-    ListRuta()
+    Capi63Theme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            val navController = rememberNavController()
+
+            ListRutaScreen(navController)
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListRuta() {
+fun ListRutaScreen(navController: NavHostController) {
     var showMenu by remember {
         mutableStateOf(false)
     }
@@ -68,11 +85,19 @@ fun ListRuta() {
                     )
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = Primary1,
+                    containerColor = PklPrimary700,
                     titleContentColor = Color.White,
                 ),
                 navigationIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(
+                        onClick = {
+                            navController.navigate(Capi63Screen.ListBs.route){
+                                popUpTo(Capi63Screen.ListBs.route){
+                                    inclusive = true
+                                }
+                            }
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Back Button",
@@ -117,7 +142,7 @@ fun ListRuta() {
                         .padding(innerPadding)
                         .fillMaxWidth()
                         .height(40.dp)
-                        .background(Primary2),
+                        .background(PklPrimary300),
                     Arrangement.SpaceAround,
                     Alignment.CenterVertically,
                 ) {
@@ -174,8 +199,10 @@ fun ListRuta() {
             FloatingActionButton(
                 modifier = Modifier
                     .padding(all = 16.dp),
-                onClick = { /*TODO*/ },
-                containerColor = Primary2
+                onClick = {
+                          navController.navigate("isi_ruta")
+                },
+                containerColor = PklPrimary300
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,

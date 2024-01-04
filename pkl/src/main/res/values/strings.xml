@@ -27,6 +27,7 @@
     <string name="jmlRTZ">Jumlah Rumah Tangga dengan ART Z:&#xa0;</string>
     <string name="genz_satuBS">Gen Z dalam Satu Blok Sensus</string>
     <string name="jml_genz">Jumlah Gen Z:&#xa0;</string>
+    <string name="jml_genz_blm_kwn">Jumlah Gen Z Belum Kawin:&#xa0;</string>
     <string name="genz_dewasa">Jumlah Gen Z Dewasa:&#xa0;</string>
     <string name="genz_anak">Jumlah Gen Z Anak:&#xa0;</string>
     <string name="total">Total</string>

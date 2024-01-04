@@ -94,13 +94,14 @@ fun LoginScreen(navController: NavHostController, loginViewModel: LoginViewModel
                         )
                         Spacer(modifier = Modifier.height(15.dp))
                         LoginButton(onClick = {
-                            loginViewModel.login(nimState.text, passwordState.text)
+//                            loginViewModel.login(nimState.text, passwordState.text)
+                            navController.navigate("beranda")
                         })
                         // Menangani state dari login
                         loginState?.let {
-                            if (it.nim != "") {
-                                navController.navigate("success")
-                            }
+//                            if (it.nim != "") {
+                                navController.navigate("beranda")
+//                            }
 
                         }
                     }

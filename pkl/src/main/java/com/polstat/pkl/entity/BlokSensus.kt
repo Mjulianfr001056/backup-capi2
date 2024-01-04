@@ -41,11 +41,11 @@ data class BlokSensus(
     }
 
     fun getBlokSensus(): String {
-        return "$KODE_PROVINSI" +
-            "$kodeKabupaten" +
-            "$kodeKecamatan" +
-            "$kodeDesa" +
-            "$noBS" +
-            "$JENIS_BS"
+        return KODE_PROVINSI +
+                kodeKabupaten +
+                kodeKecamatan +
+                kodeDesa +
+                noBS +
+                JENIS_BS
     }
 }
