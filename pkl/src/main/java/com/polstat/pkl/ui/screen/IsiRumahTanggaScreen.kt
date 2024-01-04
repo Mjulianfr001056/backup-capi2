@@ -4,11 +4,13 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,6 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +38,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -41,34 +46,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.theme.Capi63Theme
+import com.polstat.pkl.ui.theme.PklAccent
+import com.polstat.pkl.ui.theme.PklBase
+import com.polstat.pkl.ui.theme.PklPrimary
+import com.polstat.pkl.ui.theme.PklPrimary700
 import com.polstat.pkl.ui.theme.PklPrimary900
-
-val PklPrimary700 = Color(0XFFC4314E)
-val PklPrimary300 = Color(0xFFD93F57)
-val PklPrimary100 = Color(0xFFF7A180)
-
-val PklTertiary900 = Color(0xFFCA2128)
-val PklTertiary700 = Color(0xFFEC2B26)
-val PklTertiary300 = Color(0xFFFBAC1B)
-val PklTertiary100 = Color(0xFFFBe47E)
-
-val PklSecondary700 = Color(0xFF03396C)
-val PklSecondary300 = Color(0xFF005B96)
-val PklSecondary100 = Color(0xFF6497B1)
-val PklSecondary50 = Color(0xFFB3CDE0)
-
-val PklPrimary = Color(0xFF951A2E)
-val PklSecondary = Color(0xFF011f4B)
-val PklAccent = Color(0xFFF58020)
-val PklBase = Color(0xFFFFFAE6)
+import com.polstat.pkl.ui.theme.PklSecondary
+import com.polstat.pkl.ui.theme.PoppinsFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,6 +82,9 @@ fun IsiRumahTanggaScreen(
     var namaKepalaRuta by rememberSaveable { mutableStateOf("") }
     var alamat by rememberSaveable { mutableStateOf("") }
     var selectedGenZOption by rememberSaveable { mutableStateOf(genZOptions[0]) }
+    var jumlahGenZ by rememberSaveable { mutableStateOf("") }
+    var noUrutRutaEligible by rememberSaveable { mutableStateOf(initialNoUrutRuta) }
+    var catatan by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -121,13 +118,17 @@ fun IsiRumahTanggaScreen(
                             .padding(15.dp)
                     ) {
                         Text(
-                            text = "Isian Listing Ruta Terakhir"
+                            text = "Isian Listing Ruta Terakhir",
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium
                         )
 
                         Spacer(modifier = Modifier.padding(10.dp))
 
                         Text(
-                            text = "No. Segmen: $noSegmen | No. BF: $noBangunanFisik | No. BS: $noBangunanSensus"
+                            text = "No. Segmen: $noSegmen | No. BF: $noBangunanFisik | No. BS: $noBangunanSensus",
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Light
                         )
                     }
                 }
@@ -135,7 +136,12 @@ fun IsiRumahTanggaScreen(
                 InputNomor(
                     value = noSegmen,
                     onValueChange = { noSegmen = it },
-                    label = { Text(text = "1. Nomor Segmen") },
+                    label = {
+                        Text(
+                            text = "1. Nomor Segmen",
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.SemiBold
+                        ) },
                     onIncrement = { noSegmen = increment(noSegmen) },
                     onDecrement = { noSegmen = decrement(noSegmen) }
                 )
@@ -145,7 +151,12 @@ fun IsiRumahTanggaScreen(
                 InputNomor(
                     value = noBangunanFisik,
                     onValueChange = { noBangunanFisik = it },
-                    label = { Text(text = "2. Nomor Urut Bangunan Fisik") },
+                    label = {
+                        Text(
+                            text = "2. Nomor Urut Bangunan Fisik",
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.SemiBold
+                        ) },
                     onIncrement = { noBangunanFisik = increment(noBangunanFisik) },
                     onDecrement = { noBangunanFisik = decrement(noBangunanFisik) }
                 )
@@ -155,7 +166,12 @@ fun IsiRumahTanggaScreen(
                 InputNomor(
                     value = noBangunanSensus,
                     onValueChange = { noBangunanSensus = it },
-                    label = { Text(text = "3. Nomor Urut Bangunan Sensus") },
+                    label = {
+                        Text(
+                            text = "3. Nomor Urut Bangunan Sensus",
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.SemiBold
+                        ) },
                     onIncrement = { noBangunanSensus = increment(noBangunanSensus) },
                     onDecrement = { noBangunanSensus = decrement(noBangunanSensus) }
                 )
@@ -165,7 +181,12 @@ fun IsiRumahTanggaScreen(
                 InputNomor(
                     value = noUrutRuta,
                     onValueChange = { noUrutRuta = it },
-                    label = { Text(text = "4. Nomor Urut Rumah Tangga") },
+                    label = {
+                        Text(
+                            text = "4. Nomor Urut Rumah Tangga",
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.SemiBold
+                        ) },
                     onIncrement = { noUrutRuta = increment(noUrutRuta) },
                     onDecrement = { noUrutRuta = decrement(noUrutRuta) }
                 )
@@ -175,7 +196,16 @@ fun IsiRumahTanggaScreen(
                 TextField(
                     value = namaKepalaRuta,
                     onValueChange = { namaKepalaRuta = it },
-                    label = { Text(text = "5. Nama Kepala Rumah Tangga") },
+                    label = {
+                        Text(
+                            text = "5. Nama Kepala Rumah Tangga",
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.SemiBold
+                        ) },
+                    textStyle = TextStyle.Default.copy(
+                        fontFamily = PoppinsFontFamily,
+                        fontWeight = FontWeight.SemiBold
+                    ),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.textFieldColors(
@@ -193,13 +223,25 @@ fun IsiRumahTanggaScreen(
                 TextField(
                     value = alamat,
                     onValueChange = { alamat = it },
-                    label = { Text(text = "6. Alamat") },
+                    label = {
+                        Text(
+                            text = "6. Alamat",
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.SemiBold
+                        ) },
+                    textStyle = TextStyle.Default.copy(
+                        fontFamily = PoppinsFontFamily,
+                        fontWeight = FontWeight.SemiBold
+                    ),
                     singleLine = false,
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.textFieldColors(
                         containerColor = Color.Transparent,
                         focusedIndicatorColor = PklPrimary700,
                         unfocusedIndicatorColor = PklAccent
+                    ),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Next
                     )
                 )
 
@@ -209,13 +251,102 @@ fun IsiRumahTanggaScreen(
                     modifier = Modifier.padding(horizontal = 16.dp)
                 ) {
                     Text(
-                        text = "7. Keberadaan Gen Z dan Orang Tua"
+                        text = "7. Keberadaan Gen Z dan Orang Tua",
+                        fontFamily = PoppinsFontFamily,
+                        fontWeight = FontWeight.SemiBold
                     )
 
                     RadioButtons(
                         options = genZOptions,
                         selectedOption = selectedGenZOption,
                         onOptionSelected = { option -> selectedGenZOption = option }
+                    )
+                }
+
+                if (selectedGenZOption == "Ya") {
+                    Spacer(modifier = Modifier.padding(10.dp))
+
+                    TextField(
+                        value = jumlahGenZ,
+                        onValueChange = { jumlahGenZ = it },
+                        label = {
+                            Text(
+                                text = "8. Jumlah Gen Z yang belum kawin dalam rumah tangga",
+                                fontFamily = PoppinsFontFamily,
+                                fontWeight = FontWeight.SemiBold
+                            ) },
+                        textStyle = TextStyle.Default.copy(
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color.Transparent,
+                            focusedIndicatorColor = PklPrimary700,
+                            unfocusedIndicatorColor = PklAccent
+                        ),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Next
+                        )
+                    )
+                    
+                    Spacer(modifier = Modifier.padding(10.dp))
+
+                    InputNomor(
+                        value = noUrutRutaEligible,
+                        onValueChange = { noUrutRutaEligible = it },
+                        label = {
+                            Text(
+                                text = "9. Nomor urut rumah tangga eligible",
+                                fontFamily = PoppinsFontFamily,
+                                fontWeight = FontWeight.SemiBold
+                            ) },
+                        onIncrement = { noUrutRutaEligible = increment(noUrutRutaEligible) },
+                        onDecrement = { noUrutRutaEligible = decrement(noUrutRutaEligible) }
+                    )
+                }
+                
+                Spacer(modifier = Modifier.padding(10.dp))
+
+                TextField(
+                    value = catatan,
+                    onValueChange = { catatan = it },
+                    label = {
+                        Text(
+                            text = "10. Catatan",
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.SemiBold
+                        ) },
+                    textStyle = TextStyle.Default.copy(
+                        fontFamily = PoppinsFontFamily,
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    singleLine = false,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.Transparent,
+                        focusedIndicatorColor = PklPrimary700,
+                        unfocusedIndicatorColor = PklAccent
+                    ),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done
+                    )
+                )
+                
+                Spacer(modifier = Modifier.padding(10.dp))
+
+                Button(
+                    onClick = { /*TODO*/ },
+                    shape = MaterialTheme.shapes.small,
+                    contentPadding = PaddingValues(10.dp),
+                    modifier = Modifier.padding(horizontal = 2.dp).fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)
+                ) {
+                    Text(
+                        text = "Kirim",
+                        fontFamily = PoppinsFontFamily,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
@@ -249,7 +380,9 @@ fun RadioButtons(
                 Text(
                     text = option,
                     style = MaterialTheme.typography.bodySmall.merge(),
-                    modifier = Modifier.padding(start = 16.dp)
+                    modifier = Modifier.padding(start = 16.dp),
+                    fontFamily = PoppinsFontFamily,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         }
@@ -276,6 +409,10 @@ fun InputNomor(
             containerColor = Color.Transparent,
             focusedIndicatorColor = PklPrimary700,
             unfocusedIndicatorColor = PklAccent
+        ),
+        textStyle = TextStyle.Default.copy(
+            fontFamily = PoppinsFontFamily,
+            fontWeight = FontWeight.SemiBold
         ),
         trailingIcon = {
             Row {
@@ -312,11 +449,14 @@ fun IsiRumahTanggaTopBar(navController: NavHostController) {
         title = {
             Text(
                 text = "ISI RUMAH TANGGA",
-                color = Color.White
+                fontFamily = PoppinsFontFamily,
+                fontWeight = FontWeight.Medium,
+                fontSize = 20.sp
             )
         },
-        colors = TopAppBarDefaults.mediumTopAppBarColors(
-            containerColor = PklPrimary900
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = PklPrimary900,
+            titleContentColor = Color.White,
         ),
         navigationIcon = {
             IconButton(
@@ -330,8 +470,9 @@ fun IsiRumahTanggaTopBar(navController: NavHostController) {
             ) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = null,
-                    tint = PklBase
+                    contentDescription = "kembali",
+                    tint = Color.White,
+                    modifier = Modifier.size(25.dp)
                 )
             }
         }
