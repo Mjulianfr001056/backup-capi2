@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -46,20 +47,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.polstat.pkl.R
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary
 import com.polstat.pkl.ui.theme.PklPrimary700
+import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListBSScreen() {
+fun ListBSScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = PklPrimary700
+                    containerColor = PklPrimary900
                 ),
                 modifier = Modifier.shadow(10.dp),
                 title = {
@@ -72,7 +78,15 @@ fun ListBSScreen() {
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(
+                        onClick = {
+                            navController.navigate(Capi63Screen.Sampling.route){
+                                popUpTo(Capi63Screen.Sampling.route){
+                                    inclusive = true
+                                }
+                            }
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             tint = Color.White,
@@ -100,13 +114,19 @@ fun ListBSScreen() {
             )
         },
         content = { innerPadding ->
-            ListBS(Modifier.padding(innerPadding))
+            ListBS(
+                navController = navController,
+                modifier = Modifier.padding(innerPadding)
+            )
         },
     )
 }
 
 @Composable
-private fun BlokSensus() {
+private fun BlokSensus(
+    onLihatRutaClicked: () -> Unit,
+    onLihatSampleClicked: () -> Unit
+) {
     var expanded by remember { mutableStateOf(false) }
     var status by remember { mutableStateOf("Sampel Terkirim") }
 
@@ -160,31 +180,31 @@ private fun BlokSensus() {
                 .padding(horizontal = 20.dp, vertical = 20.dp)) {
                 Column {
                     if (status === "Proses Listing") {
-                        Text(text = stringResource(R.string.proses_n_listing), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 15.sp)
+                        Text(text = stringResource(R.string.proses_n_listing), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 14.sp)
                     } else {
-                        Text(text = stringResource(R.string.proses_n_listing), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp)
+                        Text(text = stringResource(R.string.proses_n_listing), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                     }
 
                 }
                 Column {
                     if (status === "Listing Selesai") {
-                        Text(text = stringResource(R.string.listing_n_selesai), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 15.sp)
+                        Text(text = stringResource(R.string.listing_n_selesai), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 14.sp)
                     } else {
-                        Text(text = stringResource(R.string.listing_n_selesai), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp)
+                        Text(text = stringResource(R.string.listing_n_selesai), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
                 Column {
                     if (status === "Telah Disampel") {
-                        Text(text = stringResource(R.string.telah_n_disampel), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 15.sp)
+                        Text(text = stringResource(R.string.telah_n_disampel), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 14.sp)
                     } else {
-                        Text(text = stringResource(R.string.telah_n_disampel), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp)
+                        Text(text = stringResource(R.string.telah_n_disampel), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
                 Column {
                     if (status === "Sampel Terkirim") {
-                        Text(text = stringResource(R.string.sampel_n_terkirim), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 15.sp)
+                        Text(text = stringResource(R.string.sampel_n_terkirim), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 14.sp)
                     } else {
-                        Text(text = stringResource(R.string.sampel_n_terkirim), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp)
+                        Text(text = stringResource(R.string.sampel_n_terkirim), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -201,7 +221,8 @@ private fun BlokSensus() {
                             Text(
                                 text = stringResource(R.string.rekapitulasi),
                                 style = MaterialTheme.typography.titleMedium,
-                                color = Color.Gray
+                                color = Color.Gray,
+                                fontWeight = FontWeight.Bold
                             )
                         }
                         Row {
@@ -209,7 +230,8 @@ private fun BlokSensus() {
                                 text = stringResource(R.string.jmlRT),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
-                                color = Color.Gray
+                                color = Color.Gray,
+                                fontWeight = FontWeight.SemiBold
                             )
                             Text(
                                 text = "3",
@@ -223,7 +245,8 @@ private fun BlokSensus() {
                                 text = stringResource(R.string.jmlRTZ),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
-                                color = Color.Gray
+                                color = Color.Gray,
+                                fontWeight = FontWeight.SemiBold
                             )
                             Text(
                                 text = "3",
@@ -242,41 +265,14 @@ private fun BlokSensus() {
                         }
                         Row {
                             Text(
-                                text = stringResource(R.string.jml_genz),
+                                text = stringResource(R.string.jml_genz_blm_kwn),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
-                                color = Color.Gray
+                                color = Color.Gray,
+                                fontWeight = FontWeight.SemiBold
                             )
                             Text(
                                 text = "3",
-                                fontFamily = PoppinsFontFamily,
-                                fontSize = 10.sp,
-                                color = PklPrimary
-                            )
-                        }
-                        Row {
-                            Text(
-                                text = stringResource(R.string.genz_dewasa),
-                                fontFamily = PoppinsFontFamily,
-                                fontSize = 10.sp,
-                                color = Color.Gray
-                            )
-                            Text(
-                                text = "1",
-                                fontFamily = PoppinsFontFamily,
-                                fontSize = 10.sp,
-                                color = PklPrimary
-                            )
-                        }
-                        Row (modifier = Modifier.padding(bottom = 10.dp)) {
-                            Text(
-                                text = stringResource(R.string.genz_anak),
-                                fontFamily = PoppinsFontFamily,
-                                fontSize = 10.sp,
-                                color = Color.Gray
-                            )
-                            Text(
-                                text = "2",
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
                                 color = PklPrimary
@@ -302,7 +298,7 @@ private fun BlokSensus() {
                     }
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Icon(
@@ -316,7 +312,9 @@ private fun BlokSensus() {
                             .padding(16.dp)
                     )
                     Row {
-                        Button(onClick = {},
+                        Button(onClick = {
+                            onLihatRutaClicked()
+                        },
                             shape = MaterialTheme.shapes.small,
                             contentPadding = PaddingValues(10.dp),
                             modifier = Modifier.padding(horizontal = 2.dp),
@@ -324,7 +322,9 @@ private fun BlokSensus() {
                             Text(stringResource(R.string.lihat_ruta), fontFamily = PoppinsFontFamily, fontSize = 15.sp)
                         }
                         if (status === "Sampel Terkirim") {
-                            Button(onClick = {},
+                            Button(onClick = {
+                                onLihatSampleClicked()
+                            },
                                 shape = MaterialTheme.shapes.small,
                                 contentPadding = PaddingValues(10.dp),
                                 modifier = Modifier.padding(horizontal = 2.dp),
@@ -340,7 +340,10 @@ private fun BlokSensus() {
 }
 
 @Composable
-private fun ListBS(modifier: Modifier = Modifier) {
+private fun ListBS(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     val itemCount = 2
 
     LazyColumn (
@@ -350,7 +353,12 @@ private fun ListBS(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top){
         items(itemCount) {
-            BlokSensus()
+            BlokSensus(
+                onLihatRutaClicked = {
+                    navController.navigate("list_ruta")
+                },
+                onLihatSampleClicked = {}
+            )
         }
     }
 }
@@ -359,6 +367,12 @@ private fun ListBS(modifier: Modifier = Modifier) {
 @Composable
 fun PreviewListBSScreen() {
     Capi63Theme {
-        ListBSScreen()
+        Surface (
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            val navController = rememberNavController()
+            ListBSScreen(navController)
+        }
     }
 }
