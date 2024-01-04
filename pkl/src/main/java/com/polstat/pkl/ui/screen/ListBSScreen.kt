@@ -158,7 +158,7 @@ private fun BlokSensus() {
             Row (horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 20.dp)) {
-                Column () {
+                Column {
                     if (status === "Proses Listing") {
                         Text(text = stringResource(R.string.proses_n_listing), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 15.sp)
                     } else {
@@ -166,21 +166,21 @@ private fun BlokSensus() {
                     }
 
                 }
-                Column () {
+                Column {
                     if (status === "Listing Selesai") {
                         Text(text = stringResource(R.string.listing_n_selesai), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 15.sp)
                     } else {
                         Text(text = stringResource(R.string.listing_n_selesai), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp)
                     }
                 }
-                Column () {
+                Column {
                     if (status === "Telah Disampel") {
                         Text(text = stringResource(R.string.telah_n_disampel), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 15.sp)
                     } else {
                         Text(text = stringResource(R.string.telah_n_disampel), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp)
                     }
                 }
-                Column () {
+                Column {
                     if (status === "Sampel Terkirim") {
                         Text(text = stringResource(R.string.sampel_n_terkirim), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 15.sp)
                     } else {
@@ -315,7 +315,7 @@ private fun BlokSensus() {
                             }
                             .padding(16.dp)
                     )
-                    Row(){
+                    Row {
                         Button(onClick = {},
                             shape = MaterialTheme.shapes.small,
                             contentPadding = PaddingValues(10.dp),
