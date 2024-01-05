@@ -2,21 +2,14 @@ package org.odk.collect.android.mainmenu
 
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
 import com.polstat.pkl.CapiFirstActivity
 import org.odk.collect.android.R
 import org.odk.collect.android.activities.ActivityUtils
 import org.odk.collect.android.activities.CrashHandlerActivity
-import org.odk.collect.android.activities.FirstLaunchActivity
 import org.odk.collect.android.configure.qr.AppConfigurationGenerator
 import org.odk.collect.android.injection.DaggerUtils
-import org.odk.collect.android.pkl.CobaLoginJuga
 import org.odk.collect.android.projects.ProjectCreator
 import org.odk.collect.android.projects.ProjectSettingsDialog
 import org.odk.collect.android.utilities.ThemeUtils
