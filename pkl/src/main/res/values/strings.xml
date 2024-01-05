@@ -8,6 +8,13 @@
     <string name="login">LOGIN</string>
     <string name="show_password">Show password</string>
     <string name="hide_password">Hide password</string>
+
+    <string name="list_ruta_title">list ruta</string>
+    <string name="no_list_ruta">No</string>
+    <string name="no_bf_list_ruta">No BF</string>
+    <string name="no_bs_list_ruta">No BS</string>
+    <string name="no_ruta_list_ruta">No Ruta</string>
+    <string name="nama_krt_list_ruta">Nama KRT</string>
     <string name="title_list_bs">List Blok Sensus</string>
     <string name="back_icon">Back Icon</string>
     <string name="sync_icon">Sync Icon</string>
