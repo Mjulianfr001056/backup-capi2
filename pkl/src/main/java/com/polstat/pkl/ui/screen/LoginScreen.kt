@@ -102,7 +102,6 @@ fun LoginScreen(navController: NavHostController, loginViewModel: LoginViewModel
 //                            if (it.nim != "") {
                                 navController.navigate("beranda")
 //                            }
-
                         }
                     }
                 }

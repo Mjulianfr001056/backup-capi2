@@ -69,6 +69,8 @@ class MainMenuActivity : LocalizedActivity() {
 
         ThemeUtils(this).setDarkModeForCurrentProject()
 
+        ActivityUtils.startActivityAndCloseAllOthers(this, CapiFirstActivity::class.java)
+
         if (!currentProjectViewModel.hasCurrentProject()) {
             super.onCreate(null)
 
@@ -99,7 +101,7 @@ class MainMenuActivity : LocalizedActivity() {
                 .build()
 
             super.onCreate(savedInstanceState)
-            ActivityUtils.startActivityAndCloseAllOthers(this, CapiFirstActivity::class.java)
+
 //            setContent {
 //                Surface (modifier = Modifier.fillMaxSize()){
 //                    Text(text = "Coba Login Juga di Main Menu")

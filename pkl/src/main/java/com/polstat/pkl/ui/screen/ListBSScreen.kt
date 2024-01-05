@@ -355,9 +355,11 @@ private fun ListBS(
         items(itemCount) {
             BlokSensus(
                 onLihatRutaClicked = {
-                    navController.navigate("list_ruta")
+                    navController.navigate(Capi63Screen.ListRuta.route)
                 },
-                onLihatSampleClicked = {}
+                onLihatSampleClicked = {
+                    navController.navigate(Capi63Screen.ListSample.route)
+                }
             )
         }
     }

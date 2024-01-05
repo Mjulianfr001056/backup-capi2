@@ -102,7 +102,7 @@ fun HorizontalMenu(navController: NavHostController, isPml: Boolean) {
                     image = painterResource(R.drawable.password),
                     name = "Password Master",
                     onCardClicked = {
-                        navController.navigate("beranda")
+                        navController.navigate("password")
                     }
                 )
             } else {
