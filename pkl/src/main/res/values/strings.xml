@@ -1,0 +1,44 @@
+<resources>
+    <string name="title_activity_capi_first">CapiFirstActivity</string>
+    <string name="capi">CAPI</string>
+    <string name="pkl_63">PKL D-IV 63</string>
+    <string name="nim">NIM</string>
+    <string name="wajib">*Wajib</string>
+    <string name="password">Password</string>
+    <string name="login">LOGIN</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+
+    <string name="list_ruta_title">list ruta</string>
+    <string name="no_list_ruta">No</string>
+    <string name="no_bf_list_ruta">No BF</string>
+    <string name="no_bs_list_ruta">No BS</string>
+    <string name="no_ruta_list_ruta">No Ruta</string>
+    <string name="nama_krt_list_ruta">Nama KRT</string>
+    <string name="title_list_bs">List Blok Sensus</string>
+    <string name="back_icon">Back Icon</string>
+    <string name="sync_icon">Sync Icon</string>
+    <string name="blok_sensus">Blok Sensus&#xa0;</string>
+    <string name="kec">Kec.&#xa0;</string>
+    <string name="kel">, Kel.&#xa0;</string>
+    <string name="proses_listing">Proses Listing</string>
+    <string name="listing_selesai">Listing Selesai</string>
+    <string name="telah_disampel">Telah Disampel</string>
+    <string name="sampel_terkirim">Sampel Terkirim</string>
+    <string name="proses_n_listing">Proses\nListing</string>
+    <string name="listing_n_selesai">Listing\nSelesai</string>
+    <string name="telah_n_disampel">Telah\nDisampel</string>
+    <string name="sampel_n_terkirim">Sampel\nTerkirim</string>
+    <string name="rekapitulasi">Rekapitulasi</string>
+    <string name="jmlRT">Jumlah Rumah Tangga:&#xa0;</string>
+    <string name="jmlRTZ">Jumlah Rumah Tangga dengan ART Z:&#xa0;</string>
+    <string name="genz_satuBS">Gen Z dalam Satu Blok Sensus</string>
+    <string name="jml_genz">Jumlah Gen Z:&#xa0;</string>
+    <string name="jml_genz_blm_kwn">Jumlah Gen Z Belum Kawin:&#xa0;</string>
+    <string name="genz_dewasa">Jumlah Gen Z Dewasa:&#xa0;</string>
+    <string name="genz_anak">Jumlah Gen Z Anak:&#xa0;</string>
+    <string name="total">Total</string>
+    <string name="toggle">Toggle</string>
+    <string name="lihat_ruta">Lihat Ruta</string>
+    <string name="lihat_sampel">Lihat Sampel</string>
+</resources>
