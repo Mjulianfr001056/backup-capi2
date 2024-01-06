@@ -1,5 +1,6 @@
 package com.polstat.pkl.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -46,12 +47,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
+import com.polstat.pkl.viewmodel.AuthViewModel
 
 @Preview
 @Composable
@@ -62,17 +65,29 @@ fun BerandaScreenPreview() {
             color = MaterialTheme.colorScheme.background
         ) {
             val navController = rememberNavController()
-            BerandaScreen(navController)
+            BerandaScreen(
+                navController = navController,
+                viewModel = hiltViewModel()
+            )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BerandaScreen(navController: NavHostController){
+fun BerandaScreen(
+    navController: NavHostController,
+    viewModel: AuthViewModel
+) {
     var showMenu by remember {
         mutableStateOf(false)
     }
+
+    val user = viewModel.getUserFromSession()
+
+    val dataTim = viewModel.getDataTimFromSession()
+
+    val wilayah = viewModel.getWilayahFromSession()
 
     Scaffold(
         topBar = {
@@ -178,7 +193,7 @@ fun BerandaScreen(navController: NavHostController){
                             .align(Alignment.CenterHorizontally)
                     )
                     Text(
-                        text = "Nama Mahasiswa",
+                        text = "${user?.nama}",
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         fontFamily = PoppinsFontFamily,
                         fontWeight = FontWeight.Medium
@@ -187,7 +202,7 @@ fun BerandaScreen(navController: NavHostController){
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     ) {
                         Text(
-                            text = "NIM Mahasiswa",
+                            text = "${user?.nim}",
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.Medium
                         )
@@ -197,7 +212,7 @@ fun BerandaScreen(navController: NavHostController){
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            text = "PPL/PCL",
+                            text = if (user?.isKoor!!) "PCL" else "PPL",
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.Medium
                         )
@@ -206,7 +221,7 @@ fun BerandaScreen(navController: NavHostController){
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     ) {
                         Text(
-                            text = "Tim Dummy Modul 1",
+                            text = "${dataTim.namaTim}",
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.Medium
                         )
@@ -216,10 +231,11 @@ fun BerandaScreen(navController: NavHostController){
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            text = "Nomor Tim",
+                            text = "${dataTim.idTim}",
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.Medium
                         )
+                        Log.d("Beranda", dataTim.anggota.size.toString())
                     }
                 }
             }

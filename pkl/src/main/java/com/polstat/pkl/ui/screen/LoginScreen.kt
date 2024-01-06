@@ -17,8 +17,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -40,6 +40,7 @@ import com.polstat.pkl.ui.state.NimStateSaver
 import com.polstat.pkl.ui.state.PasswordState
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.viewmodel.AuthViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
 
@@ -55,11 +56,13 @@ fun LoginScreen(
     val passwordState = remember { PasswordState() }
     val context = LocalContext.current
     var isLoginProcess by remember { mutableStateOf(false) }
+    val showLoading by viewModel.showLoadingChannel.collectAsState(false)
 
     LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
         viewModel.showErrorToastChannel.collectLatest { show ->
             if (show) {
                 isLoginProcess = false
+                delay(1500)
                 Toast.makeText(context, "Login Failed", Toast.LENGTH_SHORT).show()
             }
         }
@@ -67,15 +70,20 @@ fun LoginScreen(
 
     LaunchedEffect(viewModel.authResponse) {
         viewModel.authResponse.collectLatest { response ->
-            if (response.nim.isNotBlank()) {
+            if (response.status == "success") {
                 isLoginProcess = false
+                delay(1000)
                 Toast.makeText(context, "Login Success", Toast.LENGTH_SHORT).show()
                 navController.navigate(Capi63Screen.Beranda.route)
             }
         }
     }
 
-    Column (
+    LoadingDialog(
+        showDialog = showLoading
+    )
+
+    Column(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(80.dp))
@@ -109,7 +117,7 @@ fun LoginScreen(
                             shape = RoundedCornerShape(20.dp)
                         )
                 ) {
-                    Column (
+                    Column(
                         modifier = Modifier.padding(15.dp)
                     ) {
                         Nim(nimState, onImeAction = { focusRequester.requestFocus() })
@@ -120,22 +128,15 @@ fun LoginScreen(
                             onImeAction = {}
                         )
                         Spacer(modifier = Modifier.height(15.dp))
-                        LoginButton(onClick = {
-//                            loginViewModel.login(nimState.text, passwordState.text)
-//                            navController.navigate("beranda")
-                            isLoginProcess = true
-                            viewModel.login(
-                                nim = nimState.text,
-                                password = passwordState.text
-                            )
-
-                        })
-                        // Menangani state dari login
-//                        loginState?.let {
-////                            if (it.nim != "") {
-//                                navController.navigate("beranda")
-////                            }
-//                        }
+                        LoginButton(
+                            onClick = {
+                                isLoginProcess = true
+                                viewModel.login(
+                                    nim = nimState.text,
+                                    password = passwordState.text
+                                )
+                            }
+                        )
                     }
                 }
             }

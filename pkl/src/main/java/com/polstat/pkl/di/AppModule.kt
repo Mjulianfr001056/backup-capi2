@@ -2,8 +2,8 @@ package com.polstat.pkl.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.polstat.pkl.auth.repository.SessionRepository
-import com.polstat.pkl.auth.repository.SessionRepositoryImpl
+import com.polstat.pkl.repository.SessionRepository
+import com.polstat.pkl.repository.SessionRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

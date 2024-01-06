@@ -1,4 +1,4 @@
-package com.polstat.pkl.main.domain
+package com.polstat.pkl.model.domain
 
 data class DataTim(
     val anggota: List<Mahasiswa>,

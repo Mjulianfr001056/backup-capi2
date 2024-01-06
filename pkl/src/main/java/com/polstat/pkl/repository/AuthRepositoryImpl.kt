@@ -1,7 +1,9 @@
-package com.polstat.pkl.auth.repository
+package com.polstat.pkl.repository
 
-import com.polstat.pkl.auth.network.AuthApi
-import com.polstat.pkl.auth.response.AuthResponse
+import com.polstat.pkl.network.AuthApi
+import com.polstat.pkl.model.response.AuthResponse
+import com.polstat.pkl.model.domain.Session
+import com.polstat.pkl.model.domain.User
 import com.polstat.pkl.utils.Result
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -20,17 +22,21 @@ class AuthRepositoryImpl @Inject constructor(
         sessionRepository.saveSession(session)
     }
 
-    override suspend fun login(nim: String, password: String) : Flow<Result<AuthResponse>> {
+    override suspend fun login(nim: String, password: String): Flow<Result<AuthResponse>> {
         return flow {
             emit(Result.Loading(true))
             val authResponse = try {
                 val response = authApi.login(nim, password)
                 val session = Session(
-                    nama = response.nama,
-                    nim = response.nim,
-                    avatar = response.avatar,
-                    isKoor = response.isKoor,
-                    id_kuesioner = response.id_kuesioner
+                    user = User(
+                        nama = response.nama,
+                        nim = response.nim,
+                        avatar = response.avatar,
+                        isKoor = response.isKoor,
+                        id_kuesioner = response.id_kuesioner
+                    ),
+                    dataTim = response.dataTim,
+                    wilayah = response.wilayah
                 )
                 saveSession(session)
                 response
@@ -52,4 +58,5 @@ class AuthRepositoryImpl @Inject constructor(
             emit(Result.Loading(false))
         }
     }
+
 }

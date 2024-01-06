@@ -1,15 +1,12 @@
 package com.polstat.pkl.di
 
-import android.content.SharedPreferences
-import com.polstat.pkl.auth.network.AuthApi
-import com.polstat.pkl.auth.repository.AuthRepository
-import com.polstat.pkl.auth.repository.AuthRepositoryImpl
-import com.polstat.pkl.auth.repository.SessionRepository
-import com.polstat.pkl.auth.repository.SessionRepositoryImpl
+import com.polstat.pkl.network.AuthApi
+import com.polstat.pkl.repository.AuthRepository
+import com.polstat.pkl.repository.AuthRepositoryImpl
+import com.polstat.pkl.repository.SessionRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

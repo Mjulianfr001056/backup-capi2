@@ -1,6 +1,6 @@
-package com.polstat.pkl.auth.network
+package com.polstat.pkl.network
 
-import com.polstat.pkl.auth.response.AuthResponse
+import com.polstat.pkl.model.response.AuthResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 

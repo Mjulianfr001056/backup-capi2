@@ -1,7 +1,7 @@
-package com.polstat.pkl.auth.response
+package com.polstat.pkl.model.response
 
-import com.polstat.pkl.main.domain.DataTim
-import com.polstat.pkl.main.domain.Wilayah
+import com.polstat.pkl.model.domain.DataTim
+import com.polstat.pkl.model.domain.Wilayah
 
 data class AuthResponse(
     val avatar: String,

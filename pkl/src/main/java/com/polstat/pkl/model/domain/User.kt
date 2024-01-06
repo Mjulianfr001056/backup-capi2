@@ -1,6 +1,6 @@
-package com.polstat.pkl.auth.repository
+package com.polstat.pkl.model.domain
 
-data class Session(
+data class User (
     val nama: String,
     val nim: String,
     val avatar: String,

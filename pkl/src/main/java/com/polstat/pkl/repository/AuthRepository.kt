@@ -1,6 +1,6 @@
-package com.polstat.pkl.auth.repository
+package com.polstat.pkl.repository
 
-import com.polstat.pkl.auth.response.AuthResponse
+import com.polstat.pkl.model.response.AuthResponse
 import com.polstat.pkl.utils.Result
 import kotlinx.coroutines.flow.Flow
 

@@ -1,7 +1,8 @@
-package com.polstat.pkl.auth.repository
+package com.polstat.pkl.repository
 
 import android.content.SharedPreferences
 import com.google.gson.Gson
+import com.polstat.pkl.model.domain.Session
 import javax.inject.Inject
 
 class SessionRepositoryImpl @Inject constructor(

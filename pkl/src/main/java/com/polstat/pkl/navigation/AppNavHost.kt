@@ -36,7 +36,8 @@ fun AppNavHost(
         }
         composable(Capi63Screen.Beranda.route) {
             BerandaScreen(
-                navController = navController
+                navController = navController,
+                viewModel = authViewModel
             )
         }
         composable(Capi63Screen.Sampling.route) {
