@@ -1,6 +1,7 @@
 package com.polstat.pkl.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -13,15 +14,15 @@ import com.polstat.pkl.ui.screen.ListSampleScreen
 import com.polstat.pkl.ui.screen.LoginScreen
 import com.polstat.pkl.ui.screen.PasswordMasterScreen
 import com.polstat.pkl.ui.screen.SamplingScreen
-import com.polstat.pkl.ui.viewmodel.LoginViewModel
-import com.polstat.pkl.ui.viewmodel.PasswordMasterViewModel
+import com.polstat.pkl.viewmodel.AuthViewModel
+import com.polstat.pkl.viewmodel.PasswordMasterViewModel
 
 @Composable
 fun AppNavHost(
-    navController: NavHostController,
-    loginViewModel: LoginViewModel
+    navController: NavHostController
 ) {
     val passwordMasterViewModel: PasswordMasterViewModel = viewModel()
+    val authViewModel: AuthViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
@@ -30,7 +31,7 @@ fun AppNavHost(
         composable(Capi63Screen.Login.route) {
             LoginScreen(
                 navController = navController,
-                loginViewModel = loginViewModel
+                viewModel = authViewModel
             )
         }
         composable(Capi63Screen.Beranda.route) {

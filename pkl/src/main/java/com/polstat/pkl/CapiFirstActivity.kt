@@ -11,7 +11,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.navigation.AppNavHost
 import com.polstat.pkl.ui.theme.Capi63Theme
-import com.polstat.pkl.ui.viewmodel.LoginViewModel
 
 class CapiFirstActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,10 +23,9 @@ class CapiFirstActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    val loginViewModel: LoginViewModel = viewModel()
+
                     AppNavHost(
                         navController = navController,
-                        loginViewModel = loginViewModel
                     )
                 }
             }
