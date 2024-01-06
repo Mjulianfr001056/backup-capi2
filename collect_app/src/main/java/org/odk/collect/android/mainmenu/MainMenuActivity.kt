@@ -21,7 +21,7 @@ import org.odk.collect.settings.SettingsProvider
 import org.odk.collect.strings.localization.LocalizedActivity
 import javax.inject.Inject
 
-@AndroidEntryPoint
+//@AndroidEntryPoint
 class MainMenuActivity : LocalizedActivity() {
 
     @Inject

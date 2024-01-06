@@ -161,6 +161,7 @@ import okhttp3.OkHttpClient;
  * Add dependency providers here (annotated with @Provides)
  * for objects you need to inject
  */
+
 @Module
 @DisableInstallInCheck
 @SuppressWarnings("PMD.CouplingBetweenObjects")
