@@ -36,7 +36,10 @@ class AuthViewModel @Inject constructor(
             anggota = listOf(),
             idTim = "",
             namaTim = "",
-            passPML = ""
+            passPML = "",
+            namaPML = "",
+            nimPML = "",
+            teleponPML = ""
         ),
         id_kuesioner = "",
         isKoor = false,

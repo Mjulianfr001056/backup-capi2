@@ -35,6 +35,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.polstat.pkl.R
 import com.polstat.pkl.navigation.Capi63Screen
+import com.polstat.pkl.ui.screen.components.LoadingDialog
+import com.polstat.pkl.ui.screen.components.LoginButton
+import com.polstat.pkl.ui.screen.components.LogoTitle
+import com.polstat.pkl.ui.screen.components.Nim
+import com.polstat.pkl.ui.screen.components.Password
 import com.polstat.pkl.ui.state.NimState
 import com.polstat.pkl.ui.state.NimStateSaver
 import com.polstat.pkl.ui.state.PasswordState
