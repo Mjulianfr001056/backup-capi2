@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
 import com.polstat.pkl.CapiFirstActivity
-import dagger.hilt.android.AndroidEntryPoint
 import org.odk.collect.android.R
 import org.odk.collect.android.activities.ActivityUtils
 import org.odk.collect.android.activities.CrashHandlerActivity
@@ -21,7 +20,6 @@ import org.odk.collect.settings.SettingsProvider
 import org.odk.collect.strings.localization.LocalizedActivity
 import javax.inject.Inject
 
-//@AndroidEntryPoint
 class MainMenuActivity : LocalizedActivity() {
 
     @Inject
