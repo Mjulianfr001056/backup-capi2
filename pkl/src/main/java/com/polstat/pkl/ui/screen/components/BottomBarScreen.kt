@@ -1,4 +1,4 @@
-package com.polstat.pkl.ui.screen
+package com.polstat.pkl.ui.screen.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter

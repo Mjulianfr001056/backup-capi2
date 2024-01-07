@@ -1,5 +1,6 @@
 package com.polstat.pkl.ui.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,11 +16,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -31,24 +34,61 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.polstat.pkl.R
+import com.polstat.pkl.navigation.Capi63Screen
+import com.polstat.pkl.ui.screen.components.LoadingDialog
+import com.polstat.pkl.ui.screen.components.LoginButton
+import com.polstat.pkl.ui.screen.components.LogoTitle
+import com.polstat.pkl.ui.screen.components.Nim
+import com.polstat.pkl.ui.screen.components.Password
 import com.polstat.pkl.ui.state.NimState
 import com.polstat.pkl.ui.state.NimStateSaver
 import com.polstat.pkl.ui.state.PasswordState
 import com.polstat.pkl.ui.theme.PklPrimary900
-import com.polstat.pkl.ui.viewmodel.LoginViewModel
+import com.polstat.pkl.viewmodel.AuthViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 
 
 @Composable
-fun LoginScreen(navController: NavHostController, loginViewModel: LoginViewModel) {
+fun LoginScreen(
+    navController: NavHostController,
+    viewModel: AuthViewModel
+) {
     val focusRequester = remember { FocusRequester() }
     val nimState by rememberSaveable(stateSaver = NimStateSaver) {
         mutableStateOf(NimState(""))
     }
     val passwordState = remember { PasswordState() }
     val context = LocalContext.current
-    val loginState by loginViewModel.loginState.observeAsState()
+    var isLoginProcess by remember { mutableStateOf(false) }
+    val showLoading by viewModel.showLoadingChannel.collectAsState(false)
 
-    Column (
+    LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
+        viewModel.showErrorToastChannel.collectLatest { show ->
+            if (show) {
+                isLoginProcess = false
+                delay(1500)
+                Toast.makeText(context, "Login Failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    LaunchedEffect(viewModel.authResponse) {
+        viewModel.authResponse.collectLatest { response ->
+            if (response.status == "success") {
+                isLoginProcess = false
+                delay(1000)
+                Toast.makeText(context, "Login Success", Toast.LENGTH_SHORT).show()
+                navController.navigate(Capi63Screen.Beranda.route)
+            }
+        }
+    }
+
+    LoadingDialog(
+        showDialog = showLoading
+    )
+
+    Column(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(80.dp))
@@ -82,7 +122,7 @@ fun LoginScreen(navController: NavHostController, loginViewModel: LoginViewModel
                             shape = RoundedCornerShape(20.dp)
                         )
                 ) {
-                    Column (
+                    Column(
                         modifier = Modifier.padding(15.dp)
                     ) {
                         Nim(nimState, onImeAction = { focusRequester.requestFocus() })
@@ -93,16 +133,15 @@ fun LoginScreen(navController: NavHostController, loginViewModel: LoginViewModel
                             onImeAction = {}
                         )
                         Spacer(modifier = Modifier.height(15.dp))
-                        LoginButton(onClick = {
-//                            loginViewModel.login(nimState.text, passwordState.text)
-                            navController.navigate("beranda")
-                        })
-                        // Menangani state dari login
-                        loginState?.let {
-//                            if (it.nim != "") {
-                                navController.navigate("beranda")
-//                            }
-                        }
+                        LoginButton(
+                            onClick = {
+                                isLoginProcess = true
+                                viewModel.login(
+                                    nim = nimState.text,
+                                    password = passwordState.text
+                                )
+                            }
+                        )
                     }
                 }
             }

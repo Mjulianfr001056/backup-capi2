@@ -1,4 +1,4 @@
-package com.polstat.pkl.ui.screen
+package com.polstat.pkl.ui.screen.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

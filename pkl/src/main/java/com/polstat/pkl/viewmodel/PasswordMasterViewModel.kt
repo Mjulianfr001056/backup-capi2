@@ -1,4 +1,4 @@
-package com.polstat.pkl.ui.viewmodel
+package com.polstat.pkl.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

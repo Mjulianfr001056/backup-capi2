@@ -152,6 +152,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import dagger.hilt.migration.DisableInstallInCheck;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 import okhttp3.OkHttpClient;
@@ -160,7 +161,9 @@ import okhttp3.OkHttpClient;
  * Add dependency providers here (annotated with @Provides)
  * for objects you need to inject
  */
+
 @Module
+@DisableInstallInCheck
 @SuppressWarnings("PMD.CouplingBetweenObjects")
 public class AppDependencyModule {
 

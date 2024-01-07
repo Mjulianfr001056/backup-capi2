@@ -49,7 +49,7 @@ import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
-import com.polstat.pkl.ui.viewmodel.PasswordMasterViewModel
+import com.polstat.pkl.viewmodel.PasswordMasterViewModel
 import androidx.compose.runtime.getValue
 import com.polstat.pkl.ui.theme.PklBase
 
