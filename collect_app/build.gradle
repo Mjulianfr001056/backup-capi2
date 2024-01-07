@@ -3,6 +3,8 @@ apply from: '../config/quality.gradle'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 apply plugin: "com.google.android.gms.oss-licenses-plugin"
+apply plugin: "com.google.dagger.hilt.android"
+apply plugin:  'kotlin-kapt'
 
 import com.android.ddmlib.DdmPreferences
 import dependencies.Dependencies
@@ -259,6 +261,13 @@ dependencies {
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
+
+    // Dagger - Hilt
+    implementation("com.google.dagger:hilt-android:2.49")
+    kapt("com.google.dagger:hilt-compiler:2.49")
+    kapt("androidx.hilt:hilt-compiler:1.1.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+
     repositories {
         mavenLocal() // Only used for javarosa_local dependency
     }
