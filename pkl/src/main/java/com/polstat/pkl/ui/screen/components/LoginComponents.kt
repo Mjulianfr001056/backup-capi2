@@ -37,8 +37,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -57,7 +55,6 @@ import com.polstat.pkl.R
 import com.polstat.pkl.ui.state.NimState
 import com.polstat.pkl.ui.state.NimStateSaver
 import com.polstat.pkl.ui.state.PasswordState
-import com.polstat.pkl.ui.state.TextFieldState
 import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PklQuaternary
@@ -65,47 +62,40 @@ import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.ui.theme.typography
 
 @Composable
-fun Nim(
-    nimState: TextFieldState = remember { NimState() },
-    imeAction: ImeAction = ImeAction.Next,
+fun NimTextField(
+    value: String = "",
+    onValueChange: (String) -> Unit,
+    errorMessage: String?,
     onImeAction: () -> Unit = {}
 ) {
+    val imeAction: ImeAction = ImeAction.Next
+
     Column {
         val characterCount = remember { mutableIntStateOf(0) }
+        val isError: Boolean = errorMessage.isNullOrBlank()
 
         OutlinedTextField(
-            value = nimState.text,
+            value = value,
             onValueChange = {
-                if (it.matches(Regex("\\d*"))) {
-                    if (it.length <= 9) {
-                        nimState.text = it
-                        characterCount.intValue = it.length
-                    }
-                }
+                onValueChange(it)
             },
             label = {
                 Text(
                     text = stringResource(id = R.string.nim),
                     style = typography.titleSmall,
-                    color = if (nimState.showErrors()) PklPrimary900 else PklQuaternary
+                    color = if (isError) PklPrimary900 else PklQuaternary
                 )
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(all = 0.dp)
-                .onFocusChanged { focusState ->
-                    nimState.onFocusChange(focusState.isFocused)
-                    if (!focusState.isFocused) {
-                        nimState.enableShowErrors()
-                    }
-                },
+                .padding(all = 0.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedTextColor = PklPrimary900,
                 focusedTextColor = PklPrimary900,
                 cursorColor = PklPrimary900,
             ),
             textStyle = typography.bodyMedium,
-            isError = nimState.showErrors(),
+            isError = isError,
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = imeAction
             ),
@@ -136,46 +126,44 @@ fun Nim(
 }
 
 @Composable
-fun Password(
-    label: String,
-    passwordState: TextFieldState,
+fun PasswordTextField(
     modifier: Modifier = Modifier,
-    imeAction: ImeAction = ImeAction.Done,
-    onImeAction: () -> Unit = {}
+    value: String = "",
+    onValueChange: (String) -> Unit,
+    errorMessage: String?,
 ) {
+    val imeAction: ImeAction = ImeAction.Done
+    val isError: Boolean = errorMessage.isNullOrBlank()
+
     Column {
         val showPassword = rememberSaveable { mutableStateOf(false) }
         OutlinedTextField(
-            value = passwordState.text,
+            value = value,
             onValueChange = {
-                passwordState.text = it
-                passwordState.enableShowErrors() },
+                onValueChange(it)
+            },
             modifier = modifier
                 .fillMaxWidth()
-                .padding(all = 0.dp)
-                .onFocusChanged { focusState ->
-                    passwordState.onFocusChange(focusState.isFocused)
-                    if (!focusState.isFocused) {
-                        passwordState.enableShowErrors()
-                    }
-                },
+                .padding(all = 0.dp),
             textStyle = TextStyle(
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.W400,
                 fontSize = 14.sp,
                 lineHeight = 20.sp,
-                letterSpacing = 0.25.sp),
+                letterSpacing = 0.25.sp
+            ),
             label = {
                 Text(
-                    text = label,
+                    text = stringResource(id = R.string.password),
                     style = typography.titleSmall,
-                    color = if (passwordState.showErrors()) PklPrimary900 else PklQuaternary
-                ) },
+                    color = if (isError) PklPrimary900 else PklQuaternary
+                )
+            },
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedTextColor = PklPrimary900,
                 focusedTextColor = PklPrimary900,
                 cursorColor = PklPrimary900,
-                ),
+            ),
             trailingIcon = {
                 if (showPassword.value) {
                     IconButton(
@@ -203,19 +191,20 @@ fun Password(
                     }
                 } },
             visualTransformation =
-                if (showPassword.value) VisualTransformation.None
-                else PasswordVisualTransformation(),
-            isError = passwordState.showErrors(),
+            if (showPassword.value)
+                VisualTransformation.None
+            else PasswordVisualTransformation(),
+            isError = isError,
             supportingText = {
-                passwordState.getError()?.let { error -> TextFieldError(textError = error) }
-                             },
+                if (errorMessage != null) {
+                    TextFieldError(
+                        textError = errorMessage
+                    )
+                }
+            },
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = imeAction,
                 keyboardType = KeyboardType.Password),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    onImeAction()
-                }),
             singleLine = true
         )
         Text(
@@ -357,7 +346,7 @@ fun NimPreview() {
         Surface(
             color = MaterialTheme.colorScheme.background
         ) {
-            Nim(nimState = nimState, onImeAction = { focusRequester.requestFocus() })
+//            Nim(nimState = nimState, onImeAction = { focusRequester.requestFocus() })
         }
     }
 }
@@ -373,10 +362,10 @@ fun PasswordPreview() {
         Surface(
             color = MaterialTheme.colorScheme.background
         ) {
-            Password(label = stringResource(id = R.string.password),
-                passwordState = passwordState,
-                modifier = Modifier.focusRequester(focusRequester),
-                onImeAction = {})
+//            PasswordTextField(label = stringResource(id = R.string.password),
+//                passwordState = passwordState,
+//                modifier = Modifier.focusRequester(focusRequester),
+//                onImeAction = {})
         }
     }
 }

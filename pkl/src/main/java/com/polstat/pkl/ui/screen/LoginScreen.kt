@@ -21,7 +21,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,19 +29,15 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.polstat.pkl.R
 import com.polstat.pkl.navigation.Capi63Screen
+import com.polstat.pkl.ui.event.LoginScreenEvent
 import com.polstat.pkl.ui.screen.components.LoadingDialog
 import com.polstat.pkl.ui.screen.components.LoginButton
 import com.polstat.pkl.ui.screen.components.LogoTitle
-import com.polstat.pkl.ui.screen.components.Nim
-import com.polstat.pkl.ui.screen.components.Password
-import com.polstat.pkl.ui.state.NimState
-import com.polstat.pkl.ui.state.NimStateSaver
-import com.polstat.pkl.ui.state.PasswordState
+import com.polstat.pkl.ui.screen.components.NimTextField
+import com.polstat.pkl.ui.screen.components.PasswordTextField
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.viewmodel.AuthViewModel
 import kotlinx.coroutines.delay
@@ -55,10 +50,11 @@ fun LoginScreen(
     viewModel: AuthViewModel
 ) {
     val focusRequester = remember { FocusRequester() }
-    val nimState by rememberSaveable(stateSaver = NimStateSaver) {
-        mutableStateOf(NimState(""))
-    }
-    val passwordState = remember { PasswordState() }
+//    val nimState by rememberSaveable(stateSaver = NimStateSaver) {
+//        mutableStateOf(NimState(""))
+//    }
+//    val passwordState = remember { PasswordState() }
+    val state = viewModel.state
     val context = LocalContext.current
     var isLoginProcess by remember { mutableStateOf(false) }
     val showLoading by viewModel.showLoadingChannel.collectAsState(false)
@@ -125,21 +121,28 @@ fun LoginScreen(
                     Column(
                         modifier = Modifier.padding(15.dp)
                     ) {
-                        Nim(nimState, onImeAction = { focusRequester.requestFocus() })
-                        Password(
-                            label = stringResource(id = R.string.password),
-                            passwordState = passwordState,
-                            modifier = Modifier.focusRequester(focusRequester),
-                            onImeAction = {}
+                        NimTextField(
+                            value = state.nim,
+                            onValueChange = {
+                                viewModel.onEvent(LoginScreenEvent.NimChanged(it))
+                            },
+                            errorMessage = state.nimError,
+                            onImeAction = { focusRequester.requestFocus() }
                         )
+                        PasswordTextField(
+                            value = state.password,
+                            onValueChange = {
+                                viewModel.onEvent(LoginScreenEvent.PasswordChanged(it))
+                            },
+                            errorMessage = state.passwordError,
+                            modifier = Modifier.focusRequester(focusRequester),
+                        )
+
                         Spacer(modifier = Modifier.height(15.dp))
                         LoginButton(
                             onClick = {
                                 isLoginProcess = true
-                                viewModel.login(
-                                    nim = nimState.text,
-                                    password = passwordState.text
-                                )
+                                viewModel.onEvent(LoginScreenEvent.submit)
                             }
                         )
                     }

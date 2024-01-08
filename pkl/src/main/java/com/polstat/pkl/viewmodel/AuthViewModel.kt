@@ -1,15 +1,22 @@
 package com.polstat.pkl.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.polstat.pkl.repository.AuthRepository
-import com.polstat.pkl.repository.SessionRepository
-import com.polstat.pkl.model.response.AuthResponse
 import com.polstat.pkl.model.domain.DataTim
 import com.polstat.pkl.model.domain.User
 import com.polstat.pkl.model.domain.Wilayah
+import com.polstat.pkl.model.response.AuthResponse
+import com.polstat.pkl.repository.AuthRepository
+import com.polstat.pkl.repository.SessionRepository
+import com.polstat.pkl.ui.event.LoginScreenEvent
+import com.polstat.pkl.ui.state.LoginScreenState
 import com.polstat.pkl.utils.Result
+import com.polstat.pkl.utils.use_case.ValidateNim
+import com.polstat.pkl.utils.use_case.ValidatePassword
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -23,57 +30,29 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val sessionRepository: SessionRepository
+    private val sessionRepository: SessionRepository,
+    private val validateNim: ValidateNim,
+    private val validatePassword: ValidatePassword
 ): ViewModel(){
 
+    var state by mutableStateOf(LoginScreenState())
+
     companion object {
-        private const val TAG = "SamplingViewModel"
+        private const val TAG = "CAPI63_AUTH_VM"
     }
 
-    val initialValue = AuthResponse(
-        avatar = "",
-        dataTim = DataTim(
-            anggota = listOf(),
-            idTim = "",
-            namaTim = "",
-            passPML = "",
-            namaPML = "",
-            nimPML = "",
-            teleponPML = ""
-        ),
-        id_kuesioner = "",
-        isKoor = false,
-        nama = "",
-        nim = "",
-        status = "",
-        wilayah = Wilayah(
-            catatan = "",
-            idKab = "",
-            idKec = "",
-            idKel = "",
-            jmlGenZ = 0,
-            jmlRt = 0,
-            jmlRtGenz = 0,
-            namaKab = "",
-            namaKec = "",
-            namaKel = "",
-            noBS = "",
-            ruta = listOf(),
-            status = "",
-            tglListing = Any(),
-            tglPeriksa = Any()
-        )
-    )
+    val initialValue = AuthResponse()
 
-    private val _authResponse = MutableStateFlow<AuthResponse>(initialValue)
+    private val _authResponse = MutableStateFlow(initialValue)
+
     val authResponse = _authResponse.asStateFlow()
 
     private val _session = sessionRepository.getActiveSession()
-
     private val _showLoadingChannel = Channel<Boolean>()
-    val showLoadingChannel = _showLoadingChannel.receiveAsFlow()
 
+    val showLoadingChannel = _showLoadingChannel.receiveAsFlow()
     private val _showErrorToastChannel = Channel<Boolean>()
+
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
     fun login(
@@ -106,6 +85,38 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+    fun onEvent(event: LoginScreenEvent){
+        when(event){
+            is LoginScreenEvent.NimChanged -> {
+                state = state.copy(nim = event.nim)
+            }
+            is LoginScreenEvent.PasswordChanged -> {
+                state = state.copy(password = event.password)
+            }
+            is LoginScreenEvent.submit -> {
+                validateForm()
+            }
+        }
+    }
+
+    private fun validateForm(){
+        val nimResult = validateNim.execute(state.nim)
+        val passwordResult = validatePassword.execute(state.password)
+
+        val hasError = listOf(nimResult, passwordResult)
+            .any { !it.successful }
+
+        if(hasError){
+            state = state.copy(
+                nimError = nimResult.errorMessage,
+                passwordError = passwordResult.errorMessage
+            )
+        } else {
+            login(state.nim, state.password)
+            return
+        }
+    }
+
     private fun openLoadingDialog() {
         _showLoadingChannel.trySend(true)
     }
@@ -124,6 +135,10 @@ class AuthViewModel @Inject constructor(
 
     fun getWilayahFromSession() : Wilayah {
         return _session!!.wilayah
+    }
+
+    sealed class ValidationEvent {
+        object Success : ValidationEvent()
     }
 
 }
