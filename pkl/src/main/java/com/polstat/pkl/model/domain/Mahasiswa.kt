@@ -10,5 +10,5 @@ data class Mahasiswa(
     val nim: String,
     val no_hp: String,
     val password: String,
-    val wilayah: Wilayah
+    val wilayah: List<Wilayah>
 )

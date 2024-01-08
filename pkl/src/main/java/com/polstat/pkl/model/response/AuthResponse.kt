@@ -11,5 +11,5 @@ data class AuthResponse(
     val nama: String,
     val nim: String,
     val status: String,
-    val wilayah: Wilayah
+    val wilayah: List<Wilayah>
 )

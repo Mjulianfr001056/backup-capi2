@@ -46,22 +46,24 @@ class AuthViewModel @Inject constructor(
         nama = "",
         nim = "",
         status = "",
-        wilayah = Wilayah(
-            catatan = "",
-            idKab = "",
-            idKec = "",
-            idKel = "",
-            jmlGenZ = 0,
-            jmlRt = 0,
-            jmlRtGenz = 0,
-            namaKab = "",
-            namaKec = "",
-            namaKel = "",
-            noBS = "",
-            ruta = listOf(),
-            status = "",
-            tglListing = Any(),
-            tglPeriksa = Any()
+        wilayah = listOf(
+            Wilayah(
+                catatan = "",
+                idKab = "",
+                idKec = "",
+                idKel = "",
+                jmlGenZ = 0,
+                jmlRt = 0,
+                jmlRtGenz = 0,
+                namaKab = "",
+                namaKec = "",
+                namaKel = "",
+                noBS = "",
+                ruta = listOf(),
+                status = "",
+                tglListing = Any(),
+                tglPeriksa = Any()
+            )
         )
     )
 
@@ -122,7 +124,7 @@ class AuthViewModel @Inject constructor(
         return _session!!.dataTim
     }
 
-    fun getWilayahFromSession() : Wilayah {
+    fun getWilayahFromSession() : List<Wilayah> {
         return _session!!.wilayah
     }
 
