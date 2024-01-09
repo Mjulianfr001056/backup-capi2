@@ -17,7 +17,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
-    val BASE_URL = "https://4f37-103-162-62-54.ngrok-free.app"
+    val BASE_URL = "https://4f37-103-162-62-54.ngrok-free.app "
 
     @Provides
     @Singleton
@@ -51,6 +51,5 @@ class NetworkModule {
     fun provideAuthRepository(authApi: AuthApi, sessionRepository: SessionRepository) : AuthRepository {
         return AuthRepositoryImpl(authApi, sessionRepository)
     }
-
 
 }

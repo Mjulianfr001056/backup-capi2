@@ -1,5 +1,6 @@
 package com.polstat.pkl.repository
 
+import android.util.Log
 import com.polstat.pkl.model.domain.DataTim
 import com.polstat.pkl.network.AuthApi
 import com.polstat.pkl.model.response.AuthResponse
@@ -17,6 +18,11 @@ class AuthRepositoryImpl @Inject constructor(
     private val authApi: AuthApi,
     private val sessionRepository: SessionRepository
 ) : AuthRepository {
+
+    companion object {
+        private const val TAG = "AuthRepositoryImpl"
+    }
+
     val session get() = sessionRepository.getActiveSession()
 
     private fun saveSession(session: Session) {
@@ -56,18 +62,23 @@ class AuthRepositoryImpl @Inject constructor(
                     wilayah = response.wilayah
                 )
                 saveSession(session)
+                Log.d(TAG, "Session was saved: $session")
                 response
             } catch (e: IOException) {
                 e.printStackTrace()
-                emit(Result.Error(message = "Authentication Error"))
+                emit(Result.Error(message = e.localizedMessage ?: "Authentication Error"))
                 return@flow
             } catch (e: HttpException) {
                 e.printStackTrace()
-                emit(Result.Error(message = "Authentication Error"))
+                when (e.code()) {
+                    404 -> emit(Result.Error(message = "Nim tidak ditemukan!"))
+                    400 -> emit(Result.Error(message = "Password salah!"))
+                    else -> emit(Result.Error(message = e.localizedMessage ?: "Authentication Error"))
+                }
                 return@flow
             } catch (e: Exception) {
                 e.printStackTrace()
-                emit(Result.Error(message = "Authentication Error"))
+                emit(Result.Error(message = e.localizedMessage ?: "Authentication Error"))
                 return@flow
             }
 
