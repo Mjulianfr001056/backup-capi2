@@ -279,7 +279,7 @@ fun ListPplCard(
                                                     progressBackgroundColor = PklPrimary100,
                                                     progressIndicatorColor = PklPrimary900,
                                                     completedColor = PklPrimary900,
-                                                    circularIndicatorDiameter = 56.dp
+                                                    circularIndicatorDiameter = 66.dp
                                                 )
                                             }
                                         }
@@ -344,12 +344,12 @@ fun WilayahKerjaCard(
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Row (
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Column (
+                        Column(
                             modifier = Modifier.fillMaxWidth(0.5f)
                         ) {
                             Text(
@@ -359,7 +359,7 @@ fun WilayahKerjaCard(
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
                             )
                         }
-                        Column (
+                        Column(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
@@ -377,7 +377,7 @@ fun WilayahKerjaCard(
                                     .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
-                                Column (
+                                Column(
                                     modifier = Modifier.fillMaxWidth(0.5f)
                                 ) {
                                     Text(
@@ -388,7 +388,7 @@ fun WilayahKerjaCard(
                                         modifier = Modifier.align(Alignment.CenterHorizontally)
                                     )
                                 }
-                                Column (
+                                Column(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Text(
@@ -456,7 +456,7 @@ fun StatusListingCard(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    if(anggotaTim.isNotEmpty()) {
+                    if (anggotaTim.isNotEmpty()) {
                         anggotaTim.forEach { mahasiswa ->
                             Row(
                                 modifier = Modifier
@@ -471,8 +471,8 @@ fun StatusListingCard(
                             ) {
                                 Column {
                                     if (mahasiswa.wilayah_kerja.isNotEmpty()) {
-                                        mahasiswa.wilayah_kerja.forEach {wilayah ->
-                                            Row (
+                                        mahasiswa.wilayah_kerja.forEach { wilayah ->
+                                            Row(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 horizontalArrangement = Arrangement.SpaceBetween,
                                                 verticalAlignment = Alignment.CenterVertically
@@ -573,42 +573,44 @@ fun ProgresListingCard(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    listWilayah.forEach { wilayah ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(
-                                    start = 10.dp,
-                                    top = 10.dp,
-                                    end = 10.dp
-                                ),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = wilayah.noBS!!,
-                                    style = TextStyle(
-                                        fontFamily = PoppinsFontFamily,
-                                        fontWeight = FontWeight.Medium,
-                                        fontSize = 18.sp,
-                                        platformStyle = PlatformTextStyle(
-                                            includeFontPadding = false
-                                        )
+                    if (listWilayah.isNotEmpty()) {
+                        listWilayah.forEach { wilayah ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(
+                                        start = 10.dp,
+                                        top = 10.dp,
+                                        end = 10.dp
                                     ),
-                                    color = Color.DarkGray
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column {
+                                    Text(
+                                        text = wilayah.noBS!!,
+                                        style = TextStyle(
+                                            fontFamily = PoppinsFontFamily,
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 18.sp,
+                                            platformStyle = PlatformTextStyle(
+                                                includeFontPadding = false
+                                            )
+                                        ),
+                                        color = Color.DarkGray
+                                    )
+                                }
+                                AnimatedCircularProgressIndicator(
+                                    currentValue = wilayah.ruta.size ?: 0,
+                                    maxValue = if (wilayah.jmlRt == 0 || wilayah.jmlRt == null) 99 else wilayah.jmlRt,
+                                    progressBackgroundColor = PklPrimary100,
+                                    progressIndicatorColor = PklPrimary900,
+                                    completedColor = PklPrimary900,
+                                    circularIndicatorDiameter = 66.dp
                                 )
                             }
-                            AnimatedCircularProgressIndicator(
-                                currentValue = wilayah.ruta.size,
-                                maxValue = wilayah.jmlRt,
-                                progressBackgroundColor = PklPrimary100,
-                                progressIndicatorColor = PklPrimary900,
-                                completedColor = PklPrimary900,
-                                circularIndicatorDiameter = 52.dp
-                            )
+                            Spacer(modifier = Modifier.height(12.dp))
                         }
-                        Spacer(modifier = Modifier.height(12.dp))
                     }
                 }
             }

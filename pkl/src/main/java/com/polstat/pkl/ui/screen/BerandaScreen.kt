@@ -36,6 +36,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.ui.screen.components.BottomBar
 import com.polstat.pkl.ui.screen.components.ListPplCard
+import com.polstat.pkl.ui.screen.components.PmlCard
 import com.polstat.pkl.ui.screen.components.ProfileCard
 import com.polstat.pkl.ui.screen.components.ProgresListingCard
 import com.polstat.pkl.ui.screen.components.StatusListingCard
@@ -168,6 +169,7 @@ fun BerandaScreen(
                 ListPplCard(listMahasiswa = dataTim.anggota)
                 StatusListingCard(anggotaTim = dataTim.anggota)
             } else {
+                PmlCard(dataTim = dataTim)
                 ProgresListingCard(listWilayah = listWilayah)
             }
         }
