@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -30,6 +31,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -122,7 +125,7 @@ fun ListRutaScreen(navController: NavHostController) {
                             tint = Color.White
                         )
                     }
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { }) {
                         Icon(
                             imageVector = Icons.Filled.Sync,
                             contentDescription = "Reload Button",
@@ -155,20 +158,31 @@ fun ListRutaScreen(navController: NavHostController) {
             if (showSearchBar) {
                 Row(modifier = Modifier
                     .fillMaxWidth(),
-                    Arrangement.Start) {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.back_icon)
-                        )
-                    }
-                    TextField(
-                        value = text,
-                        onValueChange = {
-                            text = it
-//                            listRutaViewModel.searchRuta(text)
-                        },
-                        placeholder = { Text(stringResource(id = R.string.search_list_ruta)) }
+                    Arrangement.Start,
+                    Alignment.CenterVertically) {
+                    SearchBar(
+                        query = text,
+                        onQueryChange = { text = it },
+                        onSearch = { text },
+                        active = false,
+                        onActiveChange = { true },
+                        placeholder = { Text(
+                            text = stringResource(id = R.string.search_list_ruta),
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 14.sp,
+                            color = Color.White) },
+                        leadingIcon = {
+                            IconButton(onClick = { showSearchBar = false }) {
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowBack,
+                                    contentDescription = stringResource(id = R.string.back_icon),
+                                    tint = Color.White
+                                )
+                            }},
+                        shape = RoundedCornerShape(0.dp),
+                        colors = SearchBarDefaults.colors(containerColor = PklPrimary900, inputFieldColors = TextFieldDefaults.colors(Color.White)),
+                        content = {  }
                     )
                 }
             }
