@@ -6,22 +6,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -77,7 +72,7 @@ fun ProfileCard(
                     .align(Alignment.CenterHorizontally)
             )
             Text(
-                text = user.nama!!,
+                text = user.nama,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.Medium
@@ -86,7 +81,7 @@ fun ProfileCard(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text(
-                    text = user.nim!!,
+                    text = user.nim,
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium
                 )
@@ -96,7 +91,7 @@ fun ProfileCard(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = if (user.isKoor!!) "PCL" else "PPL",
+                    text = if (user.isKoor) "PCL" else "PPL",
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium
                 )
@@ -105,7 +100,7 @@ fun ProfileCard(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text(
-                    text = dataTim.namaTim!!,
+                    text = dataTim.namaTim,
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium
                 )
@@ -115,7 +110,7 @@ fun ProfileCard(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = dataTim.idTim!!,
+                    text = dataTim.idTim,
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium
                 )
@@ -148,7 +143,7 @@ fun PmlCard(
                     .padding(8.dp),
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.Medium,
-                fontSize = 24.sp,
+                fontSize = 20.sp,
                 color = Color.White
             )
             Box(
@@ -162,14 +157,14 @@ fun PmlCard(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = dataTim.namaPML!!,
+                        text = dataTim.namaPML,
                         fontFamily = PoppinsFontFamily,
                         fontWeight = FontWeight.Medium,
                         fontSize = 18.sp,
                         color = Color.DarkGray
                     )
                     Text(
-                        text = dataTim.nimPML!!,
+                        text = dataTim.nimPML,
                         fontFamily = PoppinsFontFamily,
                         fontWeight = FontWeight.Medium,
                         fontSize = 14.sp
@@ -203,7 +198,7 @@ fun ListPplCard(
                     .padding(8.dp),
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.Medium,
-                fontSize = 24.sp,
+                fontSize = 20.sp,
                 color = Color.White
             )
             Box(
@@ -274,8 +269,8 @@ fun ListPplCard(
                                                 )
                                                 Spacer(modifier = Modifier.width(16.dp))
                                                 AnimatedCircularProgressIndicator(
-                                                    currentValue = wilayah.ruta.size ?: 0,
-                                                    maxValue = if (wilayah.jmlRt == 0 || wilayah.jmlRt == null) 99 else wilayah.jmlRt,
+                                                    currentValue = wilayah.ruta.size,
+                                                    maxValue = if (wilayah.jmlRt == 0) 99 else wilayah.jmlRt,
                                                     progressBackgroundColor = PklPrimary100,
                                                     progressIndicatorColor = PklPrimary900,
                                                     completedColor = PklPrimary900,
@@ -332,7 +327,7 @@ fun WilayahKerjaCard(
                     .padding(8.dp),
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.Medium,
-                fontSize = 24.sp,
+                fontSize = 20.sp,
                 color = Color.White
             )
             Box(
@@ -381,7 +376,7 @@ fun WilayahKerjaCard(
                                     modifier = Modifier.fillMaxWidth(0.5f)
                                 ) {
                                     Text(
-                                        text = wilayah.noBS ?: "N/A",
+                                        text = wilayah.noBS,
                                         fontFamily = PoppinsFontFamily,
                                         fontWeight = FontWeight.Medium,
                                         fontSize = 30.sp,
@@ -444,7 +439,7 @@ fun StatusListingCard(
                     .padding(8.dp),
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.Medium,
-                fontSize = 24.sp,
+                fontSize = 20.sp,
                 color = Color.White
             )
             Box(
@@ -514,11 +509,11 @@ fun StatusListingCard(
                                                     )
                                                 }
                                                 Text(
-                                                    text = wilayah.status.uppercase(Locale.getDefault())!!,
+                                                    text = wilayah.status.uppercase(Locale.getDefault()),
                                                     style = TextStyle(
                                                         fontFamily = PoppinsFontFamily,
                                                         fontWeight = FontWeight.Medium,
-                                                        fontSize = 25.sp,
+                                                        fontSize = 20.sp,
                                                         platformStyle = PlatformTextStyle(
                                                             includeFontPadding = false
                                                         )
@@ -561,7 +556,7 @@ fun ProgresListingCard(
                     .padding(8.dp),
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.Medium,
-                fontSize = 24.sp,
+                fontSize = 20.sp,
                 color = Color.White
             )
             Box(
@@ -588,11 +583,11 @@ fun ProgresListingCard(
                             ) {
                                 Column {
                                     Text(
-                                        text = wilayah.noBS!!,
+                                        text = wilayah.noBS,
                                         style = TextStyle(
                                             fontFamily = PoppinsFontFamily,
                                             fontWeight = FontWeight.Medium,
-                                            fontSize = 18.sp,
+                                            fontSize = 20.sp,
                                             platformStyle = PlatformTextStyle(
                                                 includeFontPadding = false
                                             )
@@ -601,8 +596,8 @@ fun ProgresListingCard(
                                     )
                                 }
                                 AnimatedCircularProgressIndicator(
-                                    currentValue = wilayah.ruta.size ?: 0,
-                                    maxValue = if (wilayah.jmlRt == 0 || wilayah.jmlRt == null) 99 else wilayah.jmlRt,
+                                    currentValue = wilayah.ruta.size,
+                                    maxValue = if (wilayah.jmlRt == 0) 99 else wilayah.jmlRt,
                                     progressBackgroundColor = PklPrimary100,
                                     progressIndicatorColor = PklPrimary900,
                                     completedColor = PklPrimary900,
