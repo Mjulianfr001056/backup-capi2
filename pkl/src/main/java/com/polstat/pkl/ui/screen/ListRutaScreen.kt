@@ -78,9 +78,9 @@ fun ListRutaPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListRutaScreen(navController: NavHostController) {
-    var showMenu by remember {
-        mutableStateOf(false)
-    }
+    var showMenu by remember { mutableStateOf(false) }
+    var showSearchBar by remember { mutableStateOf(false) }
+    var text by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -115,7 +115,7 @@ fun ListRutaScreen(navController: NavHostController) {
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { showSearchBar = true }) {
                         Icon(
                             imageVector = Icons.Outlined.Search,
                             contentDescription = "Search Button",
@@ -151,6 +151,27 @@ fun ListRutaScreen(navController: NavHostController) {
                     }
                 },
             )
+
+            if (showSearchBar) {
+                Row(modifier = Modifier
+                    .fillMaxWidth(),
+                    Arrangement.Start) {
+                    IconButton(onClick = { }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = stringResource(id = R.string.back_icon)
+                        )
+                    }
+                    TextField(
+                        value = text,
+                        onValueChange = {
+                            text = it
+//                            listRutaViewModel.searchRuta(text)
+                        },
+                        placeholder = { Text(stringResource(id = R.string.search_list_ruta)) }
+                    )
+                }
+            }
         },
         content = { innerPadding ->
             Column {

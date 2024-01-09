@@ -41,4 +41,5 @@
     <string name="toggle">Toggle</string>
     <string name="lihat_ruta">Lihat Ruta</string>
     <string name="lihat_sampel">Lihat Sampel</string>
+    <string name="search_list_ruta">Masukkan kode ruta atau nama KRT</string>
 </resources>
