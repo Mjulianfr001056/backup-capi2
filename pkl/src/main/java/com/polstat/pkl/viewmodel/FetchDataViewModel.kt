@@ -21,13 +21,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AuthViewModel @Inject constructor(
+class FetchDataViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val sessionRepository: SessionRepository
 ): ViewModel(){
 
     companion object {
-        private const val TAG = "SamplingViewModel"
+        private const val TAG = "FetchDataViewModel"
     }
 
     val initialValue = AuthResponse(
@@ -46,23 +46,7 @@ class AuthViewModel @Inject constructor(
         nama = "",
         nim = "",
         status = "",
-        wilayah = Wilayah(
-            catatan = "",
-            idKab = "",
-            idKec = "",
-            idKel = "",
-            jmlGenZ = 0,
-            jmlRt = 0,
-            jmlRtGenz = 0,
-            namaKab = "",
-            namaKec = "",
-            namaKel = "",
-            noBS = "",
-            ruta = listOf(),
-            status = "",
-            tglListing = Any(),
-            tglPeriksa = Any()
-        )
+        wilayah = listOf()
     )
 
     private val _authResponse = MutableStateFlow<AuthResponse>(initialValue)
@@ -122,7 +106,7 @@ class AuthViewModel @Inject constructor(
         return _session!!.dataTim
     }
 
-    fun getWilayahFromSession() : Wilayah {
+    fun getWilayahFromSession() : List<Wilayah> {
         return _session!!.wilayah
     }
 

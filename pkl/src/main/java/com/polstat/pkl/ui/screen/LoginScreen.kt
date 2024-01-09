@@ -44,7 +44,7 @@ import com.polstat.pkl.ui.state.NimState
 import com.polstat.pkl.ui.state.NimStateSaver
 import com.polstat.pkl.ui.state.PasswordState
 import com.polstat.pkl.ui.theme.PklPrimary900
-import com.polstat.pkl.viewmodel.AuthViewModel
+import com.polstat.pkl.viewmodel.FetchDataViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
@@ -52,7 +52,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun LoginScreen(
     navController: NavHostController,
-    viewModel: AuthViewModel
+    viewModel: FetchDataViewModel
 ) {
     val focusRequester = remember { FocusRequester() }
     val nimState by rememberSaveable(stateSaver = NimStateSaver) {
