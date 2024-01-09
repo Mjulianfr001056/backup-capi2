@@ -45,7 +45,7 @@ import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
-import com.polstat.pkl.viewmodel.FetchDataViewModel
+import com.polstat.pkl.viewmodel.AuthViewModel
 
 @Preview
 @Composable
@@ -68,7 +68,7 @@ fun BerandaScreenPreview() {
 @Composable
 fun BerandaScreen(
     navController: NavHostController,
-    viewModel: FetchDataViewModel
+    viewModel: AuthViewModel
 ) {
     var showMenu by remember {
         mutableStateOf(false)

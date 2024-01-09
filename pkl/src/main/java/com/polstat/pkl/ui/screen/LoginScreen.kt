@@ -39,7 +39,7 @@ import com.polstat.pkl.ui.screen.components.LogoTitle
 import com.polstat.pkl.ui.screen.components.NimTextField
 import com.polstat.pkl.ui.screen.components.PasswordTextField
 import com.polstat.pkl.ui.theme.PklPrimary900
-import com.polstat.pkl.viewmodel.FetchDataViewModel
+import com.polstat.pkl.viewmodel.AuthViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
@@ -47,7 +47,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun LoginScreen(
     navController: NavHostController,
-    viewModel: FetchDataViewModel
+    viewModel: AuthViewModel
 ) {
     val focusRequester = remember { FocusRequester() }
 //    val nimState by rememberSaveable(stateSaver = NimStateSaver) {
@@ -64,7 +64,7 @@ fun LoginScreen(
             if (show) {
                 isLoginProcess = false
                 delay(1500)
-                Toast.makeText(context, "Login Failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, viewModel.errorMessage.value, Toast.LENGTH_SHORT).show()
             }
         }
     }

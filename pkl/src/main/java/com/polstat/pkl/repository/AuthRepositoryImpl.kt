@@ -66,15 +66,19 @@ class AuthRepositoryImpl @Inject constructor(
                 response
             } catch (e: IOException) {
                 e.printStackTrace()
-                emit(Result.Error(message = "Authentication Error"))
+                emit(Result.Error(message = e.localizedMessage ?: "Authentication Error"))
                 return@flow
             } catch (e: HttpException) {
                 e.printStackTrace()
-                emit(Result.Error(message = "Authentication Error"))
+                when (e.code()) {
+                    404 -> emit(Result.Error(message = "Nim tidak ditemukan!"))
+                    400 -> emit(Result.Error(message = "Password salah!"))
+                    else -> emit(Result.Error(message = e.localizedMessage ?: "Authentication Error"))
+                }
                 return@flow
             } catch (e: Exception) {
                 e.printStackTrace()
-                emit(Result.Error(message = "Authentication Error"))
+                emit(Result.Error(message = e.localizedMessage ?: "Authentication Error"))
                 return@flow
             }
 

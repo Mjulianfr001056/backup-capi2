@@ -5,7 +5,7 @@ import com.polstat.pkl.model.domain.Wilayah
 
 data class AuthResponse(
     val avatar: String = "",
-    val dataTim: DataTim = DataTim(), // Asumsikan Anda memiliki konstruktor default di DataTim
+    val dataTim: DataTim = DataTim(),
     val id_kuesioner: String = "",
     val isKoor: Boolean = false,
     val nama: String = "",

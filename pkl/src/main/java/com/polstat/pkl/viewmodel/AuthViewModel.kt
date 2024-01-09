@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FetchDataViewModel @Inject constructor(
+class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val sessionRepository: SessionRepository,
     private val validateNim: ValidateNim,
@@ -46,6 +46,10 @@ class FetchDataViewModel @Inject constructor(
     private val _authResponse = MutableStateFlow(initialValue)
 
     val authResponse = _authResponse.asStateFlow()
+
+    private val _errorMessage = MutableStateFlow<String>("")
+
+    val errorMessage = _errorMessage.asStateFlow()
 
     private val _session = sessionRepository.getActiveSession()
 
@@ -76,6 +80,9 @@ class FetchDataViewModel @Inject constructor(
                     }
 
                     is Result.Error -> {
+                        result.message?.let { error ->
+                            _errorMessage.value = error
+                        }
                         _showErrorToastChannel.send(true)
                         Log.e(TAG, "Error in login")
                     }

@@ -52,5 +52,4 @@ class NetworkModule {
         return AuthRepositoryImpl(authApi, sessionRepository)
     }
 
-
 }
