@@ -9,15 +9,3 @@ data class DataTim(
     val nimPML: String = "",
     val teleponPML: String = ""
 )
-//{
-//    // Konstruktor default
-//    constructor() : this(
-//        anggota = emptyList(),
-//        idTim = "",
-//        namaTim = "",
-//        passPML = "",
-//        namaPML = "",
-//        nimPML = "",
-//        teleponPML = ""
-//    )
-//}

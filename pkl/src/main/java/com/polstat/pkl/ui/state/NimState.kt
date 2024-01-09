@@ -4,6 +4,7 @@ import java.util.regex.Pattern
 
 private const val NIM_VALIDATION_REGEX = "\\d+"
 
+@Deprecated("Pakai LoginScreenState")
 class NimState(val nim: String? = null) :
     TextFieldState(validator = ::isNimValid, errorFor = ::nimValidationError) {
     init {
