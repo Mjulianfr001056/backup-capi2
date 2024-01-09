@@ -41,5 +41,18 @@
     <string name="toggle">Toggle</string>
     <string name="lihat_ruta">Lihat Ruta</string>
     <string name="lihat_sampel">Lihat Sampel</string>
-    <string name="search_list_ruta">Masukkan kode ruta atau nama KRT</string>
+    <string name="action_art">Aksi Untuk ART</string>
+    <string name="ubah_action_art">Ubah</string>
+    <string name="salin_action_art">Salin isian ruta</string>
+    <string name="hapus_action_art">Hapus</string>
+    <string name="detail_ruta">detail ruta</string>
+    <string name="nomor_segmen_ruta">Nomor Segmen</string>
+    <string name="nomor_urut_bangunan_fisik_ruta">Nomor Urut Bangunan Fisik</string>
+    <string name="nomor_urut_bangunan_sensus_ruta">Nomor Urut Bangunan Sensus</string>
+    <string name="nomor_urut_krt_ruta">Nomor Urut Kepala Rumah Tangga</string>
+    <string name="nama_krt_ruta">Nama Kepala Rumah Tangga</string>
+    <string name="alamat_ruta">Alamat</string>
+    <string name="keberadaan_genz_ortu_ruta">Keberadaan Gen Z dan Orang Tua</string>
+    <string name="close_popup_list_ruta">close</string>
+    <string name="search_list_ruta">Masukkan kode ruta atau nama kepala ruta</string>
 </resources>

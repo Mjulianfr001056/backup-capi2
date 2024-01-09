@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -35,7 +37,6 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
@@ -49,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -337,15 +339,35 @@ fun RutaRow(
         }
 
         if (openDetail) {
-            Dialog(
-                onDismissRequest = { openDetail = false },
+            Dialog(onDismissRequest = { openDetail = false },
                 content = {
                     Column(
-                        Modifier
-                            .background(Color.White)
-                            .padding(10.dp), Arrangement.Center, Alignment.CenterHorizontally) {
+                        modifier = Modifier
+                            .background(
+                                color = PklBase,
+                                shape = RoundedCornerShape(15.dp)
+                            )
+                            .height(500.dp),
+                        Arrangement.Center,
+                        Alignment.CenterHorizontally
+                    ) {
                         Text(
-                            text = "DETAIL RUTA",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    color = PklPrimary900,
+                                    shape = RoundedCornerShape(
+                                        topStart = 15.dp,
+                                        topEnd = 15.dp
+                                    )
+                                )
+                                .padding(
+                                    top = 10.dp,
+                                    bottom = 10.dp
+                                ),
+                            text = stringResource(id = R.string.detail_ruta).uppercase(),
+                            textAlign = TextAlign.Center,
+                            color = Color.White,
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.Medium,
                             fontSize = 20.sp
@@ -355,221 +377,217 @@ fun RutaRow(
                                 .fillMaxWidth()
                                 .verticalScroll(rememberScrollState())
                                 .weight(1f)
+                                .padding(10.dp)
                         ) {
-                            Text(text = "DETAIL 1",
+                            Text(
+                                text = stringResource(id = R.string.nomor_segmen_ruta),
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp)
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(30.dp)
-                                    .background(Color.Transparent)
-                                    .padding(bottom = 10.dp),
-                                value = "Detail1",
-                                onValueChange = {},
-                                colors = TextFieldDefaults.colors(Color.Transparent)
+                                fontSize = 14.sp
                             )
-                            Text(text = "DETAIL 1",
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp)
                             TextField(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(30.dp)
                                     .background(Color.Transparent)
-                                    .padding(bottom = 10.dp),
+                                    .padding(
+                                        top = 10.dp,
+                                        bottom = 15.dp
+                                    ),
                                 value = "Detail1",
-                                onValueChange = {},
-                                colors = TextFieldDefaults.colors(Color.Transparent)
+                                onValueChange = { },
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    focusedTextColor = Color.Black,
+                                    unfocusedTextColor = Color.Black,
+                                    focusedIndicatorColor = PklPrimary900
+                                ),
+                                textStyle = TextStyle(fontSize = 12.sp)
                             )
-                            Text(text = "DETAIL 1",
+                            Spacer(modifier = Modifier.size(10.dp))
+                            Text(
+                                text = stringResource(id = R.string.nomor_urut_bangunan_fisik_ruta),
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp)
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(30.dp)
-                                    .background(Color.Transparent)
-                                    .padding(bottom = 10.dp),
-                                value = "Detail1",
-                                onValueChange = {},
-                                colors = TextFieldDefaults.colors(Color.Transparent)
+                                fontSize = 14.sp
                             )
-                            Text(text = "DETAIL 1",
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp)
                             TextField(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(30.dp)
                                     .background(Color.Transparent)
-                                    .padding(bottom = 10.dp),
+                                    .padding(
+                                        top = 10.dp,
+                                        bottom = 15.dp
+                                    ),
                                 value = "Detail1",
                                 onValueChange = {},
-                                colors = TextFieldDefaults.colors(Color.Transparent)
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    focusedTextColor = Color.Black,
+                                    unfocusedTextColor = Color.Black,
+                                    focusedIndicatorColor = PklPrimary900
+                                ),
+                                textStyle = TextStyle(fontSize = 12.sp)
                             )
-                            Text(text = "DETAIL 1",
+                            Spacer(modifier = Modifier.size(10.dp))
+                            Text(
+                                text = stringResource(id = R.string.nomor_urut_bangunan_sensus_ruta),
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp)
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(30.dp)
-                                    .background(Color.Transparent)
-                                    .padding(bottom = 10.dp),
-                                value = "Detail1",
-                                onValueChange = {},
-                                colors = TextFieldDefaults.colors(Color.Transparent)
+                                fontSize = 14.sp
                             )
-                            Text(text = "DETAIL 1",
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp)
                             TextField(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(30.dp)
                                     .background(Color.Transparent)
-                                    .padding(bottom = 10.dp),
+                                    .padding(
+                                        top = 10.dp,
+                                        bottom = 15.dp
+                                    ),
                                 value = "Detail1",
                                 onValueChange = {},
-                                colors = TextFieldDefaults.colors(Color.Transparent)
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    focusedTextColor = Color.Black,
+                                    unfocusedTextColor = Color.Black,
+                                    focusedIndicatorColor = PklPrimary900
+                                ),
+                                textStyle = TextStyle(fontSize = 12.sp)
                             )
-                            Text(text = "DETAIL 1",
+                            Spacer(modifier = Modifier.size(10.dp))
+                            Text(
+                                text = stringResource(id = R.string.nomor_urut_krt_ruta),
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp)
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(30.dp)
-                                    .background(Color.Transparent)
-                                    .padding(bottom = 10.dp),
-                                value = "Detail1",
-                                onValueChange = {},
-                                colors = TextFieldDefaults.colors(Color.Transparent)
+                                fontSize = 14.sp
                             )
-                            Text(text = "DETAIL 1",
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp)
                             TextField(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(30.dp)
                                     .background(Color.Transparent)
-                                    .padding(bottom = 10.dp),
+                                    .padding(
+                                        top = 10.dp,
+                                        bottom = 15.dp
+                                    ),
                                 value = "Detail1",
                                 onValueChange = {},
-                                colors = TextFieldDefaults.colors(Color.Transparent)
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    focusedTextColor = Color.Black,
+                                    unfocusedTextColor = Color.Black,
+                                    focusedIndicatorColor = PklPrimary900
+                                ),
+                                textStyle = TextStyle(fontSize = 12.sp)
                             )
-                            Text(text = "DETAIL 1",
+                            Spacer(modifier = Modifier.size(10.dp))
+                            Text(
+                                text = stringResource(id = R.string.nama_krt_ruta),
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp)
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(30.dp)
-                                    .background(Color.Transparent)
-                                    .padding(bottom = 10.dp),
-                                value = "Detail1",
-                                onValueChange = {},
-                                colors = TextFieldDefaults.colors(Color.Transparent)
+                                fontSize = 14.sp
                             )
-                            Text(text = "DETAIL 1",
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp)
                             TextField(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(30.dp)
                                     .background(Color.Transparent)
-                                    .padding(bottom = 10.dp),
+                                    .padding(
+                                        top = 10.dp,
+                                        bottom = 15.dp
+                                    ),
                                 value = "Detail1",
                                 onValueChange = {},
-                                colors = TextFieldDefaults.colors(Color.Transparent)
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    focusedTextColor = Color.Black,
+                                    unfocusedTextColor = Color.Black,
+                                    focusedIndicatorColor = PklPrimary900
+                                ),
+                                textStyle = TextStyle(fontSize = 12.sp)
                             )
-                            Text(text = "DETAIL 1",
+                            Spacer(modifier = Modifier.size(10.dp))
+                            Text(
+                                text = stringResource(id = R.string.alamat_ruta),
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp)
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(30.dp)
-                                    .background(Color.Transparent)
-                                    .padding(bottom = 10.dp),
-                                value = "Detail1",
-                                onValueChange = {},
-                                colors = TextFieldDefaults.colors(Color.Transparent)
+                                fontSize = 14.sp
                             )
-                            Text(text = "DETAIL 1",
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp)
                             TextField(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(30.dp)
                                     .background(Color.Transparent)
-                                    .padding(bottom = 10.dp),
+                                    .padding(
+                                        top = 10.dp,
+                                        bottom = 15.dp
+                                    ),
                                 value = "Detail1",
                                 onValueChange = {},
-                                colors = TextFieldDefaults.colors(Color.Transparent)
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    focusedTextColor = Color.Black,
+                                    unfocusedTextColor = Color.Black,
+                                    focusedIndicatorColor = PklPrimary900
+                                ),
+                                textStyle = TextStyle(fontSize = 12.sp)
                             )
-                            Text(text = "DETAIL 1",
+                            Spacer(modifier = Modifier.size(10.dp))
+                            Text(
+                                text = stringResource(id = R.string.keberadaan_genz_ortu_ruta),
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp)
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(30.dp)
-                                    .background(Color.Transparent)
-                                    .padding(bottom = 10.dp),
-                                value = "Detail1",
-                                onValueChange = {},
-                                colors = TextFieldDefaults.colors(Color.Transparent)
+                                fontSize = 14.sp
                             )
-                            Text(text = "DETAIL 1",
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp)
                             TextField(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(30.dp)
                                     .background(Color.Transparent)
-                                    .padding(bottom = 10.dp),
+                                    .padding(
+                                        top = 10.dp,
+                                        bottom = 15.dp
+                                    ),
                                 value = "Detail1",
                                 onValueChange = {},
-                                colors = TextFieldDefaults.colors(Color.Transparent)
-                            )
-                            Text(text = "DETAIL 1",
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp)
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(30.dp)
-                                    .background(Color.Transparent)
-                                    .padding(bottom = 10.dp),
-                                value = "Detail1",
-                                onValueChange = {},
-                                colors = TextFieldDefaults.colors(Color.Transparent)
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    focusedTextColor = Color.Black,
+                                    unfocusedTextColor = Color.Black,
+                                    focusedIndicatorColor = PklPrimary900
+                                ),
+                                textStyle = TextStyle(fontSize = 12.sp)
                             )
                         }
-                        TextButton(onClick = { openDetail = false }) {
-                            Text("Close")
-                        }
+                        Text(modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = PklPrimary900,
+                                shape = RoundedCornerShape(
+                                    bottomStart = 15.dp,
+                                    bottomEnd = 15.dp
+                                )
+                            )
+                            .clickable { openDetail = false }
+                            .padding(
+                                top = 10.dp,
+                                bottom = 10.dp
+                            ),
+                            textAlign = TextAlign.Center,
+                            text = stringResource(id = R.string.close_popup_list_ruta).uppercase(),
+                            color = Color.White,
+                            fontFamily = PoppinsFontFamily,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Medium)
                     }
                 })
         }
@@ -577,54 +595,79 @@ fun RutaRow(
         if (openDialog) {
             Dialog(onDismissRequest = { openDialog = false },
                 content = {
-                    Surface {
-                        Column(
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = PklBase,
+                                shape = RoundedCornerShape(15.dp)
+                            ),
+                        verticalArrangement = Arrangement.SpaceEvenly,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
                             modifier = Modifier
-                                .fillMaxWidth(),
-                            verticalArrangement = Arrangement.SpaceEvenly,
-                            horizontalAlignment = Alignment.CenterHorizontally,
+                                .fillMaxWidth()
+                                .background(
+                                    color = PklPrimary900,
+                                    shape = RoundedCornerShape(
+                                        topStart = 15.dp,
+                                        topEnd = 15.dp
+                                    )
+                                )
+                                .padding(
+                                    top = 10.dp,
+                                    bottom = 10.dp
+                                ),
+                            text = stringResource(id = R.string.action_art),
+                            color = PklBase,
+                            textAlign = TextAlign.Center,
+                            fontFamily = PoppinsFontFamily,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Divider()
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            Arrangement.Center,
+                            Alignment.CenterHorizontally
                         ) {
-                            Text(
-                                modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
-                                text = "Aksi Untuk ART",
-                                fontFamily = PoppinsFontFamily,
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                            Divider()
-                            Text(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(50.dp)
-                                    .clickable { },
+                            Text(modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { }
+                                .padding(
+                                    top = 10.dp,
+                                    bottom = 10.dp
+                                ),
                                 textAlign = TextAlign.Center,
-                                text = "Ubah",
+                                text = stringResource(id = R.string.ubah_action_art),
                                 fontSize = 16.sp,
                                 fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(50.dp)
-                                    .clickable { },
+                                fontWeight = FontWeight.Medium)
+                            Text(modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { }
+                                .padding(
+                                    top = 10.dp,
+                                    bottom = 10.dp
+                                ),
                                 textAlign = TextAlign.Center,
-                                text = "Salin isian ruta",
+                                text = stringResource(id = R.string.salin_action_art),
                                 fontSize = 16.sp,
                                 fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(50.dp)
-                                    .clickable { },
+                                fontWeight = FontWeight.Medium)
+                            Text(modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { }
+                                .padding(
+                                    top = 10.dp,
+                                    bottom = 10.dp
+                                ),
                                 textAlign = TextAlign.Center,
-                                text = "Hapus",
+                                text = stringResource(id = R.string.hapus_action_art),
                                 fontSize = 16.sp,
                                 fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium
-                            )
+                                fontWeight = FontWeight.Medium)
                         }
                     }
                 })
