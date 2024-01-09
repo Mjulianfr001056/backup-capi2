@@ -3,5 +3,5 @@ package com.polstat.pkl.model.domain
 data class Session(
     val user: User,
     val dataTim: DataTim,
-    val wilayah: Wilayah
+    val wilayah: List<Wilayah>
 )
