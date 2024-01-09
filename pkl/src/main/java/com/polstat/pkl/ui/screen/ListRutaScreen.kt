@@ -6,14 +6,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -64,6 +66,8 @@ import com.polstat.pkl.R
 import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.theme.*
 import com.polstat.pkl.ui.theme.PklPrimary300
+import com.polstat.pkl.viewmodel.ListRutaViewModel
+import com.polstat.pkl.viewmodel.RutaUiState
 
 @Preview
 @Composable
@@ -75,14 +79,14 @@ fun ListRutaPreview() {
         ) {
             val navController = rememberNavController()
 
-            ListRutaScreen(navController)
+//            ListRutaScreen(navController)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListRutaScreen(navController: NavHostController) {
+fun ListRutaScreen(navController: NavHostController, listRutaViewModel: ListRutaViewModel) {
     var showMenu by remember { mutableStateOf(false) }
     var showSearchBar by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
@@ -164,8 +168,13 @@ fun ListRutaScreen(navController: NavHostController) {
                     Alignment.CenterVertically) {
                     SearchBar(
                         query = text,
-                        onQueryChange = { text = it },
-                        onSearch = { text },
+                        onQueryChange = {
+                            text = it
+                            listRutaViewModel.searchRuta(text)
+                                        },
+                        onSearch = { text = it
+                            listRutaViewModel.searchRuta(text)
+                                   },
                         active = false,
                         onActiveChange = { true },
                         placeholder = { Text(
@@ -184,7 +193,7 @@ fun ListRutaScreen(navController: NavHostController) {
                             }},
                         shape = RoundedCornerShape(0.dp),
                         colors = SearchBarDefaults.colors(containerColor = PklPrimary900, inputFieldColors = TextFieldDefaults.colors(Color.White)),
-                        content = {  }
+                        content = { listRutaViewModel.searchRuta(text) }
                     )
                 }
             }
@@ -254,8 +263,7 @@ fun ListRutaScreen(navController: NavHostController) {
 
                 }
 //                ScrollContent()
-                RutaRow()
-                RutaRow()
+                RutaList(rutaUiState = listRutaViewModel.rutaUiState)
             }
         },
         floatingActionButton = {
@@ -277,14 +285,14 @@ fun ListRutaScreen(navController: NavHostController) {
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class,
-    ExperimentalLayoutApi::class
-)
-@Preview(showBackground = true)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RutaRow(
-//    onClick: () -> Unit,
-//    onEnableChange: (Boolean) -> Unit
+    no: Int,
+    noBF: String,
+    noBS: String,
+    noRuta: String,
+    namaKRT: String
 ) {
     var openDialog by remember { mutableStateOf(false) }
     var openDetail by remember { mutableStateOf(false) }
@@ -300,31 +308,31 @@ fun RutaRow(
         Alignment.CenterVertically
     ) {
         Text(
-            text = stringResource(id = R.string.no_list_ruta),
+            text = "$no",
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
         )
         Text(
-            text = stringResource(id = R.string.no_bf_list_ruta),
+            text = noBF,
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
         )
         Text(
-            text = stringResource(id = R.string.no_bs_list_ruta),
+            text = noBS,
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
         )
         Text(
-            text = stringResource(id = R.string.no_ruta_list_ruta),
+            text = noRuta,
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
         )
         Text(
-            text = stringResource(id = R.string.nama_krt_list_ruta),
+            text = namaKRT,
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
@@ -672,6 +680,41 @@ fun RutaRow(
                     }
                 })
         }
+    }
+}
+
+@Composable
+fun RutaList(rutaUiState: RutaUiState) {
+    when (rutaUiState) {
+        is RutaUiState.Success -> {
+            val ruta = rutaUiState.ruta
+            var i = 0
+            LazyColumn(modifier = Modifier.fillMaxHeight(),
+                content = {
+                    items(items = ruta) { ruta ->
+                        i++
+                        RutaRow(
+                            no = i,
+                            noBF = ruta.no_bg_fisik,
+                            noBS = ruta.no_bg_fisik,
+                            noRuta = ruta.no_urut_rt,
+                            namaKRT = ruta.nama_krt
+                        )
+                    }
+                })
+        }
+
+        is RutaUiState.Loading -> {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                text = "Loading...",
+                textAlign = TextAlign.Center
+            )
+        }
+
+        is RutaUiState.Error -> {}
     }
 }
 
