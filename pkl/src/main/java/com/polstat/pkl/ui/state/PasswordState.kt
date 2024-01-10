@@ -1,8 +1,10 @@
 package com.polstat.pkl.ui.state
 
+@Deprecated("Pakai LoginScreenState")
 class PasswordState :
     TextFieldState(validator = ::isPasswordValid, errorFor = ::passwordValidationError)
 
+@Deprecated("Pakai LoginScreenState")
 class ConfirmPasswordState(private val passwordState: PasswordState) : TextFieldState() {
     override val isValid
         get() = passwordAndConfirmationValid(passwordState.text, text)

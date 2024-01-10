@@ -12,6 +12,7 @@ import com.polstat.pkl.ui.screen.ListBSScreen
 import com.polstat.pkl.ui.screen.ListRutaScreen
 import com.polstat.pkl.ui.screen.ListSampleScreen
 import com.polstat.pkl.ui.screen.LoginScreen
+import com.polstat.pkl.ui.screen.OnBoardingScreen
 import com.polstat.pkl.ui.screen.PasswordMasterScreen
 import com.polstat.pkl.ui.screen.SamplingScreen
 import com.polstat.pkl.viewmodel.AuthViewModel
@@ -26,8 +27,13 @@ fun AppNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = Capi63Screen.Login.route
+        startDestination = Capi63Screen.OnBoarding.route
     ) {
+        composable(Capi63Screen.OnBoarding.route) {
+            OnBoardingScreen(
+                navController = navController
+            )
+        }
         composable(Capi63Screen.Login.route) {
             LoginScreen(
                 navController = navController,

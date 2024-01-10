@@ -1,6 +1,7 @@
 package com.polstat.pkl.navigation
 
 sealed class Capi63Screen (val route: String) {
+    object OnBoarding : Capi63Screen(route = "onboarding")
     object Login : Capi63Screen(route = "login")
     object Beranda : Capi63Screen(route = "beranda")
     object Sampling : Capi63Screen(route = "sampling")
