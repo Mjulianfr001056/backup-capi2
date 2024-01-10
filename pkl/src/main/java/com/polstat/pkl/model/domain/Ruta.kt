@@ -14,5 +14,6 @@ data class Ruta(
     val noBgSensus: Int = 0,
     val noSegmen: Int = 0,
     val noUrutRtEgb: Int = 0,
-    val noUrutRuta: Int = 0
+    val noUrutRuta: Int = 0,
+    val status: String = ""
 )
