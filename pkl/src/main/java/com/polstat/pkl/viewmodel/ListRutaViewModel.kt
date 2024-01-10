@@ -8,9 +8,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.model.domain.Ruta
 import com.polstat.pkl.repository.RutaRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ListRutaViewModel(
+@HiltViewModel
+class ListRutaViewModel @Inject constructor(
     private val rutaRepository: RutaRepository
 ): ViewModel() {
 
