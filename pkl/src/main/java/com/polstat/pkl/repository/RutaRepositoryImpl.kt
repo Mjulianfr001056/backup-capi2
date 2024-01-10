@@ -7,6 +7,11 @@ import javax.inject.Inject
 class RutaRepositoryImpl @Inject constructor(
     private val rutaApi: RutaApi
 ): RutaRepository{
+
+    companion object {
+        private const val TAG = "RutaRepositoryImpl"
+    }
+
     override suspend fun getAllRuta(): List<Ruta> = rutaApi.rutaSynchronize()
 
     override suspend fun getRuta(kodeRuta: String): Ruta {

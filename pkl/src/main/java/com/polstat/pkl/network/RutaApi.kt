@@ -1,6 +1,7 @@
 package com.polstat.pkl.network
 
 import com.polstat.pkl.model.domain.Ruta
+import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 

@@ -46,7 +46,7 @@ class ListRutaViewModel @Inject constructor(
         if (rutaUiState is RutaUiState.Success) {
             val filteredRuta = listRuta.filter { listRuta ->
                 listRuta.kodeRuta.lowercase().contains(search.lowercase(), false)
-                listRuta.nama_krt.lowercase().contains(search.lowercase(), false)
+                listRuta.namaKrt.lowercase().contains(search.lowercase(), false)
             }
             rutaUiState = RutaUiState.Success(filteredRuta)
         }

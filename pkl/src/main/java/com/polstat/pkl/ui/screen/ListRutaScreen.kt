@@ -66,6 +66,7 @@ import com.polstat.pkl.R
 import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.theme.*
 import com.polstat.pkl.ui.theme.PklPrimary300
+import com.polstat.pkl.viewmodel.AuthViewModel
 import com.polstat.pkl.viewmodel.ListRutaViewModel
 import com.polstat.pkl.viewmodel.RutaUiState
 
@@ -86,7 +87,7 @@ fun ListRutaPreview() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListRutaScreen(navController: NavHostController, listRutaViewModel: ListRutaViewModel) {
+fun ListRutaScreen(navController: NavHostController, listRutaViewModel: ListRutaViewModel, authViewModel: AuthViewModel) {
     var showMenu by remember { mutableStateOf(false) }
     var showSearchBar by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
@@ -696,13 +697,13 @@ fun RutaList(rutaUiState: RutaUiState) {
             LazyColumn(modifier = Modifier.fillMaxHeight(),
                 content = {
                     items(items = ruta) { ruta ->
-                        i++
+//                        i++
                         RutaRow(
                             no = i,
-                            noBF = ruta.no_bg_fisik,
-                            noBS = ruta.no_bg_fisik,
-                            noRuta = ruta.no_urut_rt,
-                            namaKRT = ruta.nama_krt
+                            noBF = ruta.noBgFisik.toString(),
+                            noBS = ruta.noBS,
+                            noRuta = ruta.noUrutRuta.toString(),
+                            namaKRT = ruta.namaKrt
                         )
                     }
                 })
