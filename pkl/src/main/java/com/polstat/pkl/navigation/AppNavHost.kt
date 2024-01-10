@@ -56,7 +56,8 @@ fun AppNavHost(
         }
         composable(Capi63Screen.ListBs.route) {
             ListBSScreen(
-                navController = navController
+                navController = navController,
+                viewModel = authViewModel
             )
         }
         composable(Capi63Screen.ListRuta.route) {

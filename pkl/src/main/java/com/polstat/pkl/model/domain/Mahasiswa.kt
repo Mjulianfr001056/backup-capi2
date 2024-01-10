@@ -12,18 +12,3 @@ data class Mahasiswa(
     val password: String = "",
     val wilayah_kerja: List<Wilayah> = emptyList()
 )
-//{
-//    // Konstruktor default
-//    constructor() : this(
-//        alamat = "",
-//        email = "",
-//        foto = "",
-//        id_tim = "",
-//        isKoor = false,
-//        nama = "",
-//        nim = "",
-//        no_hp = "",
-//        password = "",
-//        wilayah = emptyList()
-//    )
-//}
