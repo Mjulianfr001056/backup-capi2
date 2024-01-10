@@ -642,7 +642,9 @@ fun RutaRow(
                         ) {
                             Text(modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { }
+                                .clickable {
+//                                    mungkin ini harusnya move ke screen buat ubah ruta
+                                }
                                 .padding(
                                     top = 10.dp,
                                     bottom = 10.dp
@@ -666,7 +668,9 @@ fun RutaRow(
                                 fontWeight = FontWeight.Medium)
                             Text(modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { }
+                                .clickable {
+//                                    harusnya muncul dialog konfirmasi
+                                }
                                 .padding(
                                     top = 10.dp,
                                     bottom = 10.dp

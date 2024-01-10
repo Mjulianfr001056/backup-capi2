@@ -21,9 +21,11 @@ class ListRutaViewModel @Inject constructor(
         private const val TAG = "ListRutaViewModel"
     }
 
-    private lateinit var ruta: List<Ruta>
+    private lateinit var listRuta: List<Ruta>
+    private lateinit var ruta: Ruta
     var rutaUiState: RutaUiState by mutableStateOf(RutaUiState.Loading)
         private set
+    var selectedRuta: String by mutableStateOf("")
 
     init {
         viewModelScope.launch {
@@ -38,13 +40,13 @@ class ListRutaViewModel @Inject constructor(
     }
 
     fun searchRuta(search: String) {
-        if (!::ruta.isInitialized)
+        if (!::listRuta.isInitialized)
             return
 
         if (rutaUiState is RutaUiState.Success) {
-            val filteredRuta = ruta.filter { ruta ->
-                ruta.kodeRuta.lowercase().contains(search.lowercase(), false)
-                ruta.nama_krt.lowercase().contains(search.lowercase(), false)
+            val filteredRuta = listRuta.filter { listRuta ->
+                listRuta.kodeRuta.lowercase().contains(search.lowercase(), false)
+                listRuta.nama_krt.lowercase().contains(search.lowercase(), false)
             }
             rutaUiState = RutaUiState.Success(filteredRuta)
         }
@@ -52,7 +54,7 @@ class ListRutaViewModel @Inject constructor(
 
     suspend fun getAllRuta() {
         try {
-            ruta = rutaRepository.getAllRuta()
+            listRuta = rutaRepository.getAllRuta()
         } catch (e: Exception) {
             Log.e(
                 TAG, "Error: ${e.message}"
@@ -60,9 +62,29 @@ class ListRutaViewModel @Inject constructor(
             return
         }
         Log.d(
-            TAG, "ruta: $ruta"
+            TAG, "List Ruta: $listRuta"
         )
-        rutaUiState = RutaUiState.Success(ruta)
+        rutaUiState = RutaUiState.Success(listRuta)
+    }
+
+    suspend fun editRuta() {
+        try {
+           ruta = rutaRepository.editRuta("update", selectedRuta)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in update ruta: ${e.message}")
+            return
+        }
+        Log.d(TAG, "Updated ruta: $ruta")
+    }
+
+    suspend fun deleteRuta() {
+        try {
+            rutaRepository.deleteRuta("delete", selectedRuta)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in delete ruta: ${e.message}")
+            return
+        }
+        Log.d(TAG, "Ruta is deleted")
     }
 }
 
