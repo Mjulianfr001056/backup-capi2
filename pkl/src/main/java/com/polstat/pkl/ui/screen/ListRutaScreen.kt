@@ -63,6 +63,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.R
+import com.polstat.pkl.model.domain.Wilayah
 import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.theme.*
 import com.polstat.pkl.ui.theme.PklPrimary300
@@ -91,6 +92,7 @@ fun ListRutaScreen(navController: NavHostController, listRutaViewModel: ListRuta
     var showMenu by remember { mutableStateOf(false) }
     var showSearchBar by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
+    var wilayah = authViewModel.getWilayahFromSession()
 
     Scaffold(
         topBar = {
@@ -264,7 +266,7 @@ fun ListRutaScreen(navController: NavHostController, listRutaViewModel: ListRuta
 
                 }
 //                ScrollContent()
-                RutaList(rutaUiState = listRutaViewModel.rutaUiState)
+                RutaList(rutaUiState = listRutaViewModel.rutaUiState, wilayah = wilayah)
             }
         },
         floatingActionButton = {
@@ -689,7 +691,7 @@ fun RutaRow(
 }
 
 @Composable
-fun RutaList(rutaUiState: RutaUiState) {
+fun RutaList(rutaUiState: RutaUiState, wilayah: List<Wilayah>) {
     when (rutaUiState) {
         is RutaUiState.Success -> {
             val ruta = rutaUiState.ruta
@@ -697,7 +699,7 @@ fun RutaList(rutaUiState: RutaUiState) {
             LazyColumn(modifier = Modifier.fillMaxHeight(),
                 content = {
                     items(items = ruta) { ruta ->
-//                        i++
+                        i++
                         RutaRow(
                             no = i,
                             noBF = ruta.noBgFisik.toString(),

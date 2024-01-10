@@ -12,7 +12,11 @@ class RutaRepositoryImpl @Inject constructor(
         private const val TAG = "RutaRepositoryImpl"
     }
 
-    override suspend fun getAllRuta(): List<Ruta> = rutaApi.rutaSynchronize()
+    override suspend fun getAllRuta(noBS: String): List<Ruta> {
+        TODO("Not yet implemented")
+    }
+
+//    override suspend fun getAllRuta(): List<Ruta> = rutaApi.rutaSynchronize()
 
     override suspend fun getRuta(kodeRuta: String): Ruta {
         TODO("Not yet implemented")

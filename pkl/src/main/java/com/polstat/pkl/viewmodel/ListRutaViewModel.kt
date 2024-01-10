@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.model.domain.Ruta
+import com.polstat.pkl.model.domain.Wilayah
 import com.polstat.pkl.repository.RutaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -23,14 +24,16 @@ class ListRutaViewModel @Inject constructor(
 
     private lateinit var listRuta: List<Ruta>
     private lateinit var ruta: Ruta
+    private lateinit var wilayah: Wilayah
     var rutaUiState: RutaUiState by mutableStateOf(RutaUiState.Loading)
         private set
     var selectedRuta: String by mutableStateOf("")
 
+
     init {
         viewModelScope.launch {
             try {
-                getAllRuta()
+                getAllRuta(wilayah.noBS)
             } catch (e: Exception) {
                 Log.e(
                     TAG, e.stackTraceToString()
@@ -52,9 +55,9 @@ class ListRutaViewModel @Inject constructor(
         }
     }
 
-    suspend fun getAllRuta() {
+    suspend fun getAllRuta(noBS: String) {
         try {
-            listRuta = rutaRepository.getAllRuta()
+            listRuta = rutaRepository.getAllRuta(noBS)
         } catch (e: Exception) {
             Log.e(
                 TAG, "Error: ${e.message}"
