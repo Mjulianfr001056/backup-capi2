@@ -1,5 +1,6 @@
 package com.polstat.pkl.repository
 
+import android.util.Log
 import com.polstat.pkl.model.domain.Ruta
 import com.polstat.pkl.model.domain.Session
 import com.polstat.pkl.model.domain.Wilayah
@@ -33,6 +34,8 @@ class LocalRutaRepositoryImpl @Inject constructor(
         val updatedSession = session.copy(wilayah = updatedWilayahList)
 
         saveSession(updatedSession)
+
+        Log.d(TAG, "Session was updated: $updatedSession")
 
         return "Ruta berhasil disimpan!"
     }
@@ -82,6 +85,8 @@ class LocalRutaRepositoryImpl @Inject constructor(
 
         saveSession(updatedSession)
 
+        Log.d(TAG, "Session was updated: $updatedSession")
+
         return "Ruta berhasil diupdate!"
     }
 
@@ -116,6 +121,8 @@ class LocalRutaRepositoryImpl @Inject constructor(
         val updatedSession = session.copy(wilayah = updatedWilayahList)
 
         saveSession(updatedSession)
+
+        Log.d(TAG, "Session was updated: $updatedSession")
 
         return "Ruta berhasil dihapus!"
 

@@ -2,7 +2,6 @@ package com.polstat.pkl.repository
 
 import android.util.Log
 import com.polstat.pkl.model.request.SyncRutaRequest
-import com.polstat.pkl.model.domain.Session
 import com.polstat.pkl.model.response.SyncRutaResponse
 import com.polstat.pkl.network.RutaApi
 import com.polstat.pkl.utils.Result
@@ -25,7 +24,7 @@ class RemoteRutaRepositoryImpl @Inject constructor(
             emit(Result.Loading(true))
             val syncRutaResponse = try {
                 val response = rutaApi.sinkronisasiRuta(syncRutaRequest)
-                Log.d(TAG, "Sync Ruta Response:  ${response}")
+                Log.d(TAG, "Sync Ruta Response:  $response")
                 response
             } catch (e: IOException) {
                 e.printStackTrace()
