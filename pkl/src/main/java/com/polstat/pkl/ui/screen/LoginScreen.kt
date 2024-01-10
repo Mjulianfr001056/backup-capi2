@@ -24,7 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.polstat.pkl.R
-import com.polstat.pkl.navigation.Capi63Screen
+import com.polstat.pkl.navigation.CapiScreen
 import com.polstat.pkl.ui.event.LoginScreenEvent
 import com.polstat.pkl.ui.screen.components.LoadingDialog
 import com.polstat.pkl.ui.screen.components.LoginButton
@@ -62,7 +62,11 @@ fun LoginScreen(
                 isLoginProcess = false
                 delay(1000)
                 Toast.makeText(context, "Login Success", Toast.LENGTH_SHORT).show()
-                navController.navigate(Capi63Screen.Beranda.route)
+                navController.navigate(CapiScreen.Top.MAIN){
+                    popUpTo(CapiScreen.Top.AUTH){
+                        inclusive = true
+                    }
+                }
             }
         }
     }
