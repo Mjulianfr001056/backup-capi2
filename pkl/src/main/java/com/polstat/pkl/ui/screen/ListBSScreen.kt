@@ -46,10 +46,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.polstat.pkl.R
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.polstat.pkl.model.domain.Wilayah
 import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklBase
@@ -57,10 +60,13 @@ import com.polstat.pkl.ui.theme.PklPrimary
 import com.polstat.pkl.ui.theme.PklPrimary700
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
+import com.polstat.pkl.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListBSScreen(navController: NavHostController) {
+fun ListBSScreen(navController: NavHostController, viewModel: AuthViewModel) {
+    val listWilayah = viewModel.getWilayahFromSession()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -115,6 +121,7 @@ fun ListBSScreen(navController: NavHostController) {
         },
         content = { innerPadding ->
             ListBS(
+                listWilayah = listWilayah,
                 navController = navController,
                 modifier = Modifier.padding(innerPadding)
             )
@@ -125,10 +132,11 @@ fun ListBSScreen(navController: NavHostController) {
 @Composable
 private fun BlokSensus(
     onLihatRutaClicked: () -> Unit,
-    onLihatSampleClicked: () -> Unit
+    onLihatSampleClicked: () -> Unit,
+    wilayah: Wilayah
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var status by remember { mutableStateOf("Sampel Terkirim") }
+    var status by remember { mutableStateOf(wilayah.status) }
 
     Box(
         modifier = Modifier
@@ -145,7 +153,7 @@ private fun BlokSensus(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(R.string.blok_sensus) + "444A",
+                    text = stringResource(R.string.blok_sensus) + wilayah.noBS,
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(horizontal = 8.dp),
                     color = Color.DarkGray
@@ -159,7 +167,7 @@ private fun BlokSensus(
                 ) {
                     Row {
                         Text(
-                            text = stringResource(R.string.kec) + "Batu" + stringResource(R.string.kel) + "Oro-Oro Ombo",
+                            text = stringResource(R.string.kec) + wilayah.namaKec + stringResource(R.string.kel) + wilayah.namaKel,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(start = 8.dp),
                             color = Color.DarkGray
@@ -167,7 +175,7 @@ private fun BlokSensus(
                     }
                     Row {
                         Text(
-                            text = "Batu" + ", " + "Jawa Timur",
+                            text = wilayah.namaKab + ", " + "Bali",
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(start = 8.dp),
                             color = Color.DarkGray
@@ -234,7 +242,7 @@ private fun BlokSensus(
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
-                                text = "3",
+                                text = wilayah.jmlRt.toString(),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
                                 color = PklPrimary
@@ -249,7 +257,7 @@ private fun BlokSensus(
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
-                                text = "3",
+                                text = wilayah.jmlRtGenz.toString(),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
                                 color = PklPrimary
@@ -272,7 +280,7 @@ private fun BlokSensus(
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
-                                text = "3",
+                                text = wilayah.jmlGenZ.toString(),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
                                 color = PklPrimary
@@ -284,7 +292,7 @@ private fun BlokSensus(
                             Text(text = stringResource(R.string.total), fontFamily = PoppinsFontFamily, fontSize = 15.sp)
                         }
                         Row {
-                            Text(text = "3", style = MaterialTheme.typography.headlineLarge, color = PklPrimary, fontWeight = FontWeight.Bold)
+                            Text(text = wilayah.jmlGenZ.toString(), style = MaterialTheme.typography.headlineLarge, color = PklPrimary, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -298,7 +306,9 @@ private fun BlokSensus(
                     }
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Icon(
@@ -341,25 +351,26 @@ private fun BlokSensus(
 
 @Composable
 private fun ListBS(
+    listWilayah : List<Wilayah>,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    val itemCount = 2
-
     LazyColumn (
         modifier
             .fillMaxSize()
             .background(color = PklBase),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top){
-        items(itemCount) {
+        items(listWilayah.size) { index ->
+            val wilayah = listWilayah[index]
             BlokSensus(
                 onLihatRutaClicked = {
                     navController.navigate(Capi63Screen.ListRuta.route)
                 },
                 onLihatSampleClicked = {
                     navController.navigate(Capi63Screen.ListSample.route)
-                }
+                },
+                wilayah
             )
         }
     }
@@ -374,7 +385,7 @@ fun PreviewListBSScreen() {
             color = MaterialTheme.colorScheme.background
         ) {
             val navController = rememberNavController()
-            ListBSScreen(navController)
+            ListBSScreen(navController, viewModel = hiltViewModel())
         }
     }
 }
