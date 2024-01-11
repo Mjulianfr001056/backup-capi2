@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.polstat.pkl.ui.screen.components.BottomBar
+import com.polstat.pkl.ui.screen.components.BottomNavBar
 import com.polstat.pkl.ui.screen.components.ListPplCard
 import com.polstat.pkl.ui.screen.components.PmlCard
 import com.polstat.pkl.ui.screen.components.ProfileCard
@@ -56,7 +56,9 @@ fun BerandaScreenPreview() {
             color = MaterialTheme.colorScheme.background
         ) {
             val navController = rememberNavController()
+            val rootController = rememberNavController()
             BerandaScreen(
+                rootController = rootController,
                 navController = navController,
                 viewModel = hiltViewModel()
             )
@@ -67,6 +69,7 @@ fun BerandaScreenPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BerandaScreen(
+    rootController: NavHostController,
     navController: NavHostController,
     viewModel: AuthViewModel
 ) {
@@ -147,7 +150,7 @@ fun BerandaScreen(
             )
         },
         bottomBar = {
-            BottomBar(navController = navController)
+            BottomNavBar(rootNavController = rootController)
         }
     ) {innerPadding ->
         Column(

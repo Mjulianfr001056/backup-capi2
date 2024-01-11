@@ -12,7 +12,7 @@ plugins {
 
 android {
     namespace = "com.polstat.pkl"
-    compileSdk = Versions.android_compile_sdk
+    compileSdk = 34
 
     defaultConfig {
 
@@ -69,7 +69,7 @@ dependencies {
     implementation("androidx.compose.material:material:1.5.4")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-core:1.5.4")
-    implementation("androidx.compose.material:material-icons-extended:1.6.0-beta03")
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
