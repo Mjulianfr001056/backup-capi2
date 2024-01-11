@@ -1,131 +1,63 @@
 package com.polstat.pkl.repository
 
 import android.util.Log
+import com.polstat.pkl.database.Capi63Database
+import com.polstat.pkl.mapper.toRutaEntity
 import com.polstat.pkl.model.domain.Ruta
-import com.polstat.pkl.model.domain.Session
-import com.polstat.pkl.model.domain.Wilayah
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class LocalRutaRepositoryImpl @Inject constructor(
-    private val sessionRepository: SessionRepository
+    private val capi63Database: Capi63Database
 ) : LocalRutaRepository {
 
     companion object {
         private const val TAG = "LocalRutaRepoImpl"
     }
 
-    private fun saveSession(session: Session) {
-        sessionRepository.saveSession(session)
-    }
-
-    override fun createRuta(session: Session, wilayah: Wilayah, ruta: Ruta): String {
-
-        val updatedWilayahList = session.wilayah.map {
-            if (it == wilayah) {
-                val updatedRutaList = it.ruta.toMutableList()
-                updatedRutaList.add(ruta)
-
-                it.copy(ruta = updatedRutaList)
-            } else {
-                it
+    override fun insertRuta(
+        ruta: Ruta
+    ): Flow<String> {
+        return  flow {
+            try {
+                val readyRuta = ruta.copy(status = "insert")
+                capi63Database.capi63Dao.insertRuta(readyRuta.toRutaEntity())
+                val message = "Berhasil menambahkan ruta!"
+                Log.d(TAG, "insertRuta: $message")
+            } catch (e: Exception) {
+                val message = "Gagal menambahkan ruta!"
+                Log.d(TAG, "insertRuta: $message (${e.message})")
             }
         }
-
-        val updatedSession = session.copy(wilayah = updatedWilayahList)
-
-        saveSession(updatedSession)
-
-        Log.d(TAG, "Session was updated: $updatedSession")
-
-        return "Ruta berhasil disimpan!"
     }
 
-    override fun updateRuta(session: Session, wilayah: Wilayah, updatedRuta: Ruta): String {
-
-        val updatedWilayahList = session.wilayah.map {
-            // Mencari wilayah yang rutanya akan diupdate
-            if (it == wilayah) {
-                val updatedRutaList = it.ruta.map { existingRuta ->
-                    // Mencari ruta yang akan diupdate
-                    if (existingRuta.kodeRuta == updatedRuta.kodeRuta) {
-                        // Mengupdate nilai atribut-atribut Ruta
-                        existingRuta.copy(
-                            alamat = updatedRuta.alamat,
-                            catatan = updatedRuta.catatan,
-                            isGenzOrtu = updatedRuta.isGenzOrtu,
-                            jmlGenz = updatedRuta.jmlGenz,
-                            lat = updatedRuta.lat,
-                            long = updatedRuta.long,
-                            namaKrt = updatedRuta.namaKrt,
-                            noBS = updatedRuta.noBS,
-                            noBgFisik = updatedRuta.noBgFisik,
-                            noBgSensus = updatedRuta.noBgSensus,
-                            noSegmen = updatedRuta.noSegmen,
-                            noUrutRtEgb = updatedRuta.noUrutRtEgb,
-                            noUrutRuta = updatedRuta.noUrutRuta,
-                            status = "update"
-                        )
-
-                    } else {
-                        // Membiarkan ruta yang tidak diupdate
-                        existingRuta
-                    }
-                }
-
-                // Memperbarui list ruta dari wilayah
-                it.copy(ruta = updatedRutaList)
-            } else {
-                // Membiarkan wilayah yang rutanya tidak diupdate
-                it
+    override fun updateRuta(ruta: Ruta): Flow<String> {
+        return  flow {
+            try {
+                val readyRuta = ruta.copy(status = "update")
+                capi63Database.capi63Dao.updateRuta(readyRuta.toRutaEntity())
+                val message = "Berhasil mengupdate ruta!"
+                Log.d(TAG, "updateRuta: $message")
+            } catch (e: Exception) {
+                val message = "Gagal mengupdate ruta!"
+                Log.d(TAG, "updateRuta: $message (${e.message})")
             }
         }
-
-        // Memperbarui session
-        val updatedSession = session.copy(wilayah = updatedWilayahList)
-
-        saveSession(updatedSession)
-
-        Log.d(TAG, "Session was updated: $updatedSession")
-
-        return "Ruta berhasil diupdate!"
     }
 
-    override fun deleteRuta(session: Session, wilayah: Wilayah, deletedRuta: Ruta): String {
-
-        val updatedWilayahList = session.wilayah.map {
-            // Mencari wilayah yang rutanya akan diupdate
-            if (it == wilayah) {
-                val updatedRutaList = it.ruta.map { existingRuta ->
-                    // Mencari ruta yang akan diupdate
-                    if (existingRuta.kodeRuta == deletedRuta.kodeRuta) {
-                        // Mengupdate nilai atribut-atribut Ruta
-                        existingRuta.copy(
-                            status = "delete"
-                        )
-
-                    } else {
-                        // Membiarkan ruta yang tidak diupdate
-                        existingRuta
-                    }
-                }
-
-                // Memperbarui list ruta dari wilayah
-                it.copy(ruta = updatedRutaList)
-            } else {
-                // Membiarkan wilayah yang rutanya tidak diupdate
-                it
+    override fun fakeDeleteRuta(ruta: Ruta): Flow<String> {
+        return  flow {
+            try {
+                val readyRuta = ruta.copy(status = "delete")
+                capi63Database.capi63Dao.updateRuta(readyRuta.toRutaEntity())
+                val message = "Berhasil menghapus ruta!"
+                Log.d(TAG, "fakeDeleteRuta: $message")
+            } catch (e: Exception) {
+                val message = "Gagal menghapus ruta!"
+                Log.d(TAG, "fakeDeleteRuta: $message (${e.message})")
             }
         }
-
-        // Memperbarui session
-        val updatedSession = session.copy(wilayah = updatedWilayahList)
-
-        saveSession(updatedSession)
-
-        Log.d(TAG, "Session was updated: $updatedSession")
-
-        return "Ruta berhasil dihapus!"
-
     }
 
 }

@@ -1,6 +1,7 @@
 package com.polstat.pkl.di
 
 import com.polstat.pkl.network.AuthApi
+import com.polstat.pkl.network.RutaApi
 import com.polstat.pkl.repository.AuthRepository
 import com.polstat.pkl.repository.AuthRepositoryImpl
 import com.polstat.pkl.repository.SessionRepository
@@ -12,12 +13,13 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
-    val BASE_URL = "https://4f37-103-162-62-54.ngrok-free.app "
+    val BASE_URL = "https://0b44-103-162-62-54.ngrok-free.app/"
 
     @Provides
     @Singleton
@@ -48,8 +50,16 @@ class NetworkModule {
 
     @Provides
     @Singleton
+    fun provideRutaApi(retrofit: Retrofit) : RutaApi {
+        return retrofit.create(RutaApi::class.java)
+    }
+
+    @Provides
+    @Singleton
     fun provideAuthRepository(authApi: AuthApi, sessionRepository: SessionRepository) : AuthRepository {
         return AuthRepositoryImpl(authApi, sessionRepository)
     }
+
+
 
 }

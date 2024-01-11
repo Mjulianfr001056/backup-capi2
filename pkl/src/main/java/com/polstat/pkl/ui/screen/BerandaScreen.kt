@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,7 +46,7 @@ import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
-import com.polstat.pkl.viewmodel.AuthViewModel
+import com.polstat.pkl.viewmodel.BerandaViewModel
 
 @Preview
 @Composable
@@ -68,17 +69,23 @@ fun BerandaScreenPreview() {
 @Composable
 fun BerandaScreen(
     navController: NavHostController,
-    viewModel: AuthViewModel
+    viewModel: BerandaViewModel
 ) {
     var showMenu by remember {
         mutableStateOf(false)
     }
 
-    val user = viewModel.getUserFromSession()
 
-    val dataTim = viewModel.getDataTimFromSession()
 
-    val listWilayah = viewModel.getWilayahFromSession()
+    val session = viewModel.session
+
+    val dataTim = viewModel.dataTim.collectAsState()
+
+    viewModel.dataTimWithMahasiswa.collectAsState()
+
+    val listMahasiswaWithWilayah = viewModel.listMahasiswaWithWilayah.collectAsState()
+
+    val listWilayahWithRuta = viewModel.listWilayahWithRuta.collectAsState()
 
     Scaffold(
         topBar = {
@@ -158,19 +165,42 @@ fun BerandaScreen(
                 .verticalScroll(rememberScrollState())
         ) {
 
-            ProfileCard(
-                user = user,
-                dataTim = dataTim
-            )
+            session?.let {
+                ProfileCard(
+                    session = it,
+                    dataTim = dataTim.value
+                )
+            }
 
-            WilayahKerjaCard(listWilayah = listWilayah)
+            if (listMahasiswaWithWilayah.value.isNotEmpty()) {
+                listMahasiswaWithWilayah.value.forEach{ mahasiswaWithWilayah ->
+                    if (mahasiswaWithWilayah.mahasiswa.nim == session!!.nim) {
+                        WilayahKerjaCard(
+                            listWilayah = mahasiswaWithWilayah.listWilayah
+                        )
+                    }
+                }
+            }
 
-            if (user.isKoor) {
-                ListPplCard(listMahasiswa = dataTim.anggota)
-                StatusListingCard(anggotaTim = dataTim.anggota)
+            if (session!!.isKoor) {
+                ListPplCard(
+                    listMahasiswaWithWilayah = listMahasiswaWithWilayah.value,
+                    listWilayahWithRuta = listWilayahWithRuta.value
+                )
+                StatusListingCard(listMahasiswaWithWilayah = listMahasiswaWithWilayah.value)
             } else {
-                PmlCard(dataTim = dataTim)
-                ProgresListingCard(listWilayah = listWilayah)
+                PmlCard(dataTim = dataTim.value)
+
+                if (listMahasiswaWithWilayah.value.isNotEmpty()) {
+                    listMahasiswaWithWilayah.value.forEach{ mahasiswaWithWilayah ->
+                        if (mahasiswaWithWilayah.mahasiswa.nim == session.nim) {
+                            ProgresListingCard(
+                                mahasiswaWithWilayah = mahasiswaWithWilayah,
+                                listWilayahWithRuta = listWilayahWithRuta.value
+                            )
+                        }
+                    }
+                }
             }
         }
     }

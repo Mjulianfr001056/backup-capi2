@@ -1,15 +1,15 @@
 package com.polstat.pkl.repository
 
 import com.polstat.pkl.model.domain.Ruta
-import com.polstat.pkl.model.domain.Session
-import com.polstat.pkl.model.domain.Wilayah
+import kotlinx.coroutines.flow.Flow
 
 interface LocalRutaRepository {
 
-    fun createRuta(session: Session, wilayah: Wilayah, ruta: Ruta) : String
+    fun insertRuta(ruta: Ruta) : Flow<String>
 
-    fun updateRuta(session: Session, wilayah: Wilayah, updatedRuta: Ruta) : String
+    fun updateRuta(ruta: Ruta) : Flow<String>
 
-    fun deleteRuta(session: Session, wilayah: Wilayah, deletedRuta: Ruta) : String
+    fun fakeDeleteRuta(ruta: Ruta) : Flow<String>
+
 
 }
