@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
 
+@Deprecated("Pakai LoginScreenState")
 open class TextFieldState(
     private val validator: (String) -> Boolean = { true },
     private val errorFor: (String) -> String = { "" }

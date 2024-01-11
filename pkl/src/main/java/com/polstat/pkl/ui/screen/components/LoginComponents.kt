@@ -15,29 +15,24 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
@@ -52,23 +47,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.polstat.pkl.R
-import com.polstat.pkl.ui.state.NimState
-import com.polstat.pkl.ui.state.NimStateSaver
-import com.polstat.pkl.ui.state.PasswordState
-import com.polstat.pkl.ui.theme.Capi63Theme
+import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PklQuaternary
+import com.polstat.pkl.ui.theme.PklSecondary
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.ui.theme.typography
 
+@Preview(showBackground = true, apiLevel = 28)
 @Composable
 fun NimTextField(
     value: String = "",
-    onValueChange: (String) -> Unit,
-    errorMessage: String?,
-    onImeAction: () -> Unit = {}
+    onValueChange: (String) -> Unit = {},
+    errorMessage: String? = null,
 ) {
-    val imeAction: ImeAction = ImeAction.Next
 
     Column {
         val characterCount = remember { mutableIntStateOf(0) }
@@ -83,12 +75,13 @@ fun NimTextField(
                 Text(
                     text = stringResource(id = R.string.nim),
                     style = typography.titleSmall,
-                    color = if (isError) PklPrimary900 else PklQuaternary
+                    color = if (isError) PklPrimary900 else PklSecondary
                 )
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(all = 0.dp),
+            shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedTextColor = PklPrimary900,
                 focusedTextColor = PklPrimary900,
@@ -97,42 +90,41 @@ fun NimTextField(
             textStyle = typography.bodyMedium,
             isError = isError,
             keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = imeAction
+                imeAction = ImeAction.Next
             ),
-            keyboardActions = KeyboardActions(onDone = {
-                onImeAction()
-            }),
-            singleLine = true
+            singleLine = true,
+            supportingText = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = errorMessage ?: "",
+                        fontFamily = PoppinsFontFamily,
+                        fontWeight = FontWeight.W600,
+                        fontSize = 10.sp,
+                        color = PklPrimary900
+                    )
+                    Text(
+                        text = "${characterCount.intValue}/9",
+                        fontFamily = PoppinsFontFamily,
+                        fontWeight = FontWeight.W600,
+                        fontSize = 10.sp,
+                        color = PklQuaternary
+                    )
+                }
+            }
         )
-        Row(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = stringResource(id = R.string.wajib),
-                fontFamily = PoppinsFontFamily,
-                fontWeight = FontWeight.W600,
-                fontSize = 10.sp,
-                color = PklQuaternary
-            )
-            Text(
-                text = "${characterCount.intValue}/9",
-                fontFamily = PoppinsFontFamily,
-                fontWeight = FontWeight.W600,
-                fontSize = 10.sp,
-                color = PklQuaternary
-            )
-        }
     }
 }
 
+@Preview(showBackground = true, apiLevel = 28)
 @Composable
 fun PasswordTextField(
-    modifier: Modifier = Modifier,
     value: String = "",
-    onValueChange: (String) -> Unit,
-    errorMessage: String?,
+    onValueChange: (String) -> Unit = {},
+    errorMessage: String? = null,
 ) {
-    val imeAction: ImeAction = ImeAction.Done
     val isError: Boolean = errorMessage.isNullOrBlank()
 
     Column {
@@ -142,7 +134,7 @@ fun PasswordTextField(
             onValueChange = {
                 onValueChange(it)
             },
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(all = 0.dp),
             textStyle = TextStyle(
@@ -164,6 +156,7 @@ fun PasswordTextField(
                 focusedTextColor = PklPrimary900,
                 cursorColor = PklPrimary900,
             ),
+            shape = RoundedCornerShape(10.dp),
             trailingIcon = {
                 if (showPassword.value) {
                     IconButton(
@@ -186,7 +179,7 @@ fun PasswordTextField(
                         Icon(
                             imageVector = Icons.Filled.VisibilityOff,
                             contentDescription = stringResource(id = R.string.show_password),
-                            modifier = Modifier.size(15.dp)
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 } },
@@ -196,27 +189,28 @@ fun PasswordTextField(
             else PasswordVisualTransformation(),
             isError = isError,
             supportingText = {
-                if (errorMessage != null) {
-                    TextFieldError(
-                        textError = errorMessage
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
+                ){
+                    Text(
+                        text = errorMessage ?: "",
+                        fontFamily = PoppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 10.sp,
+                        color = PklPrimary900
                     )
                 }
             },
             keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = imeAction,
+                imeAction = ImeAction.Done,
                 keyboardType = KeyboardType.Password),
             singleLine = true
-        )
-        Text(
-            text = stringResource(id = R.string.wajib),
-            fontFamily = PoppinsFontFamily,
-            fontWeight = FontWeight.W600,
-            fontSize = 10.sp,
-            color = PklQuaternary
         )
     }
 }
 
+@Preview(showBackground = true, apiLevel = 28)
 @Composable
 fun LogoTitle() {
     Row(
@@ -237,7 +231,7 @@ fun LogoTitle() {
                 fontWeight = FontWeight.W400,
                 fontSize = 28.sp,
                 lineHeight = 0.sp,
-                color = PklPrimary900,
+                color = PklSecondary,
                 style = TextStyle(
                     platformStyle = PlatformTextStyle(
                         includeFontPadding = false
@@ -250,7 +244,7 @@ fun LogoTitle() {
                 fontWeight = FontWeight.W400,
                 fontSize = 28.sp,
                 lineHeight = 0.em,
-                color = PklPrimary900,
+                color = PklSecondary,
                 style = TextStyle(
                     platformStyle = PlatformTextStyle(
                         includeFontPadding = false
@@ -261,34 +255,29 @@ fun LogoTitle() {
     }
 }
 
+@Preview(showBackground = true, apiLevel = 28)
 @Composable
-fun TextFieldError(textError: String) {
-    Row(modifier = Modifier.fillMaxWidth()) {
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(
-            text = textError,
-            modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colorScheme.error
-        )
-    }
-}
-
-@Composable
-fun LoginButton(onClick: () -> Unit) {
+fun LoginButton(
+    onClick: () -> Unit = {}
+) {
     Button(
         onClick = onClick,
-        modifier = Modifier.size(240.dp, 45.dp),
-        contentPadding = PaddingValues(4.dp),
+        modifier = Modifier.size(210.dp, 35.dp),
+        contentPadding = PaddingValues(5.dp),
         shape = RoundedCornerShape(10.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = PklSecondary
+        )
     ) {
         Row(
+            modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Box(
                 modifier = Modifier
-                    .size(45.dp)
-                    .background(PklPrimary900)
-                    .padding(start = 10.dp),
+                    .size(55.dp)
+                    .background(PklSecondary),
+                contentAlignment = Alignment.Center
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.login),
@@ -296,23 +285,22 @@ fun LoginButton(onClick: () -> Unit) {
                     modifier = Modifier.fillMaxSize()
                 )
             }
-            Spacer(modifier = Modifier.width(10.dp))
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
-                        color = Color.White, shape = RoundedCornerShape(
+                        color = PklBase,
+                        shape = RoundedCornerShape(
                             topEnd = 10.dp, bottomEnd = 10.dp
                         )
                     ), contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = stringResource(id = R.string.login),
+                    text = "Masuk",
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 24.sp,
-                    letterSpacing = 5.sp,
-                    color = PklQuaternary
+                    fontSize = 16.sp,
+                    color = PklSecondary
                 )
             }
         }
@@ -320,65 +308,3 @@ fun LoginButton(onClick: () -> Unit) {
 }
 
 
-@Preview
-@Composable
-fun LogoTitlePreview() {
-    Capi63Theme {
-        // A surface container using the 'background' color from the theme
-        Surface(
-            color = MaterialTheme.colorScheme.background
-        ) {
-            LogoTitle()
-        }
-    }
-}
-
-@Preview
-@Composable
-fun NimPreview() {
-    val focusRequester = remember { FocusRequester() }
-    val nimState by rememberSaveable(stateSaver = NimStateSaver) {
-        mutableStateOf(NimState(""))
-    }
-
-    Capi63Theme {
-        // A surface container using the 'background' color from the theme
-        Surface(
-            color = MaterialTheme.colorScheme.background
-        ) {
-//            Nim(nimState = nimState, onImeAction = { focusRequester.requestFocus() })
-        }
-    }
-}
-
-@Preview
-@Composable
-fun PasswordPreview() {
-    val passwordState = remember { PasswordState() }
-    val focusRequester = remember { FocusRequester() }
-
-    Capi63Theme {
-        // A surface container using the 'background' color from the theme
-        Surface(
-            color = MaterialTheme.colorScheme.background
-        ) {
-//            PasswordTextField(label = stringResource(id = R.string.password),
-//                passwordState = passwordState,
-//                modifier = Modifier.focusRequester(focusRequester),
-//                onImeAction = {})
-        }
-    }
-}
-
-@Preview
-@Composable
-fun LoginButtonPreview() {
-    Capi63Theme {
-        // A surface container using the 'background' color from the theme
-        Surface(
-            color = MaterialTheme.colorScheme.background
-        ) {
-            LoginButton(onClick = {})
-        }
-    }
-}

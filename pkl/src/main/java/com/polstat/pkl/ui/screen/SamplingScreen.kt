@@ -24,9 +24,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -37,21 +35,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.R
-import com.polstat.pkl.ui.screen.components.BottomBar
-import com.polstat.pkl.ui.theme.Capi63Theme
+import com.polstat.pkl.ui.screen.components.BottomNavBar
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SamplingScreen(navController: NavHostController, isPml: Boolean) {
+fun SamplingScreen(
+    rootController: NavHostController,
+    navController: NavHostController,
+    isPml: Boolean
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -71,7 +70,7 @@ fun SamplingScreen(navController: NavHostController, isPml: Boolean) {
             )
         },
         bottomBar = {
-            BottomBar(navController = navController)
+            BottomNavBar(rootNavController = rootController)
         },
         content = { innerPadding ->
             Box(
@@ -211,16 +210,16 @@ fun MenuButton(image: Painter, name: String, onCardClicked: () -> Unit) {
     }
 }
 
-@Preview
-@Composable
-fun SamlingScreenPreview () {
-    Capi63Theme {
-        Surface (
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            val navController = rememberNavController()
-            SamplingScreen(navController, isPml = true)
-        }
-    }
-}
+//@Preview
+//@Composable
+//fun SamlingScreenPreview () {
+//    Capi63Theme {
+//        Surface (
+//            modifier = Modifier.fillMaxSize(),
+//            color = MaterialTheme.colorScheme.background
+//        ) {
+//            val navController = rememberNavController()
+//            SamplingScreen(navController, isPml = true)
+//        }
+//    }
+//}
