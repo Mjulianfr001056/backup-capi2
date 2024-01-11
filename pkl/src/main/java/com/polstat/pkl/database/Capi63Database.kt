@@ -27,20 +27,4 @@ abstract class Capi63Database : RoomDatabase() {
 
     abstract val capi63Dao: Capi63Dao
 
-//    companion object {
-//        @Volatile
-//        private var INSTANCE: Capi63Database? = null
-//
-//        fun getInstance(context: Context) : Capi63Database {
-//            synchronized(this) {
-//                return INSTANCE ?: Room.databaseBuilder(
-//                    context.applicationContext,
-//                    Capi63Database::class.java,
-//                    "capi63_db"
-//                ).build().also {
-//                    INSTANCE = it
-//                }
-//            }
-//        }
-//    }
 }

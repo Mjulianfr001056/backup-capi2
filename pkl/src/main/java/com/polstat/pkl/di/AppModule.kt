@@ -1,8 +1,8 @@
 package com.polstat.pkl.di
 
-import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.room.Room
 import com.polstat.pkl.database.Capi63Database
 import com.polstat.pkl.database.dao.Capi63Dao
@@ -27,6 +27,10 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class AppModule {
 
+    companion object {
+        private const val TAG = "CAPI63_APP_MODULE"
+    }
+
     @Provides
     @Singleton
     fun getSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
@@ -42,6 +46,7 @@ class AppModule {
     @Provides
     @Singleton
     fun provideCapi63Database(@ApplicationContext context: Context) : Capi63Database {
+        Log.d(TAG, "Database initialized successfully")
         return Room.databaseBuilder(
             context,
             Capi63Database::class.java,
