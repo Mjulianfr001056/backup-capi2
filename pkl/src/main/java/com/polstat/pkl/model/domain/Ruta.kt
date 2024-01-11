@@ -3,35 +3,16 @@ package com.polstat.pkl.model.domain
 data class Ruta(
     val alamat: String = "",
     val catatan: String = "",
-    val is_genz_ortu: String = "",
-    val jml_genz: String = "",
+    val isGenzOrtu: String = "",
+    val jmlGenz: Int = 0,
     val kodeRuta: String = "",
-    val lat: String = "",
-    val long: String = "",
-    val nama_krt: String = "",
-    val no_bg_fisik: String = "",
-    val no_bg_sensus: String = "",
-    val no_bs: String = "",
-    val no_segmen: String = "",
-    val no_urut_rt: String = "",
-    val no_urut_rt_egb: String = ""
+    val lat: Double = 0.0,
+    val long: Double = 0.0,
+    val namaKrt: String = "",
+    val noBS: String = "",
+    val noBgFisik: Int = 0,
+    val noBgSensus: Int = 0,
+    val noSegmen: Int = 0,
+    val noUrutRtEgb: Int = 0,
+    val noUrutRuta: Int = 0
 )
-//{
-//    // Konstruktor default
-//    constructor() : this(
-//        alamat = "",
-//        catatan = "",
-//        is_genz_ortu = "",
-//        jml_genz = "",
-//        kodeRuta = "",
-//        lat = "",
-//        long = "",
-//        nama_krt = "",
-//        no_bg_fisik = "",
-//        no_bg_sensus = "",
-//        no_bs = "",
-//        no_segmen = "",
-//        no_urut_rt = "",
-//        no_urut_rt_egb = ""
-//    )
-//}

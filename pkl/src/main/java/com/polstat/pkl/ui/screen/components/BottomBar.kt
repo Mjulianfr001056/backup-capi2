@@ -1,5 +1,6 @@
 package com.polstat.pkl.ui.screen.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigation
@@ -14,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination
@@ -21,10 +23,13 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 
 @Composable
+@Deprecated("Akan diganti")
 fun BottomBar(navController: NavHostController) {
     val screens = listOf(
         BottomBarScreen.sampling,
@@ -83,4 +88,59 @@ fun RowScope.AddItem(
             }
         }
     )
+}
+
+@Composable
+fun BottomNavBar(rootNavController : NavHostController){
+    val navBackStackEntry by rootNavController.currentBackStackEntryAsState()
+    BottomNavigation(
+        backgroundColor = PklPrimary900,
+        contentColor = Color.White
+    ) {
+        items.forEach {
+            val isSelected = it.title.lowercase() == navBackStackEntry?.destination?.route
+            BottomNavigationItem(
+                selected = isSelected,
+                label = {
+                    Text(
+                        text = it.title,
+                        style = TextStyle(
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Light,
+                            fontSize = 12.sp
+                        ),
+
+                    )
+                },
+                onClick = {
+                    rootNavController.navigate(it.title) {
+                        popUpTo(rootNavController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                icon = {
+                    Icon(
+                        imageVector = if (isSelected) it.selectedIcon else it.unselectedIcon,
+                        contentDescription = it.title,
+                        modifier = Modifier.size(28.dp),
+                    )
+                }
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, apiLevel = 28)
+@Composable
+fun PreviewBottomBar() {
+    val navController = rememberNavController()
+    Capi63Theme {
+        Column{
+            BottomNavBar(rootNavController = navController)
+            BottomBar(navController = navController)
+        }
+    }
 }

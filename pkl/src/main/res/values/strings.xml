@@ -6,6 +6,7 @@
     <string name="wajib">*Wajib</string>
     <string name="password">Password</string>
     <string name="login">LOGIN</string>
+    <string name="masuk">masuk</string>
     <string name="show_password">Show password</string>
     <string name="hide_password">Hide password</string>
 
