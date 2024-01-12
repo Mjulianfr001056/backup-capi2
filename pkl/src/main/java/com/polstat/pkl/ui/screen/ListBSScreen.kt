@@ -65,7 +65,7 @@ import com.polstat.pkl.viewmodel.AuthViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListBSScreen(navController: NavHostController, viewModel: AuthViewModel) {
-    val listWilayah = viewModel.getWilayahFromSession()
+//    val listWilayah = viewModel.getWilayahFromSession()
 
     Scaffold(
         topBar = {
@@ -121,7 +121,7 @@ fun ListBSScreen(navController: NavHostController, viewModel: AuthViewModel) {
         },
         content = { innerPadding ->
             ListBS(
-                listWilayah = listWilayah,
+                listWilayah = emptyList(),
                 navController = navController,
                 modifier = Modifier.padding(innerPadding)
             )

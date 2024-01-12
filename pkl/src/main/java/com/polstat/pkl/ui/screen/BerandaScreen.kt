@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,7 +46,7 @@ import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
-import com.polstat.pkl.viewmodel.AuthViewModel
+import com.polstat.pkl.viewmodel.BerandaViewModel
 
 @Preview
 @Composable
@@ -71,17 +72,15 @@ fun BerandaScreenPreview() {
 fun BerandaScreen(
     rootController: NavHostController,
     navController: NavHostController,
-    viewModel: AuthViewModel
+    viewModel: BerandaViewModel
 ) {
     var showMenu by remember {
         mutableStateOf(false)
     }
 
-    val user = viewModel.getUserFromSession()
+    val session = viewModel.session
 
-    val dataTim = viewModel.getDataTimFromSession()
-
-    val listWilayah = viewModel.getWilayahFromSession()
+    val dataTimWithAll = viewModel.dataTimWithAll.collectAsState()
 
     Scaffold(
         topBar = {
@@ -162,18 +161,33 @@ fun BerandaScreen(
         ) {
 
             ProfileCard(
-                user = user,
-                dataTim = dataTim
+                session = session!!,
+                dataTim = dataTimWithAll.value.dataTimWithMahasiswa!!.dataTim
             )
 
-            WilayahKerjaCard(listWilayah = listWilayah)
+            if (dataTimWithAll.value.listMahasiswaWithAll!!.isNotEmpty()) {
+                dataTimWithAll.value.listMahasiswaWithAll!!.forEach{ mahasiswaWithAll ->
+                    if (mahasiswaWithAll.mahasiswaWithWilayah!!.mahasiswa!!.nim == session.nim) {
+                        WilayahKerjaCard(
+                            listWilayah = mahasiswaWithAll.mahasiswaWithWilayah.listWilayah!!
+                        )
+                    }
+                }
+            }
 
-            if (user.isKoor) {
-                ListPplCard(listMahasiswa = dataTim.anggota)
-                StatusListingCard(anggotaTim = dataTim.anggota)
+            if (session.isKoor!!) {
+                ListPplCard(dataTimWithAll = dataTimWithAll.value)
+                StatusListingCard(dataTimWithAll = dataTimWithAll.value)
             } else {
-                PmlCard(dataTim = dataTim)
-                ProgresListingCard(listWilayah = listWilayah)
+                PmlCard(dataTim = dataTimWithAll.value.dataTimWithMahasiswa!!.dataTim)
+
+                if (dataTimWithAll.value.listMahasiswaWithAll!!.isNotEmpty()) {
+                    dataTimWithAll.value.listMahasiswaWithAll!!.forEach{ mahasiswaWithAll ->
+                        if (mahasiswaWithAll.mahasiswaWithWilayah!!.mahasiswa!!.nim == session.nim) {
+                            ProgresListingCard(mahasiswaWithAll = mahasiswaWithAll)
+                        }
+                    }
+                }
             }
         }
     }
