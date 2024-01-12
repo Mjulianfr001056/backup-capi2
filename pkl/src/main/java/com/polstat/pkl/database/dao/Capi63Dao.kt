@@ -20,7 +20,7 @@ interface Capi63Dao {
 
     // Operasi database untuk entitas DataTim
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertDataTim(dataTimEntity: DataTimEntity)
 
     @Query("SELECT * FROM data_tim WHERE idTim = :idTim")
@@ -28,17 +28,17 @@ interface Capi63Dao {
 
     // Operasi database untuk entitas Mahasiswa
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertMahasiswa(mahasiswaEntity: MahasiswaEntity)
 
     // Operasi database untuk entitas Wilayah
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertWilayah(wilayahEntity: WilayahEntity)
 
     // Operasi database untuk entitas Ruta
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertRuta(rutaEntity: RutaEntity)
 
     @Update
