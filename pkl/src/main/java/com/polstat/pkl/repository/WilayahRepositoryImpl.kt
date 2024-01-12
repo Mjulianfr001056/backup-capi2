@@ -1,5 +1,6 @@
 package com.polstat.pkl.repository
 
+import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
 import com.polstat.pkl.database.Capi63Database
 import com.polstat.pkl.database.relation.WilayahWithRuta
@@ -15,24 +16,31 @@ class WilayahRepositoryImpl @Inject constructor(
 ) : WilayahRepository {
 
     companion object {
-        private const val TAG = "WilayahRepoImpl"
+        private const val TAG = "CAPI63_WILAYAHREPOIMPL"
     }
 
     override suspend fun insertWilayah(
         wilayah: Wilayah,
         nim: String
     ): Flow<String> {
-        return  flow {
+        return flow {
             try {
                 capi63Database.capi63Dao.insertWilayah(wilayah.toWilayahEntity(nim))
                 val message = "Berhasil menambahkan wilayah!"
-                Log.d(TAG, "insertWilayah: ${message}")
+                Log.d(TAG, "insertWilayah: $message $wilayah")
+                emit(message)
+            } catch (e: SQLiteConstraintException) {
+                val message = "Gagal menambahkan wilayah! Constraint pelanggaran: ${e.message}"
+                Log.d(TAG, "insertWilayah: $message")
+                emit(message)
             } catch (e: Exception) {
-                val message = "Gagal menambahkan wilayah!"
-                Log.d(TAG, "insertWilayah: ${message} (${e.message})")
+                val message = "Gagal menambahkan wilayah! Kesalahan umum: ${e.message}"
+                Log.d(TAG, "insertWilayah: $message")
+                emit(message)
             }
         }
     }
+
 
     override suspend fun getWilayahWithRuta(
         noBS: String

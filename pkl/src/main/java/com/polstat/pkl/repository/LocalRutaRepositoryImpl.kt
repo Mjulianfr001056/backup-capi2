@@ -13,7 +13,7 @@ class LocalRutaRepositoryImpl @Inject constructor(
 ) : LocalRutaRepository {
 
     companion object {
-        private const val TAG = "LocalRutaRepoImpl"
+        private const val TAG = "CAPI63_LCLRUTAREPOIMPL"
     }
 
     override fun insertRuta(
@@ -24,10 +24,13 @@ class LocalRutaRepositoryImpl @Inject constructor(
                 val readyRuta = ruta.copy(status = "insert")
                 capi63Database.capi63Dao.insertRuta(readyRuta.toRutaEntity())
                 val message = "Berhasil menambahkan ruta!"
-                Log.d(TAG, "insertRuta: $message")
+                Log.d(TAG, "insertRuta: $message $ruta")
+                emit(message)
             } catch (e: Exception) {
                 val message = "Gagal menambahkan ruta!"
                 Log.d(TAG, "insertRuta: $message (${e.message})")
+                emit(message)
+                return@flow
             }
         }
     }

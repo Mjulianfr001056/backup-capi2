@@ -3,7 +3,10 @@ package com.polstat.pkl.repository
 import android.util.Log
 import com.polstat.pkl.database.Capi63Database
 import com.polstat.pkl.database.entity.DataTimEntity
+import com.polstat.pkl.database.relation.DataTimWithAll
 import com.polstat.pkl.database.relation.DataTimWithMahasiswa
+import com.polstat.pkl.database.relation.MahasiswaWithAll
+import com.polstat.pkl.database.relation.WilayahWithRuta
 import com.polstat.pkl.mapper.toDataTimEntity
 import com.polstat.pkl.model.domain.DataTim
 import com.polstat.pkl.utils.Result
@@ -16,7 +19,7 @@ class DataTimRepositoryImpl @Inject constructor (
 ) : DataTimRepository {
 
     companion object {
-        private const val TAG = "DataTimRepoImpl"
+        private const val TAG = "CAPI63_DATATIMREPOIMPL"
     }
 
     override suspend fun insertDataTim(
@@ -26,10 +29,13 @@ class DataTimRepositoryImpl @Inject constructor (
             try {
                 capi63Database.capi63Dao.insertDataTim(dataTim.toDataTimEntity())
                 val message = "Berhasil menambahkan data tim!"
-                Log.d(TAG, "insertDataTim: $message")
+                Log.d(TAG, "insertDataTim: $message $dataTim")
+                emit(message)
             } catch (e: Exception) {
                 val message = "Gagal menambahkan data tim!"
                 Log.d(TAG, "insertDataTim: $message (${e.message})")
+                emit(message)
+                return@flow
             }
         }
     }
@@ -70,6 +76,45 @@ class DataTimRepositoryImpl @Inject constructor (
             } catch (e: Exception) {
                 Log.d(TAG, "Gagal getDataTimWithMahasiswa: ${e.message}")
                 emit(Result.Error(null, "Error fetching DataTimWithMahasiswa: ${e.message}"))
+            } finally {
+                emit(Result.Loading(false))
+            }
+        }
+    }
+
+    override suspend fun getDataTimWithAll(
+        idTim: String
+    ): Flow<Result<DataTimWithAll>> {
+        return flow {
+            try {
+                emit(Result.Loading(true))
+
+                val dataTimWithMahasiswa = capi63Database.capi63Dao.getDataTimWithMahasiswa(idTim)
+
+                val listMahasiswaWithAll = dataTimWithMahasiswa.listMahasiswa?.map { mahasiswa ->
+
+                    val mahasiswaWithWilayah = capi63Database.capi63Dao.getMahasiswaWithWilayah(mahasiswa.nim)
+
+                    val listWilayahWithRuta = mahasiswaWithWilayah.listWilayah?.map { wilayah ->
+
+                        val ruta = capi63Database.capi63Dao.getWilayahWithRuta(wilayah.noBS)
+
+                        WilayahWithRuta(wilayah, ruta.listRuta)
+
+                    }
+
+                    MahasiswaWithAll(mahasiswaWithWilayah, listWilayahWithRuta)
+
+                }
+
+                val dataTimWithAll = DataTimWithAll(dataTimWithMahasiswa, listMahasiswaWithAll)
+
+                Log.d(TAG, "Berhasil getDataTimWithAll: $dataTimWithAll")
+
+                emit(Result.Success(dataTimWithAll))
+            } catch (e: Exception) {
+                Log.d(TAG, "Gagal getDataTimWithAll: ${e.message}")
+                emit(Result.Error(null, "Error fetching DataTimWithAll: ${e.message}"))
             } finally {
                 emit(Result.Loading(false))
             }

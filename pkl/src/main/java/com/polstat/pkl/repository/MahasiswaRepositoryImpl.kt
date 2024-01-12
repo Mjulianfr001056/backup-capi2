@@ -1,8 +1,11 @@
 package com.polstat.pkl.repository
 
+import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
 import com.polstat.pkl.database.Capi63Database
+import com.polstat.pkl.database.relation.MahasiswaWithAll
 import com.polstat.pkl.database.relation.MahasiswaWithWilayah
+import com.polstat.pkl.database.relation.WilayahWithRuta
 import com.polstat.pkl.mapper.toMahasiswaEntity
 import com.polstat.pkl.model.domain.Mahasiswa
 import com.polstat.pkl.utils.Result
@@ -15,7 +18,7 @@ class MahasiswaRepositoryImpl @Inject constructor (
 ) : MahasiswaRepository {
 
     companion object {
-        private const val TAG = "MahasiswaRepoImpl"
+        private const val TAG = "CAPI63_MHSREPOIMPL"
     }
 
     override suspend fun insertMahasiswa(
@@ -23,15 +26,23 @@ class MahasiswaRepositoryImpl @Inject constructor (
     ): Flow<String> {
         return flow {
             try {
+                Log.d(TAG, "Mahasiswa entity: ${mahasiswa.toMahasiswaEntity()}")
                 capi63Database.capi63Dao.insertMahasiswa(mahasiswa.toMahasiswaEntity())
                 val message = "Berhasil menambahkan mahasiswa!"
-                Log.d(TAG, "insertDataTim: ${message}")
+                Log.d(TAG, "insertDataTim: $message $mahasiswa")
+                emit(message)
+            } catch (e: SQLiteConstraintException) {
+                val message = "Gagal menambahkan mahasiswa! Constraint pelanggaran: ${e.message}"
+                Log.d(TAG, "insertDataTim: $message")
+                emit(message)
             } catch (e: Exception) {
-                val message = "Gagal menambahkan mahasiswa!"
-                Log.d(TAG, "insertDataTim: ${message} (${e.message})")
+                val message = "Gagal menambahkan mahasiswa! Kesalahan umum: ${e.message}"
+                Log.d(TAG, "insertDataTim: $message")
+                emit(message)
             }
         }
     }
+
 
     override suspend fun getMahasiswaWithWilayah(
         nim: String
@@ -52,6 +63,39 @@ class MahasiswaRepositoryImpl @Inject constructor (
                 emit(Result.Loading(false))
             }
         }
+    }
+
+    override suspend fun getMahasiswaWithAll(nim: String): Flow<Result<MahasiswaWithAll>> {
+        return flow {
+            try {
+                emit(Result.Loading(true))
+
+                val mahasiswaWithWilayah = capi63Database.capi63Dao.getMahasiswaWithWilayah(nim)
+
+                val listWilayahWithRuta = mahasiswaWithWilayah.listWilayah?.map { wilayah ->
+
+                    val ruta = capi63Database.capi63Dao.getWilayahWithRuta(wilayah.noBS)
+
+                    WilayahWithRuta(wilayah, ruta.listRuta)
+
+                }
+
+                val mahasiswaWithAll = MahasiswaWithAll(
+                    mahasiswaWithWilayah = mahasiswaWithWilayah,
+                    listWilayahWithRuta = listWilayahWithRuta
+                )
+
+                Log.d(TAG, "Berhasil getMahasiswaWithAll: $mahasiswaWithAll")
+
+                emit(Result.Success(mahasiswaWithAll))
+            } catch (e: Exception) {
+                Log.d(TAG, "Gagal getMahasiswaWithWilayah: ${e.message}")
+                emit(Result.Error(null, "Error fetching DataTim: ${e.message}"))
+            } finally {
+                emit(Result.Loading(false))
+            }
+        }
+
     }
 
 }

@@ -78,13 +78,13 @@ fun BerandaScreen(
         mutableStateOf(false)
     }
 
-
-
     val session = viewModel.session
 
     val dataTim = viewModel.dataTim.collectAsState()
 
-    viewModel.dataTimWithMahasiswa.collectAsState()
+    val dataTimWithAll = viewModel.dataTimWithAll.collectAsState()
+
+    val dataTimWithMahasiswa = viewModel.dataTimWithMahasiswa.collectAsState()
 
     val listMahasiswaWithWilayah = viewModel.listMahasiswaWithWilayah.collectAsState()
 
@@ -168,39 +168,31 @@ fun BerandaScreen(
                 .verticalScroll(rememberScrollState())
         ) {
 
-            session?.let {
-                ProfileCard(
-                    session = it,
-                    dataTim = dataTim.value
-                )
-            }
+            ProfileCard(
+                session = session!!,
+                dataTim = dataTimWithAll.value.dataTimWithMahasiswa!!.dataTim
+            )
 
-            if (listMahasiswaWithWilayah.value.isNotEmpty()) {
-                listMahasiswaWithWilayah.value.forEach{ mahasiswaWithWilayah ->
-                    if (mahasiswaWithWilayah.mahasiswa.nim == session!!.nim) {
+            if (dataTimWithAll.value.listMahasiswaWithAll!!.isNotEmpty()) {
+                dataTimWithAll.value.listMahasiswaWithAll!!.forEach{ mahasiswaWithAll ->
+                    if (mahasiswaWithAll.mahasiswaWithWilayah!!.mahasiswa!!.nim == session.nim) {
                         WilayahKerjaCard(
-                            listWilayah = mahasiswaWithWilayah.listWilayah
+                            listWilayah = mahasiswaWithAll.mahasiswaWithWilayah.listWilayah!!
                         )
                     }
                 }
             }
 
-            if (session!!.isKoor) {
-                ListPplCard(
-                    listMahasiswaWithWilayah = listMahasiswaWithWilayah.value,
-                    listWilayahWithRuta = listWilayahWithRuta.value
-                )
-                StatusListingCard(listMahasiswaWithWilayah = listMahasiswaWithWilayah.value)
+            if (session.isKoor!!) {
+                ListPplCard(dataTimWithAll = dataTimWithAll.value)
+                StatusListingCard(dataTimWithAll = dataTimWithAll.value)
             } else {
-                PmlCard(dataTim = dataTim.value)
+                PmlCard(dataTim = dataTimWithAll.value.dataTimWithMahasiswa!!.dataTim)
 
-                if (listMahasiswaWithWilayah.value.isNotEmpty()) {
-                    listMahasiswaWithWilayah.value.forEach{ mahasiswaWithWilayah ->
-                        if (mahasiswaWithWilayah.mahasiswa.nim == session.nim) {
-                            ProgresListingCard(
-                                mahasiswaWithWilayah = mahasiswaWithWilayah,
-                                listWilayahWithRuta = listWilayahWithRuta.value
-                            )
+                if (dataTimWithAll.value.listMahasiswaWithAll!!.isNotEmpty()) {
+                    dataTimWithAll.value.listMahasiswaWithAll!!.forEach{ mahasiswaWithAll ->
+                        if (mahasiswaWithAll.mahasiswaWithWilayah!!.mahasiswa!!.nim == session.nim) {
+                            ProgresListingCard(mahasiswaWithAll = mahasiswaWithAll)
                         }
                     }
                 }

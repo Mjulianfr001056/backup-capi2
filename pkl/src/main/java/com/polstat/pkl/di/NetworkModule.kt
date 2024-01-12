@@ -4,6 +4,8 @@ import com.polstat.pkl.network.AuthApi
 import com.polstat.pkl.network.RutaApi
 import com.polstat.pkl.repository.AuthRepository
 import com.polstat.pkl.repository.AuthRepositoryImpl
+import com.polstat.pkl.repository.RemoteRutaRepository
+import com.polstat.pkl.repository.RemoteRutaRepositoryImpl
 import com.polstat.pkl.repository.SessionRepository
 import dagger.Module
 import dagger.Provides
@@ -13,7 +15,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import javax.inject.Singleton
 
 @Module
@@ -60,6 +61,10 @@ class NetworkModule {
         return AuthRepositoryImpl(authApi, sessionRepository)
     }
 
-
+    @Provides
+    @Singleton
+    fun provideRemoteRutaRepository(rutaApi: RutaApi) : RemoteRutaRepository {
+        return RemoteRutaRepositoryImpl(rutaApi)
+    }
 
 }

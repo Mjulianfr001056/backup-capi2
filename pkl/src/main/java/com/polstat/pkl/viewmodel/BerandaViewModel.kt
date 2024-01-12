@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.database.entity.DataTimEntity
+import com.polstat.pkl.database.relation.DataTimWithAll
 import com.polstat.pkl.database.relation.DataTimWithMahasiswa
+import com.polstat.pkl.database.relation.MahasiswaWithAll
 import com.polstat.pkl.database.relation.MahasiswaWithWilayah
 import com.polstat.pkl.database.relation.WilayahWithRuta
 import com.polstat.pkl.repository.DataTimRepository
@@ -45,9 +47,21 @@ class BerandaViewModel @Inject constructor(
 
     val dataTimWithMahasiswa = _dataTimWithMahasiswa.asStateFlow()
 
+    private val _dataTimWithAll = MutableStateFlow(DataTimWithAll())
+
+    val dataTimWithAll = _dataTimWithAll.asStateFlow()
+
+    private val _mahasiswaWithAll = MutableStateFlow(MahasiswaWithAll())
+
+    val mahasiswaWithAll = _mahasiswaWithAll.asStateFlow()
+
     private val _listMahasiswaWithWilayah = MutableStateFlow<List<MahasiswaWithWilayah>>(emptyList())
 
     val listMahasiswaWithWilayah = _listMahasiswaWithWilayah.asStateFlow()
+
+    private val _filteredListMahasiswaWithWilayah = MutableStateFlow<List<MahasiswaWithWilayah>>(emptyList())
+
+    val filteredListMahasiswaWithWilayah = _filteredListMahasiswaWithWilayah.asStateFlow()
 
     private val _listWilayahWithRuta = MutableStateFlow<List<WilayahWithRuta>>(emptyList())
 
@@ -63,54 +77,7 @@ class BerandaViewModel @Inject constructor(
 
     init {
 
-        getMahasiswaWithWilayah(_session!!.nim)
-
-        if (_session.isKoor) {
-
-            getDataTimWithMahasiswa(_session.idTim)
-
-            if (_dataTimWithMahasiswa.value.listMahasiswa.isNotEmpty()) {
-
-                _dataTimWithMahasiswa.value.listMahasiswa.forEach { mahasiswa ->
-
-                    getMahasiswaWithWilayah(mahasiswa.nim)
-
-                    if (_listMahasiswaWithWilayah.value.isNotEmpty()) {
-
-                        _listMahasiswaWithWilayah.value.forEach { mahasiswaWithWilayah ->
-
-                            if (mahasiswaWithWilayah.listWilayah.isNotEmpty()) {
-
-                                mahasiswaWithWilayah.listWilayah.forEach { wilayah ->
-
-                                    getWilayahWithRuta(wilayah.noBS)
-
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-        } else {
-
-            getDataTim(_session.idTim)
-
-            if (_listMahasiswaWithWilayah.value.isNotEmpty()) {
-
-                _listMahasiswaWithWilayah.value.forEach { mahasiswaWithWilayah ->
-
-                    if (mahasiswaWithWilayah.listWilayah.isNotEmpty()) {
-
-                        mahasiswaWithWilayah.listWilayah.forEach { wilayah ->
-
-                            getWilayahWithRuta(wilayah.noBS)
-
-                        }
-                    }
-                }
-            }
-        }
+        getDataTimWithAll(_session!!.idTim!!)
 
     }
 
@@ -220,6 +187,62 @@ class BerandaViewModel @Inject constructor(
                }
            }
        }
+    }
+
+    private fun getDataTimWithAll(
+        idTim: String
+    ) {
+        viewModelScope.launch {
+            dataTimRepository.getDataTimWithAll(idTim).collectLatest { result ->
+                when(result) {
+                    is Result.Success -> {
+                        result.data?.let { response ->
+                            _dataTimWithAll.value = response
+                            Log.d(TAG, "getDataTimWithAll succeed: $response")
+                        }
+                    }
+                    is Result.Loading -> {
+                        Log.d(TAG, "getDataTimWithAll: Loading...")
+                    }
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            _errorMessage.value = error
+                        }
+                        _showErrorToastChannel.send(true)
+                        Log.e(TAG, "getDataTimWithAll: Error in getDataTimWithAll")
+                    }
+
+                }
+            }
+        }
+    }
+
+    private fun getMahasiswaWithAll(
+        nim: String
+    ) {
+        viewModelScope.launch {
+            mahasiswaRepository.getMahasiswaWithAll(nim).collectLatest { result ->
+                when(result) {
+                    is Result.Success -> {
+                        result.data?.let { response ->
+                            _mahasiswaWithAll.value = response
+                            Log.d(TAG, "getMahasiswaWithAll succeed: $response")
+                        }
+                    }
+                    is Result.Loading -> {
+                        Log.d(TAG, "getMahasiswaWithAll: Loading...")
+                    }
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            _errorMessage.value = error
+                        }
+                        _showErrorToastChannel.send(true)
+                        Log.e(TAG, "getMahasiswaWithAll: Error in getMahasiswaWithAll")
+                    }
+
+                }
+            }
+        }
     }
 
 }

@@ -7,10 +7,10 @@ import com.polstat.pkl.database.entity.MahasiswaEntity
 
 data class DataTimWithMahasiswa (
     @Embedded
-    val dataTim: DataTimEntity = DataTimEntity(),
+    val dataTim: DataTimEntity? = DataTimEntity(),
     @Relation(
         parentColumn = "idTim",
         entityColumn = "id_tim"
     )
-    val listMahasiswa: List<MahasiswaEntity> = emptyList()
+    val listMahasiswa: List<MahasiswaEntity>? = emptyList()
 )
