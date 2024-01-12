@@ -80,15 +80,7 @@ fun BerandaScreen(
 
     val session = viewModel.session
 
-    val dataTim = viewModel.dataTim.collectAsState()
-
     val dataTimWithAll = viewModel.dataTimWithAll.collectAsState()
-
-    val dataTimWithMahasiswa = viewModel.dataTimWithMahasiswa.collectAsState()
-
-    val listMahasiswaWithWilayah = viewModel.listMahasiswaWithWilayah.collectAsState()
-
-    val listWilayahWithRuta = viewModel.listWilayahWithRuta.collectAsState()
 
     Scaffold(
         topBar = {
