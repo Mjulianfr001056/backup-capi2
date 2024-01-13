@@ -8,6 +8,7 @@ import com.polstat.pkl.database.dao.Capi63Dao
 import com.polstat.pkl.database.entity.DataTimEntity
 import com.polstat.pkl.database.entity.MahasiswaEntity
 import com.polstat.pkl.database.entity.RutaEntity
+import com.polstat.pkl.database.entity.SampelRutaEntity
 import com.polstat.pkl.database.entity.WilayahEntity
 
 @Database(
@@ -15,7 +16,8 @@ import com.polstat.pkl.database.entity.WilayahEntity
         DataTimEntity::class,
         MahasiswaEntity::class,
         WilayahEntity::class,
-        RutaEntity::class
+        RutaEntity::class,
+        SampelRutaEntity::class
     ],
     version = 1
 )

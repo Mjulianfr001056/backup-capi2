@@ -18,6 +18,8 @@ import com.polstat.pkl.ui.screen.OnBoardingScreen
 import com.polstat.pkl.ui.screen.PasswordMasterScreen
 import com.polstat.pkl.ui.screen.SamplingScreen
 import com.polstat.pkl.viewmodel.AuthViewModel
+import com.polstat.pkl.viewmodel.ListBSViewModel
+import com.polstat.pkl.viewmodel.ListSampelViewModel
 import com.polstat.pkl.viewmodel.PasswordMasterViewModel
 
 @Composable
@@ -71,6 +73,8 @@ fun SamplingNavHost(
     val samplingNavController = rememberNavController()
     val passwordMasterViewModel: PasswordMasterViewModel = viewModel()
     val authViewModel = hiltViewModel<AuthViewModel>()
+    val listBSViewModel = hiltViewModel<ListBSViewModel>()
+    val listSampelViewModel = hiltViewModel<ListSampelViewModel>()
 
     NavHost(
         navController = samplingNavController,
@@ -91,7 +95,7 @@ fun SamplingNavHost(
             composable(CapiScreen.Listing.LIST_BS) {
                 ListBSScreen(
                     navController = samplingNavController,
-                    viewModel = authViewModel
+                    viewModel = listBSViewModel
                 )
             }
             composable(CapiScreen.Listing.LIST_RUTA) {
@@ -101,7 +105,8 @@ fun SamplingNavHost(
             }
             composable(CapiScreen.Listing.LIST_SAMPLE){
                 ListSampleScreen(
-                    navController = samplingNavController
+                    navController = samplingNavController,
+                    viewModel = listSampelViewModel
                 )
             }
             composable(CapiScreen.Listing.ISI_RUTA) {

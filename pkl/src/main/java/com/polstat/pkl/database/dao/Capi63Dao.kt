@@ -9,6 +9,7 @@ import androidx.room.Update
 import com.polstat.pkl.database.entity.DataTimEntity
 import com.polstat.pkl.database.entity.MahasiswaEntity
 import com.polstat.pkl.database.entity.RutaEntity
+import com.polstat.pkl.database.entity.SampelRutaEntity
 import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.database.relation.DataTimWithAll
 import com.polstat.pkl.database.relation.DataTimWithMahasiswa
@@ -41,6 +42,9 @@ interface Capi63Dao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRuta(rutaEntity: RutaEntity)
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertSampelRuta(sampelRutaEntity: SampelRutaEntity)
+
     @Update
     suspend fun updateRuta(rutaEntity: RutaEntity)
 
@@ -59,4 +63,11 @@ interface Capi63Dao {
     @Query("SELECT * FROM wilayah WHERE noBS = :noBS")
     suspend fun getWilayahWithRuta(noBS: String) : WilayahWithRuta
 
+    @Transaction
+    @Query("SELECT * FROM wilayah WHERE nim = :nim")
+    suspend fun getWilayahByNIM(nim: String) : List<WilayahEntity>
+
+    @Transaction
+    @Query("SELECT * FROM sampel_ruta WHERE noBS = :noBS")
+    suspend fun getSampelRutaByNoBS(noBS: String) : List<SampelRutaEntity>
 }
