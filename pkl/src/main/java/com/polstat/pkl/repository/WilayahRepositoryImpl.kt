@@ -3,6 +3,7 @@ package com.polstat.pkl.repository
 import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
 import com.polstat.pkl.database.Capi63Database
+import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.database.relation.WilayahWithRuta
 import com.polstat.pkl.mapper.toWilayahEntity
 import com.polstat.pkl.model.domain.Wilayah
@@ -57,6 +58,27 @@ class WilayahRepositoryImpl @Inject constructor(
             } catch (e: Exception) {
                 Log.d(TAG, "Gagal getWilayahWithRuta: ${e.message}")
                 emit(Result.Error(null, "Error fetching WilayahWithRuta: ${e.message}"))
+            } finally {
+                emit(Result.Loading(false))
+            }
+        }
+    }
+
+    override suspend fun getWilayahByNIM(
+        nim: String
+    ): Flow<Result<List<WilayahEntity>>> {
+        return flow {
+            try {
+                emit(Result.Loading(true))
+
+                val wilayahList = capi63Database.capi63Dao.getWilayahByNIM(nim)
+
+                Log.d(TAG, "Berhasil getWilayahByNIM: $wilayahList")
+
+                emit(Result.Success(wilayahList))
+            } catch (e: Exception) {
+                Log.d(TAG, "Gagal getWilayahByNIM: ${e.message}")
+                emit(Result.Error(null, "Error fetching WilayahByNIM: ${e.message}"))
             } finally {
                 emit(Result.Loading(false))
             }

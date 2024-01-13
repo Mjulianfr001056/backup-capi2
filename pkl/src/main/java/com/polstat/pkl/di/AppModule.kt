@@ -6,12 +6,15 @@ import android.util.Log
 import androidx.room.Room
 import com.polstat.pkl.database.Capi63Database
 import com.polstat.pkl.database.dao.Capi63Dao
+import com.polstat.pkl.network.SampelRutaApi
 import com.polstat.pkl.repository.DataTimRepository
 import com.polstat.pkl.repository.DataTimRepositoryImpl
 import com.polstat.pkl.repository.LocalRutaRepository
 import com.polstat.pkl.repository.LocalRutaRepositoryImpl
 import com.polstat.pkl.repository.MahasiswaRepository
 import com.polstat.pkl.repository.MahasiswaRepositoryImpl
+import com.polstat.pkl.repository.SampelRutaRepository
+import com.polstat.pkl.repository.SampelRutaRepositoryImpl
 import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.SessionRepositoryImpl
 import com.polstat.pkl.repository.WilayahRepository
