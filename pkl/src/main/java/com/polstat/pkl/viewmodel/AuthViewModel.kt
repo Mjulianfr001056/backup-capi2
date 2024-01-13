@@ -82,7 +82,6 @@ class AuthViewModel @Inject constructor(
                     is Result.Success -> {
                         result.data?.let { response ->
                             Log.d(TAG, "$response")
-
                             _authResponse.value = response
 
                             Log.d(TAG, "Login successful: $response")
