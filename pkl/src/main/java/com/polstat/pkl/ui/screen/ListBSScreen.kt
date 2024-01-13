@@ -1,5 +1,6 @@
 package com.polstat.pkl.ui.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,25 +49,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.polstat.pkl.R
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.polstat.pkl.model.domain.Wilayah
+import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary
-import com.polstat.pkl.ui.theme.PklPrimary700
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
-import com.polstat.pkl.viewmodel.AuthViewModel
+import com.polstat.pkl.viewmodel.ListBSViewModel
+import com.polstat.pkl.viewmodel.ListSampelViewModel
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListBSScreen(navController: NavHostController, viewModel: AuthViewModel) {
-//    val listWilayah = viewModel.getWilayahFromSession()
+fun ListBSScreen(navController: NavHostController, viewModel: ListBSViewModel) {
+
+    val listWilayah = viewModel.listWilayahByNIM
 
     Scaffold(
         topBar = {
@@ -121,7 +123,7 @@ fun ListBSScreen(navController: NavHostController, viewModel: AuthViewModel) {
         },
         content = { innerPadding ->
             ListBS(
-                listWilayah = emptyList(),
+                listWilayah = listWilayah.value,
                 navController = navController,
                 modifier = Modifier.padding(innerPadding)
             )
@@ -133,10 +135,9 @@ fun ListBSScreen(navController: NavHostController, viewModel: AuthViewModel) {
 private fun BlokSensus(
     onLihatRutaClicked: () -> Unit,
     onLihatSampleClicked: () -> Unit,
-    wilayah: Wilayah
+    wilayah: WilayahEntity
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var status by remember { mutableStateOf(wilayah.status) }
 
     Box(
         modifier = Modifier
@@ -187,7 +188,7 @@ private fun BlokSensus(
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 20.dp)) {
                 Column {
-                    if (status === "Proses Listing") {
+                    if (wilayah.status == "listing") {
                         Text(text = stringResource(R.string.proses_n_listing), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 14.sp)
                     } else {
                         Text(text = stringResource(R.string.proses_n_listing), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
@@ -195,26 +196,26 @@ private fun BlokSensus(
 
                 }
                 Column {
-                    if (status === "Listing Selesai") {
+                    if (wilayah.status == "listing-selesai") {
                         Text(text = stringResource(R.string.listing_n_selesai), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 14.sp)
                     } else {
                         Text(text = stringResource(R.string.listing_n_selesai), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
                 Column {
-                    if (status === "Telah Disampel") {
+                    if (wilayah.status == "telah-disampel") {
                         Text(text = stringResource(R.string.telah_n_disampel), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 14.sp)
                     } else {
                         Text(text = stringResource(R.string.telah_n_disampel), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
-                Column {
-                    if (status === "Sampel Terkirim") {
-                        Text(text = stringResource(R.string.sampel_n_terkirim), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 14.sp)
-                    } else {
-                        Text(text = stringResource(R.string.sampel_n_terkirim), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                    }
-                }
+//                Column {
+//                    if (status === "Sampel Terkirim") {
+//                        Text(text = stringResource(R.string.sampel_n_terkirim), softWrap = true, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = PklPrimary, fontFamily = PoppinsFontFamily, fontSize = 14.sp)
+//                    } else {
+//                        Text(text = stringResource(R.string.sampel_n_terkirim), softWrap = true, textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = PoppinsFontFamily, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+//                    }
+//                }
             }
             Row (
                 modifier = Modifier.padding(vertical = 8.dp)
@@ -289,7 +290,7 @@ private fun BlokSensus(
                     }
                     Column (modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                         Row {
-                            Text(text = stringResource(R.string.total), fontFamily = PoppinsFontFamily, fontSize = 15.sp)
+                            Text(text = stringResource(R.string.total), fontFamily = PoppinsFontFamily, fontSize = 15.sp, color = Color.Gray)
                         }
                         Row {
                             Text(text = wilayah.jmlGenZ.toString(), style = MaterialTheme.typography.headlineLarge, color = PklPrimary, fontWeight = FontWeight.Bold)
@@ -329,19 +330,20 @@ private fun BlokSensus(
                             contentPadding = PaddingValues(10.dp),
                             modifier = Modifier.padding(horizontal = 2.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)) {
-                            Text(stringResource(R.string.lihat_ruta), fontFamily = PoppinsFontFamily, fontSize = 15.sp)
+                            Text(stringResource(R.string.lihat_ruta), fontFamily = PoppinsFontFamily, fontSize = 15.sp, color = Color.Black, textAlign = TextAlign.Center)
                         }
-                        if (status === "Sampel Terkirim") {
+//                        if (wilayah.status == "telah-disampel") {
                             Button(onClick = {
+//                                onLihatSampleClicked(wilayah.noBS)
                                 onLihatSampleClicked()
                             },
                                 shape = MaterialTheme.shapes.small,
                                 contentPadding = PaddingValues(10.dp),
                                 modifier = Modifier.padding(horizontal = 2.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)) {
-                                Text(stringResource(R.string.lihat_sampel), fontFamily = PoppinsFontFamily, fontSize = 15.sp)
+                                Text(stringResource(R.string.lihat_sampel), fontFamily = PoppinsFontFamily, fontSize = 15.sp, color = Color.Black, textAlign = TextAlign.Center)
                             }
-                        }
+//                        }
                     }
                 }
             }
@@ -351,7 +353,7 @@ private fun BlokSensus(
 
 @Composable
 private fun ListBS(
-    listWilayah : List<Wilayah>,
+    listWilayah: List<WilayahEntity>?,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
@@ -361,17 +363,19 @@ private fun ListBS(
             .background(color = PklBase),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top){
-        items(listWilayah.size) { index ->
-            val wilayah = listWilayah[index]
-            BlokSensus(
-                onLihatRutaClicked = {
-                    navController.navigate(Capi63Screen.ListRuta.route)
-                },
-                onLihatSampleClicked = {
-                    navController.navigate(Capi63Screen.ListSample.route)
-                },
-                wilayah
-            )
+        listWilayah?.size?.let {
+            items(it) { index ->
+                val wilayah = listWilayah[index]
+                BlokSensus(
+                    onLihatRutaClicked = {
+                        navController.navigate(Capi63Screen.ListRuta.route)
+                    },
+                    onLihatSampleClicked = {
+                        navController.navigate(Capi63Screen.ListSample.route)
+                    },
+                    wilayah
+                )
+            }
         }
     }
 }
