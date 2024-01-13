@@ -16,7 +16,7 @@ class RemoteRutaRepositoryImpl @Inject constructor(
 ) : RemoteRutaRepository {
 
     companion object {
-        private const val TAG = "RemRutaRepoImpl"
+        private const val TAG = "CAPI63_REMRUTAREPOIMPL"
     }
 
     override suspend fun sinkronisasiRuta(syncRutaRequest: SyncRutaRequest): Flow<Result<SyncRutaResponse>> {

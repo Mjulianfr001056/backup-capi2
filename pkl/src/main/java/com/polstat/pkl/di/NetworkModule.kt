@@ -1,8 +1,11 @@
 package com.polstat.pkl.di
 
 import com.polstat.pkl.network.AuthApi
+import com.polstat.pkl.network.RutaApi
 import com.polstat.pkl.repository.AuthRepository
 import com.polstat.pkl.repository.AuthRepositoryImpl
+import com.polstat.pkl.repository.RemoteRutaRepository
+import com.polstat.pkl.repository.RemoteRutaRepositoryImpl
 import com.polstat.pkl.repository.SessionRepository
 import dagger.Module
 import dagger.Provides
@@ -48,8 +51,20 @@ class NetworkModule {
 
     @Provides
     @Singleton
+    fun provideRutaApi(retrofit: Retrofit) : RutaApi {
+        return retrofit.create(RutaApi::class.java)
+    }
+
+    @Provides
+    @Singleton
     fun provideAuthRepository(authApi: AuthApi, sessionRepository: SessionRepository) : AuthRepository {
         return AuthRepositoryImpl(authApi, sessionRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideRemoteRutaRepository(rutaApi: RutaApi) : RemoteRutaRepository {
+        return RemoteRutaRepositoryImpl(rutaApi)
     }
 
 }

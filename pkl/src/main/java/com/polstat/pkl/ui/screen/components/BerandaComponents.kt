@@ -1,6 +1,5 @@
 package com.polstat.pkl.ui.screen.components
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,12 +27,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.polstat.pkl.database.entity.DataTimEntity
+import com.polstat.pkl.database.entity.WilayahEntity
+import com.polstat.pkl.database.relation.DataTimWithAll
+import com.polstat.pkl.database.relation.MahasiswaWithAll
 import com.polstat.pkl.model.domain.DataTim
 import com.polstat.pkl.model.domain.Mahasiswa
-import com.polstat.pkl.model.domain.User
+import com.polstat.pkl.model.domain.Session
 import com.polstat.pkl.model.domain.Wilayah
 import com.polstat.pkl.ui.theme.PklPrimary100
 import com.polstat.pkl.ui.theme.PklPrimary900
@@ -43,8 +45,8 @@ import java.util.Locale
 
 @Composable
 fun ProfileCard(
-    user: User,
-    dataTim: DataTim
+    session: Session,
+    dataTim: DataTimEntity?
 ) {
     Card(
         modifier = Modifier
@@ -72,7 +74,7 @@ fun ProfileCard(
                     .align(Alignment.CenterHorizontally)
             )
             Text(
-                text = user.nama,
+                text = session.nama!!,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.Medium
@@ -81,7 +83,7 @@ fun ProfileCard(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text(
-                    text = user.nim,
+                    text = session.nim!!,
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium
                 )
@@ -91,7 +93,7 @@ fun ProfileCard(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = if (user.isKoor) "PCL" else "PPL",
+                    text = if (session.isKoor!!) "PCL" else "PPL",
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium
                 )
@@ -100,7 +102,7 @@ fun ProfileCard(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text(
-                    text = dataTim.namaTim,
+                    text = dataTim!!.namaTim!!,
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium
                 )
@@ -114,7 +116,6 @@ fun ProfileCard(
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium
                 )
-                Log.d("Beranda", dataTim.anggota.size.toString())
             }
         }
     }
@@ -122,7 +123,7 @@ fun ProfileCard(
 
 @Composable
 fun PmlCard(
-    dataTim: DataTim
+    dataTim: DataTimEntity?
 ) {
     Card(
         modifier = Modifier
@@ -157,14 +158,14 @@ fun PmlCard(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = dataTim.namaPML,
+                        text = dataTim!!.namaPML!!,
                         fontFamily = PoppinsFontFamily,
                         fontWeight = FontWeight.Medium,
                         fontSize = 18.sp,
                         color = Color.DarkGray
                     )
                     Text(
-                        text = dataTim.nimPML,
+                        text = dataTim.nimPML!!,
                         fontFamily = PoppinsFontFamily,
                         fontWeight = FontWeight.Medium,
                         fontSize = 14.sp
@@ -177,7 +178,7 @@ fun PmlCard(
 
 @Composable
 fun ListPplCard(
-    listMahasiswa: List<Mahasiswa>
+    dataTimWithAll: DataTimWithAll
 ) {
     Card(
         modifier = Modifier
@@ -210,78 +211,80 @@ fun ListPplCard(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (listMahasiswa.isNotEmpty()) {
-                        listMahasiswa.forEach { mahasiswa ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(
-                                        start = 10.dp,
-                                        top = 10.dp,
-                                        end = 10.dp
-                                    ),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column {
-                                    Text(
-                                        text = mahasiswa.nama,
-                                        style = TextStyle(
-                                            fontFamily = PoppinsFontFamily,
-                                            fontWeight = FontWeight.Medium,
-                                            fontSize = 18.sp,
-                                            platformStyle = PlatformTextStyle(
-                                                includeFontPadding = false
-                                            )
+
+                    if (dataTimWithAll.listMahasiswaWithAll!!.isNotEmpty()) {
+                        dataTimWithAll.listMahasiswaWithAll.forEach{ mahasiswaWithAll ->
+
+                            if (mahasiswaWithAll.mahasiswaWithWilayah!!.mahasiswa!!.nim != dataTimWithAll.dataTimWithMahasiswa!!.dataTim!!.nimPML) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(
+                                            start = 10.dp,
+                                            top = 10.dp,
+                                            end = 10.dp
                                         ),
-                                        color = Color.DarkGray
-                                    )
-                                    Text(
-                                        text = mahasiswa.nim,
-                                        style = TextStyle(
-                                            fontFamily = PoppinsFontFamily,
-                                            fontWeight = FontWeight.Medium,
-                                            fontSize = 14.sp,
-                                            platformStyle = PlatformTextStyle(
-                                                includeFontPadding = false
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = mahasiswaWithAll.mahasiswaWithWilayah.mahasiswa!!.nama!!,
+                                            style = TextStyle(
+                                                fontFamily = PoppinsFontFamily,
+                                                fontWeight = FontWeight.Medium,
+                                                fontSize = 14.sp,
+                                                platformStyle = PlatformTextStyle(
+                                                    includeFontPadding = false
+                                                )
+                                            ),
+                                            color = Color.DarkGray
+                                        )
+                                        Text(
+                                            text = mahasiswaWithAll.mahasiswaWithWilayah.mahasiswa.nim,
+                                            style = TextStyle(
+                                                fontFamily = PoppinsFontFamily,
+                                                fontWeight = FontWeight.Medium,
+                                                fontSize = 12.sp,
+                                                platformStyle = PlatformTextStyle(
+                                                    includeFontPadding = false
+                                                )
                                             )
                                         )
-                                    )
-                                }
-                                Column {
-                                    println(mahasiswa.nama)
-                                    println(mahasiswa.wilayah_kerja.size)
-                                    if (mahasiswa.wilayah_kerja.isNotEmpty()) {
-                                        mahasiswa.wilayah_kerja.forEach { wilayah ->
-                                            Row(
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                Text(
-                                                    text = wilayah.noBS,
-                                                    style = TextStyle(
-                                                        fontFamily = PoppinsFontFamily,
-                                                        fontWeight = FontWeight.Medium,
-                                                        fontSize = 18.sp,
-                                                        platformStyle = PlatformTextStyle(
-                                                            includeFontPadding = false
+                                    }
+                                    Column {
+                                        if (mahasiswaWithAll.listWilayahWithRuta!!.isNotEmpty()) {
+                                            mahasiswaWithAll.listWilayahWithRuta.forEach { wilayahWithRuta ->
+                                                Row(
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Text(
+                                                        text = wilayahWithRuta.wilayah!!.noBS,
+                                                        style = TextStyle(
+                                                            fontFamily = PoppinsFontFamily,
+                                                            fontWeight = FontWeight.Medium,
+                                                            fontSize = 18.sp,
+                                                            platformStyle = PlatformTextStyle(
+                                                                includeFontPadding = false
+                                                            )
                                                         )
                                                     )
-                                                )
-                                                Spacer(modifier = Modifier.width(16.dp))
-                                                AnimatedCircularProgressIndicator(
-                                                    currentValue = wilayah.ruta.size,
-                                                    maxValue = if (wilayah.jmlRt == 0) 99 else wilayah.jmlRt,
-                                                    progressBackgroundColor = PklPrimary100,
-                                                    progressIndicatorColor = PklPrimary900,
-                                                    completedColor = PklPrimary900,
-                                                    circularIndicatorDiameter = 66.dp
-                                                )
+                                                    Spacer(modifier = Modifier.width(16.dp))
+                                                    AnimatedCircularProgressIndicator(
+                                                        currentValue = wilayahWithRuta.listRuta!!.size,
+                                                        maxValue = (if (wilayahWithRuta.wilayah.jmlRt == 0) 99 else wilayahWithRuta.wilayah.jmlRt)!!,
+                                                        progressBackgroundColor = PklPrimary100,
+                                                        progressIndicatorColor = PklPrimary900,
+                                                        completedColor = PklPrimary900,
+                                                        circularIndicatorDiameter = 66.dp
+                                                    )
+                                                }
                                             }
                                         }
                                     }
                                 }
+                                Spacer(modifier = Modifier.height(12.dp))
                             }
-                            Spacer(modifier = Modifier.height(12.dp))
                         }
                     } else {
                         // Tampilkan pesan atau lakukan aksi lain jika listMahasiswa kosong
@@ -305,7 +308,7 @@ fun ListPplCard(
 
 @Composable
 fun WilayahKerjaCard(
-    listWilayah: List<Wilayah>
+    listWilayah: List<WilayahEntity>
 ) {
     // Second Card - Add another Card element here
     Card(
@@ -418,7 +421,7 @@ fun WilayahKerjaCard(
 
 @Composable
 fun StatusListingCard(
-    anggotaTim: List<Mahasiswa>
+    dataTimWithAll: DataTimWithAll
 ) {
     Card(
         modifier = Modifier
@@ -451,8 +454,8 @@ fun StatusListingCard(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (anggotaTim.isNotEmpty()) {
-                        anggotaTim.forEach { mahasiswa ->
+                    if (dataTimWithAll.listMahasiswaWithAll!!.isNotEmpty()) {
+                        dataTimWithAll.listMahasiswaWithAll.forEach { mahasiswaWithAll ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -465,8 +468,8 @@ fun StatusListingCard(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column {
-                                    if (mahasiswa.wilayah_kerja.isNotEmpty()) {
-                                        mahasiswa.wilayah_kerja.forEach { wilayah ->
+                                    if (mahasiswaWithAll.listWilayahWithRuta!!.isNotEmpty()) {
+                                        mahasiswaWithAll.listWilayahWithRuta.forEach { wilayahWithRuta ->
                                             Row(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -474,7 +477,7 @@ fun StatusListingCard(
                                             ) {
                                                 Column {
                                                     Text(
-                                                        text = wilayah.noBS,
+                                                        text = wilayahWithRuta.wilayah!!.noBS,
                                                         style = TextStyle(
                                                             fontFamily = PoppinsFontFamily,
                                                             fontWeight = FontWeight.Medium,
@@ -486,7 +489,7 @@ fun StatusListingCard(
                                                         color = Color.DarkGray
                                                     )
                                                     Text(
-                                                        text = wilayah.namaKel,
+                                                        text = wilayahWithRuta.wilayah.namaKel!!,
                                                         style = TextStyle(
                                                             fontFamily = PoppinsFontFamily,
                                                             fontWeight = FontWeight.Medium,
@@ -497,7 +500,7 @@ fun StatusListingCard(
                                                         )
                                                     )
                                                     Text(
-                                                        text = wilayah.namaKec,
+                                                        text = wilayahWithRuta.wilayah.namaKec!!,
                                                         style = TextStyle(
                                                             fontFamily = PoppinsFontFamily,
                                                             fontWeight = FontWeight.Medium,
@@ -509,7 +512,7 @@ fun StatusListingCard(
                                                     )
                                                 }
                                                 Text(
-                                                    text = wilayah.status.uppercase(Locale.getDefault()),
+                                                    text = wilayahWithRuta.wilayah!!.status!!.uppercase(Locale.getDefault()),
                                                     style = TextStyle(
                                                         fontFamily = PoppinsFontFamily,
                                                         fontWeight = FontWeight.Medium,
@@ -535,7 +538,7 @@ fun StatusListingCard(
 
 @Composable
 fun ProgresListingCard(
-    listWilayah: List<Wilayah>
+    mahasiswaWithAll: MahasiswaWithAll
 ) {
     Card(
         modifier = Modifier
@@ -568,8 +571,8 @@ fun ProgresListingCard(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (listWilayah.isNotEmpty()) {
-                        listWilayah.forEach { wilayah ->
+                    if (mahasiswaWithAll.listWilayahWithRuta!!.isNotEmpty()) {
+                        mahasiswaWithAll.listWilayahWithRuta.forEach { wilayahWithRuta ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -583,7 +586,7 @@ fun ProgresListingCard(
                             ) {
                                 Column {
                                     Text(
-                                        text = wilayah.noBS,
+                                        text = wilayahWithRuta.wilayah!!.noBS,
                                         style = TextStyle(
                                             fontFamily = PoppinsFontFamily,
                                             fontWeight = FontWeight.Medium,
@@ -595,9 +598,10 @@ fun ProgresListingCard(
                                         color = Color.DarkGray
                                     )
                                 }
+
                                 AnimatedCircularProgressIndicator(
-                                    currentValue = wilayah.ruta.size,
-                                    maxValue = if (wilayah.jmlRt == 0) 99 else wilayah.jmlRt,
+                                    currentValue = wilayahWithRuta.listRuta!!.size,
+                                    maxValue = (if (wilayahWithRuta.wilayah!!.jmlRt == 0) 99 else wilayahWithRuta.wilayah.jmlRt)!!,
                                     progressBackgroundColor = PklPrimary100,
                                     progressIndicatorColor = PklPrimary900,
                                     completedColor = PklPrimary900,
@@ -618,65 +622,67 @@ fun ProgresListingCard(
 //
 //}
 
-@Preview
-@Composable
-fun ProgresListingCardPreview() {
-    ProgresListingCard(listWilayah = listOf(wilayah1))
-}
+//@Preview
+//@Composable
+//fun ProgresListingCardPreview() {
+//    ProgresListingCard(listWilayah = listOf(wilayah1))
+//}
+//
+//@Preview
+//@Composable
+//fun StatusListingCardPreview() {
+//    val anggotaTim = listOf(mahasiswa1, mahasiswa2)
+//
+//    StatusListingCard(
+//        anggotaTim = anggotaTim
+//    )
+//}
+//
+//@Preview
+//@Composable
+//fun ProfileCardPreview() {
+//    ProfileCard(
+//        session = sessionPml,
+//        dataTim = dataTimPml
+//    )
+//}
+//
+//@Preview
+//@Composable
+//fun PmlCardPreview() {
+//    PmlCard(dataTim = dataTimPpl)
+//}
+//
+//@Preview
+//@Composable
+//fun ListPplCardPreview() {
+//    val listMahasiswa = listOf(mahasiswa1, mahasiswa2)
+//
+//    ListPplCard(anggotaTim = listMahasiswa)
+//}
+//
+//@Preview
+//@Composable
+//fun WilayahWilayahKerjaCardPreview() {
+//    WilayahKerjaCard(listWilayah = listOf(wilayah1))
+//}
 
-@Preview
-@Composable
-fun StatusListingCardPreview() {
-    val anggotaTim = listOf(mahasiswa1, mahasiswa2)
-
-    StatusListingCard(
-        anggotaTim = anggotaTim
-    )
-}
-
-@Preview
-@Composable
-fun ProfileCardPreview() {
-    ProfileCard(
-        user = userPml,
-        dataTim = dataTimPml
-    )
-}
-
-@Preview
-@Composable
-fun PmlCardPreview() {
-    PmlCard(dataTim = dataTimPpl)
-}
-
-@Preview
-@Composable
-fun ListPplCardPreview() {
-    val listMahasiswa = listOf(mahasiswa1, mahasiswa2)
-
-    ListPplCard(listMahasiswa = listMahasiswa)
-}
-
-@Preview
-@Composable
-fun WilayahWilayahKerjaCardPreview() {
-    WilayahKerjaCard(listWilayah = listOf(wilayah1))
-}
-
-val userPml = User(
+val sessionPml = Session(
     nama = "Falana Rofako",
     nim = "222112038",
     avatar = "avatar_falana",
     isKoor = true,
-    id_kuesioner = "00000"
+    id_kuesioner = "00000",
+    idTim = ""
 )
 
-val userPpl = User(
+val sessionPpl = Session(
     nama = "Satria Baja Hitam",
     nim = "111222333",
     avatar = "avatar_satria",
     isKoor = false,
-    id_kuesioner = "11111"
+    id_kuesioner = "11111",
+    idTim = ""
 )
 
 val wilayah1 = Wilayah(
@@ -718,11 +724,11 @@ val wilayah2 = Wilayah(
 val mahasiswa1 = Mahasiswa(
     alamat = "Jl. Pemuda No. 123, Surabaya",
     email = "mahasiswa1@example.com",
-    foto = userPpl.avatar,
+    foto = sessionPpl.avatar,
     id_tim = "001",
     isKoor = false,
-    nama = userPpl.nama,
-    nim = userPpl.nim,
+    nama = sessionPpl.nama,
+    nim = sessionPpl.nim!!,
     no_hp = "081234567890",
     password = "password1",
     wilayah_kerja = listOf(wilayah1)
@@ -747,8 +753,8 @@ val dataTimPpl = DataTim(
     idTim = "001",
     namaTim = "Tim Modul 1",
     passPML = "12345678",
-    namaPML = userPml.nama,
-    nimPML = userPml.nim,
+    namaPML = sessionPml.nama,
+    nimPML = sessionPml.nim,
     teleponPML = "08585858585"
 )
 
@@ -757,7 +763,7 @@ val dataTimPml = DataTim(
     idTim = "001",
     namaTim = "Tim Modul 1",
     passPML = "12345678",
-    namaPML = userPml.nama,
-    nimPML = userPml.nim,
+    namaPML = sessionPml.nama,
+    nimPML = sessionPml.nim,
     teleponPML = "08585858585"
 )

@@ -5,7 +5,6 @@ import com.polstat.pkl.model.domain.DataTim
 import com.polstat.pkl.network.AuthApi
 import com.polstat.pkl.model.response.AuthResponse
 import com.polstat.pkl.model.domain.Session
-import com.polstat.pkl.model.domain.User
 import com.polstat.pkl.utils.Result
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -35,31 +34,12 @@ class AuthRepositoryImpl @Inject constructor(
             val authResponse = try {
                 val response = authApi.login(nim, password)
                 val session = Session(
-                    user = User(
-                        nama = response.nama,
-                        nim = response.nim,
-                        avatar = response.avatar,
-                        isKoor = response.isKoor,
-                        id_kuesioner = response.id_kuesioner
-                    ),
-                    dataTim = if (response.isKoor) DataTim(
-                        anggota = response.dataTim.anggota,
-                        idTim = response.dataTim.idTim,
-                        namaTim = response.dataTim.namaTim,
-                        passPML = response.dataTim.passPML,
-                        namaPML = response.nama,
-                        nimPML = response.nim,
-                        teleponPML = ""
-                    ) else DataTim(
-                        anggota = emptyList(),
-                        idTim = response.dataTim.idTim,
-                        namaTim = response.dataTim.namaTim,
-                        passPML = response.dataTim.passPML,
-                        namaPML = response.dataTim.namaPML,
-                        nimPML = response.dataTim.nimPML,
-                        teleponPML = response.dataTim.teleponPML
-                    ),
-                    wilayah = response.wilayah
+                    nama = response.nama,
+                    nim = response.nim,
+                    avatar = response.avatar,
+                    isKoor = response.isKoor,
+                    id_kuesioner = response.id_kuesioner,
+                    idTim = response.dataTim.idTim
                 )
                 saveSession(session)
                 Log.d(TAG, "Session was saved: $session")
