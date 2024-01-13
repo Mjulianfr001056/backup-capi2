@@ -54,6 +54,9 @@
     <string name="nama_krt_ruta">Nama Kepala Rumah Tangga</string>
     <string name="alamat_ruta">Alamat</string>
     <string name="keberadaan_genz_ortu_ruta">Keberadaan Gen Z dan Orang Tua</string>
+    <string name="jml_genz_yang_belum_kawin_dalam_ruta">Jumlah Gen Z yang Belum Kawin dalam Rumah Tangga</string>
+    <string name="nomor_urut_ruta_egb">Nomor Urut Rumah Tangga Eligible</string>
+    <string name="catatan">Catatan</string>
     <string name="close_popup_list_ruta">close</string>
     <string name="search_list_ruta">Masukkan kode ruta atau nama kepala ruta</string>
 </resources>

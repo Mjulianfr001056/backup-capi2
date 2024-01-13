@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -26,6 +27,9 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -34,6 +38,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
@@ -88,7 +93,10 @@ fun ListRutaPreview() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListRutaScreen(navController: NavHostController, listRutaViewModel: ListRutaViewModel, authViewModel: AuthViewModel) {
+fun ListRutaScreen(navController: NavHostController,
+                   listRutaViewModel: ListRutaViewModel,
+                   authViewModel: AuthViewModel
+) {
     var showMenu by remember { mutableStateOf(false) }
     var showSearchBar by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
@@ -266,7 +274,21 @@ fun ListRutaScreen(navController: NavHostController, listRutaViewModel: ListRuta
 
                 }
 //                ScrollContent()
-                RutaList(rutaUiState = listRutaViewModel.rutaUiState, wilayah = wilayah)
+//                RutaList(rutaUiState = listRutaViewModel.rutaUiState, wilayah = wilayah)
+                RutaRow(
+                    no = 1,
+                    noBF = "noBF",
+                    noBS = "noBS",
+                    noRuta = "noRuta",
+                    namaKRT = "NamaKRT"
+                )
+                RutaRow(
+                    no = 1,
+                    noBF = "noBF",
+                    noBS = "noBS",
+                    noRuta = "noRuta",
+                    namaKRT = "NamaKRT"
+                )
             }
         },
         floatingActionButton = {
@@ -297,14 +319,16 @@ fun RutaRow(
     noRuta: String,
     namaKRT: String
 ) {
-    var openDialog by remember { mutableStateOf(false) }
+    var openActionDialog by remember { mutableStateOf(false) }
     var openDetail by remember { mutableStateOf(false) }
+    var openPasswordMasterDialog by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp)
             .combinedClickable(onLongClick = {
-                openDialog = true
+                openActionDialog = true
             },
                 onClick = { }),
         Arrangement.SpaceEvenly,
@@ -349,7 +373,9 @@ fun RutaRow(
             )
         }
 
+//      menampilkan Pop Up Detail Ruta
         if (openDetail) {
+//            RutaDetailPopup(showDialog = openDetail)
             Dialog(onDismissRequest = { openDetail = false },
                 content = {
                     Column(
@@ -388,196 +414,17 @@ fun RutaRow(
                                 .fillMaxWidth()
                                 .verticalScroll(rememberScrollState())
                                 .weight(1f)
-                                .padding(10.dp)
                         ) {
-                            Text(
-                                text = stringResource(id = R.string.nomor_segmen_ruta),
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp
-                            )
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(30.dp)
-                                    .background(Color.Transparent)
-                                    .padding(
-                                        top = 10.dp,
-                                        bottom = 15.dp
-                                    ),
-                                value = "Detail1",
-                                onValueChange = { },
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    focusedTextColor = Color.Black,
-                                    unfocusedTextColor = Color.Black,
-                                    focusedIndicatorColor = PklPrimary900
-                                ),
-                                textStyle = TextStyle(fontSize = 12.sp)
-                            )
-                            Spacer(modifier = Modifier.size(10.dp))
-                            Text(
-                                text = stringResource(id = R.string.nomor_urut_bangunan_fisik_ruta),
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp
-                            )
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(30.dp)
-                                    .background(Color.Transparent)
-                                    .padding(
-                                        top = 10.dp,
-                                        bottom = 15.dp
-                                    ),
-                                value = "Detail1",
-                                onValueChange = {},
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    focusedTextColor = Color.Black,
-                                    unfocusedTextColor = Color.Black,
-                                    focusedIndicatorColor = PklPrimary900
-                                ),
-                                textStyle = TextStyle(fontSize = 12.sp)
-                            )
-                            Spacer(modifier = Modifier.size(10.dp))
-                            Text(
-                                text = stringResource(id = R.string.nomor_urut_bangunan_sensus_ruta),
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp
-                            )
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(30.dp)
-                                    .background(Color.Transparent)
-                                    .padding(
-                                        top = 10.dp,
-                                        bottom = 15.dp
-                                    ),
-                                value = "Detail1",
-                                onValueChange = {},
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    focusedTextColor = Color.Black,
-                                    unfocusedTextColor = Color.Black,
-                                    focusedIndicatorColor = PklPrimary900
-                                ),
-                                textStyle = TextStyle(fontSize = 12.sp)
-                            )
-                            Spacer(modifier = Modifier.size(10.dp))
-                            Text(
-                                text = stringResource(id = R.string.nomor_urut_krt_ruta),
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp
-                            )
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(30.dp)
-                                    .background(Color.Transparent)
-                                    .padding(
-                                        top = 10.dp,
-                                        bottom = 15.dp
-                                    ),
-                                value = "Detail1",
-                                onValueChange = {},
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    focusedTextColor = Color.Black,
-                                    unfocusedTextColor = Color.Black,
-                                    focusedIndicatorColor = PklPrimary900
-                                ),
-                                textStyle = TextStyle(fontSize = 12.sp)
-                            )
-                            Spacer(modifier = Modifier.size(10.dp))
-                            Text(
-                                text = stringResource(id = R.string.nama_krt_ruta),
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp
-                            )
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(30.dp)
-                                    .background(Color.Transparent)
-                                    .padding(
-                                        top = 10.dp,
-                                        bottom = 15.dp
-                                    ),
-                                value = "Detail1",
-                                onValueChange = {},
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    focusedTextColor = Color.Black,
-                                    unfocusedTextColor = Color.Black,
-                                    focusedIndicatorColor = PklPrimary900
-                                ),
-                                textStyle = TextStyle(fontSize = 12.sp)
-                            )
-                            Spacer(modifier = Modifier.size(10.dp))
-                            Text(
-                                text = stringResource(id = R.string.alamat_ruta),
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp
-                            )
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(30.dp)
-                                    .background(Color.Transparent)
-                                    .padding(
-                                        top = 10.dp,
-                                        bottom = 15.dp
-                                    ),
-                                value = "Detail1",
-                                onValueChange = {},
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    focusedTextColor = Color.Black,
-                                    unfocusedTextColor = Color.Black,
-                                    focusedIndicatorColor = PklPrimary900
-                                ),
-                                textStyle = TextStyle(fontSize = 12.sp)
-                            )
-                            Spacer(modifier = Modifier.size(10.dp))
-                            Text(
-                                text = stringResource(id = R.string.keberadaan_genz_ortu_ruta),
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp
-                            )
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(30.dp)
-                                    .background(Color.Transparent)
-                                    .padding(
-                                        top = 10.dp,
-                                        bottom = 15.dp
-                                    ),
-                                value = "Detail1",
-                                onValueChange = {},
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    focusedTextColor = Color.Black,
-                                    unfocusedTextColor = Color.Black,
-                                    focusedIndicatorColor = PklPrimary900
-                                ),
-                                textStyle = TextStyle(fontSize = 12.sp)
-                            )
+                            DetailRutaTextField(label = R.string.nomor_segmen_ruta)
+                            DetailRutaTextField(label = R.string.nomor_urut_bangunan_fisik_ruta)
+                            DetailRutaTextField(label = R.string.nomor_urut_bangunan_sensus_ruta)
+                            DetailRutaTextField(label = R.string.nomor_urut_krt_ruta)
+                            DetailRutaTextField(label = R.string.nama_krt_ruta)
+                            DetailRutaTextField(label = R.string.alamat_ruta)
+                            DetailRutaTextField(label = R.string.keberadaan_genz_ortu_ruta)
+                            DetailRutaTextField(label = R.string.jml_genz_yang_belum_kawin_dalam_ruta)
+                            DetailRutaTextField(label = R.string.nomor_urut_ruta_egb)
+                            DetailRutaTextField(label = R.string.catatan)
                         }
                         Text(modifier = Modifier
                             .fillMaxWidth()
@@ -603,8 +450,10 @@ fun RutaRow(
                 })
         }
 
-        if (openDialog) {
-            Dialog(onDismissRequest = { openDialog = false },
+//      menampilkan Action Dialog
+        if (openActionDialog) {
+//            RutaActionDialog(showDialog = openActionDialog)
+            Dialog(onDismissRequest = { openActionDialog = false },
                 content = {
                     Column(
                         modifier = Modifier
@@ -643,6 +492,7 @@ fun RutaRow(
                             Arrangement.Center,
                             Alignment.CenterHorizontally
                         ) {
+//                          untuk edit ruta
                             Text(modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
@@ -657,6 +507,8 @@ fun RutaRow(
                                 fontSize = 16.sp,
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium)
+
+//                          untuk salin ruta
                             Text(modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { }
@@ -669,10 +521,12 @@ fun RutaRow(
                                 fontSize = 16.sp,
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium)
+
+//                          untuk menghapus ruta
                             Text(modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-//                                    harusnya muncul dialog konfirmasi
+                                    openPasswordMasterDialog = true
                                 }
                                 .padding(
                                     top = 10.dp,
@@ -686,6 +540,77 @@ fun RutaRow(
                         }
                     }
                 })
+        }
+
+//      menampilkan pop up password master jika mengeklik action hapus
+        if (openPasswordMasterDialog) {
+            var inputPasswordMaster by remember { mutableStateOf("") }
+
+            AlertDialog(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                onDismissRequest = { openPasswordMasterDialog = false },
+                confirmButton = {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(0.45f),
+                        onClick = { },
+                        colors = ButtonDefaults.buttonColors(PklPrimary900)) {
+                        Text(text = "Hapus")
+                    } },
+                dismissButton = {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(0.45f),
+                        onClick = { openPasswordMasterDialog = false },
+                        colors = ButtonDefaults.buttonColors(containerColor = PklTertiary100, contentColor = PklPrimary900)
+                    ) {
+                        Text(text = "Batal")
+                    }},
+                title = { Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = "Konfirmasi",
+                    fontFamily = PoppinsFontFamily,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 24.sp,
+                    textAlign = TextAlign.Center,
+                ) },
+                containerColor = PklBase,
+                titleContentColor = PklPrimary900,
+                textContentColor = Color.Black,
+                text = {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        Arrangement.Center,
+                        Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Hapus Rumah Tangga membutuhkan persetujuan PML. Harap hubungi PML untuk memperoleh password master.",
+                            textAlign = TextAlign.Center,
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 14.sp
+                        )
+                        Spacer(modifier = Modifier.size(15.dp))
+                        TextField(
+                            singleLine = true,
+                            value = inputPasswordMaster,
+                            onValueChange = { inputPasswordMaster = it},
+                            placeholder = { Text(modifier = Modifier.fillMaxWidth(), text = "Masukkan password master", textAlign = TextAlign.Center, fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Medium, fontSize = 14.sp)},
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedTextColor = Color.Black,
+                                unfocusedTextColor = Color.Black,
+                                unfocusedIndicatorColor = Color.Black,
+                                focusedIndicatorColor = PklPrimary900,
+                                selectionColors = TextSelectionColors(handleColor = PklPrimary900, backgroundColor = PklPrimary900.copy(0.5f)),
+                                focusedPlaceholderColor = Color.Black.copy(alpha = 0.7f),
+                                unfocusedPlaceholderColor = Color.Black.copy(alpha = 0.7f)
+                            ),
+                            textStyle = TextStyle(fontSize = 16.sp, fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center)
+                        )
+                    }
+                }
+            )
         }
     }
 }
@@ -722,10 +647,50 @@ fun RutaList(rutaUiState: RutaUiState, wilayah: List<Wilayah>) {
         }
 
         is RutaUiState.Error -> {}
+        else -> {}
     }
 }
 
-
+@Composable
+fun DetailRutaTextField(label: Int) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 15.dp, end = 15.dp, top = 5.dp, bottom = 5.dp)
+    ) {
+        Text(
+            text = stringResource(id = label),
+            fontFamily = PoppinsFontFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp,
+            color = PklPrimary900
+        )
+        OutlinedTextField(
+            value = "Detail1",
+            onValueChange = {},
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(0.dp)
+                .background(Color.Transparent)
+                ,
+            readOnly = true,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+                focusedIndicatorColor = PklPrimary900,
+                unfocusedIndicatorColor = PklPrimary900
+            ),
+            textStyle = TextStyle(
+                fontFamily = PoppinsFontFamily,
+                fontWeight = FontWeight.Medium,
+                fontSize = 14.sp
+            ),
+            shape = RoundedCornerShape(10.dp)
+        )
+    }
+}
 
 
 

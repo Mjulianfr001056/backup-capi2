@@ -8,14 +8,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.model.domain.Ruta
 import com.polstat.pkl.model.domain.Wilayah
-import com.polstat.pkl.repository.RutaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ListRutaViewModel @Inject constructor(
-    private val rutaRepository: RutaRepository
 ): ViewModel() {
 
     companion object {
@@ -57,7 +55,7 @@ class ListRutaViewModel @Inject constructor(
 
     suspend fun getAllRuta(noBS: String) {
         try {
-            listRuta = rutaRepository.getAllRuta(noBS)
+//            listRuta = rutaRepository.getAllRuta(noBS)
         } catch (e: Exception) {
             Log.e(
                 TAG, "Error: ${e.message}"
@@ -72,7 +70,7 @@ class ListRutaViewModel @Inject constructor(
 
     suspend fun editRuta() {
         try {
-           ruta = rutaRepository.editRuta("update", selectedRuta)
+//           ruta = rutaRepository.editRuta("update", selectedRuta)
         } catch (e: Exception) {
             Log.e(TAG, "Error in update ruta: ${e.message}")
             return
@@ -82,7 +80,7 @@ class ListRutaViewModel @Inject constructor(
 
     suspend fun deleteRuta() {
         try {
-            rutaRepository.deleteRuta("delete", selectedRuta)
+//            rutaRepository.deleteRuta("delete", selectedRuta)
         } catch (e: Exception) {
             Log.e(TAG, "Error in delete ruta: ${e.message}")
             return
