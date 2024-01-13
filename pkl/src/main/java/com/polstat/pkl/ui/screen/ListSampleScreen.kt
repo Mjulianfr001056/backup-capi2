@@ -1,5 +1,6 @@
 package com.polstat.pkl.ui.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -40,18 +42,35 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.polstat.pkl.database.entity.SampelRutaEntity
 import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
+import com.polstat.pkl.viewmodel.ListSampelViewModel
 
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListSampleScreen(navController: NavHostController){
-        Scaffold(
+fun ListSampleScreen(navController: NavHostController, viewModel: ListSampelViewModel){
+
+//    val noBS = navController.currentBackStackEntry?.arguments?.getString("noBS")
+    val noBS = "444B"
+
+    LaunchedEffect(key1 = true) {
+        if (noBS != null) {
+            viewModel.getSampelByBS(noBS)
+            viewModel.fetchSampelRuta(noBS)
+        }
+    }
+
+    val listSampelRuta = viewModel.listSampelRuta
+
+    Scaffold(
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -130,7 +149,8 @@ fun ListSampleScreen(navController: NavHostController){
                 navController = navController,
                 modifier = Modifier
                     .padding(innerPadding)
-                    .fillMaxSize()
+                    .fillMaxSize(),
+                listSampelRuta = listSampelRuta.value
             )
         },
     )
@@ -140,14 +160,16 @@ fun ListSampleScreen(navController: NavHostController){
 @Composable
 fun PreviewListSampleScreen(){
     ListSampleScreen(
-        navController = rememberNavController()
+        navController = rememberNavController(),
+        viewModel = hiltViewModel()
     )
 }
 
 @Composable
 private fun ListSample(
     navController: NavController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    listSampelRuta: List<SampelRutaEntity>
 ){
     val itemCount = 4
 
@@ -157,17 +179,24 @@ private fun ListSample(
             .background(color = com.polstat.pkl.ui.theme.PklBase),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
-    ){ items(itemCount) {
-            Sample(
-                onPetunjukArahClicked = {}
-            )
+    ){
+        listSampelRuta.size.let {
+            items(it) { index ->
+                val sampelRuta = listSampelRuta[index]
+                Sample(
+                    onPetunjukArahClicked = {},
+                    sampelRuta
+                )
+            }
         }
+
     }
 }
 
 @Composable
 private fun Sample(
     onPetunjukArahClicked: () -> Unit,
+    sampelRuta: SampelRutaEntity
 ){
     Box(
         modifier = Modifier
@@ -189,7 +218,7 @@ private fun Sample(
                     modifier = Modifier.size(24.dp)
                 )
                 Text(
-                    text = "DANANG",
+                    text = "${sampelRuta.namaKrt}",
                     style = MaterialTheme.typography.titleLarge,
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.SemiBold,
@@ -212,7 +241,7 @@ private fun Sample(
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = " 001",
+                        text = " ${sampelRuta.noBgFisik}",
                         color = PklPrimary900,
                         fontFamily = PoppinsFontFamily,
                         fontWeight = FontWeight.Medium,
@@ -230,7 +259,7 @@ private fun Sample(
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = " S001",
+                        text = " ${sampelRuta.noSegmen}",
                         color = PklPrimary900,
                         fontFamily = PoppinsFontFamily,
                         fontWeight = FontWeight.Medium,
@@ -253,7 +282,7 @@ private fun Sample(
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = " 001",
+                        text = " ${sampelRuta.noBS}",
                         color = PklPrimary900,
                         fontFamily = PoppinsFontFamily,
                         fontWeight = FontWeight.Medium,
@@ -271,7 +300,7 @@ private fun Sample(
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = " 001",
+                        text = " ${sampelRuta.noUrutRuta}",
                         color = PklPrimary900,
                         fontFamily = PoppinsFontFamily,
                         fontWeight = FontWeight.Medium,
@@ -290,7 +319,7 @@ private fun Sample(
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = " RT 001/RW 001",
+                    text = " ${sampelRuta.alamat}",
                     color = PklPrimary900,
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium,
@@ -315,7 +344,7 @@ private fun Sample(
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = " 1",
+                    text = " ${sampelRuta.noUrutRtEgb}",
                     color = PklPrimary900,
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium,
@@ -344,11 +373,11 @@ private fun Sample(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewSample(){
-    Sample(
-        onPetunjukArahClicked = {}
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewSample(){
+//    Sample(
+//        onPetunjukArahClicked = {}
+//    )
+//}
 
