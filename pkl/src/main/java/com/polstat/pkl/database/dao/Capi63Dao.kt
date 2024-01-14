@@ -11,7 +11,6 @@ import com.polstat.pkl.database.entity.MahasiswaEntity
 import com.polstat.pkl.database.entity.RutaEntity
 import com.polstat.pkl.database.entity.SampelRutaEntity
 import com.polstat.pkl.database.entity.WilayahEntity
-import com.polstat.pkl.database.relation.DataTimWithAll
 import com.polstat.pkl.database.relation.DataTimWithMahasiswa
 import com.polstat.pkl.database.relation.MahasiswaWithWilayah
 import com.polstat.pkl.database.relation.WilayahWithRuta

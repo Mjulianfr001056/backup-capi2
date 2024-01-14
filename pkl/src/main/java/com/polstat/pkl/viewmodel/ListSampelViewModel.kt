@@ -1,15 +1,14 @@
 package com.polstat.pkl.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.database.entity.SampelRutaEntity
 import com.polstat.pkl.model.response.SampelRutaResponse
 import com.polstat.pkl.repository.SampelRutaRepository
-import com.polstat.pkl.repository.SessionRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import com.polstat.pkl.utils.Result
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,18 +20,18 @@ import javax.inject.Inject
 @HiltViewModel
 class ListSampelViewModel @Inject constructor(
     private val sampelRutaRepository: SampelRutaRepository,
-    private val sessionRepository: SessionRepository
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     companion object {
         private const val TAG = "CAPI63_LISTSAMPEL_VM"
     }
 
-    private val sampelRutaValue = SampelRutaResponse()
+    val noBS = savedStateHandle.get<String>("noBS")
 
-    private val _listSampelRutaByBS = MutableStateFlow(sampelRutaValue)
+    private val _sampelRutaResponse = MutableStateFlow(SampelRutaResponse())
 
-    val listSampelRutaByBS = _listSampelRutaByBS.asStateFlow()
+    val sampelRutaResponse = _sampelRutaResponse.asStateFlow()
 
     private val _listSampelRuta = MutableStateFlow<List<SampelRutaEntity>>(emptyList())
 
@@ -41,8 +40,6 @@ class ListSampelViewModel @Inject constructor(
     private val _errorMessage = MutableStateFlow("")
 
     val errorMessage = _errorMessage.asStateFlow()
-
-    private val _session = sessionRepository.getActiveSession()
 
     private val _showLoadingChannel = Channel<Boolean>()
 
@@ -53,21 +50,22 @@ class ListSampelViewModel @Inject constructor(
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
     init {
-        getSampelByBS("444B")
+        getSampelRutaFromWSAndInsertThem(noBS!!)
     }
 
-    fun fetchSampelRuta(
+
+    private fun getSampelRutaFromWSAndInsertThem(
         noBS: String
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            openLoadingDialog()
+        viewModelScope.launch {
+//            openLoadingDialog()
             sampelRutaRepository.getSampelRutaFromWS(noBS).collectLatest { result ->
                 when (result) {
                     is Result.Success -> {
                         result.data?.let { response ->
                             Log.d(TAG, "$response")
 
-                            _listSampelRutaByBS.value = response
+                            _sampelRutaResponse.value = response
 
                             Log.d(TAG, "Fetch Sampel Ruta successful: $response")
                         }
@@ -87,8 +85,8 @@ class ListSampelViewModel @Inject constructor(
                 }
             }
 
-            if (listSampelRutaByBS.value.SampelRuta.isNotEmpty() == true) {
-                listSampelRutaByBS.value.SampelRuta.forEach { sampelRuta ->
+            if (_sampelRutaResponse.value.isNotEmpty()) {
+                _sampelRutaResponse.value.forEach { sampelRuta ->
                     sampelRutaRepository.insertSampelRuta(sampelRuta).collectLatest { message ->
                         Log.d(TAG, message)
                     }
@@ -97,7 +95,7 @@ class ListSampelViewModel @Inject constructor(
         }
     }
 
-    fun getSampelByBS(
+    fun getSampelByBSFromDB(
         noBS: String
     ) {
         viewModelScope.launch {
