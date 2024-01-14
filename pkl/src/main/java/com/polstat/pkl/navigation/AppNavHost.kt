@@ -76,7 +76,6 @@ fun SamplingNavHost(
     val passwordMasterViewModel: PasswordMasterViewModel = viewModel()
     val authViewModel = hiltViewModel<AuthViewModel>()
     val listBSViewModel = hiltViewModel<ListBSViewModel>()
-
     NavHost(
         navController = samplingNavController,
         startDestination = CapiScreen.Sampling.START
@@ -101,7 +100,7 @@ fun SamplingNavHost(
             }
             composable(CapiScreen.Listing.LIST_RUTA) {
                 ListRutaScreen(
-                    navController = samplingNavController
+                    navController = samplingNavController, listRutaViewModel = listRutaViewModel, authViewModel = authViewModel
                 )
             }
             composable(
