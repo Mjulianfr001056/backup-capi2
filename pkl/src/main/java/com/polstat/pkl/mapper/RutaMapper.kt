@@ -62,3 +62,7 @@ fun RutaEntity.toRutaDto(): RutaDto {
         status = status
     )
 }
+
+fun List<RutaEntity>.toRutaDtoList(): List<RutaDto> {
+    return this.map { it.toRutaDto() }
+}

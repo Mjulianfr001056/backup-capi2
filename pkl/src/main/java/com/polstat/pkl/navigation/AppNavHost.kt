@@ -102,10 +102,17 @@ fun SamplingNavHost(
                     viewModel = listBSViewModel
                 )
             }
-            composable(CapiScreen.Listing.LIST_RUTA) {
+            composable(
+                route = CapiScreen.Listing.LIST_RUTA + "/{noBS}",
+                arguments = listOf(
+                    navArgument("noBS") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
                 ListRutaScreen(
                     navController = samplingNavController,
-                    listRutaViewModel = hiltViewModel(),
+                    viewModel = hiltViewModel(),
                     authViewModel = authViewModel
                 )
             }

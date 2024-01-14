@@ -47,6 +47,9 @@ interface Capi63Dao {
     @Update
     suspend fun updateRuta(rutaEntity: RutaEntity)
 
+    @Query("SELECT * FROM ruta WHERE kodeRuta = :kodeRuta")
+    suspend fun getRuta(kodeRuta: String) : RutaEntity
+
 
     // Operasi database untuk entitas berelasi
 

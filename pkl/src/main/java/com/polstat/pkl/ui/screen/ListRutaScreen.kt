@@ -49,6 +49,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,13 +69,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.R
-import com.polstat.pkl.model.domain.Wilayah
+import com.polstat.pkl.database.entity.RutaEntity
 import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.theme.*
 import com.polstat.pkl.ui.theme.PklPrimary300
 import com.polstat.pkl.viewmodel.AuthViewModel
 import com.polstat.pkl.viewmodel.ListRutaViewModel
-import com.polstat.pkl.viewmodel.RutaUiState
 
 @Preview
 @Composable
@@ -94,12 +94,15 @@ fun ListRutaPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListRutaScreen(navController: NavHostController,
-                   listRutaViewModel: ListRutaViewModel,
+                   viewModel: ListRutaViewModel,
                    authViewModel: AuthViewModel
 ) {
     var showMenu by remember { mutableStateOf(false) }
     var showSearchBar by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
+    var noBS = viewModel.noBS
+    var session = viewModel.session
+    var wilayahWithRuta = viewModel.wilayahWithRuta.collectAsState()
 //    var wilayah = authViewModel.getWilayahFromSession()
 
     Scaffold(
@@ -142,7 +145,13 @@ fun ListRutaScreen(navController: NavHostController,
                             tint = Color.White
                         )
                     }
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = {
+                        viewModel.synchronizeRuta(
+                            nim = session!!.nim!!,
+                            noBS = noBS!!,
+                            listRuta = wilayahWithRuta.value.listRuta!!
+                        )
+                    }) {
                         Icon(
                             imageVector = Icons.Filled.Sync,
                             contentDescription = "Reload Button",
@@ -276,7 +285,7 @@ fun ListRutaScreen(navController: NavHostController,
 
                 }
 //                ScrollContent()
-//                RutaList(rutaUiState = listRutaViewModel.rutaUiState, wilayah = wilayah)
+                RutaList(listRuta = wilayahWithRuta.value.listRuta!!)
                 RutaRow(
                     no = 1,
                     noBF = "noBF",
@@ -556,6 +565,7 @@ fun RutaRow(
                     Button(
                         modifier = Modifier.fillMaxWidth(0.45f),
                         onClick = {
+
                         },
                         colors = ButtonDefaults.buttonColors(PklPrimary900)) {
                         Text(text = "Hapus")
@@ -618,48 +628,36 @@ fun RutaRow(
     }
 }
 
-//@Composable
-//fun RutaList(rutaUiState: RutaUiState, wilayah: List<Wilayah>) {
-//    when (rutaUiState) {
-//        is RutaUiState.Success -> {
-//            val ruta = rutaUiState.ruta
-//            var i = 0
-//            LazyColumn(modifier = Modifier.fillMaxHeight(),
-//                content = {
-//                    items(items = ruta) { ruta ->
-//                        i++
-//                        RutaRow(
-//                            no = i,
-//                            noBF = ruta.noBgFisik.toString(),
-//                            noBS = ruta.noBS.toString(),
-//                            noRuta = ruta.noUrutRuta.toString(),
-//                            namaKRT = ruta.namaKrt.toString()
-//                        )
-//                    }
-//                })
-//        }
-//
-//        is RutaUiState.Loading -> {
-//            Text(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(10.dp),
-//                text = "Loading...",
-//                textAlign = TextAlign.Center
-//            )
-//        }
-//
-//        is RutaUiState.Error -> {}
-//        else -> {}
-//    }
-//}
+@Composable
+fun RutaList(listRuta: List<RutaEntity>) {
+    LazyColumn(modifier = Modifier.fillMaxHeight(),
+        content = {
+            listRuta.size.let {
+                items(it) { index ->
+                    val ruta = listRuta[index]
+                    RutaRow(
+                        no = index + 1,
+                        noBF = ruta.noBgFisik.toString(),
+                        noBS = ruta.noBS.toString(),
+                        noRuta = ruta.noUrutRuta.toString(),
+                        namaKRT = ruta.namaKrt.toString()
+                    )
+                }
+            }
+        })
+}
 
 @Composable
 fun DetailRutaTextField(label: Int) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 15.dp, end = 15.dp, top = 5.dp, bottom = 5.dp)
+            .padding(
+                start = 15.dp,
+                end = 15.dp,
+                top = 5.dp,
+                bottom = 5.dp
+            )
     ) {
         Text(
             text = stringResource(id = label),
