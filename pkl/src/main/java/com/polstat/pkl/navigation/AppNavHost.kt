@@ -118,7 +118,8 @@ fun SamplingNavHost(
             }
             composable(CapiScreen.Listing.ISI_RUTA) {
                 IsiRumahTanggaScreen(
-                    navController = samplingNavController
+                    navController = samplingNavController,
+                    viewModel = hiltViewModel()
                 )
             }
         }
