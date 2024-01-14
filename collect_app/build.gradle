@@ -262,6 +262,10 @@ dependencies {
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 
+    // Compose
+    implementation "androidx.compose.material:material:1.5.4"
+    implementation "androidx.compose.material:material-icons-core:1.5.4"
+
     // Dagger - Hilt
     implementation("com.google.dagger:hilt-android:2.49")
     kapt("com.google.dagger:hilt-compiler:2.49")
