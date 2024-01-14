@@ -4,7 +4,6 @@ import android.os.Build
 import android.os.Bundle
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
-import com.polstat.pkl.CapiFirstActivity
 import org.odk.collect.android.R
 import org.odk.collect.android.activities.ActivityUtils
 import org.odk.collect.android.activities.CrashHandlerActivity
@@ -18,6 +17,7 @@ import org.odk.collect.crashhandler.CrashHandler
 import org.odk.collect.permissions.PermissionsProvider
 import org.odk.collect.settings.SettingsProvider
 import org.odk.collect.strings.localization.LocalizedActivity
+import timber.log.Timber
 import javax.inject.Inject
 
 class MainMenuActivity : LocalizedActivity() {
@@ -62,7 +62,8 @@ class MainMenuActivity : LocalizedActivity() {
 
         ThemeUtils(this).setDarkModeForCurrentProject()
 
-        ActivityUtils.startActivityAndCloseAllOthers(this, CapiFirstActivity::class.java)
+//        ActivityUtils.startActivityAndCloseAllOthers(this, CapiFirstActivity::class.java)
+        Timber.tag("MAINMENU_ACTIVITY").d("onCreate: ${currentProjectViewModel.hasCurrentProject()}")
 
         if (!currentProjectViewModel.hasCurrentProject()) {
             super.onCreate(null)
@@ -95,11 +96,7 @@ class MainMenuActivity : LocalizedActivity() {
 
             super.onCreate(savedInstanceState)
 
-//            setContent {
-//                Surface (modifier = Modifier.fillMaxSize()){
-//                    Text(text = "Coba Login Juga di Main Menu")
-//                }
-//            }
+            setContentView(R.layout.main_menu_activity)
         }
     }
 
