@@ -34,6 +34,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -51,24 +52,28 @@ import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.viewmodel.ListSampelViewModel
+import kotlinx.coroutines.flow.collectLatest
 
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListSampleScreen(navController: NavHostController, viewModel: ListSampelViewModel){
+fun ListSampleScreen(
+    navController: NavHostController,
+    viewModel: ListSampelViewModel
+){
 
-//    val noBS = navController.currentBackStackEntry?.arguments?.getString("noBS")
-    val noBS = "444B"
+    val noBS = viewModel.noBS
 
-    LaunchedEffect(key1 = true) {
-        if (noBS != null) {
-            viewModel.getSampelByBS(noBS)
-            viewModel.fetchSampelRuta(noBS)
+    val listSampelRuta = viewModel.listSampelRuta.collectAsState()
+
+    LaunchedEffect(key1 = viewModel.sampelRutaResponse) {
+        viewModel.sampelRutaResponse.collectLatest { response ->
+            if (response.isNotEmpty() && listSampelRuta.value.isEmpty()) {
+                viewModel.getSampelByBSFromDB(noBS!!)
+            }
         }
     }
-
-    val listSampelRuta = viewModel.listSampelRuta
 
     Scaffold(
         topBar = {
@@ -171,8 +176,6 @@ private fun ListSample(
     modifier: Modifier = Modifier,
     listSampelRuta: List<SampelRutaEntity>
 ){
-    val itemCount = 4
-
     LazyColumn(
         modifier
             .fillMaxSize()
@@ -185,7 +188,7 @@ private fun ListSample(
                 val sampelRuta = listSampelRuta[index]
                 Sample(
                     onPetunjukArahClicked = {},
-                    sampelRuta
+                    sampelRuta = sampelRuta
                 )
             }
         }
@@ -372,12 +375,3 @@ private fun Sample(
         }
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewSample(){
-//    Sample(
-//        onPetunjukArahClicked = {}
-//    )
-//}
-

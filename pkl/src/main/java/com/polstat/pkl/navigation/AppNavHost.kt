@@ -4,9 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.polstat.pkl.ui.screen.BerandaScreen
 import com.polstat.pkl.ui.screen.IsiRumahTanggaScreen
@@ -74,7 +76,6 @@ fun SamplingNavHost(
     val passwordMasterViewModel: PasswordMasterViewModel = viewModel()
     val authViewModel = hiltViewModel<AuthViewModel>()
     val listBSViewModel = hiltViewModel<ListBSViewModel>()
-    val listSampelViewModel = hiltViewModel<ListSampelViewModel>()
 
     NavHost(
         navController = samplingNavController,
@@ -103,10 +104,17 @@ fun SamplingNavHost(
                     navController = samplingNavController
                 )
             }
-            composable(CapiScreen.Listing.LIST_SAMPLE){
+            composable(
+                route = CapiScreen.Listing.LIST_SAMPLE + "/{noBS}",
+                arguments = listOf(
+                    navArgument("noBS") {
+                        type = NavType.StringType
+                    }
+                )
+            ){
                 ListSampleScreen(
                     navController = samplingNavController,
-                    viewModel = listSampelViewModel
+                    viewModel = hiltViewModel()
                 )
             }
             composable(CapiScreen.Listing.ISI_RUTA) {

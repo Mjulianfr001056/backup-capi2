@@ -65,7 +65,10 @@ import com.polstat.pkl.viewmodel.ListSampelViewModel
 @SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListBSScreen(navController: NavHostController, viewModel: ListBSViewModel) {
+fun ListBSScreen(
+    navController: NavHostController,
+    viewModel: ListBSViewModel
+) {
 
     val listWilayah = viewModel.listWilayahByNIM
 
@@ -371,9 +374,9 @@ private fun ListBS(
                         navController.navigate(Capi63Screen.ListRuta.route)
                     },
                     onLihatSampleClicked = {
-                        navController.navigate(Capi63Screen.ListSample.route)
+                        navController.navigate(Capi63Screen.ListSample.route + "/${wilayah.noBS}")
                     },
-                    wilayah
+                    wilayah = wilayah
                 )
             }
         }

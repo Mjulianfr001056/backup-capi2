@@ -6,10 +6,7 @@ import com.polstat.pkl.database.Capi63Database
 import com.polstat.pkl.database.entity.SampelRutaEntity
 import com.polstat.pkl.mapper.toSampelRutaEntity
 import com.polstat.pkl.model.domain.SampelRuta
-import com.polstat.pkl.model.request.SyncRutaRequest
 import com.polstat.pkl.model.response.SampelRutaResponse
-import com.polstat.pkl.model.response.SyncRutaResponse
-import com.polstat.pkl.network.RutaApi
 import com.polstat.pkl.network.SampelRutaApi
 import com.polstat.pkl.utils.Result
 import kotlinx.coroutines.flow.Flow
@@ -33,11 +30,11 @@ class SampelRutaRepositoryImpl @Inject constructor(
         return flow {
             emit(Result.Loading(true))
             val sampelRutaResponse = try {
-                val response = sampelRutaApi.getSampel(noBS)
-                SampelRutaResponse(response)
+                sampelRutaApi.getSampel(noBS)
             }  catch (e: IOException) {
                 e.printStackTrace()
                 emit(Result.Error(message = e.localizedMessage ?: "Fetch Sampel Ruta Error"))
+                Log.e(TAG, "getSampelRutaFromWS: Terjadi kesalahan!", e)
                 return@flow
             } catch (e: HttpException) {
                 e.printStackTrace()
@@ -46,12 +43,16 @@ class SampelRutaRepositoryImpl @Inject constructor(
                     400 -> emit(Result.Error(message = "Terjadi Kesalahan Pengambilan Data"))
                     else -> emit(Result.Error(message = e.localizedMessage ?: "Fetch Sampel Ruta Error"))
                 }
+                Log.e(TAG, "getSampelRutaFromWS: Terjadi kesalahan!", e)
                 return@flow
             } catch (e: Exception) {
                 e.printStackTrace()
                 emit(Result.Error(message = e.localizedMessage ?: "Fetch Sampel Ruta Error"))
+                Log.e(TAG, "getSampelRutaFromWS: Terjadi kesalahan!", e)
                 return@flow
             }
+
+            Log.d(TAG, "Berhasil getSampelRutaFromWS! : $sampelRutaResponse")
 
             emit(Result.Success(sampelRutaResponse))
             emit(Result.Loading(false))

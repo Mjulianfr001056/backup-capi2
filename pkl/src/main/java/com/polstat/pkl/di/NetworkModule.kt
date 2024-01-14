@@ -81,4 +81,5 @@ class NetworkModule {
     @Singleton
     fun provideSampelRutaRepository(sampelRutaApi: SampelRutaApi, capi63Database: Capi63Database) : SampelRutaRepository {
         return SampelRutaRepositoryImpl(sampelRutaApi, capi63Database)
-    }}
+    }
+}
