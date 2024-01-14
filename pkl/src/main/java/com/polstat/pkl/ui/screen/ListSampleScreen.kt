@@ -1,6 +1,9 @@
+@file:Suppress("DEPRECATION")
+
 package com.polstat.pkl.ui.screen
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,8 +22,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.HomeWork
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -29,29 +32,41 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat.recreate
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.polstat.pkl.R
 import com.polstat.pkl.database.entity.SampelRutaEntity
 import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.viewmodel.ListSampelViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
 
@@ -65,7 +80,22 @@ fun ListSampleScreen(
 
     val noBS = viewModel.noBS
 
+    val context = LocalContext.current
+
     val listSampelRuta = viewModel.listSampelRuta.collectAsState()
+
+    var searchText by remember { mutableStateOf("") }
+
+    var showSearchBar by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
+        viewModel.showErrorToastChannel.collectLatest { show ->
+            if (show) {
+                delay(1500)
+                Toast.makeText(context, viewModel.errorMessage.value, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     LaunchedEffect(key1 = viewModel.sampelRutaResponse) {
         viewModel.sampelRutaResponse.collectLatest { response ->
@@ -115,14 +145,11 @@ fun ListSampleScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxHeight()
                     ) {
-                        IconButton(onClick = {
-                            /*TODO*/
-                        }) {
+                        IconButton(onClick = { showSearchBar = true }) {
                             Icon(
-                                imageVector = Icons.Filled.Search,
-                                tint = Color.White,
-                                contentDescription = "Search Icon",
-                                modifier = Modifier.size(25.dp)
+                                imageVector = Icons.Outlined.Search,
+                                contentDescription = "Search Button",
+                                tint = Color.White
                             )
                         }
                         IconButton(onClick = {
@@ -136,7 +163,7 @@ fun ListSampleScreen(
                             )
                         }
                         IconButton(onClick = {
-                            /*TODO*/
+                            navController.navigate(Capi63Screen.ListSample.route + "/${noBS}")
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Sync,
@@ -148,14 +175,55 @@ fun ListSampleScreen(
                     }
                 }
             )
+
+            if (showSearchBar) {
+                Row(modifier = Modifier
+                    .fillMaxWidth(),
+                    Arrangement.Start,
+                    Alignment.CenterVertically) {
+                    SearchBar(
+                        query = searchText,
+                        onQueryChange = {
+                            searchText = it
+                        },
+                        onSearch = {
+                            searchText = it
+
+                        },
+                        active = false,
+                        onActiveChange = { true },
+                        placeholder = { Text(
+                            text = stringResource(id = R.string.search_list_sampel),
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 14.sp,
+                            color = Color.White) },
+                        leadingIcon = {
+                            IconButton(onClick = { showSearchBar = false }) {
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowBack,
+                                    contentDescription = stringResource(id = R.string.back_icon),
+                                    tint = Color.White
+                                )
+                            }},
+                        shape = RoundedCornerShape(0.dp),
+                        colors = SearchBarDefaults.colors(containerColor = PklPrimary900, inputFieldColors = TextFieldDefaults.colors(Color.White)),
+                        content = {
+
+                        }
+                    )
+                }
+            }
         },
         content = { innerPadding ->
             ListSample(
+                viewModel = viewModel,
                 navController = navController,
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize(),
-                listSampelRuta = listSampelRuta.value
+                listSampelRuta = listSampelRuta.value,
+                searchText = searchText
             )
         },
     )
@@ -172,9 +240,11 @@ fun PreviewListSampleScreen(){
 
 @Composable
 private fun ListSample(
+    viewModel: ListSampelViewModel,
     navController: NavController,
     modifier: Modifier = Modifier,
-    listSampelRuta: List<SampelRutaEntity>
+    listSampelRuta: List<SampelRutaEntity>,
+    searchText: String
 ){
     LazyColumn(
         modifier
@@ -183,9 +253,13 @@ private fun ListSample(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ){
-        listSampelRuta.size.let {
+        val filteredList = viewModel.filteredList(searchText, listSampelRuta)
+
+        val sortedList = viewModel.sortedList(filteredList)
+
+        sortedList.size.let {
             items(it) { index ->
-                val sampelRuta = listSampelRuta[index]
+                val sampelRuta = sortedList[index]
                 Sample(
                     onPetunjukArahClicked = {},
                     sampelRuta = sampelRuta

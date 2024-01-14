@@ -59,4 +59,5 @@
     <string name="catatan">Catatan</string>
     <string name="close_popup_list_ruta">close</string>
     <string name="search_list_ruta">Masukkan kode ruta atau nama kepala ruta</string>
+    <string name="search_list_sampel">Masukkan kata kunci</string>
 </resources>

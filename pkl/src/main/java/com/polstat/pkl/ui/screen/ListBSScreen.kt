@@ -1,6 +1,7 @@
 package com.polstat.pkl.ui.screen
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -61,6 +64,8 @@ import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.viewmodel.ListBSViewModel
 import com.polstat.pkl.viewmodel.ListSampelViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,6 +76,17 @@ fun ListBSScreen(
 ) {
 
     val listWilayah = viewModel.listWilayahByNIM
+
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
+        viewModel.showErrorToastChannel.collectLatest { show ->
+            if (show) {
+                delay(1500)
+                Toast.makeText(context, viewModel.errorMessage.value, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -333,18 +349,17 @@ private fun BlokSensus(
                             contentPadding = PaddingValues(10.dp),
                             modifier = Modifier.padding(horizontal = 2.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)) {
-                            Text(stringResource(R.string.lihat_ruta), fontFamily = PoppinsFontFamily, fontSize = 15.sp, color = Color.Black, textAlign = TextAlign.Center)
+                            Text(stringResource(R.string.lihat_ruta), fontFamily = PoppinsFontFamily, fontSize = 15.sp, color = Color.White, textAlign = TextAlign.Center)
                         }
 //                        if (wilayah.status == "telah-disampel") {
                             Button(onClick = {
-//                                onLihatSampleClicked(wilayah.noBS)
                                 onLihatSampleClicked()
                             },
                                 shape = MaterialTheme.shapes.small,
                                 contentPadding = PaddingValues(10.dp),
                                 modifier = Modifier.padding(horizontal = 2.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)) {
-                                Text(stringResource(R.string.lihat_sampel), fontFamily = PoppinsFontFamily, fontSize = 15.sp, color = Color.Black, textAlign = TextAlign.Center)
+                                Text(stringResource(R.string.lihat_sampel), fontFamily = PoppinsFontFamily, fontSize = 15.sp, color = Color.White, textAlign = TextAlign.Center)
                             }
 //                        }
                     }
@@ -360,26 +375,33 @@ private fun ListBS(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn (
+    LazyColumn(
         modifier
             .fillMaxSize()
             .background(color = PklBase),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top){
-        listWilayah?.size?.let {
-            items(it) { index ->
-                val wilayah = listWilayah[index]
-                BlokSensus(
-                    onLihatRutaClicked = {
-                        navController.navigate(Capi63Screen.ListRuta.route)
-                    },
-                    onLihatSampleClicked = {
-                        navController.navigate(Capi63Screen.ListSample.route + "/${wilayah.noBS}")
-                    },
-                    wilayah = wilayah
-                )
+        verticalArrangement = Arrangement.Top
+    ) {
+        listWilayah?.let { wilayahList ->
+            val sortedList = wilayahList.sortedBy { it.noBS }
+
+            sortedList.size.let {
+                items(it) { index ->
+                    val wilayah = listWilayah[index]
+                    BlokSensus(
+                        onLihatRutaClicked = {
+                            navController.navigate(Capi63Screen.ListRuta.route)
+                        },
+                        onLihatSampleClicked = {
+//                            navController.navigate(Capi63Screen.ListSample.route + "/${wilayah.noBS}")
+                            navController.navigate(Capi63Screen.ListSample.route + "/444B")
+                        },
+                        wilayah = wilayah
+                    )
+                }
             }
         }
+
     }
 }
 
