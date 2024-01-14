@@ -100,7 +100,7 @@ fun ListRutaScreen(navController: NavHostController,
     var showMenu by remember { mutableStateOf(false) }
     var showSearchBar by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
-    var wilayah = authViewModel.getWilayahFromSession()
+//    var wilayah = authViewModel.getWilayahFromSession()
 
     Scaffold(
         topBar = {
@@ -181,10 +181,10 @@ fun ListRutaScreen(navController: NavHostController,
                         query = text,
                         onQueryChange = {
                             text = it
-                            listRutaViewModel.searchRuta(text)
+//                            listRutaViewModel.searchRuta(text)
                                         },
                         onSearch = { text = it
-                            listRutaViewModel.searchRuta(text)
+//                            listRutaViewModel.searchRuta(text)
                                    },
                         active = false,
                         onActiveChange = { true },
@@ -204,7 +204,9 @@ fun ListRutaScreen(navController: NavHostController,
                             }},
                         shape = RoundedCornerShape(0.dp),
                         colors = SearchBarDefaults.colors(containerColor = PklPrimary900, inputFieldColors = TextFieldDefaults.colors(Color.White)),
-                        content = { listRutaViewModel.searchRuta(text) }
+                        content = {
+//                            listRutaViewModel.searchRuta(text)
+                        }
                     )
                 }
             }
@@ -317,7 +319,7 @@ fun RutaRow(
     noBF: String,
     noBS: String,
     noRuta: String,
-    namaKRT: String
+    namaKRT: String,
 ) {
     var openActionDialog by remember { mutableStateOf(false) }
     var openDetail by remember { mutableStateOf(false) }
@@ -553,7 +555,8 @@ fun RutaRow(
                 confirmButton = {
                     Button(
                         modifier = Modifier.fillMaxWidth(0.45f),
-                        onClick = { },
+                        onClick = {
+                        },
                         colors = ButtonDefaults.buttonColors(PklPrimary900)) {
                         Text(text = "Hapus")
                     } },
@@ -615,41 +618,41 @@ fun RutaRow(
     }
 }
 
-@Composable
-fun RutaList(rutaUiState: RutaUiState, wilayah: List<Wilayah>) {
-    when (rutaUiState) {
-        is RutaUiState.Success -> {
-            val ruta = rutaUiState.ruta
-            var i = 0
-            LazyColumn(modifier = Modifier.fillMaxHeight(),
-                content = {
-                    items(items = ruta) { ruta ->
-                        i++
-                        RutaRow(
-                            no = i,
-                            noBF = ruta.noBgFisik.toString(),
-                            noBS = ruta.noBS,
-                            noRuta = ruta.noUrutRuta.toString(),
-                            namaKRT = ruta.namaKrt
-                        )
-                    }
-                })
-        }
-
-        is RutaUiState.Loading -> {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-                text = "Loading...",
-                textAlign = TextAlign.Center
-            )
-        }
-
-        is RutaUiState.Error -> {}
-        else -> {}
-    }
-}
+//@Composable
+//fun RutaList(rutaUiState: RutaUiState, wilayah: List<Wilayah>) {
+//    when (rutaUiState) {
+//        is RutaUiState.Success -> {
+//            val ruta = rutaUiState.ruta
+//            var i = 0
+//            LazyColumn(modifier = Modifier.fillMaxHeight(),
+//                content = {
+//                    items(items = ruta) { ruta ->
+//                        i++
+//                        RutaRow(
+//                            no = i,
+//                            noBF = ruta.noBgFisik.toString(),
+//                            noBS = ruta.noBS.toString(),
+//                            noRuta = ruta.noUrutRuta.toString(),
+//                            namaKRT = ruta.namaKrt.toString()
+//                        )
+//                    }
+//                })
+//        }
+//
+//        is RutaUiState.Loading -> {
+//            Text(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(10.dp),
+//                text = "Loading...",
+//                textAlign = TextAlign.Center
+//            )
+//        }
+//
+//        is RutaUiState.Error -> {}
+//        else -> {}
+//    }
+//}
 
 @Composable
 fun DetailRutaTextField(label: Int) {
