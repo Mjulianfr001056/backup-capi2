@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -66,6 +68,7 @@ import com.polstat.pkl.viewmodel.ListBSViewModel
 import com.polstat.pkl.viewmodel.ListSampelViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import java.util.Date
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -327,8 +330,7 @@ private fun BlokSensus(
             ) {
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Icon(
@@ -341,7 +343,10 @@ private fun BlokSensus(
                             }
                             .padding(16.dp)
                     )
-                    Row {
+                    Row (
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                    ) {
                         Button(onClick = {
                             onLihatRutaClicked()
                         },
@@ -349,7 +354,7 @@ private fun BlokSensus(
                             contentPadding = PaddingValues(10.dp),
                             modifier = Modifier.padding(horizontal = 2.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)) {
-                            Text(stringResource(R.string.lihat_ruta), fontFamily = PoppinsFontFamily, fontSize = 15.sp, color = Color.White, textAlign = TextAlign.Center)
+                            Text(stringResource(R.string.lihat_ruta), fontFamily = PoppinsFontFamily, fontSize = 13.sp, color = Color.White, textAlign = TextAlign.Center)
                         }
 //                        if (wilayah.status == "telah-disampel") {
                             Button(onClick = {
@@ -359,7 +364,7 @@ private fun BlokSensus(
                                 contentPadding = PaddingValues(10.dp),
                                 modifier = Modifier.padding(horizontal = 2.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)) {
-                                Text(stringResource(R.string.lihat_sampel), fontFamily = PoppinsFontFamily, fontSize = 15.sp, color = Color.White, textAlign = TextAlign.Center)
+                                Text(stringResource(R.string.lihat_sampel), fontFamily = PoppinsFontFamily, fontSize = 13.sp, color = Color.White, textAlign = TextAlign.Center)
                             }
 //                        }
                     }
@@ -417,4 +422,29 @@ fun PreviewListBSScreen() {
             ListBSScreen(navController, viewModel = hiltViewModel())
         }
     }
+}
+
+@Preview
+@Composable
+fun BS() {
+    BlokSensus(
+        onLihatRutaClicked = { /*TODO*/ },
+        onLihatSampleClicked = { /*TODO*/ },
+        wilayah = WilayahEntity(
+            noBS = "444C",
+            idKab = "001",
+            idKec = "001",
+            idKel = "002",
+            namaKab = "Buleleng",
+            namaKec = "Kecamatan A",
+            namaKel = "Kelurahan B",
+            catatan = "",
+            jmlGenZ = 0,
+            jmlRt = 0,
+            jmlRtGenz = 0,
+            status = "telah-disampel",
+            tglListing = Date(),
+            tglPeriksa = Date(),
+            nim = ""
+        ))
 }

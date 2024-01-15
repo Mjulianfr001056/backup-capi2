@@ -3,6 +3,9 @@
 package com.polstat.pkl.ui.screen
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -223,7 +226,8 @@ fun ListSampleScreen(
                     .padding(innerPadding)
                     .fillMaxSize(),
                 listSampelRuta = listSampelRuta.value,
-                searchText = searchText
+                searchText = searchText,
+                context = context
             )
         },
     )
@@ -238,13 +242,40 @@ fun PreviewListSampleScreen(){
     )
 }
 
+@Preview
+@Composable
+fun PreviewSample(){
+    val context = LocalContext.current
+    Sample(
+        sampelRuta = SampelRutaEntity(
+            kodeRuta = "444B017",
+            noBS = "444B",
+            noBgFisik = 3,
+            noBgSensus = 3,
+            noSegmen = 2,
+            noUrutRtEgb = 16,
+            noUrutRuta = 17,
+            namaKrt = "Alfian Syarif",
+            alamat = "Jalan ABC No. 123",
+            catatan = "",
+            genzOrtu = "1",
+            jmlGenz = 1,
+            lat = 110.3557,
+            long = 4.3557
+        ),
+        onPetunjukArahClicked = {},
+        context = context
+    )
+}
+
 @Composable
 private fun ListSample(
     viewModel: ListSampelViewModel,
     navController: NavController,
     modifier: Modifier = Modifier,
     listSampelRuta: List<SampelRutaEntity>,
-    searchText: String
+    searchText: String,
+    context: Context
 ){
     LazyColumn(
         modifier
@@ -262,7 +293,8 @@ private fun ListSample(
                 val sampelRuta = sortedList[index]
                 Sample(
                     onPetunjukArahClicked = {},
-                    sampelRuta = sampelRuta
+                    sampelRuta = sampelRuta,
+                    context
                 )
             }
         }
@@ -273,8 +305,10 @@ private fun ListSample(
 @Composable
 private fun Sample(
     onPetunjukArahClicked: () -> Unit,
-    sampelRuta: SampelRutaEntity
+    sampelRuta: SampelRutaEntity,
+    context: Context
 ){
+
     Box(
         modifier = Modifier
             .fillMaxWidth(0.95f)
@@ -304,85 +338,79 @@ private fun Sample(
                 )
             }
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(32.dp)
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier.weight(0.9f)
                 ) {
-                    Text(
-                        text = "No. BF : ",
-                        color = Color.Gray,
-                        fontFamily = PoppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = " ${sampelRuta.noBgFisik}",
-                        color = PklPrimary900,
-                        fontFamily = PoppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    Row {
+                        Text(
+                            text = "No. BF : ",
+                            color = Color.Gray,
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = " ${sampelRuta.noBgFisik}",
+                            color = PklPrimary900,
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    Row {
+                        Text(
+                            text = "No. BS : ",
+                            color = Color.Gray,
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = " ${sampelRuta.noBS}",
+                            color = PklPrimary900,
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier.weight(1f)
                 ) {
-                    Text(
-                        text = "No. Segmen : ",
-                        color = Color.Gray,
-                        fontFamily = PoppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = " ${sampelRuta.noSegmen}",
-                        color = PklPrimary900,
-                        fontFamily = PoppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(30.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "No. BS : ",
-                        color = Color.Gray,
-                        fontFamily = PoppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = " ${sampelRuta.noBS}",
-                        color = PklPrimary900,
-                        fontFamily = PoppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "No. Urut Ruta : ",
-                        color = Color.Gray,
-                        fontFamily = PoppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = " ${sampelRuta.noUrutRuta}",
-                        color = PklPrimary900,
-                        fontFamily = PoppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    Row {
+                        Text(
+                            text = "No. Segmen : ",
+                            color = Color.Gray,
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = " ${sampelRuta.noSegmen}",
+                            color = PklPrimary900,
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    Row {
+                        Text(
+                            text = "No. Urut Ruta : ",
+                            color = Color.Gray,
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = " ${sampelRuta.noUrutRuta}",
+                            color = PklPrimary900,
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
             }
             Row(
@@ -430,7 +458,21 @@ private fun Sample(
             }
             Spacer(modifier = Modifier.height(4.dp))
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    val latitude = sampelRuta.lat
+                    val longitude = sampelRuta.long
+
+                    val gmmIntentUri = Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude")
+
+                    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                    mapIntent.setPackage("com.google.android.apps.maps")
+
+                    if (mapIntent.resolveActivity(context.packageManager) != null) {
+                        context.startActivity(mapIntent)
+                    } else {
+                        Toast.makeText(context, "Google Maps tidak terinstal.", Toast.LENGTH_SHORT).show()
+                    }
+                          },
                 shape = MaterialTheme.shapes.small,
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
