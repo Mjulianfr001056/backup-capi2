@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.TextSelectionColors
@@ -67,13 +66,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.R
 import com.polstat.pkl.database.entity.RutaEntity
 import com.polstat.pkl.navigation.Capi63Screen
+import com.polstat.pkl.navigation.CapiScreen
 import com.polstat.pkl.ui.theme.*
-import com.polstat.pkl.ui.theme.PklPrimary300
-import com.polstat.pkl.viewmodel.AuthViewModel
 import com.polstat.pkl.viewmodel.ListRutaViewModel
 
 @Preview
@@ -84,7 +81,7 @@ fun ListRutaPreview() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            val navController = rememberNavController()
+//            val navController = rememberNavController()
 
 //            ListRutaScreen(navController)
         }
@@ -93,16 +90,16 @@ fun ListRutaPreview() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListRutaScreen(navController: NavHostController,
-                   viewModel: ListRutaViewModel,
-                   authViewModel: AuthViewModel
+fun ListRutaScreen(
+    navController: NavHostController,
+    viewModel: ListRutaViewModel
 ) {
     var showMenu by remember { mutableStateOf(false) }
     var showSearchBar by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
-    var noBS = viewModel.noBS
-    var session = viewModel.session
-    var wilayahWithRuta = viewModel.wilayahWithRuta.collectAsState()
+    val noBS = viewModel.noBS
+    val session = viewModel.session
+    val wilayahWithRuta = viewModel.wilayahWithRuta.collectAsState()
 //    var wilayah = authViewModel.getWilayahFromSession()
 
     Scaffold(
@@ -284,22 +281,7 @@ fun ListRutaScreen(navController: NavHostController,
                     }
 
                 }
-//                ScrollContent()
                 RutaList(listRuta = wilayahWithRuta.value.listRuta!!)
-                RutaRow(
-                    no = 1,
-                    noBF = "noBF",
-                    noBS = "noBS",
-                    noRuta = "noRuta",
-                    namaKRT = "NamaKRT"
-                )
-                RutaRow(
-                    no = 1,
-                    noBF = "noBF",
-                    noBS = "noBS",
-                    noRuta = "noRuta",
-                    namaKRT = "NamaKRT"
-                )
             }
         },
         floatingActionButton = {
@@ -307,7 +289,7 @@ fun ListRutaScreen(navController: NavHostController,
                 modifier = Modifier
                     .padding(all = 16.dp),
                 onClick = {
-                          navController.navigate("isi_ruta")
+                          navController.navigate(CapiScreen.Listing.ISI_RUTA + "/$noBS")
                 },
                 containerColor = PklPrimary900
             ) {
@@ -325,10 +307,7 @@ fun ListRutaScreen(navController: NavHostController,
 @Composable
 fun RutaRow(
     no: Int,
-    noBF: String,
-    noBS: String,
-    noRuta: String,
-    namaKRT: String,
+    ruta: RutaEntity
 ) {
     var openActionDialog by remember { mutableStateOf(false) }
     var openDetail by remember { mutableStateOf(false) }
@@ -352,25 +331,25 @@ fun RutaRow(
             fontSize = 16.sp
         )
         Text(
-            text = noBF,
+            text = "${ruta.noBgFisik}",
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
         )
         Text(
-            text = noBS,
+            text = "${ruta.noBgSensus}",
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
         )
         Text(
-            text = noRuta,
+            text = "${ruta.noUrutRuta}",
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
         )
         Text(
-            text = namaKRT,
+            text = ruta.namaKrt!!,
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
@@ -426,16 +405,46 @@ fun RutaRow(
                                 .verticalScroll(rememberScrollState())
                                 .weight(1f)
                         ) {
-                            DetailRutaTextField(label = R.string.nomor_segmen_ruta)
-                            DetailRutaTextField(label = R.string.nomor_urut_bangunan_fisik_ruta)
-                            DetailRutaTextField(label = R.string.nomor_urut_bangunan_sensus_ruta)
-                            DetailRutaTextField(label = R.string.nomor_urut_krt_ruta)
-                            DetailRutaTextField(label = R.string.nama_krt_ruta)
-                            DetailRutaTextField(label = R.string.alamat_ruta)
-                            DetailRutaTextField(label = R.string.keberadaan_genz_ortu_ruta)
-                            DetailRutaTextField(label = R.string.jml_genz_yang_belum_kawin_dalam_ruta)
-                            DetailRutaTextField(label = R.string.nomor_urut_ruta_egb)
-                            DetailRutaTextField(label = R.string.catatan)
+                            DetailRutaTextField(
+                                label = R.string.nomor_segmen_ruta,
+                                value = "${ruta.noSegmen}"
+                            )
+                            DetailRutaTextField(
+                                label = R.string.nomor_urut_bangunan_fisik_ruta,
+                                value = "${ruta.noBgFisik}"
+                            )
+                            DetailRutaTextField(
+                                label = R.string.nomor_urut_bangunan_sensus_ruta,
+                                value = "${ruta.noBgSensus}"
+                            )
+                            DetailRutaTextField(
+                                label = R.string.nomor_urut_krt_ruta,
+                                value = "${ruta.noUrutRuta}"
+                            )
+                            DetailRutaTextField(
+                                label = R.string.nama_krt_ruta,
+                                value = ruta.namaKrt!!
+                            )
+                            DetailRutaTextField(
+                                label = R.string.alamat_ruta,
+                                value = ruta.alamat!!
+                            )
+                            DetailRutaTextField(
+                                label = R.string.keberadaan_genz_ortu_ruta,
+                                value = if (ruta.GenzOrtu == "1") "Ya" else "Tidak"
+                            )
+                            DetailRutaTextField(
+                                label = R.string.jml_genz_yang_belum_kawin_dalam_ruta,
+                                value = "${ruta.jmlGenz}"
+                            )
+                            DetailRutaTextField(
+                                label = R.string.nomor_urut_ruta_egb,
+                                value = "${ruta.noUrutRtEgb}"
+                            )
+                            DetailRutaTextField(
+                                label = R.string.catatan,
+                                value = ruta.catatan!!
+                            )
                         }
                         Text(modifier = Modifier
                             .fillMaxWidth()
@@ -632,23 +641,21 @@ fun RutaRow(
 fun RutaList(listRuta: List<RutaEntity>) {
     LazyColumn(modifier = Modifier.fillMaxHeight(),
         content = {
-            listRuta.size.let {
-                items(it) { index ->
-                    val ruta = listRuta[index]
-                    RutaRow(
-                        no = index + 1,
-                        noBF = ruta.noBgFisik.toString(),
-                        noBS = ruta.noBS.toString(),
-                        noRuta = ruta.noUrutRuta.toString(),
-                        namaKRT = ruta.namaKrt.toString()
-                    )
-                }
+            items(listRuta.size) { index ->
+                val ruta = listRuta[index]
+                RutaRow(
+                    no = index + 1,
+                    ruta = ruta
+                )
             }
         })
 }
 
 @Composable
-fun DetailRutaTextField(label: Int) {
+fun DetailRutaTextField(
+    label: Int,
+    value: String
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -667,7 +674,7 @@ fun DetailRutaTextField(label: Int) {
             color = PklPrimary900
         )
         OutlinedTextField(
-            value = "Detail1",
+            value = value,
             onValueChange = {},
             modifier = Modifier
                 .fillMaxWidth()

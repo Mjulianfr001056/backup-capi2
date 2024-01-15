@@ -70,10 +70,14 @@ fun IsiRumahTanggaScreen(
 ) {
     val state = viewModel.state
     val genZOptions = listOf("Tidak", "Ya")
+    val noBS = viewModel.noBS
 
     Scaffold(
         topBar = {
-            IsiRumahTanggaTopBar(navController = navController)
+            IsiRumahTanggaTopBar(
+                navController = navController,
+                noBS = noBS!!
+            )
         },
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
@@ -324,8 +328,8 @@ fun IsiRumahTanggaScreen(
                 Button(
                     onClick = {
                         viewModel.onEvent(IsiRutaScreenEvent.submit)
-                        navController.navigate(Capi63Screen.ListRuta.route){
-                            popUpTo(Capi63Screen.ListRuta.route){
+                        navController.navigate(Capi63Screen.ListRuta.route + "/${noBS}"){
+                            popUpTo(Capi63Screen.ListRuta.route + "/${noBS}"){
                                 inclusive = true
                             }
                         }
@@ -438,7 +442,10 @@ fun InputNomor(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IsiRumahTanggaTopBar(navController: NavHostController) {
+fun IsiRumahTanggaTopBar(
+    navController: NavHostController,
+    noBS: String
+) {
     TopAppBar(
         title = {
             Text(
@@ -455,8 +462,8 @@ fun IsiRumahTanggaTopBar(navController: NavHostController) {
         navigationIcon = {
             IconButton(
                 onClick = {
-                    navController.navigate(Capi63Screen.ListRuta.route){
-                        popUpTo(Capi63Screen.ListRuta.route){
+                    navController.navigate(Capi63Screen.ListRuta.route + "/$noBS"){
+                        popUpTo(Capi63Screen.ListRuta.route + "/$noBS"){
                             inclusive = true
                         }
                     }

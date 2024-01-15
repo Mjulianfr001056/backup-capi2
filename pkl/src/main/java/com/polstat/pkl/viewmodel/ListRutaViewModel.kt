@@ -9,7 +9,6 @@ import com.polstat.pkl.database.relation.WilayahWithRuta
 import com.polstat.pkl.mapper.toRuta
 import com.polstat.pkl.mapper.toRutaDtoList
 import com.polstat.pkl.model.domain.Ruta
-import com.polstat.pkl.model.domain.RutaDto
 import com.polstat.pkl.model.request.SyncRutaRequest
 import com.polstat.pkl.model.response.SyncRutaResponse
 import com.polstat.pkl.repository.LocalRutaRepository
@@ -51,11 +50,7 @@ class ListRutaViewModel @Inject constructor(
 
     private val _synchronizeRuta = MutableStateFlow(SyncRutaResponse())
 
-    val synchronizeRuta = _synchronizeRuta.asStateFlow()
-
     private val _deleteRuta = MutableStateFlow(Ruta())
-
-    val deleteRuta = _deleteRuta.asStateFlow()
 
     private val _errorMessage = MutableStateFlow("")
 
@@ -118,8 +113,10 @@ class ListRutaViewModel @Inject constructor(
         nim: String,
         noBS: String
     ) {
-        var syncRutaRequest = SyncRutaRequest(
-            nim = nim, noBS = noBS, json = listRuta.toRutaDtoList()
+        val syncRutaRequest = SyncRutaRequest(
+            nim = nim,
+            noBS = noBS,
+            json = listRuta.toRutaDtoList()
         )
         viewModelScope.launch {
             remoteRutaRepository.sinkronisasiRuta(syncRutaRequest).collectLatest { result ->

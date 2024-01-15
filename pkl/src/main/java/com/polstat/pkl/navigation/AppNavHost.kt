@@ -109,8 +109,7 @@ fun SamplingNavHost(
             ) {
                 ListRutaScreen(
                     navController = samplingNavController,
-                    viewModel = hiltViewModel(),
-                    authViewModel = authViewModel
+                    viewModel = hiltViewModel()
                 )
             }
             composable(
@@ -126,7 +125,14 @@ fun SamplingNavHost(
                     viewModel = hiltViewModel()
                 )
             }
-            composable(CapiScreen.Listing.ISI_RUTA) {
+            composable(
+                route = CapiScreen.Listing.ISI_RUTA + "/{noBS}",
+                arguments = listOf(
+                    navArgument("noBS") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
                 IsiRumahTanggaScreen(
                     navController = samplingNavController,
                     viewModel = hiltViewModel()
