@@ -21,6 +21,7 @@ import com.polstat.pkl.ui.screen.PasswordMasterScreen
 import com.polstat.pkl.ui.screen.SamplingScreen
 import com.polstat.pkl.viewmodel.AuthViewModel
 import com.polstat.pkl.viewmodel.ListBSViewModel
+import com.polstat.pkl.viewmodel.ListRutaViewModel
 import com.polstat.pkl.viewmodel.ListSampelViewModel
 import com.polstat.pkl.viewmodel.PasswordMasterViewModel
 
@@ -100,7 +101,9 @@ fun SamplingNavHost(
             }
             composable(CapiScreen.Listing.LIST_RUTA) {
                 ListRutaScreen(
-                    navController = samplingNavController, listRutaViewModel = listRutaViewModel, authViewModel = authViewModel
+                    navController = samplingNavController,
+                    listRutaViewModel = hiltViewModel(),
+                    authViewModel = authViewModel
                 )
             }
             composable(
