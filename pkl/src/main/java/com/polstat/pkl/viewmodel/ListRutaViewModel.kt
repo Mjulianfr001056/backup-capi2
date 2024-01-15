@@ -1,9 +1,13 @@
 package com.polstat.pkl.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.polstat.pkl.database.entity.RutaEntity
 import com.polstat.pkl.database.relation.WilayahWithRuta
+import com.polstat.pkl.mapper.toRuta
+import com.polstat.pkl.mapper.toRutaDtoList
 import com.polstat.pkl.model.domain.Ruta
 import com.polstat.pkl.model.request.SyncRutaRequest
 import com.polstat.pkl.model.response.SyncRutaResponse
@@ -26,7 +30,8 @@ class ListRutaViewModel @Inject constructor(
     private val sessionRepository: SessionRepository,
     private val wilayahRepository: WilayahRepository,
     private val localRutaRepository: LocalRutaRepository,
-    private val remoteRutaRepository: RemoteRutaRepository
+    private val remoteRutaRepository: RemoteRutaRepository,
+    private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
     companion object {
@@ -37,19 +42,15 @@ class ListRutaViewModel @Inject constructor(
 
     val session = _session
 
-    private val _listWilayahWithRuta = MutableStateFlow(WilayahWithRuta())
+    val noBS = savedStateHandle.get<String>("noBS")
 
-    val listWilayahWithRuta = _listWilayahWithRuta.asStateFlow()
+    private val _wilayahWithRuta = MutableStateFlow(WilayahWithRuta())
+
+    val wilayahWithRuta = _wilayahWithRuta.asStateFlow()
 
     private val _synchronizeRuta = MutableStateFlow(SyncRutaResponse())
 
-    val synchronizeRuta = _synchronizeRuta.asStateFlow()
-
-    private val _editRuta = MutableStateFlow("")
-
-    val editRuta = _editRuta.asStateFlow()
-
-
+    private val _deleteRuta = MutableStateFlow(Ruta())
 
     private val _errorMessage = MutableStateFlow("")
 
@@ -88,7 +89,7 @@ class ListRutaViewModel @Inject constructor(
                 when(result) {
                     is Result.Success -> {
                         result.data?.let { response ->
-                            _listWilayahWithRuta.value = response
+                            _wilayahWithRuta.value = response
                             Log.d(TAG, "getWilayahWithRuta success: $response")
                         }
                     }
@@ -107,9 +108,16 @@ class ListRutaViewModel @Inject constructor(
         }
     }
 
-    private fun synchronizeRuta(
-        syncRutaRequest: SyncRutaRequest
+    fun synchronizeRuta(
+        listRuta: List<RutaEntity>,
+        nim: String,
+        noBS: String
     ) {
+        val syncRutaRequest = SyncRutaRequest(
+            nim = nim,
+            noBS = noBS,
+            json = listRuta.toRutaDtoList()
+        )
         viewModelScope.launch {
             remoteRutaRepository.sinkronisasiRuta(syncRutaRequest).collectLatest { result ->
                 when (result) {
@@ -145,75 +153,46 @@ class ListRutaViewModel @Inject constructor(
         }
     }
 
-//    private fun editRuta(
-//        ruta: Ruta
-//    ) {
-//        viewModelScope.launch {
-//            localRutaRepository.updateRuta(ruta).collectLatest { result ->
-//            when (result) {
-//                    is Result.Success -> {
-//                        result.data?.let { response ->
-//                            _editRuta.value = response
-//                            Log.d(
-//                                TAG, "editRuta succeed: $response"
-//                            )
-//                        }
-//                    }
-//
-//                    is Result.Loading -> {
-//                        Log.d(
-//                            TAG, "editRuta: Loading..."
-//                        )
-//                    }
-//
-//                    is Result.Error -> {
-//                        result.message?.let { error ->
-//                            _errorMessage.value = error
-//                        }
-//                        _showErrorToastChannel.send(true)
-//                        Log.e(
-//                            TAG, "editRuta: Error in editRuta"
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    private fun deleteRuta(
-//        ruta: Ruta
-//    ) {
-//        viewModelScope.launch {
-//            localRutaRepository.fakeDeleteRuta(ruta).collectLatest { result ->
-//                when (result) {
-//                    is Result.Success -> {
-//                        result.data?.let { response ->
-//                            _editRuta.value = response
-//                            Log.d(
-//                                TAG, "deleteRuta succeed: $response"
-//                            )
-//                        }
-//                    }
-//
-//                    is Result.Loading -> {
-//                        Log.d(
-//                            TAG, "deleteRuta: Loading..."
-//                        )
-//                    }
-//
-//                    is Result.Error -> {
-//                        result.message?.let { error ->
-//                            _errorMessage.value = error
-//                        }
-//                        _showErrorToastChannel.send(true)
-//                        Log.e(
-//                            TAG, "deleteRuta: Error in deleteRuta"
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//    }
+    private fun deleteRuta(
+        kodeRuta: String
+    ) {
+        viewModelScope.launch {
+            localRutaRepository.getRuta(kodeRuta).collectLatest { result ->
+                when (result) {
+                    is Result.Success -> {
+                        result.data?.let { response ->
+                            _deleteRuta.value = response.toRuta()
+                            Log.d(
+                                TAG, "getRuta succeed: $response"
+                            )
+                        }
+                    }
+
+                    is Result.Loading -> {
+                        Log.d(
+                            TAG, "getRuta: Loading..."
+                        )
+                    }
+
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            _errorMessage.value = error
+                        }
+                        _showErrorToastChannel.send(true)
+                        Log.e(
+                            TAG, "getRuta: Error in getRuta"
+                        )
+                    }
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            localRutaRepository.fakeDeleteRuta(_deleteRuta.value).collectLatest { message ->
+                Log.d(TAG, message)
+            }
+        }
+    }
 }
 
 sealed interface RutaUiState {

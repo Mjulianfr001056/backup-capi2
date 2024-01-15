@@ -77,9 +77,6 @@ fun SamplingNavHost(
     val passwordMasterViewModel: PasswordMasterViewModel = viewModel()
     val authViewModel = hiltViewModel<AuthViewModel>()
     val listBSViewModel = hiltViewModel<ListBSViewModel>()
-    val listSampelViewModel = hiltViewModel<ListSampelViewModel>()
-    val listRutaViewModel = hiltViewModel<ListRutaViewModel>()
-
     NavHost(
         navController = samplingNavController,
         startDestination = CapiScreen.Sampling.START
@@ -102,11 +99,17 @@ fun SamplingNavHost(
                     viewModel = listBSViewModel
                 )
             }
-            composable(CapiScreen.Listing.LIST_RUTA) {
+            composable(
+                route = CapiScreen.Listing.LIST_RUTA + "/{noBS}",
+                arguments = listOf(
+                    navArgument("noBS") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
                 ListRutaScreen(
                     navController = samplingNavController,
-                    listRutaViewModel = hiltViewModel(),
-                    authViewModel = authViewModel
+                    viewModel = hiltViewModel()
                 )
             }
             composable(
@@ -122,7 +125,14 @@ fun SamplingNavHost(
                     viewModel = hiltViewModel()
                 )
             }
-            composable(CapiScreen.Listing.ISI_RUTA) {
+            composable(
+                route = CapiScreen.Listing.ISI_RUTA + "/{noBS}",
+                arguments = listOf(
+                    navArgument("noBS") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
                 IsiRumahTanggaScreen(
                     navController = samplingNavController,
                     viewModel = hiltViewModel()

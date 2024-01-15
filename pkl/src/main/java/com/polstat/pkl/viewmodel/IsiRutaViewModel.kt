@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.model.domain.Ruta
@@ -17,12 +18,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class IsiRutaViewModel @Inject constructor(
-    private val localRutaRepository: LocalRutaRepository
+    private val localRutaRepository: LocalRutaRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel(){
     var state by mutableStateOf(IsiRutaScreenState())
 
-    var noBS by mutableStateOf("444C")
+    val noBS = savedStateHandle.get<String>("noBS")
+
     var lat by mutableStateOf(0.0)
+
     var long by mutableStateOf(0.0)
 
     companion object {
