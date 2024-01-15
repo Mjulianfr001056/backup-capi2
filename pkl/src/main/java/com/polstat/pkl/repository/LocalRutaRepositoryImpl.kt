@@ -2,8 +2,10 @@ package com.polstat.pkl.repository
 
 import android.util.Log
 import com.polstat.pkl.database.Capi63Database
+import com.polstat.pkl.database.entity.RutaEntity
 import com.polstat.pkl.mapper.toRutaEntity
 import com.polstat.pkl.model.domain.Ruta
+import com.polstat.pkl.utils.Result
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -63,4 +65,24 @@ class LocalRutaRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getRuta(
+        kodeRuta: String
+    ): Flow<Result<RutaEntity>> {
+        return flow {
+            try {
+                emit(Result.Loading(true))
+
+                val rutaEntity = capi63Database.capi63Dao.getRuta(kodeRuta)
+
+                Log.d(TAG, "Berhasil getKodeRuta: $rutaEntity")
+
+                emit(Result.Success(rutaEntity))
+            } catch (e: Exception) {
+                Log.d(TAG, "Gagal getKodeRuta: ${e.message}")
+                emit(Result.Error(null, "Error fetching DataRuta: ${e.message}"))
+            } finally {
+                emit(Result.Loading(false))
+            }
+        }
+    }
 }
