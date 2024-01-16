@@ -566,6 +566,7 @@ public class FormHierarchyActivity extends LocalizedActivity implements DeleteRe
     private void refreshView(boolean isGoingUp) {
         try {
             FormController formController = formEntryViewModel.getFormController();
+            Timber.tag("CAPI_Hierarchy").d("formController: %s", formController.getSubmissionMetadata().instanceName);
 
             // Save the current index so we can return to the problematic question
             // in the event of an error.
@@ -594,6 +595,7 @@ public class FormHierarchyActivity extends LocalizedActivity implements DeleteRe
             // Because of the guard conditions below, we will skip
             // everything until we exit this group.
             TreeReference visibleGroupRef = null;
+
 
             while (event != FormEntryController.EVENT_END_OF_FORM) {
                 // get the ref to this element
@@ -732,6 +734,7 @@ public class FormHierarchyActivity extends LocalizedActivity implements DeleteRe
 
                 event = formController.stepToNextEvent(JavaRosaFormController.STEP_INTO_GROUP);
             }
+
 
             recyclerView.setAdapter(new HierarchyListAdapter(elementsToDisplay, this::onElementClick));
 

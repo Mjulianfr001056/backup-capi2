@@ -36,46 +36,46 @@ the specific language governing permissions and limitations under the License.
             app:layout_constraintVertical_chainStyle="packed"
             tools:text="You are at the end of All widgets" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/form_edits_warning"
-            style="@style/Widget.Material3.CardView.Filled"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_large"
-            app:cardBackgroundColor="?colorSurfaceContainerHighest"
-            app:layout_constraintBottom_toTopOf="@+id/buttons_container"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/description"
-            app:layout_constraintWidth_max="@dimen/max_content_width">
+<!--        <com.google.android.material.card.MaterialCardView-->
+<!--            android:id="@+id/form_edits_warning"-->
+<!--            style="@style/Widget.Material3.CardView.Filled"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="@dimen/margin_large"-->
+<!--            app:cardBackgroundColor="?colorSurfaceContainerHighest"-->
+<!--            app:layout_constraintBottom_toTopOf="@+id/buttons_container"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/description"-->
+<!--            app:layout_constraintWidth_max="@dimen/max_content_width">-->
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/margin">
+<!--            <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:padding="@dimen/margin">-->
 
-                <ImageView
-                    android:id="@+id/deprecation_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_outline_info_24"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:tint="?colorPrimary" />
+<!--                <ImageView-->
+<!--                    android:id="@+id/deprecation_icon"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:src="@drawable/ic_outline_info_24"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toTopOf="parent"-->
+<!--                    app:tint="?colorPrimary" />-->
 
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/form_edits_warning_message"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin"
-                    android:textAppearance="?textAppearanceBodyLarge"
-                    android:textColor="?colorOnSurfaceContainerHighest"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/deprecation_icon"
-                    app:layout_constraintTop_toTopOf="@id/deprecation_icon"
-                    tools:text="@string/form_edits_warning_save_as_draft_and_finalize_enabled" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.card.MaterialCardView>
+<!--                <com.google.android.material.textview.MaterialTextView-->
+<!--                    android:id="@+id/form_edits_warning_message"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginStart="@dimen/margin"-->
+<!--                    android:textAppearance="?textAppearanceBodyLarge"-->
+<!--                    android:textColor="?colorOnSurfaceContainerHighest"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintStart_toEndOf="@id/deprecation_icon"-->
+<!--                    app:layout_constraintTop_toTopOf="@id/deprecation_icon"-->
+<!--                    tools:text="@string/form_edits_warning_save_as_draft_and_finalize_enabled" />-->
+<!--            </androidx.constraintlayout.widget.ConstraintLayout>-->
+<!--        </com.google.android.material.card.MaterialCardView>-->
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/buttons_container"

@@ -7,7 +7,6 @@ import org.odk.collect.android.configure.qr.AppConfigurationGenerator
 import org.odk.collect.android.injection.DaggerUtils
 import org.odk.collect.android.mainmenu.MainMenuActivity
 import org.odk.collect.android.projects.CurrentProjectProvider
-import org.odk.collect.android.projects.DuplicateProjectConfirmationDialog
 import org.odk.collect.android.projects.ProjectCreator
 import org.odk.collect.android.projects.SettingsConnectionMatcher
 import org.odk.collect.androidshared.ui.ToastUtils
@@ -16,8 +15,7 @@ import org.odk.collect.settings.SettingsProvider
 import timber.log.Timber
 import javax.inject.Inject
 
-class ProjectConfigurerActivity : ComponentActivity(),
-    DuplicateProjectConfirmationDialog.DuplicateProjectConfirmationListener{
+class ProjectConfigurerActivity : ComponentActivity(){
 
     @Inject
     lateinit var appConfigurationGenerator: AppConfigurationGenerator
@@ -55,7 +53,7 @@ class ProjectConfigurerActivity : ComponentActivity(),
 
     }
 
-    override fun createProject(settingsJson: String) {
+    fun createProject(settingsJson: String) {
         projectCreator.createNewProject(settingsJson)
         ActivityUtils.startActivityAndCloseAllOthers(this, MainMenuActivity::class.java)
         ToastUtils.showLongToast(
@@ -64,7 +62,7 @@ class ProjectConfigurerActivity : ComponentActivity(),
         )
     }
 
-    override fun switchToProject(uuid: String) {
+    fun switchToProject(uuid: String) {
         currentProjectProvider.setCurrentProject(uuid)
         ActivityUtils.startActivityAndCloseAllOthers(this, MainMenuActivity::class.java)
         ToastUtils.showLongToast(

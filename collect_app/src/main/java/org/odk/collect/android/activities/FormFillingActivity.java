@@ -43,6 +43,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
@@ -1142,19 +1143,25 @@ public class FormFillingActivity extends LocalizedActivity implements AnimationL
         String formTitle = formController.getFormTitle();
         setTitle(formTitle);
 
+        Timber.tag("CAPI_FORMFILLING").d("Form title: %s", formController.getFormTitle());
+
+        Timber.tag("CAPI_EVENT").d("event: %s", event);
         if (event != FormEntryController.EVENT_QUESTION) {
             formController.getAuditEventLogger().logEvent(AuditEvent.getAuditEventTypeFromFecType(event),
                     formController.getFormIndex(), true, null, System.currentTimeMillis(), null);
         }
 
+        Timber.tag("CAPI_FORMFILLING 2").d("Form title: %s", formController.getFormTitle());
         switch (event) {
-            case FormEntryController.EVENT_BEGINNING_OF_FORM:
+            case FormEntryController.EVENT_BEGINNING_OF_FORM -> {
                 return createViewForFormBeginning(formController);
-            case FormEntryController.EVENT_END_OF_FORM:
+            }
+            case FormEntryController.EVENT_END_OF_FORM -> {
+                Timber.tag("CAPI_PRE_END").d("formcontroller: %s",formController.getFormTitle());
                 return createViewForFormEnd(formController);
-            case FormEntryController.EVENT_QUESTION:
-            case FormEntryController.EVENT_GROUP:
-            case FormEntryController.EVENT_REPEAT:
+            }
+            case FormEntryController.EVENT_QUESTION, FormEntryController.EVENT_GROUP, FormEntryController.EVENT_REPEAT -> {
+                Timber.tag("CAPI_REPEAT").d("formcontroller: %s", formController.getFormTitle());
                 // should only be a group here if the event_group is a field-list
                 try {
                     AuditUtils.logCurrentScreen(formController, formController.getAuditEventLogger(), System.currentTimeMillis());
@@ -1182,18 +1189,16 @@ public class FormFillingActivity extends LocalizedActivity implements AnimationL
                     }
                     return createView(event, advancingPage);
                 }
-
                 if (showNavigationButtons) {
                     updateNavigationButtonVisibility();
                 }
-
                 return odkView;
-
-            case EVENT_PROMPT_NEW_REPEAT:
+            }
+            case EVENT_PROMPT_NEW_REPEAT -> {
                 createRepeatDialog();
                 return new EmptyView(this);
-
-            default:
+            }
+            default -> {
                 Timber.e(new Error("Attempted to create a view that does not exist."));
                 // this is badness to avoid a crash.
                 try {
@@ -1204,6 +1209,7 @@ public class FormFillingActivity extends LocalizedActivity implements AnimationL
                     createErrorDialog(new FormError.Fatal(e.getCause().getMessage()));
                 }
                 return createView(event, advancingPage);
+            }
         }
     }
 
@@ -1264,6 +1270,7 @@ public class FormFillingActivity extends LocalizedActivity implements AnimationL
      * a button for saving and exiting.
      */
     private SwipeHandler.View createViewForFormEnd(FormController formController) {
+        Timber.tag("CAPI_END").d("formcontoller: %s", formController.getFormTitle());
         if (formController.getSubmissionMetadata().instanceName != null) {
             saveName = formController.getSubmissionMetadata().instanceName;
         } else {
@@ -1291,6 +1298,9 @@ public class FormFillingActivity extends LocalizedActivity implements AnimationL
         if (showNavigationButtons) {
             updateNavigationButtonVisibility();
         }
+
+        Timber.tag("CAPI_END").d("saveName: %s", saveName);
+
 
         return new FormEndView(
                 this,

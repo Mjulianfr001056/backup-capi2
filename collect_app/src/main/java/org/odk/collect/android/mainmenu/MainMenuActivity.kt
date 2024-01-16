@@ -39,6 +39,8 @@ class MainMenuActivity : LocalizedActivity() {
 
     private lateinit var currentProjectViewModel: CurrentProjectViewModel
 
+    val TAG = "CAPI_MainMenu"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         //Membuat Splash Screen
         initSplashScreen()
@@ -62,42 +64,50 @@ class MainMenuActivity : LocalizedActivity() {
 
         ThemeUtils(this).setDarkModeForCurrentProject()
 
-//        ActivityUtils.startActivityAndCloseAllOthers(this, CapiFirstActivity::class.java)
-        Timber.tag("MAINMENU_ACTIVITY").d("onCreate: ${currentProjectViewModel.hasCurrentProject()}")
+        this.supportFragmentManager.fragmentFactory = FragmentFactoryBuilder()
+            .forClass(PermissionsDialogFragment::class) {
+                PermissionsDialogFragment(
+                    permissionsProvider,
+                    viewModelProvider[RequestPermissionsViewModel::class.java]
+                )
+            }
+            .forClass(ProjectSettingsDialog::class) {
+                ProjectSettingsDialog(viewModelFactory)
+            }
+            .forClass(MainMenuFragment::class) {
+                MainMenuFragment(viewModelFactory, settingsProvider)
+            }
+            .build()
 
-        if (!currentProjectViewModel.hasCurrentProject()) {
-            super.onCreate(null)
+        super.onCreate(savedInstanceState)
 
-            // ini kodingan buat konek ke central
-//            val settingsJson = appConfigurationGenerator.getAppConfigurationAsJsonWithServerDetails(
-//                "https://0793-103-171-161-174.ngrok-free.app/v1/key/sJa3lXXUe4IskXpX68BGzUQtCMv10MRXBoZ1UEmnntiRSbJ2XjUU4bbmuCrvc7RZ/projects/2",
-//                "",
-//                ""
-//            )
-//            projectCreator.createNewProject(settingsJson)
-//            ActivityUtils.startActivityAndCloseAllOthers(this, MainMenuActivity::class.java)
+        setContentView(R.layout.main_menu_activity)
+        Timber.tag(TAG).d("Created Main Menu View")
 
-            return
-        } else {
-            this.supportFragmentManager.fragmentFactory = FragmentFactoryBuilder()
-                .forClass(PermissionsDialogFragment::class) {
-                    PermissionsDialogFragment(
-                        permissionsProvider,
-                        viewModelProvider[RequestPermissionsViewModel::class.java]
-                    )
-                }
-                .forClass(ProjectSettingsDialog::class) {
-                    ProjectSettingsDialog(viewModelFactory)
-                }
-                .forClass(MainMenuFragment::class) {
-                    MainMenuFragment(viewModelFactory, settingsProvider)
-                }
-                .build()
-
-            super.onCreate(savedInstanceState)
-
-            setContentView(R.layout.main_menu_activity)
-        }
+//        TODO("Hapus kalau ga dipakai lagi")
+//        if (!currentProjectViewModel.hasCurrentProject()) {
+//            super.onCreate(null)
+//            return
+//        } else {
+//            this.supportFragmentManager.fragmentFactory = FragmentFactoryBuilder()
+//                .forClass(PermissionsDialogFragment::class) {
+//                    PermissionsDialogFragment(
+//                        permissionsProvider,
+//                        viewModelProvider[RequestPermissionsViewModel::class.java]
+//                    )
+//                }
+//                .forClass(ProjectSettingsDialog::class) {
+//                    ProjectSettingsDialog(viewModelFactory)
+//                }
+//                .forClass(MainMenuFragment::class) {
+//                    MainMenuFragment(viewModelFactory, settingsProvider)
+//                }
+//                .build()
+//
+//            super.onCreate(savedInstanceState)
+//
+//            setContentView(R.layout.main_menu_activity)
+//        }
     }
 
     private fun initSplashScreen() {
