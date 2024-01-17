@@ -13,8 +13,8 @@ fun Mahasiswa.toMahasiswaEntity(): MahasiswaEntity {
         alamat = alamat,
         email = email,
         foto = foto,
-        id_tim = id_tim,
-        no_hp = no_hp
+        idTim = idTim,
+        noHp = noHp
     )
 }
 
@@ -25,12 +25,12 @@ fun MahasiswaEntity.toMahasiswa(
         alamat = alamat,
         email = email,
         foto = foto,
-        id_tim = id_tim,
+        idTim = idTim,
         isKoor = isKoor,
         nama = nama,
         nim = nim,
-        no_hp = no_hp,
+        noHp = noHp,
         password = password,
-        wilayah_kerja = wilayah // Sesuaikan dengan kebutuhan, saat ini diatur ke emptyList()
+        wilayahKerja = wilayah // Sesuaikan dengan kebutuhan, saat ini diatur ke emptyList()
     )
 }

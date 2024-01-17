@@ -12,6 +12,7 @@ import com.polstat.pkl.model.domain.Mahasiswa
 import com.polstat.pkl.model.response.AuthResponse
 import com.polstat.pkl.repository.AuthRepository
 import com.polstat.pkl.repository.DataTimRepository
+import com.polstat.pkl.repository.KeluargaRepository
 import com.polstat.pkl.repository.LocalRutaRepository
 import com.polstat.pkl.repository.MahasiswaRepository
 import com.polstat.pkl.repository.SessionRepository
@@ -39,6 +40,7 @@ class AuthViewModel @Inject constructor(
     private val dataTimRepository: DataTimRepository,
     private val mahasiswaRepository: MahasiswaRepository,
     private val wilayahRepository: WilayahRepository,
+    private val keluargaRepository: KeluargaRepository,
     private val localRutaRepository: LocalRutaRepository,
     private val validateNim: ValidateNim,
     private val validatePassword: ValidatePassword
@@ -107,13 +109,13 @@ class AuthViewModel @Inject constructor(
                 alamat = "",
                 email = "",
                 foto = authResponse.value.avatar,
-                id_tim = authResponse.value.dataTim.idTim,
+                idTim = authResponse.value.dataTim.idTim,
                 isKoor = authResponse.value.isKoor,
                 nama = authResponse.value.nama,
                 nim = authResponse.value.nim,
-                no_hp = "",
+                noHp = "",
                 password = "",
-                wilayah_kerja = emptyList()
+                wilayahKerja = emptyList()
             )
             mahasiswaRepository.insertMahasiswa(mahasiswa)
                 .collectLatest { message ->
@@ -143,8 +145,8 @@ class AuthViewModel @Inject constructor(
                                 Log.d(TAG, message)
                             }
 
-                        if (mahasiswa.wilayah_kerja?.isNotEmpty() == true) {
-                            mahasiswa.wilayah_kerja.forEach { wilayah ->
+                        if (mahasiswa.wilayahKerja?.isNotEmpty() == true) {
+                            mahasiswa.wilayahKerja.forEach { wilayah ->
                                 wilayahRepository.insertWilayah(
                                     wilayah,
                                     mahasiswa.nim
@@ -152,12 +154,22 @@ class AuthViewModel @Inject constructor(
                                     Log.d(TAG, message)
                                 }
 
-                                if (wilayah.ruta!!.isNotEmpty()) {
-                                    wilayah.ruta.forEach { ruta ->
-                                        localRutaRepository.insertRuta(ruta)
+                                if(wilayah.keluarga!!.isNotEmpty()) {
+                                    wilayah.keluarga.forEach { keluarga ->
+                                        keluargaRepository.insertKeluarga(keluarga)
                                             .collectLatest { message ->
                                                 Log.d(TAG, message)
                                             }
+
+                                        if (keluarga.ruta.isNotEmpty()) {
+                                            keluarga.ruta.forEach { ruta ->
+                                                localRutaRepository.insertRuta(ruta)
+                                                    .collectLatest { message ->
+                                                        Log.d(TAG, message)
+                                                    }
+                                            }
+                                        }
+
                                     }
                                 }
                             }
@@ -173,12 +185,21 @@ class AuthViewModel @Inject constructor(
                             Log.d(TAG, message)
                         }
 
-                    if (wilayah.ruta!!.isNotEmpty()) {
-                        wilayah.ruta.forEach { ruta ->
-                            localRutaRepository.insertRuta(ruta)
+                    if(wilayah.keluarga!!.isNotEmpty()) {
+                        wilayah.keluarga.forEach { keluarga ->
+                            keluargaRepository.insertKeluarga(keluarga)
                                 .collectLatest { message ->
                                     Log.d(TAG, message)
                                 }
+
+                            if (keluarga.ruta.isNotEmpty()) {
+                                keluarga.ruta.forEach { ruta ->
+                                    localRutaRepository.insertRuta(ruta)
+                                        .collectLatest { message ->
+                                            Log.d(TAG, message)
+                                        }
+                                }
+                            }
                         }
                     }
                 }
@@ -230,18 +251,6 @@ class AuthViewModel @Inject constructor(
     private fun closeLoadingDialog() {
         _showLoadingChannel.trySend(false)
     }
-
-//    fun getUserFromSession() : Session {
-//        return _session!!.user
-//    }
-//
-//    fun getDataTimFromSession() : DataTim {
-//        return _session!!.dataTim
-//    }
-//
-//    fun getWilayahFromSession() : List<Wilayah> {
-//        return _session!!.wilayah
-//    }
 
     sealed class ValidationEvent {
         object Success : ValidationEvent()
