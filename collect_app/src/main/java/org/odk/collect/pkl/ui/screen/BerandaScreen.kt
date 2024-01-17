@@ -58,7 +58,7 @@ fun BerandaScreenPreview() {
         ) {
             val navController = rememberNavController()
             val rootController = rememberNavController()
-            BerandaScreen(
+            com.polstat.pkl.ui.screen.BerandaScreen(
                 rootController = rootController,
                 navController = navController,
                 viewModel = hiltViewModel()
@@ -151,7 +151,7 @@ fun BerandaScreen(
         bottomBar = {
             BottomNavBar(rootNavController = rootController)
         }
-    ) {innerPadding ->
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -166,7 +166,7 @@ fun BerandaScreen(
             )
 
             if (dataTimWithAll.value.listMahasiswaWithAll!!.isNotEmpty()) {
-                dataTimWithAll.value.listMahasiswaWithAll!!.forEach{ mahasiswaWithAll ->
+                dataTimWithAll.value.listMahasiswaWithAll!!.forEach { mahasiswaWithAll ->
                     if (mahasiswaWithAll.mahasiswaWithWilayah!!.mahasiswa!!.nim == session.nim) {
                         WilayahKerjaCard(
                             listWilayah = mahasiswaWithAll.mahasiswaWithWilayah!!.listWilayah!!
@@ -182,7 +182,7 @@ fun BerandaScreen(
                 PmlCard(dataTim = dataTimWithAll.value.dataTimWithMahasiswa!!.dataTim)
 
                 if (dataTimWithAll.value.listMahasiswaWithAll!!.isNotEmpty()) {
-                    dataTimWithAll.value.listMahasiswaWithAll!!.forEach{ mahasiswaWithAll ->
+                    dataTimWithAll.value.listMahasiswaWithAll!!.forEach { mahasiswaWithAll ->
                         if (mahasiswaWithAll.mahasiswaWithWilayah!!.mahasiswa!!.nim == session.nim) {
                             ProgresListingCard(mahasiswaWithAll = mahasiswaWithAll)
                         }

@@ -10,6 +10,8 @@ import com.polstat.pkl.database.dao.Capi63Dao
 import com.polstat.pkl.network.LocationApi
 import com.polstat.pkl.repository.DataTimRepository
 import com.polstat.pkl.repository.DataTimRepositoryImpl
+import com.polstat.pkl.repository.KeluargaRepository
+import com.polstat.pkl.repository.KeluargaRepositoryImpl
 import com.polstat.pkl.repository.LocalRutaRepository
 import com.polstat.pkl.repository.LocalRutaRepositoryImpl
 import com.polstat.pkl.repository.LocationRepository
@@ -97,5 +99,11 @@ class AppModule {
     @Singleton
     fun provideLocalRutaRepository(capi63Database: Capi63Database) : LocalRutaRepository {
         return LocalRutaRepositoryImpl(capi63Database)
+    }
+
+    @Provides
+    @Singleton
+    fun provideKeluargaRepository(capi63Database: Capi63Database) : KeluargaRepository {
+        return KeluargaRepositoryImpl(capi63Database)
     }
 }
