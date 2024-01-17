@@ -21,15 +21,16 @@ data class IsiRutaScreenState(
     val noUrutKlgEgbError: String? = null,
     val penglMkn: Int? = 0,
     val penglMknError: String? = null,
-    val noUrutRuta: Int? = 0,
+    val noUrutRuta: List<Int>? = emptyList(),
     val noUrutRutaError: String? = null,
-    val kkOrKrt : String = "",
+    val kkOrKrt : List<String>? = emptyList(),
     val kkOrKrtError: String? = null,
-    val namaKrt: String = "",
+    val namaKrt: List<String>? = emptyList(),
     val namaKrtError: String? = null,
-    val genzOrtu: String = "",
+    val genzOrtu: List<String>? = emptyList(),
     val genzOrtuError: String? = null,
-    val katGenz: String = "",
+    val katGenz: List<String>? = emptyList(),
     val katGenzError: String? = null,
-
+    val kodeRuta: List<String>? = emptyList(),
+    val kodeRutaError: String? = null
 )

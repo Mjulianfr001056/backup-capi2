@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.polstat.pkl.model.domain.Keluarga
 import com.polstat.pkl.model.domain.Ruta
 import com.polstat.pkl.repository.LocalRutaRepository
 import com.polstat.pkl.ui.event.IsiRutaScreenEvent
@@ -44,56 +45,101 @@ class IsiRutaViewModel @Inject constructor(
     }
 
     fun onEvent(event: IsiRutaScreenEvent){
-        when(event){
+        when(event) {
+            is IsiRutaScreenEvent.SLSChanged -> {
+                state = state.copy(SLS = event.sls)
+            }
+
             is IsiRutaScreenEvent.NoSegmenChanged -> {
                 state = state.copy(noSegmen = event.noSegmen)
             }
+
             is IsiRutaScreenEvent.NoBgFisikChanged -> {
                 state = state.copy(noBgFisik = event.noBgFisik)
             }
+
             is IsiRutaScreenEvent.NoBgSensusChanged -> {
                 state = state.copy(noBgSensus = event.noBgSensus)
             }
-            is IsiRutaScreenEvent.NoUrutRutaChanged -> {
-                state = state.copy(noUrutRuta = event.noUrutRuta)
+
+            is IsiRutaScreenEvent.NoUrutKlgChanged -> {
+                state = state.copy(noUrutKlg = event.noUrutKlg)
             }
-            is IsiRutaScreenEvent.NamaKrtChanged -> {
-                state = state.copy(namaKrt = event.namaKrt)
+
+            is IsiRutaScreenEvent.NamaKKChanged -> {
+                state = state.copy(namaKK = event.namaKK)
             }
+
             is IsiRutaScreenEvent.AlamatChanged -> {
                 state = state.copy(alamat = event.alamat)
             }
+
             is IsiRutaScreenEvent.IsGenzOrtuChanged -> {
                 state = state.copy(isGenzOrtu = event.isGenzOrtu)
             }
-            is IsiRutaScreenEvent.JmlGenzChanged -> {
-                state = state.copy(jmlGenz = event.jmlGenz)
+
+            is IsiRutaScreenEvent.NoUrutKlgEgbChanged -> {
+                state = state.copy(noUrutKlgEgb = event.noUrutKlgEgb)
             }
-            is IsiRutaScreenEvent.NoUrutRtEgbChanged -> {
-                state = state.copy(noUrutRtEgb = event.noUrutRtEgb)
+
+            is IsiRutaScreenEvent.PenglMknChanged -> {
+                state = state.copy(penglMkn = event.penglMkn)
             }
-            is IsiRutaScreenEvent.CatatanChanged -> {
-                state = state.copy(catatan = event.catatan)
+
+            is IsiRutaScreenEvent.NoUrutRutaChanged -> {
+                state = state.copy(noUrutRuta = event.noUrutRuta)
             }
+
+            is IsiRutaScreenEvent.KKOrKRTChanged -> {
+                state = state.copy(kkOrKrt = event.kkOrKRT)
+            }
+
+            is IsiRutaScreenEvent.NamaKRTChanged -> {
+                state = state.copy(namaKrt = event.namaKRT)
+            }
+
+            is IsiRutaScreenEvent.GenzOrtuChanged -> {
+                state = state.copy(genzOrtu = event.genzOrtu)
+            }
+
+            is IsiRutaScreenEvent.KatGenzChanged -> {
+                state = state.copy(katGenz = event.katGenz)
+            }
+
             is IsiRutaScreenEvent.submit -> {
-                val ruta = Ruta(
-//                    noSegmen = state.noSegmen.toInt(),
-//                    noBgFisik = state.noBgFisik.toInt(),
-//                    noBgSensus = state.noBgSensus.toInt(),
-//                    noUrutRuta = state.noUrutRuta.toInt(),
-//                    namaKrt = state.namaKrt,
-//                    alamat = state.alamat,
-//                    isGenzOrtu = convertIsGenzOrtu(state.isGenzOrtu),
-//                    jmlGenz = state.jmlGenz.toInt(),
-//                    noUrutRtEgb = state.noUrutRtEgb.toInt(),
-//                    catatan = state.catatan,
-//                    noBS = noBS,
-//                    kodeRuta = noBS + state.noUrutRuta,
-//                    lat = lat,
-//                    long = long
+                val keluarga = Keluarga(
+                    SLS = state.SLS,
+                    noSegmen = state.noSegmen,
+                    noBgFisik = state.noBgFisik.toInt(),
+                    noBgSensus = state.noBgSensus.toInt(),
+                    noUrutKlg = state.noUrutKlg,
+                    namaKK = state.namaKK,
+                    alamat = state.alamat,
+                    isGenzOrtu = state.isGenzOrtu,
+                    noUrutKlgEgb = state.noUrutKlgEgb,
+                    penglMkn = state.penglMkn,
+                    noBS = noBS,
+                    kodeKlg = noBS + state.noUrutKlg,
                 )
-                Log.d(TAG, "ruta : $ruta")
-                insertRuta(ruta)
+                state.penglMkn?.let {
+                    repeat(it) {
+                        val ruta = Ruta(
+                            noUrutRuta = state.noUrutRuta,
+                            kkOrKrt = state.kkOrKrt,
+                            namaKrt = state.namaKrt,
+                            isGenzOrtu = state.genzOrtu.toInt(),
+                            katGenz = state.katGenz,
+                            long = long,
+                            lat = lat,
+                            kodeRuta = noBS + state.noUrutRuta,
+                            noBS = noBS
+                        )
+
+                        val keluargaWithRuta = keluarga.copy(ruta = listOf(ruta))
+                        Log.d(TAG, "keluarga : $keluargaWithRuta")
+                        insertRuta(ruta)
+                    }
+                }
             }
         }
     }

@@ -127,8 +127,8 @@ fun IsiRumahTanggaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 TextField(
-                    value = state.namaKrt,
-                    onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NamaKrtChanged(it)) },
+                    value = state.SLS,
+                    onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.SLSChanged(it) },
                     label = {
                         Text(
                             text = "1. Satuan Lingkungan Setempat (SLS)",
@@ -150,6 +150,8 @@ fun IsiRumahTanggaScreen(
                         imeAction = ImeAction.Next
                     )
                 )
+
+                Spacer(modifier = Modifier.padding(10.dp))
 
                 InputNomor(
                     value = state.noSegmen,
@@ -197,23 +199,23 @@ fun IsiRumahTanggaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 InputNomor(
-                    value = state.noUrutRuta,
-                    onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRutaChanged(it)) },
+                    value = state.noUrutKlg.toString(),
+                    onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutKlgChanged(it.toInt())) },
                     label = {
                         Text(
                             text = "5. Nomor Urut Keluarga",
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.SemiBold
                         ) },
-                    onIncrement = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRutaChanged(increment(state.noUrutRuta))) },
-                    onDecrement = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRutaChanged(increment(state.noUrutRuta))) }
+                    onIncrement = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRutaChanged(increment(state.noUrutKlg))) },
+                    onDecrement = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRutaChanged(increment(state.noUrutKlg))) }
                 )
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 TextField(
-                    value = state.namaKrt,
-                    onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NamaKrtChanged(it)) },
+                    value = state.namaKK,
+                    onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NamaKKChanged(it)) },
                     label = {
                         Text(
                             text = "6. Nama Kepala Keluarga",
@@ -266,8 +268,8 @@ fun IsiRumahTanggaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 InputNomor(
-                    value = state.noUrutRuta,
-                    onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRutaChanged(it)) },
+                    value = state.isGenzOrtu.toString(),
+                    onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.IsGenzOrtuChanged(it.toInt())) },
                     label = {
                         Text(
                             text = "8. Keberadaan Gen Z dan Orang Tua dalam Keluarga",
@@ -278,34 +280,34 @@ fun IsiRumahTanggaScreen(
                     onDecrement = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRutaChanged(increment(state.noUrutRuta))) }
                 )
 
-                if (state.jmlGenz != "0") {
+                if (state.isGenzOrtu.toString() != 0) {
                     Spacer(modifier = Modifier.padding(10.dp))
 
                     InputNomor(
-                        value = state.noUrutRtEgb,
-                        onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRtEgbChanged(it)) },
+                        value = state.noUrutKlgEgb.toString(),
+                        onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutKlgEgbChanged(it)) },
                         label = {
                             Text(
                                 text = "9. Nomor Urut Keluarga Eligible",
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.SemiBold
                             ) },
-                        onIncrement = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRtEgbChanged(increment(state.noUrutRtEgb))) },
-                        onDecrement = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRtEgbChanged(increment(state.noUrutRtEgb))) }
+                        onIncrement = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutKlgEgbChanged(increment(state.noUrutRtEgb))) },
+                        onDecrement = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutKlgEgbChanged(increment(state.noUrutRtEgb))) }
                     )
                 }
 
                 InputNomor(
-                    value = state.jmlGenz,
-                    onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRtEgbChanged(it)) },
+                    value = state.penglMkn,
+                    onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.PenglMknChanged(it)) },
                     label = {
                         Text(
                             text = "10. Jumlah Pengelolaan Makan/Minum dan Kebutuhan dalam Keluarga",
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.SemiBold
                         ) },
-                    onIncrement = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRtEgbChanged(increment(state.noUrutRtEgb))) },
-                    onDecrement = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRtEgbChanged(increment(state.noUrutRtEgb))) }
+                    onIncrement = { viewModel.onEvent(IsiRutaScreenEvent.PenglMknChanged(increment(state.penglMkn))) },
+                    onDecrement = { viewModel.onEvent(IsiRutaScreenEvent.PenglMknChanged(increment(state.penglMkn))) }
                 )
 
                 Spacer(modifier = Modifier.padding(10.dp))
@@ -365,8 +367,8 @@ fun KeteranganRuta(
     val kkKrtOptions = listOf("Kepala Keluarga (KK) saja", "Kepala Rumah Tangga (KRT) saja", "KK Sekaligus KRT")
 
     InputNomor(
-        value = state.noUrutRuta,
-        onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRutaChanged(it)) },
+        value = state.noUrutRuta.toString(),
+        onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRutaChanged(it.toInt())) },
         label = {
             Text(
                 text = "11. Nomor Urut Rumah Tangga",
@@ -390,8 +392,8 @@ fun KeteranganRuta(
 
         RadioButtons(
             options = kkKrtOptions,
-            selectedOption = state.isGenzOrtu,
-            onOptionSelected = { option -> viewModel.onEvent(IsiRutaScreenEvent.IsGenzOrtuChanged(option))}
+            selectedOption = state.kkOrKrt,
+            onOptionSelected = { option -> viewModel.onEvent(IsiRutaScreenEvent.KKOrKRTChanged(option)))}
         )
     }
 
@@ -399,7 +401,7 @@ fun KeteranganRuta(
 
     TextField(
         value = state.namaKrt,
-        onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NamaKrtChanged(it)) },
+        onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NamaKRTChanged(it)) },
         label = {
             Text(
                 text = "13. Nama Kepala Rumah Tangga",
