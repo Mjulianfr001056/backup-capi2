@@ -1,15 +1,19 @@
 package com.polstat.pkl.model.domain
 
 data class SampelRuta(
-    val kodeRuta: String = "",
-    val noUrutRuta: Int? = 0,
-    val kkOrKrt: String? = "",
-    val namaKrt: String? = "",
-    val isGenzOrtu: String? = "",
-    val katGenz: String? = "",
-    val long: Double? = 0.0,
-    val lat: Double? = 0.0,
-    val catatan: String? = "",
-    val noBS: String? = "",
-    var status: String? = ""
+    var kodeRuta: String = "",
+    var SLS: String = "",
+    var noSegmen: Int = 0,
+    var noBgFisik: String = "",
+    var noBgSensus: String = "",
+    var noUrutKlg: String = "",
+    var noUrutRuta: Int = 0,
+    var noUrutRutaEgb: Int = 0,
+    var genzOrtuKeluarga: String = "",
+    var alamat: String = "",
+    var namaKrt: String = "",
+    var genzOrtuRuta: Int = 0,
+    var long: Double = 0.0,
+    var lat: Double = 0.0,
+    var status: String = ""
 )

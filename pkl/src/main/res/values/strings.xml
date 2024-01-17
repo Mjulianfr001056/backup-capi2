@@ -31,13 +31,10 @@
     <string name="telah_n_disampel">Telah\nDisampel</string>
     <string name="sampel_n_terkirim">Sampel\nTerkirim</string>
     <string name="rekapitulasi">Rekapitulasi</string>
-    <string name="jmlRT">Jumlah Rumah Tangga:&#xa0;</string>
-    <string name="jmlRTZ">Jumlah Rumah Tangga dengan ART Z:&#xa0;</string>
-    <string name="genz_satuBS">Gen Z dalam Satu Blok Sensus</string>
-    <string name="jml_genz">Jumlah Gen Z:&#xa0;</string>
-    <string name="jml_genz_blm_kwn">Jumlah Gen Z Belum Kawin:&#xa0;</string>
-    <string name="genz_dewasa">Jumlah Gen Z Dewasa:&#xa0;</string>
-    <string name="genz_anak">Jumlah Gen Z Anak:&#xa0;</string>
+    <string name="jmlKlg">Jumlah Keluarga:&#xa0;</string>
+    <string name="jmlKlgEgb">Jumlah Keluarga Eligible:&#xa0;</string>
+    <string name="jmlRuta">Jumlah Ruta:&#xa0;</string>
+    <string name="jmlRutaEgb">Jumlah Ruta Eligible:&#xa0;</string>
     <string name="total">Total</string>
     <string name="toggle">Toggle</string>
     <string name="lihat_ruta">Lihat Ruta</string>

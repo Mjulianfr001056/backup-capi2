@@ -258,14 +258,14 @@ private fun BlokSensus(
                         }
                         Row {
                             Text(
-                                text = stringResource(R.string.jmlRT),
+                                text = stringResource(R.string.jmlKlg),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
                                 color = Color.Gray,
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
-                                text = wilayah.jmlRt.toString(),
+                                text = wilayah.jmlKlg.toString(),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
                                 color = PklPrimary
@@ -273,37 +273,44 @@ private fun BlokSensus(
                         }
                         Row {
                             Text(
-                                text = stringResource(R.string.jmlRTZ),
+                                text = stringResource(R.string.jmlKlgEgb),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
                                 color = Color.Gray,
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
-                                text = wilayah.jmlRtGenz.toString(),
+                                text = wilayah.jmlKlgEgb.toString(),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
                                 color = PklPrimary
                             )
                         }
-                        Row (modifier = Modifier.padding(top = 10.dp)) {
-                            Text(
-                                text = stringResource(R.string.genz_satuBS),
-                                fontFamily = PoppinsFontFamily,
-                                fontSize = 10.sp,
-                                color = Color.Gray
-                            )
-                        }
                         Row {
                             Text(
-                                text = stringResource(R.string.jml_genz_blm_kwn),
+                                text = stringResource(R.string.jmlRuta),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
                                 color = Color.Gray,
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
-                                text = wilayah.jmlGenZ.toString(),
+                                text = wilayah.jmlRuta.toString(),
+                                fontFamily = PoppinsFontFamily,
+                                fontSize = 10.sp,
+                                color = PklPrimary
+                            )
+                        }
+                        Row {
+                            Text(
+                                text = stringResource(R.string.jmlRutaEgb),
+                                fontFamily = PoppinsFontFamily,
+                                fontSize = 10.sp,
+                                color = Color.Gray,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                text = wilayah.jmlRutaEgb.toString(),
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 10.sp,
                                 color = PklPrimary
@@ -315,7 +322,7 @@ private fun BlokSensus(
                             Text(text = stringResource(R.string.total), fontFamily = PoppinsFontFamily, fontSize = 15.sp, color = Color.Gray)
                         }
                         Row {
-                            Text(text = wilayah.jmlGenZ.toString(), style = MaterialTheme.typography.headlineLarge, color = PklPrimary, fontWeight = FontWeight.Bold)
+                            Text(text = "0", style = MaterialTheme.typography.headlineLarge, color = PklPrimary, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -438,9 +445,10 @@ fun BS() {
             namaKec = "Kecamatan A",
             namaKel = "Kelurahan B",
             catatan = "",
-            jmlGenZ = 0,
-            jmlRt = 0,
-            jmlRtGenz = 0,
+            jmlKlg = 0,
+            jmlKlgEgb = 0,
+            jmlRuta = 0,
+            jmlRutaEgb = 0,
             status = "telah-disampel",
             tglListing = Date(),
             tglPeriksa = Date(),

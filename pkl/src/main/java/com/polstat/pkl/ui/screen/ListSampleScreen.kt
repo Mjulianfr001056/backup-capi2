@@ -248,20 +248,21 @@ fun PreviewSample(){
     val context = LocalContext.current
     Sample(
         sampelRuta = SampelRutaEntity(
-            kodeRuta = "444B017",
-            noBS = "444B",
-            noBgFisik = 3,
-            noBgSensus = 3,
+            kodeRuta = "",
+            SLS = "Krapyak",
             noSegmen = 2,
-            noUrutRtEgb = 16,
-            noUrutRuta = 17,
-            namaKrt = "Alfian Syarif",
-            alamat = "Jalan ABC No. 123",
-            catatan = "",
-            genzOrtu = "1",
-            jmlGenz = 1,
-            lat = 110.3557,
-            long = 4.3557
+            noBgFisik = "001",
+            noBgSensus = "002",
+            noUrutKlg = "003",
+            noUrutRuta = 2,
+            noUrutRutaEgb = 2,
+            genzOrtuKeluarga = "2",
+            alamat = "Krapyak, Bantul, DIY",
+            namaKrt = "KH Ahmad Syamsuri",
+            genzOrtuRuta = 2,
+            long = 0.0,
+            lat = 0.0,
+            status = ""
         ),
         onPetunjukArahClicked = {},
         context = context
@@ -368,7 +369,7 @@ private fun Sample(
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Text(
-                            text = " ${sampelRuta.noBS}",
+                            text = " ${sampelRuta.noBgSensus}",
                             color = PklPrimary900,
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.Medium,
@@ -449,7 +450,7 @@ private fun Sample(
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = " ${sampelRuta.noUrutRtEgb}",
+                    text = " ${sampelRuta.noUrutRutaEgb}",
                     color = PklPrimary900,
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium,

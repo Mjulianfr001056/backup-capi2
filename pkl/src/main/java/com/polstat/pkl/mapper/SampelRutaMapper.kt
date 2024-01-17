@@ -6,15 +6,19 @@ import com.polstat.pkl.model.domain.SampelRuta
 fun SampelRuta.toSampelRutaEntity(): SampelRutaEntity {
     return SampelRutaEntity(
         kodeRuta = kodeRuta,
-        noBS = noBS,
+        SLS = SLS,
+        noSegmen = noSegmen,
+        noBgFisik = noBgFisik,
+        noBgSensus = noBgSensus,
+        noUrutKlg = noUrutKlg,
         noUrutRuta = noUrutRuta,
-        kkOrKrt = kkOrKrt,
+        noUrutRutaEgb = noUrutRutaEgb,
+        genzOrtuKeluarga = genzOrtuKeluarga,
+        alamat = alamat,
         namaKrt = namaKrt,
-        catatan = catatan,
-        genzOrtu = isGenzOrtu,
-        katGenz = katGenz,
-        lat = lat,
+        genzOrtuRuta = genzOrtuRuta,
         long = long,
+        lat = lat,
         status = status
     )
 }
@@ -22,15 +26,19 @@ fun SampelRuta.toSampelRutaEntity(): SampelRutaEntity {
 fun SampelRutaEntity.toSampelRuta(): SampelRuta {
     return SampelRuta(
         kodeRuta = kodeRuta,
-        noBS = noBS,
+        SLS = SLS,
+        noSegmen = noSegmen,
+        noBgFisik = noBgFisik,
+        noBgSensus = noBgSensus,
+        noUrutKlg = noUrutKlg,
         noUrutRuta = noUrutRuta,
-        kkOrKrt = kkOrKrt,
+        noUrutRutaEgb = noUrutRutaEgb,
+        genzOrtuKeluarga = genzOrtuKeluarga,
+        alamat = alamat,
         namaKrt = namaKrt,
-        catatan = catatan,
-        isGenzOrtu = genzOrtu,
-        katGenz = katGenz,
-        lat = lat,
+        genzOrtuRuta = genzOrtuRuta,
         long = long,
+        lat = lat,
         status = status
     )
 }
