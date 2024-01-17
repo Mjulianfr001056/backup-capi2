@@ -5,8 +5,9 @@ import com.polstat.pkl.database.Capi63Database
 import com.polstat.pkl.database.entity.DataTimEntity
 import com.polstat.pkl.database.relation.DataTimWithAll
 import com.polstat.pkl.database.relation.DataTimWithMahasiswa
+import com.polstat.pkl.database.relation.KeluargaWithRuta
 import com.polstat.pkl.database.relation.MahasiswaWithAll
-import com.polstat.pkl.database.relation.WilayahWithRuta
+import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.mapper.toDataTimEntity
 import com.polstat.pkl.model.domain.DataTim
 import com.polstat.pkl.utils.Result
@@ -95,15 +96,23 @@ class DataTimRepositoryImpl @Inject constructor (
 
                     val mahasiswaWithWilayah = capi63Database.capi63Dao.getMahasiswaWithWilayah(mahasiswa.nim)
 
-                    val listWilayahWithRuta = mahasiswaWithWilayah.listWilayah?.map { wilayah ->
+                    val listWilayahWithAll = mahasiswaWithWilayah.listWilayah?.map { wilayah ->
 
-                        val ruta = capi63Database.capi63Dao.getWilayahWithRuta(wilayah.noBS)
+                        val wilayahWithKeluarga = capi63Database.capi63Dao.getWilayahWithKeluarga(wilayah.noBS)
 
-                        WilayahWithRuta(wilayah, ruta.listRuta)
+                        val listKeluargaWithRuta = wilayahWithKeluarga.listKeluarga?.map { keluarga ->
+
+                            val ruta = capi63Database.capi63Dao.getKeluargaWithRuta(keluarga.kodeKlg)
+
+                            KeluargaWithRuta(keluarga, ruta.listRuta)
+
+                        }
+
+                        WilayahWithAll(wilayahWithKeluarga, listKeluargaWithRuta)
 
                     }
 
-                    MahasiswaWithAll(mahasiswaWithWilayah, listWilayahWithRuta)
+                    MahasiswaWithAll(mahasiswaWithWilayah, listWilayahWithAll)
 
                 }
 
