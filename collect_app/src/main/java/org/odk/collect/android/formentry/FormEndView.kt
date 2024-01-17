@@ -2,11 +2,11 @@ package org.odk.collect.android.formentry
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import org.odk.collect.android.R
 import org.odk.collect.android.databinding.FormEntryEndBinding
+import timber.log.Timber
 
 class FormEndView(
     context: Context,
@@ -18,6 +18,7 @@ class FormEndView(
     private val binding = FormEntryEndBinding.inflate(LayoutInflater.from(context), this, true)
 
     init {
+        Timber.tag("CAPI_FormEndView").d("init")
         binding.description.text = context.getString(org.odk.collect.strings.R.string.save_enter_data_description, formTitle)
 
         binding.saveAsDraft.isVisible = formEndViewModel.isSaveDraftEnabled()
@@ -35,17 +36,17 @@ class FormEndView(
             binding.finalize.text = context.getString(org.odk.collect.strings.R.string.send)
         }
 
-        if (!binding.saveAsDraft.isVisible && !shouldFormBeSentAutomatically) {
-            binding.formEditsWarningMessage.setText(org.odk.collect.strings.R.string.form_edits_warning_only_finalize_enabled)
-        } else if (binding.saveAsDraft.isVisible && binding.finalize.isVisible) {
-            if (shouldFormBeSentAutomatically) {
-                binding.formEditsWarningMessage.setText(org.odk.collect.strings.R.string.form_edits_warning_save_as_draft_and_finalize_with_auto_send_enabled)
-            } else {
-                binding.formEditsWarningMessage.setText(org.odk.collect.strings.R.string.form_edits_warning_save_as_draft_and_finalize_enabled)
-            }
-        } else {
-            binding.formEditsWarning.visibility = View.GONE
-        }
+//        if (!binding.saveAsDraft.isVisible && !shouldFormBeSentAutomatically) {
+//            binding.formEditsWarningMessage.setText(org.odk.collect.strings.R.string.form_edits_warning_only_finalize_enabled)
+//        } else if (binding.saveAsDraft.isVisible && binding.finalize.isVisible) {
+//            if (shouldFormBeSentAutomatically) {
+//                binding.formEditsWarningMessage.setText(org.odk.collect.strings.R.string.form_edits_warning_save_as_draft_and_finalize_with_auto_send_enabled)
+//            } else {
+//                binding.formEditsWarningMessage.setText(org.odk.collect.strings.R.string.form_edits_warning_save_as_draft_and_finalize_enabled)
+//            }
+//        } else {
+//            binding.formEditsWarning.visibility = View.GONE
+//        }
     }
 
     override fun shouldSuppressFlingGesture() = false
