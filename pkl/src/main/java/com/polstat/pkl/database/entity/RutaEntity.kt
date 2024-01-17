@@ -11,7 +11,7 @@ data class RutaEntity (
     var noUrutRutaEgb: Int? = 0,
     var kkOrKrt: String? = "",
     var namaKrt: String? = "",
-    var genzOrtu: String? = "",
+    var genzOrtu: Int? = 0,
     var katGenz: String? = "",
     var long: Double? = 0.0,
     var lat: Double? = 0.0,
@@ -20,5 +20,5 @@ data class RutaEntity (
     var status: String? = ""
 )
 {
-    constructor() : this("", 0, 0, "", "", "", "", 0.0, 0.0, "", "")
+    constructor() : this("", 0, 0, "", "", 0, "", 0.0, 0.0, "", "")
 }
