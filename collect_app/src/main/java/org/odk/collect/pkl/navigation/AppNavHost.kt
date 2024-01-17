@@ -1,6 +1,8 @@
 package org.odk.collect.pkl.navigation
 
+import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -15,6 +17,7 @@ import com.polstat.pkl.viewmodel.ListBSViewModel
 import com.polstat.pkl.viewmodel.ListRutaViewModel
 import com.polstat.pkl.viewmodel.ListSampelViewModel
 import com.polstat.pkl.viewmodel.PasswordMasterViewModel
+import org.odk.collect.pkl.ProjectConfigurerActivity
 import org.odk.collect.pkl.ui.screen.BerandaScreen
 import org.odk.collect.pkl.ui.screen.IsiRumahTanggaScreen
 import org.odk.collect.pkl.ui.screen.ListBSScreen
@@ -174,7 +177,9 @@ fun KuesionerNavHost(
         startDestination = CapiScreen.Kuesioner.START
     ){
         composable(CapiScreen.Kuesioner.START){
-
+            val context = LocalContext.current
+            val intent = Intent(context, ProjectConfigurerActivity::class.java)
+            context.startActivity(intent)
         }
     }
 }
