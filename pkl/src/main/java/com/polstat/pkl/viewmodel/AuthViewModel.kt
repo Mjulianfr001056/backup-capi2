@@ -192,7 +192,7 @@ class AuthViewModel @Inject constructor(
                                                 Log.d(TAG, message)
                                             }
 
-                                        if (keluarga.ruta.isNotEmpty()) {
+                                        if (keluarga.ruta!!.isNotEmpty()) {
                                             keluarga.ruta.forEach { ruta ->
                                                 localRutaRepository.insertRuta(ruta)
                                                     .collectLatest { message ->
@@ -223,7 +223,7 @@ class AuthViewModel @Inject constructor(
                                     Log.d(TAG, message)
                                 }
 
-                            if (keluarga.ruta.isNotEmpty()) {
+                            if (keluarga.ruta!!.isNotEmpty()) {
                                 keluarga.ruta.forEach { ruta ->
                                     localRutaRepository.insertRuta(ruta)
                                         .collectLatest { message ->

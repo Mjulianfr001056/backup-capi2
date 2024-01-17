@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "sampel_ruta")
 data class SampelRutaEntity (
     @PrimaryKey(autoGenerate = false)
+    var noBS: String = "",
     var kodeRuta: String = "",
     var SLS: String = "",
     var noSegmen: Int = 0,
@@ -23,5 +24,5 @@ data class SampelRutaEntity (
     var status: String = ""
 )
 {
-    constructor() : this("", "", 0, "", "", "", 0, 0,"", "", "",0, 0.0, 0.0, "")
+    constructor() : this("", "", "", 0, "", "", "", 0, 0,"", "", "",0, 0.0, 0.0, "")
 }

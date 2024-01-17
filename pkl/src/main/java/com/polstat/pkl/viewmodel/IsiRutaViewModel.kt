@@ -77,20 +77,20 @@ class IsiRutaViewModel @Inject constructor(
             }
             is IsiRutaScreenEvent.submit -> {
                 val ruta = Ruta(
-                    noSegmen = state.noSegmen.toInt(),
-                    noBgFisik = state.noBgFisik.toInt(),
-                    noBgSensus = state.noBgSensus.toInt(),
-                    noUrutRuta = state.noUrutRuta.toInt(),
-                    namaKrt = state.namaKrt,
-                    alamat = state.alamat,
-                    isGenzOrtu = convertIsGenzOrtu(state.isGenzOrtu),
-                    jmlGenz = state.jmlGenz.toInt(),
-                    noUrutRtEgb = state.noUrutRtEgb.toInt(),
-                    catatan = state.catatan,
-                    noBS = noBS,
-                    kodeRuta = noBS + state.noUrutRuta,
-                    lat = lat,
-                    long = long
+//                    noSegmen = state.noSegmen.toInt(),
+//                    noBgFisik = state.noBgFisik.toInt(),
+//                    noBgSensus = state.noBgSensus.toInt(),
+//                    noUrutRuta = state.noUrutRuta.toInt(),
+//                    namaKrt = state.namaKrt,
+//                    alamat = state.alamat,
+//                    isGenzOrtu = convertIsGenzOrtu(state.isGenzOrtu),
+//                    jmlGenz = state.jmlGenz.toInt(),
+//                    noUrutRtEgb = state.noUrutRtEgb.toInt(),
+//                    catatan = state.catatan,
+//                    noBS = noBS,
+//                    kodeRuta = noBS + state.noUrutRuta,
+//                    lat = lat,
+//                    long = long
                 )
                 Log.d(TAG, "ruta : $ruta")
                 insertRuta(ruta)
