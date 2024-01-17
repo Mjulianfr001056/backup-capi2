@@ -7,15 +7,15 @@ import androidx.room.PrimaryKey
 data class SampelRutaEntity (
     @PrimaryKey(autoGenerate = false)
     var kodeRuta: String = "",
-    val noUrutRuta: Int? = 0,
-    val kkOrKrt: String? = "",
-    val namaKrt: String? = "",
-    val genzOrtu: String? = "",
-    val katGenz: String? = "",
-    val long: Double? = 0.0,
-    val lat: Double? = 0.0,
-    val catatan: String? = "",
-    val noBS: String? = "",
+    var noUrutRuta: Int? = 0,
+    var kkOrKrt: String? = "",
+    var namaKrt: String? = "",
+    var genzOrtu: String? = "",
+    var katGenz: String? = "",
+    var long: Double? = 0.0,
+    var lat: Double? = 0.0,
+    var catatan: String? = "",
+    var noBS: String? = "",
     var status: String? = ""
 )
 {

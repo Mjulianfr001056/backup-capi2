@@ -3,6 +3,7 @@ package com.polstat.pkl.model.domain
 data class Ruta(
     val kodeRuta: String = "",
     val noUrutRuta: Int? = 0,
+    val noUrutRutaEgb: Int? = 0,
     val kkOrKrt: String? = "",
     val namaKrt: String? = "",
     val isGenzOrtu: String? = "",

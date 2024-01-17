@@ -10,7 +10,7 @@ data class KeluargaEntity (
     val SLS: String? = "",
     val noBgFisik: Int? = 0,
     val noBgSensus: Int? = 0,
-    val noSegmen: Int? = 0,
+    val noSegmen: String? = "",
     val noUrutKlg: Int? = 0,
     val noUrutKlgEgb: Int? = 0,
     val namaKK: String? = "",
@@ -20,5 +20,5 @@ data class KeluargaEntity (
     val noBS: String? = ""
 )
 {
-    constructor() : this("", "", 0, 0, 0, 0, 0, "", "", 0, 0, "")
+    constructor() : this("", "", 0, 0, "", 0, 0, "", "", 0, 0, "")
 }

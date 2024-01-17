@@ -8,6 +8,7 @@ data class RutaEntity (
     @PrimaryKey(autoGenerate = false)
     var kodeRuta: String = "",
     var noUrutRuta: Int? = 0,
+    val noUrutRutaEgb: Int? = 0,
     var kkOrKrt: String? = "",
     var namaKrt: String? = "",
     var genzOrtu: String? = "",
@@ -19,5 +20,5 @@ data class RutaEntity (
     var status: String? = ""
 )
 {
-    constructor() : this("", 0, "", "", "", "", 0.0, 0.0, "", "")
+    constructor() : this("", 0, 0, "", "", "", "", 0.0, 0.0, "", "")
 }
