@@ -33,14 +33,10 @@ import com.polstat.pkl.database.entity.DataTimEntity
 import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.database.relation.DataTimWithAll
 import com.polstat.pkl.database.relation.MahasiswaWithAll
-import com.polstat.pkl.model.domain.DataTim
-import com.polstat.pkl.model.domain.Mahasiswa
 import com.polstat.pkl.model.domain.Session
-import com.polstat.pkl.model.domain.Wilayah
 import com.polstat.pkl.ui.theme.PklPrimary100
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
-import java.util.Date
 import java.util.Locale
 
 @Composable
@@ -240,28 +236,26 @@ fun ListPplCard(
                                             ),
                                             color = Color.DarkGray
                                         )
-                                        mahasiswaWithAll.mahasiswaWithWilayah!!.mahasiswa?.let {
-                                            Text(
-                                                text = it.nim,
-                                                style = TextStyle(
-                                                    fontFamily = PoppinsFontFamily,
-                                                    fontWeight = FontWeight.Medium,
-                                                    fontSize = 12.sp,
-                                                    platformStyle = PlatformTextStyle(
-                                                        includeFontPadding = false
-                                                    )
+                                        Text(
+                                            text = mahasiswaWithAll.mahasiswaWithWilayah!!.mahasiswa!!.nim,
+                                            style = TextStyle(
+                                                fontFamily = PoppinsFontFamily,
+                                                fontWeight = FontWeight.Medium,
+                                                fontSize = 12.sp,
+                                                platformStyle = PlatformTextStyle(
+                                                    includeFontPadding = false
                                                 )
                                             )
-                                        }
+                                        )
                                     }
                                     Column {
-                                        if (mahasiswaWithAll.listWilayahWithRuta!!.isNotEmpty()) {
-                                            mahasiswaWithAll.listWilayahWithRuta!!.forEach { wilayahWithRuta ->
+                                        if (mahasiswaWithAll.listWilayahWithAll!!.isNotEmpty()) {
+                                            mahasiswaWithAll.listWilayahWithAll!!.forEach { wilayahWithAll ->
                                                 Row(
                                                     verticalAlignment = Alignment.CenterVertically
                                                 ) {
                                                     Text(
-                                                        text = wilayahWithRuta.wilayah!!.noBS,
+                                                        text = wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.noBS,
                                                         style = TextStyle(
                                                             fontFamily = PoppinsFontFamily,
                                                             fontWeight = FontWeight.Medium,
@@ -272,9 +266,18 @@ fun ListPplCard(
                                                         )
                                                     )
                                                     Spacer(modifier = Modifier.width(16.dp))
-                                                    AnimatedCircularProgressIndicator(
-                                                        currentValue = wilayahWithRuta.listRuta!!.size,
-                                                        maxValue = (if (wilayahWithRuta.wilayah!!.jmlRt == 0) 99 else wilayahWithRuta.wilayah!!.jmlRt)!!,
+
+                                                    var jmlRuta = 0
+
+                                                    if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
+                                                        wilayahWithAll.listKeluargaWithRuta!!.forEach { keluarga ->
+                                                            jmlRuta += keluarga.listRuta.size
+                                                        }
+                                                    }
+
+                                                    com.polstat.pkl.ui.screen.components.AnimatedCircularProgressIndicator(
+                                                        currentValue = jmlRuta,
+                                                        maxValue = (if (wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.jmlRuta == 0) 99 else wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.jmlRuta)!!,
                                                         progressBackgroundColor = PklPrimary100,
                                                         progressIndicatorColor = PklPrimary900,
                                                         completedColor = PklPrimary900,
@@ -470,8 +473,8 @@ fun StatusListingCard(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column {
-                                    if (mahasiswaWithAll.listWilayahWithRuta!!.isNotEmpty()) {
-                                        mahasiswaWithAll.listWilayahWithRuta!!.forEach { wilayahWithRuta ->
+                                    if (mahasiswaWithAll.listWilayahWithAll!!.isNotEmpty()) {
+                                        mahasiswaWithAll.listWilayahWithAll!!.forEach { wilayahWithAll ->
                                             Row(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -479,7 +482,7 @@ fun StatusListingCard(
                                             ) {
                                                 Column {
                                                     Text(
-                                                        text = wilayahWithRuta.wilayah!!.noBS,
+                                                        text = wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.noBS,
                                                         style = TextStyle(
                                                             fontFamily = PoppinsFontFamily,
                                                             fontWeight = FontWeight.Medium,
@@ -491,7 +494,7 @@ fun StatusListingCard(
                                                         color = Color.DarkGray
                                                     )
                                                     Text(
-                                                        text = wilayahWithRuta.wilayah!!.namaKel!!,
+                                                        text = wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.namaKel!!,
                                                         style = TextStyle(
                                                             fontFamily = PoppinsFontFamily,
                                                             fontWeight = FontWeight.Medium,
@@ -502,7 +505,7 @@ fun StatusListingCard(
                                                         )
                                                     )
                                                     Text(
-                                                        text = wilayahWithRuta.wilayah!!.namaKec!!,
+                                                        text = wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.namaKec!!,
                                                         style = TextStyle(
                                                             fontFamily = PoppinsFontFamily,
                                                             fontWeight = FontWeight.Medium,
@@ -514,7 +517,7 @@ fun StatusListingCard(
                                                     )
                                                 }
                                                 Text(
-                                                    text = wilayahWithRuta.wilayah!!.status!!.uppercase(Locale.getDefault()),
+                                                    text = wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.status!!.uppercase(Locale.getDefault()),
                                                     style = TextStyle(
                                                         fontFamily = PoppinsFontFamily,
                                                         fontWeight = FontWeight.Medium,
@@ -573,8 +576,8 @@ fun ProgresListingCard(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (mahasiswaWithAll.listWilayahWithRuta!!.isNotEmpty()) {
-                        mahasiswaWithAll.listWilayahWithRuta!!.forEach { wilayahWithRuta ->
+                    if (mahasiswaWithAll.listWilayahWithAll!!.isNotEmpty()) {
+                        mahasiswaWithAll.listWilayahWithAll!!.forEach { wilayahWithAll ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -588,7 +591,7 @@ fun ProgresListingCard(
                             ) {
                                 Column {
                                     Text(
-                                        text = wilayahWithRuta.wilayah!!.noBS,
+                                        text = wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.noBS,
                                         style = TextStyle(
                                             fontFamily = PoppinsFontFamily,
                                             fontWeight = FontWeight.Medium,
@@ -601,9 +604,17 @@ fun ProgresListingCard(
                                     )
                                 }
 
-                                AnimatedCircularProgressIndicator(
-                                    currentValue = wilayahWithRuta.listRuta!!.size,
-                                    maxValue = (if (wilayahWithRuta.wilayah!!.jmlRt == 0) 99 else wilayahWithRuta.wilayah!!.jmlRt)!!,
+                                var jmlRuta = 0
+
+                                if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
+                                    wilayahWithAll.listKeluargaWithRuta!!.forEach { keluarga ->
+                                        jmlRuta += keluarga.listRuta.size
+                                    }
+                                }
+
+                                com.polstat.pkl.ui.screen.components.AnimatedCircularProgressIndicator(
+                                    currentValue = jmlRuta,
+                                    maxValue = (if (wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.jmlRuta == 0) 99 else wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.jmlRuta)!!,
                                     progressBackgroundColor = PklPrimary100,
                                     progressIndicatorColor = PklPrimary900,
                                     completedColor = PklPrimary900,
@@ -669,103 +680,103 @@ fun ProgresListingCard(
 //    WilayahKerjaCard(listWilayah = listOf(wilayah1))
 //}
 
-val sessionPml = Session(
-    nama = "Falana Rofako",
-    nim = "222112038",
-    avatar = "avatar_falana",
-    isKoor = true,
-    id_kuesioner = "00000",
-    idTim = ""
-)
-
-val sessionPpl = Session(
-    nama = "Satria Baja Hitam",
-    nim = "111222333",
-    avatar = "avatar_satria",
-    isKoor = false,
-    id_kuesioner = "11111",
-    idTim = ""
-)
-
-val wilayah1 = Wilayah(
-    catatan = "Catatan untuk wilayah 1",
-    idKab = "001",
-    idKec = "001",
-    idKel = "001",
-    jmlGenZ = 100,
-    jmlRt = 20,
-    jmlRtGenz = 10,
-    namaKab = "Nama Kabupaten 1",
-    namaKec = "Nama Kecamatan 1",
-    namaKel = "Nama Kelurahan 1",
-    noBS = "444A",
-    ruta = listOf(/*isi dengan instance Ruta*/),
-    status = "ready",
-    tglListing = Date(),
-    tglPeriksa = Date()
-)
-
-val wilayah2 = Wilayah(
-    catatan = "Catatan untuk wilayah 2",
-    idKab = "002",
-    idKec = "002",
-    idKel = "002",
-    jmlGenZ = 200,
-    jmlRt = 40,
-    jmlRtGenz = 20,
-    namaKab = "Nama Kabupaten 2",
-    namaKec = "Nama Kecamatan 2",
-    namaKel = "Nama Kelurahan 2",
-    noBS = "444B",
-    ruta = listOf(/*isi dengan instance Ruta*/),
-    status = "listing",
-    tglListing = Date(),
-    tglPeriksa = Date()
-)
-
-val mahasiswa1 = Mahasiswa(
-    alamat = "Jl. Pemuda No. 123, Surabaya",
-    email = "mahasiswa1@example.com",
-    foto = sessionPpl.avatar,
-    id_tim = "001",
-    isKoor = false,
-    nama = sessionPpl.nama,
-    nim = sessionPpl.nim!!,
-    no_hp = "081234567890",
-    password = "password1",
-    wilayah_kerja = listOf(wilayah1)
-)
-
-val mahasiswa2 = Mahasiswa(
-    alamat = "Jl. Veteran No. 456, Malang",
-    email = "mahasiswa2@example.com",
-    foto = "foto_mahasiswa2.jpg",
-    id_tim = "001",
-    isKoor = false,
-    nama = "Mahasiswa Dua",
-    nim = "87654321",
-    no_hp = "098765432109",
-    password = "password2",
-    wilayah_kerja = listOf(wilayah2)
-)
-
-
-val dataTimPpl = DataTim(
-    anggota = emptyList(),
-    idTim = "001",
-    namaTim = "Tim Modul 1",
-    passPML = "12345678",
-    namaPML = sessionPml.nama,
-    nimPML = sessionPml.nim,
-    teleponPML = "08585858585"
-)
-
-val dataTimPml = DataTim(
-    anggota = listOf(mahasiswa1, mahasiswa2),
-    idTim = "001",
-    namaTim = "Tim Modul 1",
-    passPML = "12345678",
-    namaPML = sessionPml.nama,
-    nimPML = sessionPml.nim,
-    teleponPML = "08585858585"
-)
+//val sessionPml = Session(
+//    nama = "Falana Rofako",
+//    nim = "222112038",
+//    avatar = "avatar_falana",
+//    isKoor = true,
+//    id_kuesioner = "00000",
+//    idTim = ""
+//)
+//
+//val sessionPpl = Session(
+//    nama = "Satria Baja Hitam",
+//    nim = "111222333",
+//    avatar = "avatar_satria",
+//    isKoor = false,
+//    id_kuesioner = "11111",
+//    idTim = ""
+//)
+//
+//val wilayah1 = Wilayah(
+//    catatan = "Catatan untuk wilayah 1",
+//    idKab = "001",
+//    idKec = "001",
+//    idKel = "001",
+//    jmlGenZ = 100,
+//    jmlRt = 20,
+//    jmlRtGenz = 10,
+//    namaKab = "Nama Kabupaten 1",
+//    namaKec = "Nama Kecamatan 1",
+//    namaKel = "Nama Kelurahan 1",
+//    noBS = "444A",
+//    ruta = listOf(/*isi dengan instance Ruta*/),
+//    status = "ready",
+//    tglListing = Date(),
+//    tglPeriksa = Date()
+//)
+//
+//val wilayah2 = Wilayah(
+//    catatan = "Catatan untuk wilayah 2",
+//    idKab = "002",
+//    idKec = "002",
+//    idKel = "002",
+//    jmlGenZ = 200,
+//    jmlRt = 40,
+//    jmlRtGenz = 20,
+//    namaKab = "Nama Kabupaten 2",
+//    namaKec = "Nama Kecamatan 2",
+//    namaKel = "Nama Kelurahan 2",
+//    noBS = "444B",
+//    ruta = listOf(/*isi dengan instance Ruta*/),
+//    status = "listing",
+//    tglListing = Date(),
+//    tglPeriksa = Date()
+//)
+//
+//val mahasiswa1 = Mahasiswa(
+//    alamat = "Jl. Pemuda No. 123, Surabaya",
+//    email = "mahasiswa1@example.com",
+//    foto = sessionPpl.avatar,
+//    id_tim = "001",
+//    isKoor = false,
+//    nama = sessionPpl.nama,
+//    nim = sessionPpl.nim!!,
+//    no_hp = "081234567890",
+//    password = "password1",
+//    wilayah_kerja = listOf(wilayah1)
+//)
+//
+//val mahasiswa2 = Mahasiswa(
+//    alamat = "Jl. Veteran No. 456, Malang",
+//    email = "mahasiswa2@example.com",
+//    foto = "foto_mahasiswa2.jpg",
+//    id_tim = "001",
+//    isKoor = false,
+//    nama = "Mahasiswa Dua",
+//    nim = "87654321",
+//    no_hp = "098765432109",
+//    password = "password2",
+//    wilayah_kerja = listOf(wilayah2)
+//)
+//
+//
+//val dataTimPpl = DataTim(
+//    anggota = emptyList(),
+//    idTim = "001",
+//    namaTim = "Tim Modul 1",
+//    passPML = "12345678",
+//    namaPML = sessionPml.nama,
+//    nimPML = sessionPml.nim,
+//    teleponPML = "08585858585"
+//)
+//
+//val dataTimPml = DataTim(
+//    anggota = listOf(mahasiswa1, mahasiswa2),
+//    idTim = "001",
+//    namaTim = "Tim Modul 1",
+//    passPML = "12345678",
+//    namaPML = sessionPml.nama,
+//    nimPML = sessionPml.nim,
+//    teleponPML = "08585858585"
+//)

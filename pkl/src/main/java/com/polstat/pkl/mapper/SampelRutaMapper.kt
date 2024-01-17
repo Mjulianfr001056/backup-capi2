@@ -5,6 +5,7 @@ import com.polstat.pkl.model.domain.SampelRuta
 
 fun SampelRuta.toSampelRutaEntity(): SampelRutaEntity {
     return SampelRutaEntity(
+        noBS = noBS,
         kodeRuta = kodeRuta,
         SLS = SLS,
         noSegmen = noSegmen,
@@ -25,6 +26,7 @@ fun SampelRuta.toSampelRutaEntity(): SampelRutaEntity {
 
 fun SampelRutaEntity.toSampelRuta(): SampelRuta {
     return SampelRuta(
+        noBS = noBS,
         kodeRuta = kodeRuta,
         SLS = SLS,
         noSegmen = noSegmen,
