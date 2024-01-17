@@ -1,6 +1,8 @@
 package com.polstat.pkl.viewmodel
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,12 +15,14 @@ import com.polstat.pkl.model.response.AuthResponse
 import com.polstat.pkl.repository.AuthRepository
 import com.polstat.pkl.repository.DataTimRepository
 import com.polstat.pkl.repository.LocalRutaRepository
+import com.polstat.pkl.repository.LocationRepository
 import com.polstat.pkl.repository.MahasiswaRepository
 import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.ui.event.LoginScreenEvent
 import com.polstat.pkl.ui.state.LoginScreenState
 import com.polstat.pkl.utils.Result
+import com.polstat.pkl.utils.location.GetLocationUseCase
 import com.polstat.pkl.utils.use_case.ValidateNim
 import com.polstat.pkl.utils.use_case.ValidatePassword
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,12 +30,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@RequiresApi(Build.VERSION_CODES.S)
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
@@ -41,7 +47,9 @@ class AuthViewModel @Inject constructor(
     private val wilayahRepository: WilayahRepository,
     private val localRutaRepository: LocalRutaRepository,
     private val validateNim: ValidateNim,
-    private val validatePassword: ValidatePassword
+    private val validatePassword: ValidatePassword,
+    private val getLocationUseCase: GetLocationUseCase,
+    private val locationRepository: LocationRepository
 ) : ViewModel() {
 
     var state by mutableStateOf(LoginScreenState())
@@ -60,7 +68,7 @@ class AuthViewModel @Inject constructor(
 
     val errorMessage = _errorMessage.asStateFlow()
 
-//    private val _session = sessionRepository.getActiveSession()
+    private val _session = sessionRepository.getActiveSession()
 
     private val _showLoadingChannel = Channel<Boolean>()
 
@@ -69,6 +77,29 @@ class AuthViewModel @Inject constructor(
     private val _showErrorToastChannel = Channel<Boolean>()
 
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
+
+    private val _countdown = MutableStateFlow(10)
+
+    val countdown: StateFlow<Int> = _countdown.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            while (true) {
+                delay(1000)
+                if (_countdown.value > 0) {
+                    _countdown.value--
+                } else {
+                    getLocationUseCase.invoke().collect { location ->
+                        if (location != null && _session?.nim != null) {
+                            locationRepository.updateLocation(_session.nim,location.longitude,location.latitude,location.accuracy)
+                        }
+                        Log.d(TAG, "getLocationUseCase: ${location!!.latitude}, ${location.longitude}, ${location.accuracy}")
+                    }
+                    _countdown.value = 10
+                }
+            }
+        }
+    }
 
     @Suppress("NAME_SHADOWING")
     fun login(
