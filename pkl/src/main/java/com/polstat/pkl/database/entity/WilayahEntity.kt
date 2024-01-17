@@ -14,7 +14,10 @@ data class WilayahEntity (
     val namaKec: String? = "",
     val idKel: String? = "",
     val namaKel: String? = "",
-    val jmlRt: Int? = 0,
+    val jmlKlg: Int? = 0,
+    val jmlKlgEgb: Int? = 0,
+    val jmlRuta: Int? = 0,
+    val jmlRutaEgb: Int? = 0,
     val tglListing: Date? = Date(),
     val tglPeriksa: Date? = Date(),
     val catatan: String? = "",
@@ -22,5 +25,5 @@ data class WilayahEntity (
     val nim: String? = ""
 )
 {
-    constructor() : this("", "", "", "", "", "", "", 0, Date(), Date(), "", "")
+    constructor() : this("", "", "", "", "", "", "", 0, 0, 0, 0, Date(), Date(), "", "")
 }

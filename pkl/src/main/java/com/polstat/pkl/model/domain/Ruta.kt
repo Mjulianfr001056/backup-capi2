@@ -12,5 +12,5 @@ data class Ruta(
     val lat: Double? = 0.0,
     val catatan: String? = "",
     val noBS: String? = "",
-    var status: String? = ""
+    val status: String? = ""
 )
