@@ -31,13 +31,10 @@
     <string name="telah_n_disampel">Telah\nDisampel</string>
     <string name="sampel_n_terkirim">Sampel\nTerkirim</string>
     <string name="rekapitulasi">Rekapitulasi</string>
-    <string name="jmlRT">Jumlah Rumah Tangga:&#xa0;</string>
-    <string name="jmlRTZ">Jumlah Rumah Tangga dengan ART Z:&#xa0;</string>
-    <string name="genz_satuBS">Gen Z dalam Satu Blok Sensus</string>
-    <string name="jml_genz">Jumlah Gen Z:&#xa0;</string>
-    <string name="jml_genz_blm_kwn">Jumlah Gen Z Belum Kawin:&#xa0;</string>
-    <string name="genz_dewasa">Jumlah Gen Z Dewasa:&#xa0;</string>
-    <string name="genz_anak">Jumlah Gen Z Anak:&#xa0;</string>
+    <string name="jmlKlg">Jumlah Keluarga:&#xa0;</string>
+    <string name="jmlKlgEgb">Jumlah Keluarga Eligible:&#xa0;</string>
+    <string name="jmlRuta">Jumlah Ruta:&#xa0;</string>
+    <string name="jmlRutaEgb">Jumlah Ruta Eligible:&#xa0;</string>
     <string name="total">Total</string>
     <string name="toggle">Toggle</string>
     <string name="lihat_ruta">Lihat Ruta</string>
@@ -60,4 +57,12 @@
     <string name="close_popup_list_ruta">close</string>
     <string name="search_list_ruta">Masukkan kode ruta atau nama kepala ruta</string>
     <string name="search_list_sampel">Masukkan kata kunci</string>
+    <string name="identifikasi_kk_krt">Identifikasi KK/KRT</string>
+    <string name="kategori_jml_genz">Kategori Jumlah Gen Z</string>
+    <string name="sls">Satuan Lingkungan Setempat (SLS)</string>
+    <string name="nomor_urut_keluarga">Nomor Urut Keluarga</string>
+    <string name="nama_kepala_keluarga">Nama Kepala Keluarga</string>
+    <string name="keberadaan_genz_ortu_keluarga">Keberadaan Gen Z dan Orang Tua dalam Keluarga</string>
+    <string name="no_urut_keluarga_egb">Nomor Urut Keluarga Eligible</string>
+    <string name="jml_pengelolaan_makan_keluarga">Jumlah Pengelolaan Makan/Minum dan Kebutuhan dalam Keluarga</string>
 </resources>

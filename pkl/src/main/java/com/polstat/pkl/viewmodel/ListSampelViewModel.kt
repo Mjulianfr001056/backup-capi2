@@ -132,13 +132,13 @@ class ListSampelViewModel @Inject constructor(
         val filteredList = listSampelRuta.filter {
             (searchText.isBlank() || it.namaKrt?.contains(searchText, ignoreCase = true) == true) ||
                     (searchText.isBlank() || it.noUrutRuta.toString()?.contains(searchText, ignoreCase = true) == true) ||
-                    (searchText.isBlank() || it.noBS?.contains(searchText, ignoreCase = true) == true) ||
+                    (searchText.isBlank() || it.SLS.contains(searchText, ignoreCase = true) == true) ||
                     (searchText.isBlank() || it.alamat?.contains(searchText, ignoreCase = true) == true) ||
                     (searchText.isBlank() || it.kodeRuta?.contains(searchText, ignoreCase = true) == true) ||
                     (searchText.isBlank() || it.noBgFisik.toString()?.contains(searchText, ignoreCase = true) == true) ||
                     (searchText.isBlank() || it.noBgSensus.toString()?.contains(searchText, ignoreCase = true) == true) ||
                     (searchText.isBlank() || it.noSegmen.toString()?.contains(searchText, ignoreCase = true) == true) ||
-                    (searchText.isBlank() || it.noUrutRtEgb.toString()?.contains(searchText, ignoreCase = true) == true)
+                    (searchText.isBlank() || it.noUrutRutaEgb.toString()?.contains(searchText, ignoreCase = true) == true)
         }
 
         return filteredList

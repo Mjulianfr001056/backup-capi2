@@ -7,17 +7,21 @@ import androidx.room.PrimaryKey
 data class SampelRutaEntity (
     @PrimaryKey(autoGenerate = false)
     var kodeRuta: String = "",
-    var noUrutRuta: Int? = 0,
-    var kkOrKrt: String? = "",
-    var namaKrt: String? = "",
-    var genzOrtu: String? = "",
-    var katGenz: String? = "",
-    var long: Double? = 0.0,
-    var lat: Double? = 0.0,
-    var catatan: String? = "",
-    var noBS: String? = "",
-    var status: String? = ""
+    var SLS: String = "",
+    var noSegmen: Int = 0,
+    var noBgFisik: String = "",
+    var noBgSensus: String = "",
+    var noUrutKlg: String = "",
+    var noUrutRuta: Int = 0,
+    var noUrutRutaEgb: Int = 0,
+    var genzOrtuKeluarga: String = "",
+    var alamat: String = "",
+    var namaKrt: String = "",
+    var genzOrtuRuta: Int = 0,
+    var long: Double = 0.0,
+    var lat: Double = 0.0,
+    var status: String = ""
 )
 {
-    constructor() : this("", 0, "", "", "", "", 0.0, 0.0, "", "", "")
+    constructor() : this("", "", 0, "", "", "", 0, 0,"", "", "",0, 0.0, 0.0, "")
 }
