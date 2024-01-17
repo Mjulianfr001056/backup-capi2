@@ -13,5 +13,6 @@ data class Keluarga (
     val isGenzOrtu: Int? = 0,
     val penglMkn: Int? = 0,
     val noBS: String? = "",
-    val ruta: List<Ruta>
+    val ruta: List<Ruta>? = emptyList(),
+    val status: String? = ""
 )

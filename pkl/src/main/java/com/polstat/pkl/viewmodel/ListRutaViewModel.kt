@@ -4,11 +4,13 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.polstat.pkl.database.entity.RutaEntity
+import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.database.relation.WilayahWithRuta
+import com.polstat.pkl.mapper.toKeluargaDto
 import com.polstat.pkl.mapper.toRuta
 import com.polstat.pkl.mapper.toRutaDtoList
 import com.polstat.pkl.model.domain.Ruta
+import com.polstat.pkl.model.request.JsonKlg
 import com.polstat.pkl.model.request.SyncRutaRequest
 import com.polstat.pkl.model.response.SyncRutaResponse
 import com.polstat.pkl.repository.LocalRutaRepository
@@ -47,6 +49,10 @@ class ListRutaViewModel @Inject constructor(
     private val _wilayahWithRuta = MutableStateFlow(WilayahWithRuta())
 
     val wilayahWithRuta = _wilayahWithRuta.asStateFlow()
+
+    private val _wilayahWithAll = MutableStateFlow(WilayahWithAll())
+
+    val wilayahWithAll = _wilayahWithAll.asStateFlow()
 
     private val _synchronizeRuta = MutableStateFlow(SyncRutaResponse())
 
@@ -109,14 +115,22 @@ class ListRutaViewModel @Inject constructor(
     }
 
     fun synchronizeRuta(
-        listRuta: List<RutaEntity>,
+        wilayahWithAll: WilayahWithAll,
         nim: String,
         noBS: String
     ) {
+        val jsonKlgInstance = JsonKlg()
+
+        if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
+            wilayahWithAll.listKeluargaWithRuta.forEach{ keluargaWithRuta ->
+                jsonKlgInstance.add(keluargaWithRuta.keluarga.toKeluargaDto(keluargaWithRuta.listRuta.toRutaDtoList()))
+            }
+        }
+
         val syncRutaRequest = SyncRutaRequest(
             nim = nim,
-            noBS = noBS,
-            json = listRuta.toRutaDtoList()
+            no_bs = noBS,
+            json = jsonKlgInstance
         )
         viewModelScope.launch {
             remoteRutaRepository.sinkronisasiRuta(syncRutaRequest).collectLatest { result ->

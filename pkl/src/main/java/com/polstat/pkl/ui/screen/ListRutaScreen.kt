@@ -67,7 +67,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import com.polstat.pkl.R
+import com.polstat.pkl.database.entity.KeluargaEntity
 import com.polstat.pkl.database.entity.RutaEntity
+import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.navigation.CapiScreen
 import com.polstat.pkl.ui.theme.*
@@ -99,8 +101,7 @@ fun ListRutaScreen(
     var text by remember { mutableStateOf("") }
     val noBS = viewModel.noBS
     val session = viewModel.session
-    val wilayahWithRuta = viewModel.wilayahWithRuta.collectAsState()
-//    var wilayah = authViewModel.getWilayahFromSession()
+    val wilayahWithAll = viewModel.wilayahWithAll.collectAsState()
 
     Scaffold(
         topBar = {
@@ -146,7 +147,7 @@ fun ListRutaScreen(
                         viewModel.synchronizeRuta(
                             nim = session!!.nim!!,
                             noBS = noBS!!,
-                            listRuta = wilayahWithRuta.value.listRuta!!
+                            wilayahWithAll = wilayahWithAll.value
                         )
                     }) {
                         Icon(
@@ -281,7 +282,7 @@ fun ListRutaScreen(
                     }
 
                 }
-                RutaList(listRuta = wilayahWithRuta.value.listRuta!!)
+                RutaList(wilayahWithAll =  wilayahWithAll.value)
             }
         },
         floatingActionButton = {
@@ -307,6 +308,7 @@ fun ListRutaScreen(
 @Composable
 fun RutaRow(
     no: Int,
+    keluarga: KeluargaEntity,
     ruta: RutaEntity
 ) {
     var openActionDialog by remember { mutableStateOf(false) }
@@ -331,13 +333,13 @@ fun RutaRow(
             fontSize = 16.sp
         )
         Text(
-            text = "${ruta.noBgFisik}",
+            text = "${keluarga.noBgFisik}",
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
         )
         Text(
-            text = "${ruta.noBgSensus}",
+            text = "${keluarga.noBgSensus}",
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
@@ -406,40 +408,68 @@ fun RutaRow(
                                 .weight(1f)
                         ) {
                             DetailRutaTextField(
+                                label = R.string.sls,
+                                value = "${keluarga.SLS}"
+                            )
+                            DetailRutaTextField(
                                 label = R.string.nomor_segmen_ruta,
-                                value = "${ruta.noSegmen}"
+                                value = "${keluarga.noSegmen}"
                             )
                             DetailRutaTextField(
                                 label = R.string.nomor_urut_bangunan_fisik_ruta,
-                                value = "${ruta.noBgFisik}"
+                                value = "${keluarga.noBgFisik}"
                             )
                             DetailRutaTextField(
                                 label = R.string.nomor_urut_bangunan_sensus_ruta,
-                                value = "${ruta.noBgSensus}"
+                                value = "${keluarga.noBgSensus}"
+                            )
+                            DetailRutaTextField(
+                                label = R.string.nomor_urut_keluarga,
+                                value = "${keluarga.noUrutKlg}"
+                            )
+                            DetailRutaTextField(
+                                label = R.string.nama_kepala_keluarga,
+                                value = "${keluarga.namaKK}"
+                            )
+                            DetailRutaTextField(
+                                label = R.string.alamat_ruta,
+                                value = keluarga.alamat!!
+                            )
+                            DetailRutaTextField(
+                                label = R.string.keberadaan_genz_ortu_keluarga,
+                                value = "${keluarga.isGenzOrtu}"
+                            )
+                            DetailRutaTextField(
+                                label = R.string.no_urut_keluarga_egb,
+                                value = "${keluarga.noUrutKlgEgb}"
+                            )
+                            DetailRutaTextField(
+                                label = R.string.jml_pengelolaan_makan_keluarga,
+                                value = "${keluarga.penglMkn}"
                             )
                             DetailRutaTextField(
                                 label = R.string.nomor_urut_krt_ruta,
                                 value = "${ruta.noUrutRuta}"
                             )
                             DetailRutaTextField(
+                                label = R.string.identifikasi_kk_krt,
+                                value = "${ruta.kkOrKrt}"
+                            )
+                            DetailRutaTextField(
                                 label = R.string.nama_krt_ruta,
                                 value = ruta.namaKrt!!
                             )
                             DetailRutaTextField(
-                                label = R.string.alamat_ruta,
-                                value = ruta.alamat!!
-                            )
-                            DetailRutaTextField(
                                 label = R.string.keberadaan_genz_ortu_ruta,
-                                value = if (ruta.GenzOrtu == "1") "Ya" else "Tidak"
+                                value = "${ruta.genzOrtu}"
                             )
                             DetailRutaTextField(
-                                label = R.string.jml_genz_yang_belum_kawin_dalam_ruta,
-                                value = "${ruta.jmlGenz}"
+                                label = R.string.kategori_jml_genz,
+                                value = "${ruta.katGenz}"
                             )
                             DetailRutaTextField(
                                 label = R.string.nomor_urut_ruta_egb,
-                                value = "${ruta.noUrutRtEgb}"
+                                value = "${ruta.noUrutRutaEgb}"
                             )
                             DetailRutaTextField(
                                 label = R.string.catatan,
@@ -638,17 +668,53 @@ fun RutaRow(
 }
 
 @Composable
-fun RutaList(listRuta: List<RutaEntity>) {
-    LazyColumn(modifier = Modifier.fillMaxHeight(),
+fun RutaList(wilayahWithAll: WilayahWithAll) {
+//    var no = 0
+//
+//    Column {
+//        if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
+//            wilayahWithAll.listKeluargaWithRuta.forEach { keluargaWithRuta ->
+//                if (keluargaWithRuta.listRuta.isNotEmpty()) {
+//                    keluargaWithRuta.listRuta.forEach {ruta ->
+//                        no++
+//                        RutaRow(
+//                            no = no,
+//                            keluarga = keluargaWithRuta.keluarga,
+//                            ruta = ruta
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+    LazyColumn(
+        modifier = Modifier.fillMaxHeight(),
         content = {
-            items(listRuta.size) { index ->
-                val ruta = listRuta[index]
-                RutaRow(
-                    no = index + 1,
-                    ruta = ruta
-                )
+            if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
+                wilayahWithAll.listKeluargaWithRuta.forEach { keluargaWithRuta ->
+                    if (keluargaWithRuta.listRuta.isNotEmpty()) {
+                        items(keluargaWithRuta.listRuta.size) { index ->
+                            val ruta = keluargaWithRuta.listRuta[index]
+                            RutaRow(
+                                no = index + 1,
+                                keluarga = keluargaWithRuta.keluarga,
+                                ruta = ruta
+                            )
+                        }
+                    }
+                }
             }
-        })
+//            items(listRuta.size) { index ->
+//                val ruta = listRuta[index]
+//                RutaRow(
+//                    no = index + 1,
+//                    ruta = ruta,
+//                    keluarga = keluarga
+//                )
+//            }
+        }
+    )
 }
 
 @Composable

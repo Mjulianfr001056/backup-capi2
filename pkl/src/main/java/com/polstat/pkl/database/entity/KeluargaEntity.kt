@@ -17,8 +17,9 @@ data class KeluargaEntity (
     val alamat: String? = "",
     val isGenzOrtu: Int? = 0,
     val penglMkn: Int? = 0,
-    val noBS: String? = ""
+    val noBS: String? = "",
+    val status: String? =""
 )
 {
-    constructor() : this("", "", 0, 0, "", 0, 0, "", "", 0, 0, "")
+    constructor() : this("", "", 0, 0, "", 0, 0, "", "", 0, 0, "", "")
 }

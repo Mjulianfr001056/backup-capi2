@@ -6,7 +6,7 @@ data class Ruta(
     val noUrutRutaEgb: Int? = 0,
     val kkOrKrt: String? = "",
     val namaKrt: String? = "",
-    val isGenzOrtu: String? = "",
+    val isGenzOrtu: Int? = 0,
     val katGenz: String? = "",
     val long: Double? = 0.0,
     val lat: Double? = 0.0,
