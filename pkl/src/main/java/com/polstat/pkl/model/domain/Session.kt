@@ -6,5 +6,6 @@ data class Session (
     val avatar: String?,
     val isKoor: Boolean?,
     val id_kuesioner: String?,
-    val idTim: String?
+    val idTim: String?,
+    val token: String?
 )

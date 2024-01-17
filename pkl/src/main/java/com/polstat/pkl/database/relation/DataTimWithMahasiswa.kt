@@ -10,7 +10,7 @@ data class DataTimWithMahasiswa (
     val dataTim: DataTimEntity? = DataTimEntity(),
     @Relation(
         parentColumn = "idTim",
-        entityColumn = "id_tim"
+        entityColumn = "idTim"
     )
     val listMahasiswa: List<MahasiswaEntity>? = emptyList()
 )

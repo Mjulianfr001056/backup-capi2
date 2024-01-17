@@ -1,5 +1,8 @@
 package com.polstat.pkl.di
 
+import com.google.gson.FieldNamingPolicy
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.polstat.pkl.database.Capi63Database
 import com.polstat.pkl.network.AuthApi
 import com.polstat.pkl.network.LocationApi
@@ -28,7 +31,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
-    val BASE_URL = "https://0cff-111-94-54-200.ngrok-free.app/"
+    private val BASE_URL = "https://0cff-111-94-54-200.ngrok-free.app/"
 
     @Provides
     @Singleton
@@ -43,9 +46,17 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(client: OkHttpClient): Retrofit {
+    fun provideGson(): Gson {
+        return GsonBuilder()
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .create()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(gson: Gson, client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .baseUrl(BASE_URL)
             .client(client)
             .build()

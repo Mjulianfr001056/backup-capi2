@@ -4,6 +4,8 @@ import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
 import com.polstat.pkl.database.Capi63Database
 import com.polstat.pkl.database.entity.WilayahEntity
+import com.polstat.pkl.database.relation.KeluargaWithRuta
+import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.database.relation.WilayahWithRuta
 import com.polstat.pkl.mapper.toWilayahEntity
 import com.polstat.pkl.model.domain.Wilayah
@@ -49,11 +51,8 @@ class WilayahRepositoryImpl @Inject constructor(
         return flow {
             try {
                 emit(Result.Loading(true))
-
                 val wilayahWithRuta = capi63Database.capi63Dao.getWilayahWithRuta(noBS)
-
                 Log.d(TAG, "Berhasil getWilayahWithRuta: $wilayahWithRuta")
-
                 emit(Result.Success(wilayahWithRuta))
             } catch (e: Exception) {
                 Log.d(TAG, "Gagal getWilayahWithRuta: ${e.message}")
@@ -70,15 +69,38 @@ class WilayahRepositoryImpl @Inject constructor(
         return flow {
             try {
                 emit(Result.Loading(true))
-
                 val wilayahList = capi63Database.capi63Dao.getWilayahByNIM(nim)
-
                 Log.d(TAG, "Berhasil getWilayahByNIM: $wilayahList")
-
                 emit(Result.Success(wilayahList))
             } catch (e: Exception) {
                 Log.d(TAG, "Gagal getWilayahByNIM: ${e.message}")
                 emit(Result.Error(null, "Error fetching WilayahByNIM: ${e.message}"))
+            } finally {
+                emit(Result.Loading(false))
+            }
+        }
+    }
+
+    override suspend fun getWilayahWithAll(
+        noBS: String
+    ): Flow<Result<WilayahWithAll>> {
+        return flow {
+            try {
+                emit(Result.Loading(true))
+                val wilayahWithKeluarga = capi63Database.capi63Dao.getWilayahWithKeluarga(noBS)
+                val listKeluargaWithRuta = wilayahWithKeluarga.listKeluarga?.map { keluarga ->
+                    val ruta = capi63Database.capi63Dao.getKeluargaWithRuta(keluarga.kodeKlg)
+                    KeluargaWithRuta(keluarga, ruta.listRuta)
+                }
+                val wilayahWithAll = WilayahWithAll(
+                    wilayahWithKeluarga = wilayahWithKeluarga,
+                    listKeluargaWithRuta = listKeluargaWithRuta
+                )
+                Log.d(TAG, "Berhasil getWilayahWithAll: $wilayahWithAll")
+                emit(Result.Success(wilayahWithAll))
+            } catch (e: Exception) {
+                Log.d(TAG, "Gagal getWilayahWithAll: ${e.message}")
+                emit(Result.Error(null, "Error fetching WilayahWithAll: ${e.message}"))
             } finally {
                 emit(Result.Loading(false))
             }

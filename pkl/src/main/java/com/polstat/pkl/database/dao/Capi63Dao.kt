@@ -7,12 +7,15 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.polstat.pkl.database.entity.DataTimEntity
+import com.polstat.pkl.database.entity.KeluargaEntity
 import com.polstat.pkl.database.entity.MahasiswaEntity
 import com.polstat.pkl.database.entity.RutaEntity
 import com.polstat.pkl.database.entity.SampelRutaEntity
 import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.database.relation.DataTimWithMahasiswa
+import com.polstat.pkl.database.relation.KeluargaWithRuta
 import com.polstat.pkl.database.relation.MahasiswaWithWilayah
+import com.polstat.pkl.database.relation.WilayahWithKeluarga
 import com.polstat.pkl.database.relation.WilayahWithRuta
 
 @Dao
@@ -36,6 +39,11 @@ interface Capi63Dao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertWilayah(wilayahEntity: WilayahEntity)
 
+    // Operasi database untuk entitas Keluarga
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertKeluarga(keluargaEntity: KeluargaEntity)
+
     // Operasi database untuk entitas Ruta
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -46,6 +54,9 @@ interface Capi63Dao {
 
     @Update
     suspend fun updateRuta(rutaEntity: RutaEntity)
+
+    @Query("SELECT * FROM ruta WHERE kodeRuta = :kodeRuta")
+    suspend fun getRuta(kodeRuta: String) : RutaEntity
 
 
     // Operasi database untuk entitas berelasi
@@ -60,6 +71,10 @@ interface Capi63Dao {
 
     @Transaction
     @Query("SELECT * FROM wilayah WHERE noBS = :noBS")
+    suspend fun getWilayahWithKeluarga(noBS: String) : WilayahWithKeluarga
+
+    @Transaction
+    @Query("SELECT * FROM wilayah WHERE noBS = :noBS")
     suspend fun getWilayahWithRuta(noBS: String) : WilayahWithRuta
 
     @Transaction
@@ -69,4 +84,8 @@ interface Capi63Dao {
     @Transaction
     @Query("SELECT * FROM sampel_ruta WHERE noBS = :noBS")
     suspend fun getSampelRutaByNoBS(noBS: String) : List<SampelRutaEntity>
+
+    @Transaction
+    @Query("SELECT * FROM keluarga WHERE kodeKlg = :kodeKlg")
+    suspend fun getKeluargaWithRuta(kodeKlg: String) : KeluargaWithRuta
 }

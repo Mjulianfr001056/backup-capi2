@@ -1,16 +1,14 @@
 package com.polstat.pkl.repository
 
 import android.util.Log
-import com.polstat.pkl.model.domain.DataTim
-import com.polstat.pkl.network.AuthApi
-import com.polstat.pkl.model.response.AuthResponse
 import com.polstat.pkl.model.domain.Session
+import com.polstat.pkl.model.response.AuthResponse
+import com.polstat.pkl.network.AuthApi
 import com.polstat.pkl.utils.Result
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import okio.IOException
 import retrofit2.HttpException
-
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -38,8 +36,9 @@ class AuthRepositoryImpl @Inject constructor(
                     nim = response.nim,
                     avatar = response.avatar,
                     isKoor = response.isKoor,
-                    id_kuesioner = response.id_kuesioner,
-                    idTim = response.dataTim.idTim
+                    id_kuesioner = response.idKuesioner,
+                    idTim = response.dataTim.idTim,
+                    token = response.token
                 )
                 saveSession(session)
                 Log.d(TAG, "Session was saved: $session")

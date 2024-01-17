@@ -37,11 +37,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,9 +47,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.navigation.Capi63Screen
+import com.polstat.pkl.ui.event.IsiRutaScreenEvent
 import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklAccent
 import com.polstat.pkl.ui.theme.PklBase
@@ -63,32 +60,24 @@ import com.polstat.pkl.ui.theme.PklPrimary700
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PklSecondary
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
+import com.polstat.pkl.viewmodel.IsiRutaViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IsiRumahTanggaScreen(
-    initialNoSegmen: String = "S001",
-    initialNoBangunanFisik: String = "001",
-    initialNoBangunanSensus: String = "001",
-    initialNoUrutRuta: String = "001",
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: IsiRutaViewModel
 ) {
-    val genZOptions = listOf("Ya", "Tidak")
-
-    var noSegmen by rememberSaveable { mutableStateOf(initialNoSegmen) }
-    var noBangunanFisik by rememberSaveable { mutableStateOf(initialNoBangunanFisik) }
-    var noBangunanSensus by rememberSaveable { mutableStateOf(initialNoBangunanSensus) }
-    var noUrutRuta by rememberSaveable { mutableStateOf(initialNoUrutRuta) }
-    var namaKepalaRuta by rememberSaveable { mutableStateOf("") }
-    var alamat by rememberSaveable { mutableStateOf("") }
-    var selectedGenZOption by rememberSaveable { mutableStateOf(genZOptions[0]) }
-    var jumlahGenZ by rememberSaveable { mutableStateOf("") }
-    var noUrutRutaEligible by rememberSaveable { mutableStateOf(initialNoUrutRuta) }
-    var catatan by rememberSaveable { mutableStateOf("") }
+    val state = viewModel.state
+    val genZOptions = listOf("Tidak", "Ya")
+    val noBS = viewModel.noBS
 
     Scaffold(
         topBar = {
-            IsiRumahTanggaTopBar(navController = navController)
+            IsiRumahTanggaTopBar(
+                navController = navController,
+                noBS = noBS!!
+            )
         },
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
@@ -126,7 +115,7 @@ fun IsiRumahTanggaScreen(
                         Spacer(modifier = Modifier.padding(10.dp))
 
                         Text(
-                            text = "No. Segmen: $noSegmen | No. BF: $noBangunanFisik | No. BS: $noBangunanSensus",
+                            text = "No. Segmen: ${state.noSegmen} | No. BF: ${state.noBgFisik} | No. BS: ${state.noBgSensus}",
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.Light
                         )
@@ -134,68 +123,68 @@ fun IsiRumahTanggaScreen(
                 }
 
                 InputNomor(
-                    value = noSegmen,
-                    onValueChange = { noSegmen = it },
+                    value = state.noSegmen,
+                    onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NoSegmenChanged(it)) },
                     label = {
                         Text(
                             text = "1. Nomor Segmen",
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.SemiBold
                         ) },
-                    onIncrement = { noSegmen = increment(noSegmen) },
-                    onDecrement = { noSegmen = decrement(noSegmen) }
+                    onIncrement = { viewModel.onEvent(IsiRutaScreenEvent.NoSegmenChanged(increment(state.noSegmen))) },
+                    onDecrement = { viewModel.onEvent(IsiRutaScreenEvent.NoSegmenChanged(decrement(state.noSegmen))) }
                 )
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 InputNomor(
-                    value = noBangunanFisik,
-                    onValueChange = { noBangunanFisik = it },
+                    value = state.noBgFisik,
+                    onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NoBgFisikChanged(it)) },
                     label = {
                         Text(
                             text = "2. Nomor Urut Bangunan Fisik",
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.SemiBold
                         ) },
-                    onIncrement = { noBangunanFisik = increment(noBangunanFisik) },
-                    onDecrement = { noBangunanFisik = decrement(noBangunanFisik) }
+                    onIncrement = { viewModel.onEvent(IsiRutaScreenEvent.NoBgFisikChanged(increment(state.noBgFisik))) },
+                    onDecrement = { viewModel.onEvent(IsiRutaScreenEvent.NoBgFisikChanged(increment(state.noBgFisik)))}
                 )
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 InputNomor(
-                    value = noBangunanSensus,
-                    onValueChange = { noBangunanSensus = it },
+                    value = state.noBgSensus,
+                    onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NoBgSensusChanged(it)) },
                     label = {
                         Text(
                             text = "3. Nomor Urut Bangunan Sensus",
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.SemiBold
                         ) },
-                    onIncrement = { noBangunanSensus = increment(noBangunanSensus) },
-                    onDecrement = { noBangunanSensus = decrement(noBangunanSensus) }
+                    onIncrement = { viewModel.onEvent(IsiRutaScreenEvent.NoBgSensusChanged(increment(state.noBgSensus))) },
+                    onDecrement = { viewModel.onEvent(IsiRutaScreenEvent.NoBgSensusChanged(increment(state.noBgSensus))) }
                 )
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 InputNomor(
-                    value = noUrutRuta,
-                    onValueChange = { noUrutRuta = it },
+                    value = state.noUrutRuta,
+                    onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRutaChanged(it)) },
                     label = {
                         Text(
                             text = "4. Nomor Urut Rumah Tangga",
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.SemiBold
                         ) },
-                    onIncrement = { noUrutRuta = increment(noUrutRuta) },
-                    onDecrement = { noUrutRuta = decrement(noUrutRuta) }
+                    onIncrement = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRutaChanged(increment(state.noUrutRuta))) },
+                    onDecrement = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRutaChanged(increment(state.noUrutRuta))) }
                 )
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 TextField(
-                    value = namaKepalaRuta,
-                    onValueChange = { namaKepalaRuta = it },
+                    value = state.namaKrt,
+                    onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NamaKrtChanged(it)) },
                     label = {
                         Text(
                             text = "5. Nama Kepala Rumah Tangga",
@@ -221,8 +210,8 @@ fun IsiRumahTanggaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 TextField(
-                    value = alamat,
-                    onValueChange = { alamat = it },
+                    value = state.alamat,
+                    onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.AlamatChanged(it)) },
                     label = {
                         Text(
                             text = "6. Alamat",
@@ -258,17 +247,17 @@ fun IsiRumahTanggaScreen(
 
                     RadioButtons(
                         options = genZOptions,
-                        selectedOption = selectedGenZOption,
-                        onOptionSelected = { option -> selectedGenZOption = option }
+                        selectedOption = state.isGenzOrtu,
+                        onOptionSelected = { option -> viewModel.onEvent(IsiRutaScreenEvent.IsGenzOrtuChanged(option))}
                     )
                 }
 
-                if (selectedGenZOption == "Ya") {
+                if (state.isGenzOrtu == "Ya") {
                     Spacer(modifier = Modifier.padding(10.dp))
 
                     TextField(
-                        value = jumlahGenZ,
-                        onValueChange = { jumlahGenZ = it },
+                        value = state.jmlGenz,
+                        onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.JmlGenzChanged(it)) },
                         label = {
                             Text(
                                 text = "8. Jumlah Gen Z yang belum kawin dalam rumah tangga",
@@ -294,24 +283,24 @@ fun IsiRumahTanggaScreen(
                     Spacer(modifier = Modifier.padding(10.dp))
 
                     InputNomor(
-                        value = noUrutRutaEligible,
-                        onValueChange = { noUrutRutaEligible = it },
+                        value = state.noUrutRtEgb,
+                        onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRtEgbChanged(it)) },
                         label = {
                             Text(
                                 text = "9. Nomor urut rumah tangga eligible",
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.SemiBold
                             ) },
-                        onIncrement = { noUrutRutaEligible = increment(noUrutRutaEligible) },
-                        onDecrement = { noUrutRutaEligible = decrement(noUrutRutaEligible) }
+                        onIncrement = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRtEgbChanged(increment(state.noUrutRtEgb))) },
+                        onDecrement = { viewModel.onEvent(IsiRutaScreenEvent.NoUrutRtEgbChanged(increment(state.noUrutRtEgb))) }
                     )
                 }
                 
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 TextField(
-                    value = catatan,
-                    onValueChange = { catatan = it },
+                    value = state.catatan,
+                    onValueChange = { viewModel.onEvent(IsiRutaScreenEvent.CatatanChanged(it)) },
                     label = {
                         Text(
                             text = "10. Catatan",
@@ -337,10 +326,19 @@ fun IsiRumahTanggaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        viewModel.onEvent(IsiRutaScreenEvent.submit)
+                        navController.navigate(Capi63Screen.ListRuta.route + "/${noBS}"){
+                            popUpTo(Capi63Screen.ListRuta.route + "/${noBS}"){
+                                inclusive = true
+                            }
+                        }
+                    },
                     shape = MaterialTheme.shapes.small,
                     contentPadding = PaddingValues(10.dp),
-                    modifier = Modifier.padding(horizontal = 2.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(horizontal = 2.dp)
+                        .fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)
                 ) {
                     Text(
@@ -444,7 +442,10 @@ fun InputNomor(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IsiRumahTanggaTopBar(navController: NavHostController) {
+fun IsiRumahTanggaTopBar(
+    navController: NavHostController,
+    noBS: String
+) {
     TopAppBar(
         title = {
             Text(
@@ -461,8 +462,8 @@ fun IsiRumahTanggaTopBar(navController: NavHostController) {
         navigationIcon = {
             IconButton(
                 onClick = {
-                    navController.navigate(Capi63Screen.ListRuta.route){
-                        popUpTo(Capi63Screen.ListRuta.route){
+                    navController.navigate(Capi63Screen.ListRuta.route + "/$noBS"){
+                        popUpTo(Capi63Screen.ListRuta.route + "/$noBS"){
                             inclusive = true
                         }
                     }
@@ -507,7 +508,8 @@ fun IsiRumahTanggaPreview() {
             color = MaterialTheme.colorScheme.background
         ) {
             IsiRumahTanggaScreen(
-                navController = navController
+                navController = navController,
+                viewModel = hiltViewModel()
             )
         }
     }

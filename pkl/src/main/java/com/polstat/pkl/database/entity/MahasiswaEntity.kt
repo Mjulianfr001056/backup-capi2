@@ -7,15 +7,15 @@ import androidx.room.PrimaryKey
 data class MahasiswaEntity (
     @PrimaryKey(autoGenerate = false)
     val nim: String = "",
-    val nama: String? = "",
-    val isKoor: Boolean? = false,
-    val password: String? = "",
     val alamat: String? = "",
     val email: String? = "",
     val foto: String? = "",
-    val id_tim: String? = "",
-    val no_hp: String? = ""
+    val idTim: String? = "",
+    val isKoor: Boolean? = false,
+    val nama: String? = "",
+    val noHp: String? = "",
+    val password: String? = "",
 )
 {
-    constructor() : this("","",false,"","","","","","")
+    constructor() : this("", "", "", "", "", false, "", "", "")
 }

@@ -1,7 +1,7 @@
 package com.polstat.pkl.mapper
 
 import com.polstat.pkl.database.entity.WilayahEntity
-import com.polstat.pkl.model.domain.Ruta
+import com.polstat.pkl.model.domain.Keluarga
 import com.polstat.pkl.model.domain.Wilayah
 
 fun Wilayah.toWilayahEntity(
@@ -16,9 +16,7 @@ fun Wilayah.toWilayahEntity(
         namaKec = namaKec,
         namaKel = namaKel,
         catatan = catatan,
-        jmlGenZ = jmlGenZ,
         jmlRt = jmlRt,
-        jmlRtGenz = jmlRtGenz,
         status = status,
         tglListing = tglListing,
         tglPeriksa = tglPeriksa,
@@ -27,23 +25,21 @@ fun Wilayah.toWilayahEntity(
 }
 
 fun WilayahEntity.toWilayah(
-    ruta: List<Ruta>
+    keluarga: List<Keluarga>
 ): Wilayah {
     return Wilayah(
-        catatan = catatan,
+        noBS = noBS,
         idKab = idKab,
         idKec = idKec,
         idKel = idKel,
-        jmlGenZ = jmlGenZ,
-        jmlRt = jmlRt,
-        jmlRtGenz = jmlRtGenz,
         namaKab = namaKab,
         namaKec = namaKec,
         namaKel = namaKel,
-        noBS = noBS,
-        ruta = ruta,
+        catatan = catatan,
+        jmlRt = jmlRt,
         status = status,
         tglListing = tglListing,
-        tglPeriksa = tglPeriksa
+        tglPeriksa = tglPeriksa,
+        keluarga = keluarga
     )
 }
