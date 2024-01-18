@@ -171,7 +171,7 @@ fun ListRutaScreen(
                         )
                     }
                     DropdownMenu(
-                        modifier = Modifier.background(Color.White),
+                        modifier = Modifier.background(PklBase),
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false },
                         offset = DpOffset(
@@ -179,9 +179,8 @@ fun ListRutaScreen(
                             y = (-3).dp
                         )
                     ) {
-                        DropdownMenuItem(text = { Text(text = "Menu 1") }, onClick = { /*TODO*/ })
-                        DropdownMenuItem(text = { Text(text = "Menu 2") }, onClick = { /*TODO*/ })
-                        DropdownMenuItem(text = { Text(text = "Menu 3") }, onClick = { /*TODO*/ })
+                        DropdownMenuItem(text = { Text(text = "Finalisasi BS") }, onClick = { /*TODO*/ })
+                        DropdownMenuItem(text = { Text(text = "Ambil Sampel") }, onClick = { /*TODO*/ })
                     }
                 },
             )
@@ -243,13 +242,6 @@ fun ListRutaScreen(
                         Arrangement.SpaceEvenly,
                         Alignment.CenterVertically,
                     ) {
-                        Text(
-                            text = stringResource(id = R.string.no_list_ruta),
-                            color = Color.White,
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 14.sp
-                        )
                         Text(
                             text = stringResource(id = R.string.no_bf_list_ruta),
                             color = Color.White,
@@ -314,7 +306,6 @@ fun ListRutaScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RutaRow(
-    no: Int,
     keluarga: KeluargaEntity,
     ruta: RutaEntity
 ) {
@@ -333,12 +324,6 @@ fun RutaRow(
         Arrangement.SpaceEvenly,
         Alignment.CenterVertically
     ) {
-        Text(
-            text = "$no",
-            fontFamily = PoppinsFontFamily,
-            fontWeight = FontWeight.Medium,
-            fontSize = 16.sp
-        )
         Text(
             text = "${keluarga.noBgFisik}",
             fontFamily = PoppinsFontFamily,
@@ -675,7 +660,9 @@ fun RutaRow(
 }
 
 @Composable
-fun RutaList(wilayahWithAll: WilayahWithAll) {
+fun RutaList(
+    wilayahWithAll: WilayahWithAll
+) {
 //    var no = 0
 //
 //    Column {
@@ -698,13 +685,13 @@ fun RutaList(wilayahWithAll: WilayahWithAll) {
     LazyColumn(
         modifier = Modifier.fillMaxHeight(),
         content = {
+            println("List Ruta Screen: ${wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()} ${wilayahWithAll.listKeluargaWithRuta!!.size}")
             if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
                 wilayahWithAll.listKeluargaWithRuta!!.forEach { keluargaWithRuta ->
                     if (keluargaWithRuta.listRuta.isNotEmpty()) {
                         items(keluargaWithRuta.listRuta.size) { index ->
                             val ruta = keluargaWithRuta.listRuta[index]
                             RutaRow(
-                                no = index + 1,
                                 keluarga = keluargaWithRuta.keluarga,
                                 ruta = ruta
                             )
