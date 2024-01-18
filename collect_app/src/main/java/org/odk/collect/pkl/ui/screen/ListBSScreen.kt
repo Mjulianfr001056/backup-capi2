@@ -106,9 +106,9 @@ fun ListBSScreen(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.navigate(Capi63Screen.Sampling.route){
-                                popUpTo(Capi63Screen.Sampling.route){
-                                    inclusive = true
+                            navController.navigate(Capi63Screen.ListBs.route){
+                                popUpTo(Capi63Screen.ListBs.route){
+                                    inclusive = false
                                 }
                             }
                         }

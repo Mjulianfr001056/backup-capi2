@@ -85,7 +85,7 @@ fun SamplingNavHost(
             SamplingScreen(
                 rootController = rootController,
                 navController = samplingNavController,
-                viewModel = hiltViewModel()
+                isPml = true
             )
         }
 

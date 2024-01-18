@@ -24,21 +24,27 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.R
+import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
@@ -50,10 +56,8 @@ import org.odk.collect.pkl.ui.screen.components.BottomNavBar
 fun SamplingScreen(
     rootController: NavHostController,
     navController: NavHostController,
-    viewModel: SamplingViewModel
+    isPml: Boolean
 ) {
-    val session = viewModel.session
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -73,7 +77,7 @@ fun SamplingScreen(
             )
         },
         bottomBar = {
-            BottomNavBar(rootNavController = rootController)
+            com.polstat.pkl.ui.screen.components.BottomNavBar(rootNavController = rootController)
         },
         content = { innerPadding ->
             Box(
@@ -85,7 +89,7 @@ fun SamplingScreen(
             ) {
                 HorizontalMenu(
                     navController = navController,
-                    isPml = session!!.isKoor
+                    isPml = isPml
                 )
             }
         }
@@ -94,10 +98,10 @@ fun SamplingScreen(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun HorizontalMenu(navController: NavHostController, isPml: Boolean?) {
+fun HorizontalMenu(navController: NavHostController, isPml: Boolean) {
     Column {
         FlowRow(modifier = Modifier.padding(4.dp)) {
-            if (isPml == true) {
+            if (isPml) {
                 MenuButton(
                     image = painterResource(R.drawable.listing),
                     name = "Listing",
@@ -140,53 +144,22 @@ fun MenuButton(image: Painter, name: String, onCardClicked: () -> Unit) {
         ),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White,
+            containerColor = Color.Transparent,
         ),
     ) {
-        Row(
-            modifier = Modifier
-                .background(
-                    color = PklPrimary900,
-                    shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
-                )
-                .fillMaxWidth()
-                .height(20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row {
-                Spacer(modifier = Modifier.width(5.dp))
-                Icon(
-                    imageVector = Icons.Default.MoreHoriz,
-                    modifier = Modifier
-                        .size(18.dp),
-                    contentDescription = "More",
-                    tint = Color.White
-                )
-            }
-            Row {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    modifier = Modifier
-                        .size(15.dp),
-                    contentDescription = "Close",
-                    tint = Color.White
-                )
-                Spacer(modifier = Modifier.width(5.dp))
-            }
-
-        }
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .fillMaxWidth()
-                .size(100.dp)
+                .fillMaxSize()
+                .padding(5.dp),
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(5.dp))
             Image(
                 painter = image,
                 contentDescription = name,
-                modifier = Modifier.size(64.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize()
             )
             Spacer(modifier = Modifier.height(5.dp))
             Text(
@@ -195,34 +168,19 @@ fun MenuButton(image: Painter, name: String, onCardClicked: () -> Unit) {
                 color = PklPrimary900
             )
         }
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        )
-        {
-            Row(
-                modifier = Modifier
-                    .background(
-                        color = PklPrimary900,
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .fillMaxWidth(0.75F)
-                    .height(3.dp)
-            ){}
-        }
     }
 }
 
-//@Preview
-//@Composable
-//fun SamlingScreenPreview () {
-//    Capi63Theme {
-//        Surface (
-//            modifier = Modifier.fillMaxSize(),
-//            color = MaterialTheme.colorScheme.background
-//        ) {
-//            val navController = rememberNavController()
-//            SamplingScreen(navController, isPml = true)
-//        }
-//    }
-//}
+@Preview
+@Composable
+fun SamlingScreenPreview () {
+    Capi63Theme {
+        Surface (
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            val navController = rememberNavController()
+            SamplingScreen(navController, navController, isPml = true)
+        }
+    }
+}

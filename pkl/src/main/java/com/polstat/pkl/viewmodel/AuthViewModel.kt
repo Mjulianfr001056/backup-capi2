@@ -82,22 +82,22 @@ class AuthViewModel @Inject constructor(
     val visiblePermissionDialogQueue = mutableListOf<String>()
 
     init {
-//        viewModelScope.launch {
-//            while (true) {
-//                delay(1000)
-//                if (_countdown.value > 0) {
-//                    _countdown.value--
-//                } else {
-//                    getLocationUseCase.invoke().collect { location ->
-//                        if (location != null && _session?.nim != null) {
-//                            locationRepository.updateLocation(_session.nim,location.longitude,location.latitude,location.accuracy)
-//                        }
-//                        Log.d(TAG, "getLocationUseCase: ${location!!.latitude}, ${location.longitude}, ${location.accuracy}")
-//                    }
-//                    _countdown.value = 10
-//                }
-//            }
-//        }
+        viewModelScope.launch {
+            while (true) {
+                delay(1000)
+                if (_countdown.value > 0) {
+                    _countdown.value--
+                } else {
+                    getLocationUseCase.invoke().collect { location ->
+                        if (location != null && _session?.nim != null) {
+                            locationRepository.updateLocation(_session.nim,location.longitude,location.latitude,location.accuracy)
+                        }
+                        Log.d(TAG, "getLocationUseCase: ${location!!.latitude}, ${location.longitude}, ${location.accuracy}")
+                    }
+                    _countdown.value = 600
+                }
+            }
+        }
     }
 
     @Suppress("NAME_SHADOWING")
