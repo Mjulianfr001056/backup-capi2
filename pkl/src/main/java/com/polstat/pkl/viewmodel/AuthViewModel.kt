@@ -140,13 +140,13 @@ class AuthViewModel @Inject constructor(
                 alamat = "",
                 email = "",
                 foto = authResponse.value.avatar,
-                idTim = authResponse.value.dataTim.idTim,
+                id_tim = authResponse.value.dataTim.idTim,
                 isKoor = authResponse.value.isKoor,
                 nama = authResponse.value.nama,
                 nim = authResponse.value.nim,
-                noHp = "",
+                no_hp = "",
                 password = "",
-                wilayahKerja = emptyList()
+                wilayah_kerja = emptyList()
             )
             mahasiswaRepository.insertMahasiswa(mahasiswa)
                 .collectLatest { message ->
@@ -176,8 +176,8 @@ class AuthViewModel @Inject constructor(
                                 Log.d(TAG, message)
                             }
 
-                        if (mahasiswa.wilayahKerja?.isNotEmpty() == true) {
-                            mahasiswa.wilayahKerja.forEach { wilayah ->
+                        if (mahasiswa.wilayah_kerja?.isNotEmpty() == true) {
+                            mahasiswa.wilayah_kerja.forEach { wilayah ->
                                 wilayahRepository.insertWilayah(
                                     wilayah,
                                     mahasiswa.nim
@@ -195,6 +195,10 @@ class AuthViewModel @Inject constructor(
                                         if (keluarga.ruta!!.isNotEmpty()) {
                                             keluarga.ruta.forEach { ruta ->
                                                 localRutaRepository.insertRuta(ruta)
+                                                    .collectLatest { message ->
+                                                        Log.d(TAG, message)
+                                                    }
+                                                localRutaRepository.insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
                                                     .collectLatest { message ->
                                                         Log.d(TAG, message)
                                                     }

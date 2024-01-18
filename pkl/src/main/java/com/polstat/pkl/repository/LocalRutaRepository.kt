@@ -9,6 +9,8 @@ interface LocalRutaRepository {
 
     fun insertRuta(ruta: Ruta) : Flow<String>
 
+    fun insertKeluargaAndRuta(kodeKlg: String, kodeRuta: String) : Flow<String>
+
     fun updateRuta(ruta: Ruta) : Flow<String>
 
     fun fakeDeleteRuta(ruta: Ruta) : Flow<String>

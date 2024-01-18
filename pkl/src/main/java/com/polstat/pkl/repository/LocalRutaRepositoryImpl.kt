@@ -2,6 +2,7 @@ package com.polstat.pkl.repository
 
 import android.util.Log
 import com.polstat.pkl.database.Capi63Database
+import com.polstat.pkl.database.entity.KeluargaAndRutaEntity
 import com.polstat.pkl.database.entity.RutaEntity
 import com.polstat.pkl.mapper.toRutaEntity
 import com.polstat.pkl.model.domain.Ruta
@@ -31,6 +32,29 @@ class LocalRutaRepositoryImpl @Inject constructor(
             } catch (e: Exception) {
                 val message = "Gagal menambahkan ruta!"
                 Log.d(TAG, "insertRuta: $message (${e.message})")
+                emit(message)
+                return@flow
+            }
+        }
+    }
+
+    override fun insertKeluargaAndRuta(
+        kodeKlg: String,
+        kodeRuta: String
+    ): Flow<String> {
+        return  flow {
+            try {
+                val keluargaAndRutaEntity = KeluargaAndRutaEntity(
+                    kodeKlg = kodeKlg,
+                    kodeRuta = kodeRuta
+                )
+                capi63Database.capi63Dao.insertKelurgaAndRuta(keluargaAndRutaEntity)
+                val message = "Berhasil menambahkan KeluargaAndRuta!"
+                Log.d(TAG, "insertKeluargaAndRuta: $message $keluargaAndRutaEntity")
+                emit(message)
+            } catch (e: Exception) {
+                val message = "Gagal menambahkan KeluargaAndRuta!"
+                Log.d(TAG, "insertKeluargaAndRuta: $message (${e.message})")
                 emit(message)
                 return@flow
             }

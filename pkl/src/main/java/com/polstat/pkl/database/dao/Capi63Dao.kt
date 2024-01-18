@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.polstat.pkl.database.entity.DataTimEntity
+import com.polstat.pkl.database.entity.KeluargaAndRutaEntity
 import com.polstat.pkl.database.entity.KeluargaEntity
 import com.polstat.pkl.database.entity.MahasiswaEntity
 import com.polstat.pkl.database.entity.RutaEntity
@@ -60,6 +61,9 @@ interface Capi63Dao {
 
 
     // Operasi database untuk entitas berelasi
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertKelurgaAndRuta(keluargaAndRutaEntity: KeluargaAndRutaEntity)
 
     @Transaction
     @Query("SELECT * FROM data_tim WHERE idTim = :idTim")

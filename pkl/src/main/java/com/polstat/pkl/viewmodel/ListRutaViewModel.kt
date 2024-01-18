@@ -71,7 +71,7 @@ class ListRutaViewModel @Inject constructor(
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
     init {
-        getWilayahWithRuta("444B")
+        getWilayahWithAll("444A")
     }
 
 //    fun searchRuta(search: String) {
@@ -86,6 +86,33 @@ class ListRutaViewModel @Inject constructor(
 //            rutaUiState = RutaUiState.Success(filteredRuta)
 //        }
 //    }
+
+    private fun getWilayahWithAll(
+        noBS: String
+    ) {
+        viewModelScope.launch {
+            wilayahRepository.getWilayahWithAll(noBS).collectLatest { result ->
+                when(result) {
+                    is Result.Success -> {
+                        result.data?.let { response ->
+                            _wilayahWithAll.value = response
+                            Log.d(TAG, "getWilayahWithAll success: $response")
+                        }
+                    }
+                    is Result.Loading -> {
+                        Log.d(TAG, "getWilayahWithAll: Loading...")
+                    }
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            _errorMessage.value = error
+                        }
+                        _showErrorToastChannel.send(true)
+                        Log.e(TAG, "getWilayahWithAll: Error in getWilayahWithAll")
+                    }
+                }
+            }
+        }
+    }
 
     private fun getWilayahWithRuta(
         noBS: String
