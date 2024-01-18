@@ -69,7 +69,7 @@
     <application
         android:name=".application.Collect"
         android:allowBackup="true"
-        android:icon="@drawable/notes"
+        android:icon="@drawable/logo_63"
         android:installLocation="auto"
         android:label="@string/collect_app_name"
         android:largeHeap="true"
@@ -96,7 +96,7 @@
         <activity
             android:name="org.odk.collect.pkl.CapiFirstActivity"
             android:exported="true"
-            android:label="@string/title_activity_capi_first"
+            android:label="@string/capi"
             android:theme="@style/Theme.Capi63">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
