@@ -7,12 +7,18 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.polstat.pkl.database.entity.RutaEntity
 import com.polstat.pkl.model.domain.Keluarga
 import com.polstat.pkl.model.domain.Ruta
 import com.polstat.pkl.repository.LocalRutaRepository
+import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.ui.event.IsiRutaScreenEvent
 import com.polstat.pkl.ui.state.IsiRutaScreenState
+import com.polstat.pkl.utils.Result
+import com.polstat.pkl.utils.UtilFunctions
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,11 +26,23 @@ import javax.inject.Inject
 @HiltViewModel
 class IsiRutaViewModel @Inject constructor(
     private val localRutaRepository: LocalRutaRepository,
+    private val wilayahRepository: WilayahRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel(){
-    var state by mutableStateOf(IsiRutaScreenState())
+    private val _state = MutableStateFlow(IsiRutaScreenState())
+    val state = _state.asStateFlow()
 
-    val noBS = savedStateHandle.get<String>("noBS")
+    val noBS = savedStateHandle.get<String>("noBS")!!
+
+    private val _lastRuta = MutableStateFlow(RutaEntity())
+
+    val lastRuta = _lastRuta.asStateFlow()
+
+    init {
+
+    }
+
+
 
     var lat by mutableStateOf(0.0)
 
@@ -44,95 +62,132 @@ class IsiRutaViewModel @Inject constructor(
         }
     }
 
-    fun onEvent(event: IsiRutaScreenEvent){
+    fun getLastRuta() {
+        viewModelScope.launch {
+            wilayahRepository.getWilayahWithRuta(noBS).collectLatest { result ->
+                when(result) {
+                    is Result.Success -> {
+                        result.data?.listRuta?.let { listRuta ->
+                            _lastRuta.value = listRuta.maxByOrNull { it.noUrutRuta!! }!!
+                        }
+                    }
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            Log.d(TAG, "Error getLastRuta: $error")
+                        }
+                    }
+
+                    is Result.Loading -> {
+                        Log.d(TAG, "getLastRuta: Loading...")
+                    }
+                }
+            }
+        }
+    }
+
+
+    suspend fun onEvent(
+        event: IsiRutaScreenEvent,
+        index: Int = 0
+    ) {
+        val newListNoUrutRuta = state.value.listNoUrutRuta?.toMutableList()
+        val newListKkOrKrt = state.value.listKkOrKrt?.toMutableList()
+        val newListNamaKrt = state.value.listNamaKrt?.toMutableList()
+        val newListGenzOrtu = state.value.listGenzOrtu?.toMutableList()
+        val newListKatGenz = state.value.listKatGenz?.toMutableList()
+        val newListKodeRuta = state.value.listKodeRuta?.toMutableList()
+
         when(event) {
             is IsiRutaScreenEvent.SLSChanged -> {
-                state = state.copy(SLS = event.sls)
+                _state.emit(state.value.copy(SLS = event.sls))
             }
-
             is IsiRutaScreenEvent.NoSegmenChanged -> {
-                state = state.copy(noSegmen = event.noSegmen)
+                _state.emit(state.value.copy(noSegmen = event.noSegmen))
             }
-
             is IsiRutaScreenEvent.NoBgFisikChanged -> {
-                state = state.copy(noBgFisik = event.noBgFisik)
+                _state.emit(state.value.copy(noBgFisik = event.noBgFisik))
             }
-
             is IsiRutaScreenEvent.NoBgSensusChanged -> {
-                state = state.copy(noBgSensus = event.noBgSensus)
+                _state.emit(state.value.copy(noBgSensus = event.noBgSensus))
             }
-
             is IsiRutaScreenEvent.NoUrutKlgChanged -> {
-                state = state.copy(noUrutKlg = event.noUrutKlg)
+                _state.emit(state.value.copy(noUrutKlg = event.noUrutKlg))
             }
-
             is IsiRutaScreenEvent.NamaKKChanged -> {
-                state = state.copy(namaKK = event.namaKK)
+                _state.emit(state.value.copy(namaKK = event.namaKK))
             }
-
             is IsiRutaScreenEvent.AlamatChanged -> {
-                state = state.copy(alamat = event.alamat)
+                _state.emit(state.value.copy(alamat = event.alamat))
             }
-
             is IsiRutaScreenEvent.IsGenzOrtuChanged -> {
-                state = state.copy(isGenzOrtu = event.isGenzOrtu)
+                _state.emit(state.value.copy(isGenzOrtu = event.isGenzOrtu))
             }
-
             is IsiRutaScreenEvent.NoUrutKlgEgbChanged -> {
-                state = state.copy(noUrutKlgEgb = event.noUrutKlgEgb)
+                _state.emit(state.value.copy(noUrutKlgEgb = event.noUrutKlgEgb))
             }
-
             is IsiRutaScreenEvent.PenglMknChanged -> {
-                state = state.copy(penglMkn = event.penglMkn)
+                _state.emit(state.value.copy(penglMkn = event.penglMkn))
             }
-
             is IsiRutaScreenEvent.NoUrutRutaChanged -> {
-                state = state.copy(noUrutRuta = event.noUrutRuta)
+                _state.emit(state.value.copy(noUrutRuta = event.noUrutRuta))
+                newListNoUrutRuta!!.add(0)
+                newListNoUrutRuta[index] = event.noUrutRuta
+                _state.emit(state.value.copy(listNoUrutRuta = newListNoUrutRuta))
             }
-
             is IsiRutaScreenEvent.KKOrKRTChanged -> {
-                state = state.copy(kkOrKrt = event.kkOrKRT)
+                _state.emit(state.value.copy(kkOrKrt = event.kkOrKRT))
+                newListKkOrKrt!!.add("")
+                newListKkOrKrt[index] = event.kkOrKRT
+                _state.emit(state.value.copy(listKkOrKrt = newListKkOrKrt))
             }
-
             is IsiRutaScreenEvent.NamaKRTChanged -> {
-                state = state.copy(namaKrt = event.namaKRT)
+                _state.emit(state.value.copy(namaKrt = event.namaKRT))
+                newListNamaKrt!!.add("")
+                newListNamaKrt[index] = event.namaKRT
+                _state.emit(state.value.copy(listNamaKrt = newListNamaKrt))
             }
-
             is IsiRutaScreenEvent.GenzOrtuChanged -> {
-                state = state.copy(genzOrtu = event.genzOrtu)
+                _state.emit(state.value.copy(genzOrtu = event.genzOrtu))
+                newListGenzOrtu!!.add(0)
+                newListGenzOrtu[index] = event.genzOrtu
+                _state.emit(state.value.copy(listGenzOrtu = newListGenzOrtu))
             }
-
             is IsiRutaScreenEvent.KatGenzChanged -> {
-                state = state.copy(katGenz = event.katGenz)
+                _state.emit(state.value.copy(katGenz = event.katGenz))
+                newListKatGenz!!.add(0)
+                newListKatGenz[index] = event.katGenz
+                _state.emit(state.value.copy(listKatGenz = newListKatGenz))
             }
-
             is IsiRutaScreenEvent.submit -> {
                 val keluarga = Keluarga(
-                    SLS = state.SLS,
-                    noSegmen = state.noSegmen,
-                    noBgFisik = state.noBgFisik.toInt(),
-                    noBgSensus = state.noBgSensus.toInt(),
-                    noUrutKlg = state.noUrutKlg,
-                    namaKK = state.namaKK,
-                    alamat = state.alamat,
-                    isGenzOrtu = state.isGenzOrtu,
-                    noUrutKlgEgb = state.noUrutKlgEgb,
-                    penglMkn = state.penglMkn,
+                    SLS = state.value.SLS,
+                    noSegmen = state.value.noSegmen,
+                    noBgFisik = state.value.noBgFisik?.toInt(),
+                    noBgSensus = state.value.noBgSensus?.toInt(),
+                    noUrutKlg = state.value.noUrutKlg,
+                    namaKK = state.value.namaKK,
+                    alamat = state.value.alamat,
+                    isGenzOrtu = state.value.isGenzOrtu,
+                    noUrutKlgEgb = state.value.noUrutKlgEgb,
+                    penglMkn = state.value.penglMkn,
                     noBS = noBS,
-                    kodeKlg = noBS + state.noUrutKlg,
+                    kodeKlg = noBS + state.value.noUrutKlg,
                 )
-                state.penglMkn?.let {
+                state.value.penglMkn?.let {
                     repeat(it) {
                         val ruta = Ruta(
-                            noUrutRuta = state.noUrutRuta,
-                            kkOrKrt = state.kkOrKrt,
-                            namaKrt = state.namaKrt,
-                            isGenzOrtu = state.genzOrtu.toInt(),
-                            katGenz = state.katGenz,
+                            kodeRuta = "R" + noBS + UtilFunctions.convertTo3DigitsString(state.value.noUrutRuta!!),
+                            noUrutRuta = state.value.listNoUrutRuta!![it - 1],
+                            noUrutEgb = 0,
+                            kkOrKrt = state.value.listKkOrKrt!![it - 1],
+                            namaKrt = state.value.listNamaKrt!![it - 1],
+                            isGenzOrtu = state.value.listGenzOrtu!![it - 1],
+                            katGenz = state.value.listKatGenz!![it - 1],
                             long = long,
                             lat = lat,
-                            kodeRuta = noBS + state.noUrutRuta,
-                            noBS = noBS
+                            catatan = "",
+                            noBS = noBS,
+                            status = "0"
                         )
 
                         val keluargaWithRuta = keluarga.copy(ruta = listOf(ruta))
