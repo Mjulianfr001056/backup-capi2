@@ -41,7 +41,6 @@
     <string name="lihat_sampel">Lihat Sampel</string>
     <string name="action_art">Aksi Untuk ART</string>
     <string name="ubah_action_art">Ubah</string>
-    <string name="salin_action_art">Salin isian ruta</string>
     <string name="hapus_action_art">Hapus</string>
     <string name="detail_ruta">detail ruta</string>
     <string name="nomor_segmen_ruta">Nomor Segmen</string>
@@ -65,4 +64,17 @@
     <string name="keberadaan_genz_ortu_keluarga">Keberadaan Gen Z dan Orang Tua dalam Keluarga</string>
     <string name="no_urut_keluarga_egb">Nomor Urut Keluarga Eligible</string>
     <string name="jml_pengelolaan_makan_keluarga">Jumlah Pengelolaan Makan/Minum dan Kebutuhan dalam Keluarga</string>
+    <string name="urutkan_data">Urutkan Data</string>
+    <string name="finalisasi_bs">Finalisasi BS</string>
+    <string name="ambil_sampel">Ambil Sampel</string>
+    <string name="konfirmasi_finalisasi_bs">Apakah Anda yakin ingin mengirimkan hasil listing?</string>
+    <string name="pernyataan_konfirmasi_finalisasi_bs">Dengan ini saya menyatakan bahwa apa yang saya kirimkan dapat saya pertanggungjawabkan</string>
+    <string name="kirim_hasil_listing">kirim hasil listing</string>
+    <string name="fab">Floating Action Button</string>
+    <string name="info_icon">Info Icon</string>
+    <string name="hapus_pass_master">Hapus</string>
+    <string name="batal_pass_master">Batal</string>
+    <string name="konfirmasi_pass_master">Konfirmasi</string>
+    <string name="ket_konfirm_hapus_pass_master">Hapus Rumah Tangga membutuhkan persetujuan PML. Harap hubungi PML untuk memperoleh password master.</string>
+    <string name="input_pass_master">Masukkan password master</string>
 </resources>

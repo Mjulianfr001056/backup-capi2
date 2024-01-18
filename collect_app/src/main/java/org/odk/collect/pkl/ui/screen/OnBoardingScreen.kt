@@ -1,5 +1,14 @@
 package org.odk.collect.pkl.ui.screen
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,8 +27,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -29,12 +40,68 @@ import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklQuaternary
 import com.polstat.pkl.ui.theme.PklSecondary
+import com.polstat.pkl.viewmodel.AuthViewModel
+import org.odk.collect.pkl.openAppSettings
+import org.odk.collect.pkl.ui.screen.components.PermissionDialog
 
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun OnBoardingScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: AuthViewModel
 ) {
+    val activity = LocalContext.current as Activity
+
+    val permissionToRequest = arrayOf(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.CAMERA,
+    )
+
+    val dialogQueue = viewModel.visiblePermissionDialogQueue
+
+    val multiplePermissionResultLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { perms ->
+            permissionToRequest.forEach { permission ->
+                viewModel.onPermissionResult(
+                    permission = permission,
+                    isGranted = perms[permission] == true
+                )
+            }
+        }
+    )
+
+    DisposableEffect(Unit){
+        multiplePermissionResultLauncher.launch(
+            permissionToRequest
+        )
+        onDispose {
+
+        }
+    }
+
+
+    dialogQueue
+        .reversed()
+        .forEach { permission ->
+            PermissionDialog(
+                permission = permission,
+                isPermanentlyDeclined = !activity.shouldShowRequestPermissionRationale(
+                    permission
+                ),
+                onDismiss = viewModel::dismissPermissionDialog,
+                onConfirm = {
+                    viewModel.dismissPermissionDialog()
+                    multiplePermissionResultLauncher.launch(
+                        arrayOf(permission)
+                    )
+                },
+                goToAppSettingsClick = activity::openAppSettings
+            )
+        }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -176,4 +243,11 @@ fun OnBoardingScreen(
 //            }
 //        }
     }
+}
+
+fun Activity.openAppSettings() {
+    Intent(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.fromParts("package", packageName, null)
+    ).also(::startActivity)
 }
