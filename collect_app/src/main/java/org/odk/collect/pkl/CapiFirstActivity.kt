@@ -10,12 +10,24 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.ui.theme.Capi63Theme
 import dagger.hilt.android.AndroidEntryPoint
+import org.odk.collect.android.activities.ActivityUtils
+import org.odk.collect.android.activities.CrashHandlerActivity
+import org.odk.collect.crashhandler.CrashHandler
 import org.odk.collect.pkl.navigation.AppNavHost
 
 @AndroidEntryPoint
 class CapiFirstActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        CrashHandler.getInstance(this)?.also {
+            if (it.hasCrashed(this)) {
+                super.onCreate(null)
+                ActivityUtils.startActivityAndCloseAllOthers(this, CrashHandlerActivity::class.java)
+                return
+            }
+        }
+
         super.onCreate(savedInstanceState)
+
 //        intent = Intent(this, ProjectConfigurerActivity::class.java)
 //        startActivity(intent)
         setContent {
