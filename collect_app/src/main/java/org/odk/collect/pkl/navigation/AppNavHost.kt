@@ -41,7 +41,8 @@ fun AppNavHost(
         ){
             composable(CapiScreen.Auth.ONBOARDING){
                 OnBoardingScreen(
-                    navController = navController
+                    navController = navController,
+                    viewModel = authViewModel
                 )
             }
             composable(CapiScreen.Auth.LOGIN) {

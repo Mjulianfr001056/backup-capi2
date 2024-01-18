@@ -63,44 +63,41 @@ class AuthViewModel @Inject constructor(
     private val initialValue = AuthResponse()
 
     private val _authResponse = MutableStateFlow(initialValue)
-
     val authResponse = _authResponse.asStateFlow()
 
     private val _errorMessage = MutableStateFlow("")
-
     val errorMessage = _errorMessage.asStateFlow()
 
     private val _session = sessionRepository.getActiveSession()
 
     private val _showLoadingChannel = Channel<Boolean>()
-
     val showLoadingChannel = _showLoadingChannel.receiveAsFlow()
 
     private val _showErrorToastChannel = Channel<Boolean>()
-
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
     private val _countdown = MutableStateFlow(10)
-
     val countdown: StateFlow<Int> = _countdown.asStateFlow()
 
+    val visiblePermissionDialogQueue = mutableListOf<String>()
+
     init {
-        viewModelScope.launch {
-            while (true) {
-                delay(1000)
-                if (_countdown.value > 0) {
-                    _countdown.value--
-                } else {
-                    getLocationUseCase.invoke().collect { location ->
-                        if (location != null && _session?.nim != null) {
-                            locationRepository.updateLocation(_session.nim,location.longitude,location.latitude,location.accuracy)
-                        }
-                        Log.d(TAG, "getLocationUseCase: ${location!!.latitude}, ${location.longitude}, ${location.accuracy}")
-                    }
-                    _countdown.value = 10
-                }
-            }
-        }
+//        viewModelScope.launch {
+//            while (true) {
+//                delay(1000)
+//                if (_countdown.value > 0) {
+//                    _countdown.value--
+//                } else {
+//                    getLocationUseCase.invoke().collect { location ->
+//                        if (location != null && _session?.nim != null) {
+//                            locationRepository.updateLocation(_session.nim,location.longitude,location.latitude,location.accuracy)
+//                        }
+//                        Log.d(TAG, "getLocationUseCase: ${location!!.latitude}, ${location.longitude}, ${location.accuracy}")
+//                    }
+//                    _countdown.value = 10
+//                }
+//            }
+//        }
     }
 
     @Suppress("NAME_SHADOWING")
@@ -285,6 +282,19 @@ class AuthViewModel @Inject constructor(
 
     private fun closeLoadingDialog() {
         _showLoadingChannel.trySend(false)
+    }
+
+    fun dismissPermissionDialog() {
+        visiblePermissionDialogQueue.removeFirst()
+    }
+
+    fun onPermissionResult(
+        permission: String,
+        isGranted: Boolean,
+    ){
+        if (!isGranted && !visiblePermissionDialogQueue.contains(permission)){
+            visiblePermissionDialogQueue.add(permission)
+        }
     }
 
     sealed class ValidationEvent {
