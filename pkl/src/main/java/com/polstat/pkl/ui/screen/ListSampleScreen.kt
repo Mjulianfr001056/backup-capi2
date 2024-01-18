@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package com.polstat.pkl.ui.screen
 
 import android.annotation.SuppressLint
@@ -250,7 +248,7 @@ fun PreviewSample(){
         sampelRuta = SampelRutaEntity(
             kodeRuta = "",
             SLS = "Krapyak",
-            noSegmen = 2,
+            noSegmen = "2",
             noBgFisik = "001",
             noBgSensus = "002",
             noUrutKlg = "003",
@@ -289,15 +287,13 @@ private fun ListSample(
 
         val sortedList = viewModel.sortedList(filteredList)
 
-        sortedList.size.let {
-            items(it) { index ->
-                val sampelRuta = sortedList[index]
-                Sample(
-                    onPetunjukArahClicked = {},
-                    sampelRuta = sampelRuta,
-                    context
-                )
-            }
+        items(sortedList.size) { index ->
+            val sampelRuta = sortedList[index]
+            Sample(
+                onPetunjukArahClicked = {},
+                sampelRuta = sampelRuta,
+                context
+            )
         }
 
     }

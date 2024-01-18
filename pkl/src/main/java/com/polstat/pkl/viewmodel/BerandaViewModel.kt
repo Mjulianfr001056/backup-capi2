@@ -4,8 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.database.relation.DataTimWithAll
+import com.polstat.pkl.database.relation.WilayahWithRuta
 import com.polstat.pkl.repository.DataTimRepository
 import com.polstat.pkl.repository.SessionRepository
+import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -19,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class BerandaViewModel @Inject constructor(
     private val sessionRepository: SessionRepository,
-    private val dataTimRepository: DataTimRepository
+    private val dataTimRepository: DataTimRepository,
+    private val wilayahRepository: WilayahRepository
 ) : ViewModel() {
 
     companion object {
@@ -33,6 +36,10 @@ class BerandaViewModel @Inject constructor(
     private val _dataTimWithAll = MutableStateFlow(DataTimWithAll())
 
     val dataTimWithAll = _dataTimWithAll.asStateFlow()
+
+    private val _wilayahWithRuta = MutableStateFlow(WilayahWithRuta())
+
+    val wilayahWithRuta = _wilayahWithRuta.asStateFlow()
 
     private val _errorMessage = MutableStateFlow("")
 
@@ -71,6 +78,33 @@ class BerandaViewModel @Inject constructor(
                         Log.e(TAG, "getDataTimWithAll: Error in getDataTimWithAll")
                     }
 
+                }
+            }
+        }
+    }
+
+    fun getWilayahWithRuta(
+        noBS: String
+    ) {
+        viewModelScope.launch {
+            wilayahRepository.getWilayahWithRuta(noBS).collectLatest { result ->
+                when(result) {
+                    is Result.Success -> {
+                        result.data?.let { response ->
+                            _wilayahWithRuta.value = response
+                            Log.d(TAG, "getWilayahWithRuta succeed: $response")
+                        }
+                    }
+                    is Result.Loading -> {
+                        Log.d(TAG, "getWilayahWithRuta: Loading...")
+                    }
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            _errorMessage.value = error
+                        }
+                        _showErrorToastChannel.send(true)
+                        Log.e(TAG, "getWilayahWithRuta: Error in getWilayahWithRuta")
+                    }
                 }
             }
         }

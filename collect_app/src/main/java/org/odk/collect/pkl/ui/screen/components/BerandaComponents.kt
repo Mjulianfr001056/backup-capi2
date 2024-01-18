@@ -1,5 +1,7 @@
 package org.odk.collect.pkl.ui.screen.components
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +22,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -37,6 +44,7 @@ import com.polstat.pkl.model.domain.Session
 import com.polstat.pkl.ui.theme.PklPrimary100
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
+import timber.log.Timber
 import java.util.Locale
 
 @Composable
@@ -89,7 +97,7 @@ fun ProfileCard(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = if (session.isKoor!!) "PCL" else "PPL",
+                    text = if (session.isKoor!!) "PML" else "PPL",
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium
                 )
@@ -176,6 +184,8 @@ fun PmlCard(
 fun ListPplCard(
     dataTimWithAll: DataTimWithAll
 ) {
+    var jmlRuta by remember { mutableIntStateOf(0) }
+
     Card(
         modifier = Modifier
             .padding(16.dp)
@@ -267,7 +277,7 @@ fun ListPplCard(
                                                     )
                                                     Spacer(modifier = Modifier.width(16.dp))
 
-                                                    var jmlRuta = 0
+                                                    jmlRuta = 0
 
                                                     if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
                                                         wilayahWithAll.listKeluargaWithRuta!!.forEach { keluarga ->
@@ -275,7 +285,7 @@ fun ListPplCard(
                                                         }
                                                     }
 
-                                                    com.polstat.pkl.ui.screen.components.AnimatedCircularProgressIndicator(
+                                                    AnimatedCircularProgressIndicator(
                                                         currentValue = jmlRuta,
                                                         maxValue = (if (wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.jmlRuta == 0) 99 else wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.jmlRuta)!!,
                                                         progressBackgroundColor = PklPrimary100,
@@ -545,6 +555,8 @@ fun StatusListingCard(
 fun ProgresListingCard(
     mahasiswaWithAll: MahasiswaWithAll
 ) {
+    var jmlRuta by remember { mutableIntStateOf(0) }
+
     Card(
         modifier = Modifier
             .padding(16.dp)
@@ -604,7 +616,7 @@ fun ProgresListingCard(
                                     )
                                 }
 
-                                var jmlRuta = 0
+                                jmlRuta = 0
 
                                 if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
                                     wilayahWithAll.listKeluargaWithRuta!!.forEach { keluarga ->

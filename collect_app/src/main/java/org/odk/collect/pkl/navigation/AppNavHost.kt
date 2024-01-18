@@ -13,9 +13,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.polstat.pkl.viewmodel.AuthViewModel
-import com.polstat.pkl.viewmodel.ListBSViewModel
-import com.polstat.pkl.viewmodel.ListRutaViewModel
-import com.polstat.pkl.viewmodel.ListSampelViewModel
 import com.polstat.pkl.viewmodel.PasswordMasterViewModel
 import org.odk.collect.pkl.ProjectConfigurerActivity
 import org.odk.collect.pkl.ui.screen.BerandaScreen
@@ -78,10 +75,6 @@ fun SamplingNavHost(
 ){
     val samplingNavController = rememberNavController()
     val passwordMasterViewModel: PasswordMasterViewModel = viewModel()
-    val authViewModel = hiltViewModel<AuthViewModel>()
-    val listBSViewModel = hiltViewModel<ListBSViewModel>()
-    val listSampelViewModel = hiltViewModel<ListSampelViewModel>()
-    val listRutaViewModel = hiltViewModel<ListRutaViewModel>()
 
     NavHost(
         navController = samplingNavController,
@@ -91,7 +84,7 @@ fun SamplingNavHost(
             SamplingScreen(
                 rootController = rootController,
                 navController = samplingNavController,
-                isPml = true
+                viewModel = hiltViewModel()
             )
         }
 
@@ -102,10 +95,17 @@ fun SamplingNavHost(
             composable(CapiScreen.Listing.LIST_BS) {
                 ListBSScreen(
                     navController = samplingNavController,
-                    viewModel = listBSViewModel
+                    viewModel = hiltViewModel()
                 )
             }
-            composable(CapiScreen.Listing.LIST_RUTA) {
+            composable(
+                route = CapiScreen.Listing.LIST_RUTA + "/{noBS}",
+                arguments = listOf(
+                    navArgument("noBS") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
                 ListRutaScreen(
                     navController = samplingNavController,
                     viewModel = hiltViewModel()
@@ -124,7 +124,14 @@ fun SamplingNavHost(
                     viewModel = hiltViewModel()
                 )
             }
-            composable(CapiScreen.Listing.ISI_RUTA) {
+            composable(
+                route = CapiScreen.Listing.ISI_RUTA + "/{noBS}",
+                arguments = listOf(
+                    navArgument("noBS") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
                 IsiRumahTanggaScreen(
                     navController = samplingNavController,
                     viewModel = hiltViewModel()

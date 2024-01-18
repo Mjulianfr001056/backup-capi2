@@ -42,6 +42,7 @@ import com.polstat.pkl.R
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
+import com.polstat.pkl.viewmodel.SamplingViewModel
 import org.odk.collect.pkl.ui.screen.components.BottomNavBar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,8 +50,10 @@ import org.odk.collect.pkl.ui.screen.components.BottomNavBar
 fun SamplingScreen(
     rootController: NavHostController,
     navController: NavHostController,
-    isPml: Boolean
+    viewModel: SamplingViewModel
 ) {
+    val session = viewModel.session
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -82,7 +85,7 @@ fun SamplingScreen(
             ) {
                 HorizontalMenu(
                     navController = navController,
-                    isPml = isPml
+                    isPml = session!!.isKoor
                 )
             }
         }
@@ -91,10 +94,10 @@ fun SamplingScreen(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun HorizontalMenu(navController: NavHostController, isPml: Boolean) {
+fun HorizontalMenu(navController: NavHostController, isPml: Boolean?) {
     Column {
         FlowRow(modifier = Modifier.padding(4.dp)) {
-            if (isPml) {
+            if (isPml == true) {
                 MenuButton(
                     image = painterResource(R.drawable.listing),
                     name = "Listing",
