@@ -372,7 +372,7 @@ fun ListRutaScreen(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
-                    contentDescription = "Floating Action Button",
+                    contentDescription = stringResource(id = R.string.fab),
                     tint = Color.White
                 )
             }
@@ -430,7 +430,7 @@ fun RutaRow(
         }) {
             Icon(
                 imageVector = Icons.Outlined.Info,
-                contentDescription = "Info Button",
+                contentDescription = stringResource(id = R.string.info_icon),
             )
         }
 
@@ -662,7 +662,7 @@ fun RutaRow(
 
                         },
                         colors = ButtonDefaults.buttonColors(PklPrimary900)) {
-                        Text(text = "Hapus")
+                        Text(text = stringResource(id = R.string.hapus_pass_master))
                     } },
                 dismissButton = {
                     Button(
@@ -670,11 +670,11 @@ fun RutaRow(
                         onClick = { openPasswordMasterDialog = false },
                         colors = ButtonDefaults.buttonColors(containerColor = PklTertiary100, contentColor = PklPrimary900)
                     ) {
-                        Text(text = "Batal")
+                        Text(text = stringResource(id = R.string.batal_pass_master))
                     }},
                 title = { Text(
                     modifier = Modifier.fillMaxWidth(),
-                    text = "Konfirmasi",
+                    text = stringResource(id = R.string.konfirmasi_pass_master),
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Normal,
                     fontSize = 24.sp,
@@ -690,7 +690,7 @@ fun RutaRow(
                         Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Hapus Rumah Tangga membutuhkan persetujuan PML. Harap hubungi PML untuk memperoleh password master.",
+                            text = stringResource(id = R.string.ket_konfirm_hapus_pass_master),
                             textAlign = TextAlign.Center,
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.Medium,
@@ -701,7 +701,15 @@ fun RutaRow(
                             singleLine = true,
                             value = inputPasswordMaster,
                             onValueChange = { inputPasswordMaster = it},
-                            placeholder = { Text(modifier = Modifier.fillMaxWidth(), text = "Masukkan password master", textAlign = TextAlign.Center, fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Medium, fontSize = 14.sp)},
+                            placeholder = {
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = stringResource(id = R.string.input_pass_master),
+                                    textAlign = TextAlign.Center,
+                                    fontFamily = PoppinsFontFamily,
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 14.sp
+                                )},
                             colors = TextFieldDefaults.colors(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
@@ -822,65 +830,3 @@ fun DetailRutaTextField(
         )
     }
 }
-
-@Preview
-@Composable
-fun FinalisasiBSDialog() {
-    var openFinalisasiBSDialog by remember { mutableStateOf(false) }
-    var enableFinalisasiBSButton by remember { mutableStateOf(false) }
-    var checkedCheckbox by remember { mutableStateOf(false) }
-
-    AlertDialog(
-        modifier = Modifier
-            .fillMaxWidth(),
-        onDismissRequest = { openFinalisasiBSDialog = false },
-        confirmButton = {
-            Button(
-                onClick = { },
-                enabled = enableFinalisasiBSButton,
-                content = {
-                    Text(
-                        text = stringResource(id = R.string.kirim_hasil_listing).uppercase(),
-                        fontFamily = PoppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 16.sp,
-                        color = PklBase
-                    )
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = PklPrimary900)
-            )
-        },
-        title = {
-            Text(
-                text = stringResource(id = R.string.konfirmasi_finalisasi_bs),
-                fontFamily = PoppinsFontFamily,
-                fontWeight = FontWeight.Normal,
-                fontSize = 20.sp,
-                color = PklPrimary900
-            )
-        },
-        text = {
-            Row {
-                Checkbox(
-                    checked = checkedCheckbox,
-                    onCheckedChange = { checkedCheckbox = it },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = PklPrimary900,
-                        checkmarkColor = PklBase,
-                    )
-                )
-                Text(
-                    text = stringResource(id = R.string.pernyataan_konfirmasi_finalisasi_bs),
-                    fontFamily = PoppinsFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 14.sp,
-                    color = Color.Black
-                )
-            }
-        },
-        shape = RoundedCornerShape(15.dp),
-        containerColor = PklBase
-    )
-}
-
-

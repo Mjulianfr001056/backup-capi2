@@ -70,4 +70,11 @@
     <string name="konfirmasi_finalisasi_bs">Apakah Anda yakin ingin mengirimkan hasil listing?</string>
     <string name="pernyataan_konfirmasi_finalisasi_bs">Dengan ini saya menyatakan bahwa apa yang saya kirimkan dapat saya pertanggungjawabkan</string>
     <string name="kirim_hasil_listing">kirim hasil listing</string>
+    <string name="fab">Floating Action Button</string>
+    <string name="info_icon">Info Icon</string>
+    <string name="hapus_pass_master">Hapus</string>
+    <string name="batal_pass_master">Batal</string>
+    <string name="konfirmasi_pass_master">Konfirmasi</string>
+    <string name="ket_konfirm_hapus_pass_master">Hapus Rumah Tangga membutuhkan persetujuan PML. Harap hubungi PML untuk memperoleh password master.</string>
+    <string name="input_pass_master">Masukkan password master</string>
 </resources>
