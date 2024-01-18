@@ -172,9 +172,14 @@ fun ListRutaScreen(
                             y = (-3).dp
                         )
                     ) {
-                        DropdownMenuItem(text = { Text(text = "Menu 1") }, onClick = { /*TODO*/ })
-                        DropdownMenuItem(text = { Text(text = "Menu 2") }, onClick = { /*TODO*/ })
-                        DropdownMenuItem(text = { Text(text = "Menu 3") }, onClick = { /*TODO*/ })
+                        DropdownMenuItem(
+                            text = { Text(text = stringResource(id = R.string.urutkan_data)) },
+                            onClick = { }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(text = stringResource(id = R.string.finalisasi_bs)) },
+                            onClick = { }
+                        )
                     }
                 },
             )
@@ -554,20 +559,6 @@ fun RutaRow(
                                 ),
                                 textAlign = TextAlign.Center,
                                 text = stringResource(id = R.string.ubah_action_art),
-                                fontSize = 16.sp,
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium)
-
-//                          untuk salin ruta
-                            Text(modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { }
-                                .padding(
-                                    top = 10.dp,
-                                    bottom = 10.dp
-                                ),
-                                textAlign = TextAlign.Center,
-                                text = stringResource(id = R.string.salin_action_art),
                                 fontSize = 16.sp,
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium)

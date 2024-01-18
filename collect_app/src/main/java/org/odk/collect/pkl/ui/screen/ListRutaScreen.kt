@@ -29,6 +29,8 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -66,7 +68,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.R
 import com.polstat.pkl.database.entity.KeluargaEntity
 import com.polstat.pkl.database.entity.RutaEntity
@@ -79,7 +80,6 @@ import com.polstat.pkl.ui.theme.PklPrimary300
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PklTertiary100
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
-import com.polstat.pkl.viewmodel.AuthViewModel
 import com.polstat.pkl.viewmodel.ListRutaViewModel
 
 @Preview
@@ -106,6 +106,9 @@ fun ListRutaScreen(
     var showMenu by remember { mutableStateOf(false) }
     var showSearchBar by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
+    var openFinalisasiBSDialog by remember { mutableStateOf(false) }
+    var enableFinalisasiBSButton by remember { mutableStateOf(false) }
+    var checkedCheckbox by remember { mutableStateOf(false) }
     val noBS = viewModel.noBS
     val session = viewModel.session
     val wilayahWithAll = viewModel.wilayahWithAll.collectAsState()
@@ -179,8 +182,15 @@ fun ListRutaScreen(
                             y = (-3).dp
                         )
                     ) {
-                        DropdownMenuItem(text = { Text(text = "Finalisasi BS") }, onClick = { /*TODO*/ })
-                        DropdownMenuItem(text = { Text(text = "Ambil Sampel") }, onClick = { /*TODO*/ })
+                        DropdownMenuItem(
+                            text = { Text(text = stringResource(id = R.string.finalisasi_bs)) },
+                            onClick = {
+                                openFinalisasiBSDialog = true
+                            }
+                        )
+                        DropdownMenuItem(text = { Text(text = stringResource(id = R.string.ambil_sampel)) },
+                            onClick = { }
+                        )
                     }
                 },
             )
@@ -223,6 +233,73 @@ fun ListRutaScreen(
                     )
                 }
             }
+
+            if ( openFinalisasiBSDialog ) {
+                AlertDialog(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    onDismissRequest = { openFinalisasiBSDialog = false },
+                    confirmButton = {
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = { },
+                            enabled = enableFinalisasiBSButton,
+                            content = {
+                                Text(
+                                    text = stringResource(id = R.string.kirim_hasil_listing).uppercase(),
+                                    fontFamily = PoppinsFontFamily,
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 16.sp,
+                                    color = PklBase
+                                )
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = PklPrimary900)
+                        )
+                    },
+                    title = {
+                        Text(
+                            text = stringResource(id = R.string.konfirmasi_finalisasi_bs),
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 18.sp,
+                            color = PklPrimary900,
+                            textAlign = TextAlign.Center
+                        )
+                    },
+                    text = {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            Arrangement.Start,
+                            Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = checkedCheckbox,
+                                onCheckedChange = { checkedCheckbox = it },
+                                colors = CheckboxDefaults.colors(
+                                    checkedColor = PklPrimary900,
+                                    checkmarkColor = PklBase,
+                                )
+                            )
+                            Text(
+                                text = stringResource(id = R.string.pernyataan_konfirmasi_finalisasi_bs),
+                                fontFamily = PoppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                color = Color.Black
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(15.dp),
+                    containerColor = PklBase
+                )
+            }
+
+            if (checkedCheckbox) {
+                enableFinalisasiBSButton = true
+            } else {
+                enableFinalisasiBSButton = false
+            }
+
         },
         content = { innerPadding ->
             Column {
@@ -550,20 +627,6 @@ fun RutaRow(
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium)
 
-//                          untuk salin ruta
-                            Text(modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { }
-                                .padding(
-                                    top = 10.dp,
-                                    bottom = 10.dp
-                                ),
-                                textAlign = TextAlign.Center,
-                                text = stringResource(id = R.string.salin_action_art),
-                                fontSize = 16.sp,
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium)
-
 //                          untuk menghapus ruta
                             Text(modifier = Modifier
                                 .fillMaxWidth()
@@ -758,6 +821,66 @@ fun DetailRutaTextField(
             shape = RoundedCornerShape(10.dp)
         )
     }
+}
+
+@Preview
+@Composable
+fun FinalisasiBSDialog() {
+    var openFinalisasiBSDialog by remember { mutableStateOf(false) }
+    var enableFinalisasiBSButton by remember { mutableStateOf(false) }
+    var checkedCheckbox by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        modifier = Modifier
+            .fillMaxWidth(),
+        onDismissRequest = { openFinalisasiBSDialog = false },
+        confirmButton = {
+            Button(
+                onClick = { },
+                enabled = enableFinalisasiBSButton,
+                content = {
+                    Text(
+                        text = stringResource(id = R.string.kirim_hasil_listing).uppercase(),
+                        fontFamily = PoppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp,
+                        color = PklBase
+                    )
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = PklPrimary900)
+            )
+        },
+        title = {
+            Text(
+                text = stringResource(id = R.string.konfirmasi_finalisasi_bs),
+                fontFamily = PoppinsFontFamily,
+                fontWeight = FontWeight.Normal,
+                fontSize = 20.sp,
+                color = PklPrimary900
+            )
+        },
+        text = {
+            Row {
+                Checkbox(
+                    checked = checkedCheckbox,
+                    onCheckedChange = { checkedCheckbox = it },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = PklPrimary900,
+                        checkmarkColor = PklBase,
+                    )
+                )
+                Text(
+                    text = stringResource(id = R.string.pernyataan_konfirmasi_finalisasi_bs),
+                    fontFamily = PoppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp,
+                    color = Color.Black
+                )
+            }
+        },
+        shape = RoundedCornerShape(15.dp),
+        containerColor = PklBase
+    )
 }
 
 
