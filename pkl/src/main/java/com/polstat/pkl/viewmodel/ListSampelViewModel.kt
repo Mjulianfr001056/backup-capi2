@@ -10,7 +10,6 @@ import com.polstat.pkl.repository.SampelRutaRepository
 import com.polstat.pkl.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -130,24 +129,17 @@ class ListSampelViewModel @Inject constructor(
 
     fun filteredList (searchText: String, listSampelRuta: List<SampelRutaEntity>): List<SampelRutaEntity> {
         val filteredList = listSampelRuta.filter {
-            (searchText.isBlank() || it.namaKrt?.contains(searchText, ignoreCase = true) == true) ||
-                    (searchText.isBlank() || it.noUrutRuta.toString()?.contains(searchText, ignoreCase = true) == true) ||
-                    (searchText.isBlank() || it.SLS.contains(searchText, ignoreCase = true) == true) ||
-                    (searchText.isBlank() || it.alamat?.contains(searchText, ignoreCase = true) == true) ||
-                    (searchText.isBlank() || it.kodeRuta?.contains(searchText, ignoreCase = true) == true) ||
-                    (searchText.isBlank() || it.noBgFisik.toString()?.contains(searchText, ignoreCase = true) == true) ||
-                    (searchText.isBlank() || it.noBgSensus.toString()?.contains(searchText, ignoreCase = true) == true) ||
-                    (searchText.isBlank() || it.noSegmen.toString()?.contains(searchText, ignoreCase = true) == true) ||
-                    (searchText.isBlank() || it.noUrutRutaEgb.toString()?.contains(searchText, ignoreCase = true) == true)
+            (searchText.isBlank() || it.namaKrt!!.contains(searchText, ignoreCase = true)) || (searchText.isBlank() || it.noUrutRuta.toString()
+                .contains(searchText, ignoreCase = true)) || (searchText.isBlank() || it.SLS!!.contains(searchText, ignoreCase = true)) || (searchText.isBlank() || it.alamat!!.contains(searchText, ignoreCase = true)) || (searchText.isBlank() || it.kodeRuta.contains(searchText, ignoreCase = true)) || (searchText.isBlank() || it.noBgFisik!!.contains(searchText, ignoreCase = true)) || (searchText.isBlank() || it.noBgSensus
+                ?.contains(searchText, ignoreCase = true)!!) || (searchText.isBlank() || it.noSegmen.toString().contains(searchText, ignoreCase = true)) || (searchText.isBlank() || it.noUrutRutaEgb.toString()
+                .contains(searchText, ignoreCase = true))
         }
 
         return filteredList
     }
 
-    fun sortedList (filteredList: List<SampelRutaEntity>): List<SampelRutaEntity> {
-        val sortedList = filteredList.sortedBy { it.noUrutRuta }
-
-        return sortedList
+    fun sortedList(filteredList: List<SampelRutaEntity>): List<SampelRutaEntity> {
+        return filteredList.sortedBy { it.noUrutRuta }
     }
 
     private fun openLoadingDialog() {

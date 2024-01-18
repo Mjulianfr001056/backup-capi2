@@ -10,10 +10,10 @@ data class MahasiswaEntity (
     val alamat: String? = "",
     val email: String? = "",
     val foto: String? = "",
-    val idTim: String? = "",
+    val id_tim: String? = "",
     val isKoor: Boolean? = false,
     val nama: String? = "",
-    val noHp: String? = "",
+    val no_hp: String? = "",
     val password: String? = "",
 )
 {

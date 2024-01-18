@@ -476,7 +476,7 @@ fun RutaRow(
                             )
                             DetailRutaTextField(
                                 label = R.string.nomor_urut_ruta_egb,
-                                value = "${ruta.noUrutRutaEgb}"
+                                value = "${ruta.noUrutEgb}"
                             )
                             DetailRutaTextField(
                                 label = R.string.catatan,
