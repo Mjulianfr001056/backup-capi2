@@ -21,6 +21,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.HomeWork
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Sync
@@ -106,6 +108,8 @@ fun ListSampleScreen(
         }
     }
 
+    var isDescending by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -154,12 +158,12 @@ fun ListSampleScreen(
                             )
                         }
                         IconButton(onClick = {
-                            /*TODO*/
+                            isDescending = !isDescending
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Menu,
                                 tint = Color.White,
-                                contentDescription = "Menu Icon",
+                                contentDescription = "Sort Icon",
                                 modifier = Modifier.size(25.dp)
                             )
                         }
@@ -225,7 +229,8 @@ fun ListSampleScreen(
                     .fillMaxSize(),
                 listSampelRuta = listSampelRuta.value,
                 searchText = searchText,
-                context = context
+                context = context,
+                isDescending = isDescending
             )
         },
     )
@@ -248,8 +253,8 @@ fun PreviewSample(){
         sampelRuta = SampelRutaEntity(
             kodeRuta = "",
             SLS = "Krapyak",
-            noSegmen = "2",
-            noBgFisik = "001",
+            noSegmen = "002",
+            noBgFisik = "001, 002",
             noBgSensus = "002",
             noUrutKlg = "003",
             noUrutRuta = 2,
@@ -274,7 +279,8 @@ private fun ListSample(
     modifier: Modifier = Modifier,
     listSampelRuta: List<SampelRutaEntity>,
     searchText: String,
-    context: Context
+    context: Context,
+    isDescending: Boolean
 ){
     LazyColumn(
         modifier
@@ -285,7 +291,11 @@ private fun ListSample(
     ){
         val filteredList = viewModel.filteredList(searchText, listSampelRuta)
 
-        val sortedList = viewModel.sortedList(filteredList)
+        val sortedList = if (isDescending) {
+            viewModel.sortedListByRutaDescending(filteredList)
+        } else {
+            viewModel.sortedListByRutaAscending(filteredList)
+        }
 
         items(sortedList.size) { index ->
             val sampelRuta = sortedList[index]
@@ -337,6 +347,40 @@ private fun Sample(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                Text(
+                    text = "SLS : ",
+                    color = Color.Gray,
+                    fontFamily = PoppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = " ${sampelRuta.SLS}",
+                    color = PklPrimary900,
+                    fontFamily = PoppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Row {
+                Text(
+                    text = "No. Segmen : ",
+                    color = Color.Gray,
+                    fontFamily = PoppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = " ${sampelRuta.noSegmen}",
+                    color = PklPrimary900,
+                    fontFamily = PoppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Row(
+//                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Column(
                     modifier = Modifier.weight(0.9f)
                 ) {
@@ -378,14 +422,14 @@ private fun Sample(
                 ) {
                     Row {
                         Text(
-                            text = "No. Segmen : ",
+                            text = "No. Kel : ",
                             color = Color.Gray,
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.Medium,
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Text(
-                            text = " ${sampelRuta.noSegmen}",
+                            text = " ${sampelRuta.noUrutKlg}",
                             color = PklPrimary900,
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.Medium,
@@ -394,14 +438,14 @@ private fun Sample(
                     }
                     Row {
                         Text(
-                            text = "No. Urut Ruta : ",
+                            text = "No. Ruta : ",
                             color = Color.Gray,
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.Medium,
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Text(
-                            text = " ${sampelRuta.noUrutRuta}",
+                            text = " ${String.format("%03d", sampelRuta.noUrutRuta)}",
                             color = PklPrimary900,
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.Medium,
@@ -446,7 +490,7 @@ private fun Sample(
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = " ${sampelRuta.noUrutRutaEgb}",
+                    text = " ${String.format("%03d", sampelRuta.noUrutRutaEgb)}",
                     color = PklPrimary900,
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium,
@@ -469,7 +513,7 @@ private fun Sample(
                     } else {
                         Toast.makeText(context, "Google Maps tidak terinstal.", Toast.LENGTH_SHORT).show()
                     }
-                          },
+                },
                 shape = MaterialTheme.shapes.small,
                 modifier = Modifier
                     .padding(horizontal = 20.dp)

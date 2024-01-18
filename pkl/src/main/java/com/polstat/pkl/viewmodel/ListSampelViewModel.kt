@@ -138,7 +138,11 @@ class ListSampelViewModel @Inject constructor(
         return filteredList
     }
 
-    fun sortedList(filteredList: List<SampelRutaEntity>): List<SampelRutaEntity> {
+    fun sortedListByRutaDescending(filteredList: List<SampelRutaEntity>): List<SampelRutaEntity> {
+        return filteredList.sortedByDescending { it.noUrutRuta }
+    }
+
+    fun sortedListByRutaAscending(filteredList: List<SampelRutaEntity>): List<SampelRutaEntity> {
         return filteredList.sortedBy { it.noUrutRuta }
     }
 

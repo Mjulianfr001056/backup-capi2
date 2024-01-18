@@ -97,7 +97,7 @@ class AuthViewModel @Inject constructor(
                         }
                         Log.d(TAG, "getLocationUseCase: ${location!!.latitude}, ${location.longitude}, ${location.accuracy}")
                     }
-                    _countdown.value = 10
+                    _countdown.value = 600
                 }
             }
         }
