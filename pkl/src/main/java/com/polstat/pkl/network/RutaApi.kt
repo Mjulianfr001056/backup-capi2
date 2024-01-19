@@ -5,16 +5,16 @@ import com.polstat.pkl.model.response.SyncRutaResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.Path
 
 interface RutaApi {
 
     @POST("listing/sinkronisasi-ruta")
     suspend fun sinkronisasiRuta(@Body syncRutaRequest: SyncRutaRequest) : SyncRutaResponse
 
-    @GET("generate-sampel")
+    @GET("listing/generate-sampel/{noBS}")
     suspend fun generateSampel(
-        @Query("noBS") noBS: String
+        @Path("noBS") noBS: String
     )
 
 }

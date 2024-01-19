@@ -21,13 +21,10 @@ import com.polstat.pkl.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import okio.IOException
-import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -57,9 +54,6 @@ class ListRutaViewModel @Inject constructor(
 
     val wilayahWithAll = _wilayahWithAll.asStateFlow()
 
-    private val _generateSampelResult = MutableStateFlow<GenerateSampelResult>(GenerateSampelResult.Loading)
-    val generateSampelResult: StateFlow<GenerateSampelResult> = _generateSampelResult
-
     private val _synchronizeRuta = MutableStateFlow(SyncRutaResponse())
 
     private val _deleteRuta = MutableStateFlow(Ruta())
@@ -75,6 +69,14 @@ class ListRutaViewModel @Inject constructor(
     private val _showErrorToastChannel = Channel<Boolean>()
 
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
+
+    private val _showSuccessToastChannel = Channel<Boolean>()
+
+    val showSuccessToastChannel = _showSuccessToastChannel.receiveAsFlow()
+
+    private val _successMessage = MutableStateFlow("")
+
+    val successMessage = _successMessage.asStateFlow()
 
     init {
         getWilayahWithAll(noBS!!)
@@ -202,20 +204,10 @@ class ListRutaViewModel @Inject constructor(
 
     fun generateRuta(noBS: String) {
         viewModelScope.launch {
-            try {
-                _generateSampelResult.value = GenerateSampelResult.Loading
-                remoteRutaRepository.generateRuta(noBS)
-                _generateSampelResult.value = GenerateSampelResult.Success("Generate Sampel berhasil !")
-                Log.d(TAG, "Generate Sampel berhasil !")
-            } catch (e: IOException) {
-                _generateSampelResult.value = GenerateSampelResult.Failure(e)
-                Log.d(TAG, "Generate Sampel gagal !", e)
-            } catch (e: HttpException) {
-                _generateSampelResult.value = GenerateSampelResult.Failure(e)
-                Log.d(TAG, "Generate Sampel gagal !", e)
-            } catch (e: Exception) {
-                _generateSampelResult.value = GenerateSampelResult.Failure(e)
-                e.printStackTrace()
+            remoteRutaRepository.generateRuta(noBS).collectLatest { message ->
+                _successMessage.value = message
+                _showSuccessToastChannel.send(true)
+                Log.d(TAG, message)
             }
         }
     }
@@ -260,16 +252,4 @@ class ListRutaViewModel @Inject constructor(
             }
         }
     }
-}
-
-sealed interface RutaUiState {
-    data class Success(val proker: List<Ruta>) : RutaUiState
-    object Error : RutaUiState
-    object Loading : RutaUiState
-}
-
-sealed class GenerateSampelResult {
-    data class Success(val message: String) : GenerateSampelResult()
-    object Loading : GenerateSampelResult()
-    data class Failure(val error: Throwable) : GenerateSampelResult()
 }
