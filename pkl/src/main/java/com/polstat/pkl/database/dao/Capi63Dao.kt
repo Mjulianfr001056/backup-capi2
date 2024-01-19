@@ -40,6 +40,9 @@ interface Capi63Dao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertWilayah(wilayahEntity: WilayahEntity)
 
+    @Update
+    suspend fun updateWilayah(wilayahEntity: WilayahEntity)
+
     // Operasi database untuk entitas Keluarga
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

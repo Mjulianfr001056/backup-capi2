@@ -1,6 +1,8 @@
 package org.odk.collect.pkl.ui.screen
 
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -36,6 +38,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
 //@Preview(showBackground = true, apiLevel = 28)
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun LoginScreen(
     navController: NavController,

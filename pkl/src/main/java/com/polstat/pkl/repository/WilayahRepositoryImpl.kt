@@ -7,6 +7,7 @@ import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.database.relation.KeluargaWithRuta
 import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.database.relation.WilayahWithRuta
+import com.polstat.pkl.mapper.toRutaEntity
 import com.polstat.pkl.mapper.toWilayahEntity
 import com.polstat.pkl.model.domain.Wilayah
 import com.polstat.pkl.utils.Result
@@ -40,6 +41,19 @@ class WilayahRepositoryImpl @Inject constructor(
                 val message = "Gagal menambahkan wilayah! Kesalahan umum: ${e.message}"
                 Log.d(TAG, "insertWilayah: $message")
                 emit(message)
+            }
+        }
+    }
+
+    override suspend fun updateWilayah(wilayah: Wilayah, nim: String): Flow<String> {
+        return  flow {
+            try {
+                capi63Database.capi63Dao.updateWilayah(wilayah.toWilayahEntity(nim))
+                val message = "Berhasil mengupdate wilayah!"
+                Log.d(TAG, "updateWilayah: $message")
+            } catch (e: Exception) {
+                val message = "Gagal mengupdate wilayah!"
+                Log.d(TAG, "updateWilayah: $message (${e.message})")
             }
         }
     }
