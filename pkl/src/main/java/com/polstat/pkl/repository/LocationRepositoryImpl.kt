@@ -26,7 +26,6 @@ class LocationRepositoryImpl @Inject constructor(
             val updatePosisiRequest = UpdatePosisiRequest(
                 nim,latitude,longitude,akurasi
             )
-            Log.d(TAG, "Update location berhasil ! ${updatePosisiRequest}")
             locationApi.updateLocationPCL(updatePosisiRequest)
             Log.d(TAG, "Update location berhasil !")
         } catch (e: IOException) {

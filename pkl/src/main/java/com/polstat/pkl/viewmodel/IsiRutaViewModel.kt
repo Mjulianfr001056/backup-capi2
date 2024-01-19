@@ -38,6 +38,10 @@ class IsiRutaViewModel @Inject constructor(
 
     val lastRuta = _lastRuta.asStateFlow()
 
+    private val _ruta = MutableStateFlow(RutaEntity())
+
+    val ruta = _ruta.asStateFlow()
+
     init {
 
     }
@@ -85,6 +89,26 @@ class IsiRutaViewModel @Inject constructor(
         }
     }
 
+    fun getRuta(noRuta: String) {
+        viewModelScope.launch {
+            localRutaRepository.getRuta(noRuta).collectLatest { result ->
+                when(result) {
+                    is Result.Success -> {
+                        _ruta.value = result.data!!
+                    }
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            Log.d(TAG, "Error getLastRuta: $error")
+                        }
+                    }
+
+                    is Result.Loading -> {
+                        Log.d(TAG, "getLastRuta: Loading...")
+                    }
+                }
+            }
+        }
+    }
 
     suspend fun onEvent(
         event: IsiRutaScreenEvent,

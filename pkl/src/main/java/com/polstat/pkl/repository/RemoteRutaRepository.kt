@@ -9,4 +9,6 @@ interface RemoteRutaRepository {
 
     suspend fun sinkronisasiRuta(syncRutaRequest: SyncRutaRequest) : Flow<Result<SyncRutaResponse>>
 
+    suspend fun generateRuta(noBS: String) : Flow<String>
+
 }

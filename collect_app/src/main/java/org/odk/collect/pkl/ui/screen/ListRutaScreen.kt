@@ -189,7 +189,11 @@ fun ListRutaScreen(
                             }
                         )
                         DropdownMenuItem(text = { Text(text = stringResource(id = R.string.ambil_sampel)) },
-                            onClick = { }
+                            onClick = {
+                                if (noBS != null) {
+                                    viewModel.generateRuta(noBS)
+                                }
+                            }
                         )
                     }
                 },

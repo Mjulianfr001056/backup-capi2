@@ -230,6 +230,10 @@ class AuthViewModel @Inject constructor(
                                         .collectLatest { message ->
                                             Log.d(TAG, message)
                                         }
+                                    localRutaRepository.insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
+                                        .collectLatest { message ->
+                                            Log.d(TAG, message)
+                                        }
                                 }
                             }
                         }
