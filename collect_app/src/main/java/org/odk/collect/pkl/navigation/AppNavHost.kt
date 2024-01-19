@@ -1,5 +1,6 @@
 package org.odk.collect.pkl.navigation
 
+import EditRutaScreen
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -137,6 +138,25 @@ fun SamplingNavHost(
                 )
             ) {
                 IsiRumahTanggaScreen(
+                    navController = samplingNavController,
+                    viewModel = hiltViewModel()
+                )
+            }
+            composable(
+                route = CapiScreen.Listing.EDIT_RUTA + "/{noBS}/{kodeKlg}/{kodeRuta}",
+                arguments = listOf(
+                    navArgument("noBS") {
+                        type = NavType.StringType
+                    },
+                    navArgument("kodeKlg") {
+                        type = NavType.StringType
+                    },
+                    navArgument("kodeRuta") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
+                EditRutaScreen(
                     navController = samplingNavController,
                     viewModel = hiltViewModel()
                 )

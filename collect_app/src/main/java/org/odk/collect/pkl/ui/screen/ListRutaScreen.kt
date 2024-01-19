@@ -358,7 +358,10 @@ fun ListRutaScreen(
                     }
 
                 }
-                RutaList(wilayahWithAll =  wilayahWithAll.value)
+                RutaList(
+                    wilayahWithAll =  wilayahWithAll.value,
+                    navController = navController
+                )
             }
         },
         floatingActionButton = {
@@ -384,7 +387,8 @@ fun ListRutaScreen(
 @Composable
 fun RutaRow(
     keluarga: KeluargaEntity,
-    ruta: RutaEntity
+    ruta: RutaEntity,
+    navController: NavHostController
 ) {
     var openActionDialog by remember { mutableStateOf(false) }
     var openDetail by remember { mutableStateOf(false) }
@@ -616,6 +620,7 @@ fun RutaRow(
                                 .fillMaxWidth()
                                 .clickable {
 //                                    mungkin ini harusnya move ke screen buat ubah ruta
+                                    navController.navigate(CapiScreen.Listing.EDIT_RUTA + "/${ruta.noBS}/${keluarga.kodeKlg}/${ruta.kodeRuta}")
                                 }
                                 .padding(
                                     top = 10.dp,
@@ -732,7 +737,8 @@ fun RutaRow(
 
 @Composable
 fun RutaList(
-    wilayahWithAll: WilayahWithAll
+    wilayahWithAll: WilayahWithAll,
+    navController: NavHostController
 ) {
 //    var no = 0
 //
@@ -764,7 +770,8 @@ fun RutaList(
                             val ruta = keluargaWithRuta.listRuta[index]
                             RutaRow(
                                 keluarga = keluargaWithRuta.keluarga,
-                                ruta = ruta
+                                ruta = ruta,
+                                navController = navController
                             )
                         }
                     }

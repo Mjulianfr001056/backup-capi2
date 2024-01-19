@@ -48,6 +48,12 @@ interface Capi63Dao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertKeluarga(keluargaEntity: KeluargaEntity)
 
+    @Update
+    suspend fun updateKeluarga(keluargaEntity: KeluargaEntity)
+
+    @Query("SELECT * FROM keluarga WHERE kodeKlg = :kodeKlg")
+    suspend fun getKeluarga(kodeKlg: String) : KeluargaEntity
+
     // Operasi database untuk entitas Ruta
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
