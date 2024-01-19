@@ -43,8 +43,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -82,15 +83,10 @@ fun IsiRumahTanggaScreen(
     val state = viewModel.state.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val noBS = viewModel.noBS
-//    var isSetInitinialValue by remember { mutableStateOf(false) }
-//
-//    LaunchedEffect(key1 = isSetInitinialValue) {
-//        if (!isSetInitinialValue) {
-//
-//
-//            isSetInitinialValue = false
-//        }
-//    }
+
+    LaunchedEffect(key1 = viewModel.getRutaLocation()) {
+        viewModel.getRutaLocation()
+    }
 
     Scaffold(
         topBar = {
@@ -498,7 +494,7 @@ fun IsiRumahTanggaScreen(
                         UtilFunctions.convertTo3DigitsString(
                         state.value.penglMkn!!
                     )).toInt())) } },
-                    onDecrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.PenglMknChanged(increment(
+                    onDecrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.PenglMknChanged(decrement(
                         UtilFunctions.convertTo3DigitsString(
                         state.value.penglMkn!!
                     )).toInt())) } }
@@ -516,14 +512,25 @@ fun IsiRumahTanggaScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                     ) {
-                        Text(
-                            text = "Keterangan Rumah Tangga ke-$i",
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.Medium
-                        )
-                        KeteranganRuta(viewModel = viewModel, index = i-1)
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(15.dp)
+                        ) {
+                            Text(
+                                text = "Keterangan Rumah Tangga ke-$i",
+                                fontFamily = PoppinsFontFamily,
+                                fontWeight = FontWeight.Medium
+                            )
+                            KeteranganRuta(viewModel = viewModel, index = i-1)
+                        }
                     }
+
+                    Spacer(modifier = Modifier.padding(10.dp))
                 }
+
+                Spacer(modifier = Modifier.padding(10.dp))
 
                 Button(
                     onClick = {
@@ -715,6 +722,8 @@ fun KeteranganRuta(
             }
         },
     )
+
+    Spacer(modifier = Modifier.padding(10.dp))
 }
 
 @Composable

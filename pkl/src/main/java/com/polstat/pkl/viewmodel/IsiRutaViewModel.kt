@@ -63,6 +63,10 @@ class IsiRutaViewModel @Inject constructor(
 
     val lastRuta = _lastRuta.asStateFlow()
 
+    private val _lokasi = MutableStateFlow(Lokasi())
+
+    val lokasi = _lokasi.asStateFlow()
+
     private val _wilayahWithAll = MutableStateFlow(WilayahWithAll())
 
     val wilayahWithAll = _wilayahWithAll.asStateFlow()
@@ -125,14 +129,15 @@ class IsiRutaViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
-    fun getRutaLocation() : Lokasi? {
-        var lokasi: Lokasi? = null
+    fun getRutaLocation() {
         viewModelScope.launch {
             getLocationUseCase.invoke().collect { location ->
-                lokasi = location
+                if (location != null) {
+                    _lokasi.value = location
+                }
+                Log.d(TAG, "getRutaLocation: $location")
             }
         }
-        return lokasi
     }
 
     fun updateRekapitulasiWilayah(
@@ -343,23 +348,24 @@ class IsiRutaViewModel @Inject constructor(
 
                 state.value.penglMkn?.let {
                     repeat(it) {
-                        val lokasiRuta = getRutaLocation()
                         val genzOrtuRuta = state.value.listGenzOrtu!![it]
 
                         val ruta = Ruta(
-                            kodeRuta = "R" + noBS + UtilFunctions.convertTo3DigitsString(state.value.noUrutRuta!!),
+                            kodeRuta = "R" + noBS + UtilFunctions.convertTo3DigitsString(state.value.listNoUrutRuta!![it]),
                             noUrutRuta = state.value.listNoUrutRuta!![it],
                             noUrutEgb = 0,
                             kkOrKrt = state.value.listKkOrKrt!![it],
                             namaKrt = state.value.listNamaKrt!![it],
                             isGenzOrtu = genzOrtuRuta,
                             katGenz = if (genzOrtuRuta >= 1 && genzOrtuRuta <= 2) 1 else if (genzOrtuRuta >= 3 && genzOrtuRuta <= 4) 2 else if (genzOrtuRuta > 4) 3 else 0,
-                            long = lokasiRuta!!.longitude,
-                            lat = lokasiRuta.latitude,
+                            long = lokasi.value.longitude,
+                            lat = lokasi.value.latitude,
                             catatan = "",
                             noBS = noBS,
                             status = "insert"
                         )
+
+
 
                         insertRuta(ruta)
 
@@ -371,8 +377,6 @@ class IsiRutaViewModel @Inject constructor(
                     noBS = noBS!!,
                     nim = session!!.nim!!
                 )
-
-
             }
         }
     }

@@ -12,7 +12,6 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
-import com.google.android.gms.maps.model.LatLng
 import com.polstat.pkl.model.domain.Lokasi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
