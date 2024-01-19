@@ -54,7 +54,7 @@
     <string name="nomor_urut_ruta_egb">Nomor Urut Rumah Tangga Eligible</string>
     <string name="catatan">Catatan</string>
     <string name="close_popup_list_ruta">close</string>
-    <string name="search_list_ruta">Masukkan kode ruta atau nama kepala ruta</string>
+    <string name="search_list_ruta">Masukkan kode ruta atau nama KRT</string>
     <string name="search_list_sampel">Masukkan kata kunci</string>
     <string name="identifikasi_kk_krt">Identifikasi KK/KRT</string>
     <string name="kategori_jml_genz">Kategori Jumlah Gen Z</string>
