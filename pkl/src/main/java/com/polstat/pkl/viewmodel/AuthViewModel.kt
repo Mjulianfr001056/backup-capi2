@@ -31,7 +31,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -76,8 +75,7 @@ class AuthViewModel @Inject constructor(
     private val _showErrorToastChannel = Channel<Boolean>()
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
-    private val _countdown = MutableStateFlow(10)
-    val countdown: StateFlow<Int> = _countdown.asStateFlow()
+    private val _countdown = MutableStateFlow(5)
 
     val visiblePermissionDialogQueue = mutableListOf<String>()
 
@@ -227,6 +225,10 @@ class AuthViewModel @Inject constructor(
                             if (keluarga.ruta!!.isNotEmpty()) {
                                 keluarga.ruta.forEach { ruta ->
                                     localRutaRepository.insertRuta(ruta)
+                                        .collectLatest { message ->
+                                            Log.d(TAG, message)
+                                        }
+                                    localRutaRepository.insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
                                         .collectLatest { message ->
                                             Log.d(TAG, message)
                                         }

@@ -1,6 +1,8 @@
 package org.odk.collect.pkl.navigation
 
 import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -25,6 +27,7 @@ import org.odk.collect.pkl.ui.screen.OnBoardingScreen
 import org.odk.collect.pkl.ui.screen.PasswordMasterScreen
 import org.odk.collect.pkl.ui.screen.SamplingScreen
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun AppNavHost(
     navController: NavHostController
@@ -70,6 +73,7 @@ fun AppNavHost(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun SamplingNavHost(
     rootController : NavHostController
@@ -85,10 +89,9 @@ fun SamplingNavHost(
             SamplingScreen(
                 rootController = rootController,
                 navController = samplingNavController,
-                isPml = true
+                viewModel = hiltViewModel()
             )
         }
-
         navigation(
             startDestination = CapiScreen.Listing.LIST_BS,
             route = CapiScreen.Sampling.LISTING
