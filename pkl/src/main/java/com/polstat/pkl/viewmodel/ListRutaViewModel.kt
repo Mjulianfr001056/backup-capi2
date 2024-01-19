@@ -77,7 +77,7 @@ class ListRutaViewModel @Inject constructor(
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
     init {
-        getWilayahWithAll("444A")
+        getWilayahWithAll(noBS!!)
     }
 
 //    fun searchRuta(search: String) {

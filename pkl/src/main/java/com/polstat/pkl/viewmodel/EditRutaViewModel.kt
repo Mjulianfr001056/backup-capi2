@@ -23,7 +23,7 @@ class EditRutaViewModel @Inject constructor(
     private val sessionRepository: SessionRepository,
     private val localRutaRepository: LocalRutaRepository,
     private val savedStateHandle: SavedStateHandle
-): ViewModel() {
+) : ViewModel() {
 
     companion object {
         private const val TAG = "CAPI63_EDITRUTA_VM"
@@ -51,10 +51,6 @@ class EditRutaViewModel @Inject constructor(
 
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
-
-    init {
-        editRuta(kodeRuta!!)
-    }
 
     private fun editRuta(
         kodeRuta: String

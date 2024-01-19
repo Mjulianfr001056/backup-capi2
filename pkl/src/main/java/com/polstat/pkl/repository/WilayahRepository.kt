@@ -11,6 +11,8 @@ interface WilayahRepository {
 
     suspend fun insertWilayah(wilayah: Wilayah, nim: String) : Flow<String>
 
+    suspend fun updateWilayah(wilayah: Wilayah, nim: String) : Flow<String>
+
     suspend fun getWilayahWithRuta(noBS: String) : Flow<Result<WilayahWithRuta>>
 
     suspend fun getWilayahByNIM(nim: String) : Flow<Result<List<WilayahEntity>>>

@@ -369,6 +369,8 @@ fun IsiRumahTanggaScreen(
                             KeteranganRuta(viewModel = viewModel, index = i-1)
                         }
                     }
+
+                    Spacer(modifier = Modifier.padding(10.dp))
                 }
 
                 Spacer(modifier = Modifier.padding(10.dp))
