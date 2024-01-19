@@ -2,7 +2,7 @@ package com.polstat.pkl.viewmodel
 
 import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
+//import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -24,7 +24,7 @@ import com.polstat.pkl.ui.event.IsiRutaScreenEvent
 import com.polstat.pkl.ui.state.IsiRutaScreenState
 import com.polstat.pkl.utils.Result
 import com.polstat.pkl.utils.UtilFunctions
-import com.polstat.pkl.utils.location.GetLocationUseCase
+//import com.polstat.pkl.utils.location.GetLocationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,7 +38,7 @@ class IsiRutaViewModel @Inject constructor(
     private val localRutaRepository: LocalRutaRepository,
     private val wilayahRepository: WilayahRepository,
     private val keluargaRepository: KeluargaRepository,
-    private val getLocationUseCase: GetLocationUseCase,
+//    private val getLocationUseCase: GetLocationUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel(){
     private val _session = sessionRepository.getActiveSession()
@@ -133,16 +133,16 @@ class IsiRutaViewModel @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
+//    @RequiresApi(Build.VERSION_CODES.S)
     fun getRutaLocation() {
-        viewModelScope.launch {
-            getLocationUseCase.invoke().collect { location ->
-                if (location != null) {
-                    _lokasi.value = location
-                }
-                Log.d(TAG, "getRutaLocation: $location")
-            }
-        }
+//        viewModelScope.launch {
+//            getLocationUseCase.invoke().collect { location ->
+//                if (location != null) {
+//                    _lokasi.value = location
+//                }
+//                Log.d(TAG, "getRutaLocation: $location")
+//            }
+//        }
     }
 
     fun updateRekapitulasiWilayah(
@@ -280,7 +280,7 @@ class IsiRutaViewModel @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
+//    @RequiresApi(Build.VERSION_CODES.S)
     suspend fun onEvent(
         event: IsiRutaScreenEvent,
         index: Int = 0

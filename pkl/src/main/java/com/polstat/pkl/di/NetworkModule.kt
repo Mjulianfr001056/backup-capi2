@@ -10,8 +10,8 @@ import com.polstat.pkl.network.RutaApi
 import com.polstat.pkl.network.SampelRutaApi
 import com.polstat.pkl.repository.AuthRepository
 import com.polstat.pkl.repository.AuthRepositoryImpl
-import com.polstat.pkl.repository.LocationRepository
-import com.polstat.pkl.repository.LocationRepositoryImpl
+//import com.polstat.pkl.repository.LocationRepository
+//import com.polstat.pkl.repository.LocationRepositoryImpl
 import com.polstat.pkl.repository.RemoteRutaRepository
 import com.polstat.pkl.repository.RemoteRutaRepositoryImpl
 import com.polstat.pkl.repository.SampelRutaRepository
@@ -103,9 +103,9 @@ class NetworkModule {
         return SampelRutaRepositoryImpl(sampelRutaApi, capi63Database)
     }
 
-    @Provides
-    @Singleton
-    fun provideLocationRepository(locationApi: LocationApi) : LocationRepository {
-        return LocationRepositoryImpl(locationApi)
-    }
+//    @Provides
+//    @Singleton
+//    fun provideLocationRepository(locationApi: LocationApi) : LocationRepository {
+//        return LocationRepositoryImpl(locationApi)
+//    }
 }
