@@ -74,19 +74,6 @@ class ListRutaViewModel @Inject constructor(
         getWilayahWithAll(noBS!!)
     }
 
-//    fun searchRuta(search: String) {
-//        if (!::listRuta.isInitialized)
-//            return
-//
-//        if (rutaUiState is RutaUiState.Success) {
-//            val filteredRuta = listRuta.filter { listRuta ->
-//                listRuta.kodeRuta.lowercase().contains(search.lowercase(), false)
-//                listRuta.namaKrt.toString().lowercase().contains(search.lowercase(), false)
-//            }
-//            rutaUiState = RutaUiState.Success(filteredRuta)
-//        }
-//    }
-
     private fun getWilayahWithAll(
         noBS: String
     ) {
@@ -234,10 +221,4 @@ class ListRutaViewModel @Inject constructor(
             }
         }
     }
-}
-
-sealed interface RutaUiState {
-    data class Success(val proker: List<Ruta>) : RutaUiState
-    object Error : RutaUiState
-    object Loading : RutaUiState
 }

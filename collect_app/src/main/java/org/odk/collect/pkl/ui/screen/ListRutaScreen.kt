@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -207,7 +208,6 @@ fun ListRutaScreen(
 //                            listRutaViewModel.searchRuta(text)
                         },
                         onSearch = { text = it
-//                            listRutaViewModel.searchRuta(text)
                         },
                         active = false,
                         onActiveChange = { true },
@@ -358,7 +358,7 @@ fun ListRutaScreen(
                     }
 
                 }
-                RutaList(wilayahWithAll =  wilayahWithAll.value)
+                RutaList(wilayahWithAll =  wilayahWithAll.value, searchText = text)
             }
         },
         floatingActionButton = {
@@ -401,30 +401,43 @@ fun RutaRow(
         Arrangement.SpaceEvenly,
         Alignment.CenterVertically
     ) {
+//        Spacer(modifier = Modifier.size(20.dp))
+            Text(
+                modifier = Modifier.padding(start = 10.dp, end = 10.dp),
+                text = "${keluarga.noBgFisik}",
+                fontFamily = PoppinsFontFamily,
+                fontWeight = FontWeight.Medium,
+                fontSize = 16.sp
+            )
+
+//        Spacer(modifier = Modifier.size(40.dp))
         Text(
-            text = "${keluarga.noBgFisik}",
-            fontFamily = PoppinsFontFamily,
-            fontWeight = FontWeight.Medium,
-            fontSize = 16.sp
-        )
-        Text(
+            modifier = Modifier.padding(start = 10.dp, end = 10.dp),
             text = "${keluarga.noBgSensus}",
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
         )
+
+//        Spacer(modifier = Modifier.size(40.dp))
         Text(
+            modifier = Modifier.padding(start = 10.dp, end = 10.dp),
             text = "${ruta.noUrutRuta}",
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
         )
+
+//        Spacer(modifier = Modifier.size(40.dp))
         Text(
+            modifier = Modifier.padding(start = 10.dp, end = 10.dp),
             text = ruta.namaKrt!!,
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
         )
+
+//        Spacer(modifier = Modifier.size(40.dp))
         IconButton(onClick = {
             openDetail = true
         }) {
@@ -732,34 +745,31 @@ fun RutaRow(
 
 @Composable
 fun RutaList(
-    wilayahWithAll: WilayahWithAll
+    wilayahWithAll: WilayahWithAll,
+    searchText: String
 ) {
-//    var no = 0
-//
-//    Column {
-//        if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
-//            wilayahWithAll.listKeluargaWithRuta.forEach { keluargaWithRuta ->
-//                if (keluargaWithRuta.listRuta.isNotEmpty()) {
-//                    keluargaWithRuta.listRuta.forEach {ruta ->
-//                        no++
-//                        RutaRow(
-//                            no = no,
-//                            keluarga = keluargaWithRuta.keluarga,
-//                            ruta = ruta
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//    }
+    val filteredList = wilayahWithAll.listKeluargaWithRuta
+        ?.filter { keluargaWithRuta ->
+            keluargaWithRuta.listRuta.any { ruta ->
+                ruta.kodeRuta.contains(searchText, ignoreCase = true) ||
+                ruta.namaKrt!!.contains(searchText, ignoreCase = true)
+            }
+        }
+        ?.sortedBy { keluargaWithRuta ->
+            keluargaWithRuta.listRuta.firstOrNull()?.kodeRuta
+        }
 
     LazyColumn(
-        modifier = Modifier.fillMaxHeight(),
+        modifier = Modifier
+            .fillMaxHeight()
+            .horizontalScroll(state = rememberScrollState(), enabled = true)
+        ,
         content = {
             println("List Ruta Screen: ${wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()} ${wilayahWithAll.listKeluargaWithRuta!!.size}")
-            if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
-                wilayahWithAll.listKeluargaWithRuta!!.forEach { keluargaWithRuta ->
-                    if (keluargaWithRuta.listRuta.isNotEmpty()) {
+//            if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
+//                wilayahWithAll.listKeluargaWithRuta!!.forEach { keluargaWithRuta ->
+            filteredList?.forEach { keluargaWithRuta ->
+                if (keluargaWithRuta.listRuta.isNotEmpty()) {
                         items(keluargaWithRuta.listRuta.size) { index ->
                             val ruta = keluargaWithRuta.listRuta[index]
                             RutaRow(
@@ -769,14 +779,6 @@ fun RutaList(
                         }
                     }
                 }
-            }
-//            items(listRuta.size) { index ->
-//                val ruta = listRuta[index]
-//                RutaRow(
-//                    no = index + 1,
-//                    ruta = ruta,
-//                    keluarga = keluarga
-//                )
 //            }
         }
     )
@@ -829,4 +831,18 @@ fun DetailRutaTextField(
             shape = RoundedCornerShape(10.dp)
         )
     }
+}
+
+@Composable
+fun LimitedText(
+    searchText: String
+) {
+    val limitedText = searchText.take(10)
+
+    Text(
+        text = limitedText,
+        fontWeight = FontWeight.Medium,
+        fontFamily = PoppinsFontFamily,
+        fontSize = 14.sp
+    )
 }
