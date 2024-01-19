@@ -181,44 +181,40 @@ class ListRutaViewModel @Inject constructor(
         }
     }
 
-    private fun deleteRuta(
-        kodeRuta: String
-    ) {
+    fun deleteRuta(kodeRuta: String) {
         viewModelScope.launch {
-            localRutaRepository.getRuta(kodeRuta).collectLatest { result ->
-                when (result) {
-                    is Result.Success -> {
-                        result.data?.let { response ->
-                            _deleteRuta.value = response.toRuta()
-                            Log.d(
-                                TAG, "getRuta succeed: $response"
-                            )
+            val job = launch {
+                localRutaRepository.getRuta(kodeRuta).collectLatest { result ->
+                    when (result) {
+                        is Result.Success -> {
+                            result.data?.let { response ->
+                                _deleteRuta.value = response.toRuta()
+                                Log.d(TAG, "getRuta succeed: $response")
+                            }
                         }
-                    }
-
-                    is Result.Loading -> {
-                        Log.d(
-                            TAG, "getRuta: Loading..."
-                        )
-                    }
-
-                    is Result.Error -> {
-                        result.message?.let { error ->
-                            _errorMessage.value = error
+                        is Result.Loading -> {
+                            Log.d(TAG, "getRuta: Loading...")
                         }
-                        _showErrorToastChannel.send(true)
-                        Log.e(
-                            TAG, "getRuta: Error in getRuta"
-                        )
+                        is Result.Error -> {
+                            result.message?.let { error ->
+                                _errorMessage.value = error
+                            }
+                            _showErrorToastChannel.send(true)
+                            Log.e(TAG, "getRuta: Error in getRuta")
+                        }
                     }
                 }
             }
-        }
 
-        viewModelScope.launch {
-            localRutaRepository.fakeDeleteRuta(_deleteRuta.value).collectLatest { message ->
-                Log.d(TAG, message)
+            job.join() // Menunggu hingga coroutine di atas selesai
+
+            launch {
+                Log.d(TAG, "deleted ruta: ${_deleteRuta.value}")
+                localRutaRepository.fakeDeleteRuta(_deleteRuta.value).collectLatest { message ->
+                    Log.d(TAG, message)
+                }
             }
         }
     }
+
 }

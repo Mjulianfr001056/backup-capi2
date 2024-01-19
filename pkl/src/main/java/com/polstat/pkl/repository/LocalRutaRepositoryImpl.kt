@@ -78,10 +78,10 @@ class LocalRutaRepositoryImpl @Inject constructor(
     override fun fakeDeleteRuta(ruta: Ruta): Flow<String> {
         return  flow {
             try {
-                val readyRuta = ruta.copy(status = "delete")
-                capi63Database.capi63Dao.updateRuta(readyRuta.toRutaEntity())
+                val updatedRuta = ruta.copy(status = "delete")
+                capi63Database.capi63Dao.updateRuta(updatedRuta.toRutaEntity())
                 val message = "Berhasil menghapus ruta!"
-                Log.d(TAG, "fakeDeleteRuta: $message")
+                Log.d(TAG, "fakeDeleteRuta: $message $updatedRuta")
             } catch (e: Exception) {
                 val message = "Gagal menghapus ruta!"
                 Log.d(TAG, "fakeDeleteRuta: $message (${e.message})")
