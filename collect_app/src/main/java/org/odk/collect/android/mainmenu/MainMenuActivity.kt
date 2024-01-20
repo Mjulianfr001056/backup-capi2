@@ -110,6 +110,11 @@ class MainMenuActivity : LocalizedActivity() {
 //        }
     }
 
+//    override fun onBackPressed() {
+//        super.onBackPressed()
+//        ActivityUtils.startActivityAndCloseAllOthers(this, MainMenuActivity::class.java)
+//    }
+
     private fun initSplashScreen() {
         /*
         We don't need the `installSplashScreen` call on Android 12+ (the system handles the

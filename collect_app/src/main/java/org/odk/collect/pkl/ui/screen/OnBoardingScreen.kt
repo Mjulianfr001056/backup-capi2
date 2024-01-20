@@ -4,11 +4,9 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +26,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.polstat.pkl.navigation.Capi63Screen
+import com.polstat.pkl.navigation.CapiScreen
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklQuaternary
 import com.polstat.pkl.ui.theme.PklSecondary
@@ -45,7 +45,7 @@ import org.odk.collect.pkl.openAppSettings
 import org.odk.collect.pkl.ui.screen.components.PermissionDialog
 
 
-@RequiresApi(Build.VERSION_CODES.S)
+//@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun OnBoardingScreen(
     navController: NavHostController,
@@ -101,6 +101,19 @@ fun OnBoardingScreen(
                 goToAppSettingsClick = activity::openAppSettings
             )
         }
+
+
+    LaunchedEffect(viewModel.isLoggedBefore) {
+        val isLoggedBefore = viewModel.isLoggedBefore
+
+        if (isLoggedBefore) {
+            navController.navigate(CapiScreen.Top.MAIN) {
+                popUpTo(CapiScreen.Top.AUTH) {
+                    inclusive = true
+                }
+            }
+        }
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

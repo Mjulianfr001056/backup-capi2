@@ -1,8 +1,9 @@
 package com.polstat.pkl.viewmodel
 
-import android.os.Build
-import android.util.Log
 //import androidx.annotation.RequiresApi
+//import com.polstat.pkl.repository.LocationRepository
+//import com.polstat.pkl.utils.location.GetLocationUseCase
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,14 +17,12 @@ import com.polstat.pkl.repository.AuthRepository
 import com.polstat.pkl.repository.DataTimRepository
 import com.polstat.pkl.repository.KeluargaRepository
 import com.polstat.pkl.repository.LocalRutaRepository
-//import com.polstat.pkl.repository.LocationRepository
 import com.polstat.pkl.repository.MahasiswaRepository
 import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.ui.event.LoginScreenEvent
 import com.polstat.pkl.ui.state.LoginScreenState
 import com.polstat.pkl.utils.Result
-//import com.polstat.pkl.utils.location.GetLocationUseCase
 import com.polstat.pkl.utils.use_case.ValidateNim
 import com.polstat.pkl.utils.use_case.ValidatePassword
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -77,6 +76,19 @@ class AuthViewModel @Inject constructor(
     private val _countdown = MutableStateFlow(5)
 
     val visiblePermissionDialogQueue = mutableListOf<String>()
+
+    var isLoggedBefore = false
+
+    init {
+        try {
+            Log.d(TAG, "Session NIM -> ${_session?.nim}")
+            isLoggedBefore = _session?.nim != null
+        } catch (
+            e: Exception
+        ) {
+            Log.d(TAG, "Session is not ready yet!")
+        }
+    }
 
 //    init {
 //        viewModelScope.launch {

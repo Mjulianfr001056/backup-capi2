@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.polstat.pkl.navigation.CapiScreen
 import com.polstat.pkl.ui.screen.components.BottomNavBar
 import com.polstat.pkl.ui.screen.components.ListPplCard
 import com.polstat.pkl.ui.screen.components.PmlCard
@@ -141,7 +142,14 @@ fun BerandaScreen(
                                         color = Color.Gray
                                     )
                                 },
-                                onClick = { /*TODO*/ }
+                                onClick = {
+                                    viewModel.logout()
+                                    rootController.navigate(CapiScreen.Top.AUTH) {
+                                        popUpTo(CapiScreen.Top.MAIN) {
+                                            inclusive = true
+                                        }
+                                    }
+                                }
                             )
                         }
                     }
