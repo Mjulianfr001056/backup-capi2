@@ -92,7 +92,8 @@ class AuthViewModel @Inject constructor(
                         }
                         Log.d(TAG, "getLocationUseCase: ${location!!.latitude}, ${location.longitude}, ${location.accuracy}")
                     }
-                    _countdown.value = 600
+//                    _countdown.value = 600
+                    _countdown.value = 600000 //Jangan berulan dulu
                 }
             }
         }
@@ -238,7 +239,7 @@ class AuthViewModel @Inject constructor(
                     }
                 }
             }
-
+            Log.d(TAG, "Token: ${_session?.token} ")
             delay(2000)
             closeLoadingDialog()
         }
