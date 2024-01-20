@@ -39,11 +39,14 @@ class ProjectConfigurerActivity : ComponentActivity(){
         DaggerUtils.getComponent(this).inject(this)
         settingsConnectionMatcher = SettingsConnectionMatcher(projectsRepository, settingsProvider)
 
+        val token = intent.getStringExtra("token")
+
         val settingsJson = appConfigurationGenerator.getAppConfigurationAsJsonWithServerDetails(
-            "https://central.pkl63.stis.ac.id/v1/key/fKaPJ9kmrHUJsZ0mv2jx3dQir4SygjeDHgfByQIjyidK12HALTvTrrzek5VlC\$qq/projects/2",
+            "https://central.pkl63.stis.ac.id/v1/key/${token}/projects/2",
             "",
             ""
         )
+
         Timber.tag("TEST").d("onCreate: it also works this time!")
         settingsConnectionMatcher.getProjectWithMatchingConnection(settingsJson)?.let { uuid ->
             switchToProject(uuid)

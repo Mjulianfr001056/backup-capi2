@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.polstat.pkl.viewmodel.AuthViewModel
+import com.polstat.pkl.viewmodel.KuesionerViewModel
 import com.polstat.pkl.viewmodel.PasswordMasterViewModel
 import org.odk.collect.pkl.ProjectConfigurerActivity
 import org.odk.collect.pkl.ui.screen.BerandaScreen
@@ -202,6 +203,9 @@ fun KuesionerNavHost(
     rootController : NavHostController
 ){
     val kuesionerNavController = rememberNavController()
+    val kuesionerViewModel: KuesionerViewModel = hiltViewModel()
+
+    val token = kuesionerViewModel.getToken()
 
     NavHost(
         navController = kuesionerNavController,
@@ -210,6 +214,7 @@ fun KuesionerNavHost(
         composable(CapiScreen.Kuesioner.START){
             val context = LocalContext.current
             val intent = Intent(context, ProjectConfigurerActivity::class.java)
+            intent.putExtra("token", token)
             context.startActivity(intent)
         }
     }
