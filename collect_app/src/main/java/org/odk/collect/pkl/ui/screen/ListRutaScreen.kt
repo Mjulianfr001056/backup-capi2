@@ -781,8 +781,7 @@ fun RutaList(
     LazyColumn(
         modifier = Modifier
             .fillMaxHeight()
-            .horizontalScroll(state = rememberScrollState(), enabled = true)
-        ,
+            .horizontalScroll(state = rememberScrollState(), enabled = true),
         content = {
             println("List Ruta Screen: ${wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()} ${wilayahWithAll.listKeluargaWithRuta!!.size}")
 //            if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
@@ -792,13 +791,12 @@ fun RutaList(
                     val daftarRuta = keluargaWithRuta.listRuta.filter { it.status != "delete" }
                     items(daftarRuta.size) { index ->
                         val ruta = daftarRuta[index]
-                            RutaRow(
-                                keluarga = keluargaWithRuta.keluarga,
-                                ruta = ruta,
-                                viewModel = hiltViewModel(),
-                                navController = navController
-                            )
-                        }
+                        RutaRow(
+                            keluarga = keluargaWithRuta.keluarga,
+                            ruta = ruta,
+                            viewModel = hiltViewModel(),
+                            navController = navController
+                        )
                     }
                 }
             }
