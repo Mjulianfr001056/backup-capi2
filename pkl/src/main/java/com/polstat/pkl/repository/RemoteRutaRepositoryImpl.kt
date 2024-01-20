@@ -45,4 +45,30 @@ class RemoteRutaRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun generateRuta(noBS: String): Flow<String> {
+        return flow {
+            try{
+                rutaApi.generateSampel(noBS)
+                val message = "Berhasil Generate Sampel"
+                Log.d(TAG, "Generate Sampel berhasil !")
+                emit(message)
+            } catch (e: IOException) {
+                val message = "Generate Sampel gagal !"
+                Log.d(TAG, "Generate Sampel gagal !", e)
+                emit(message)
+                e.printStackTrace()
+            } catch (e: HttpException) {
+                val message = "Generate Sampel gagal !"
+                Log.d(TAG, "Generate Sampel gagal !", e)
+                emit(message)
+                e.printStackTrace()
+            } catch (e: Exception) {
+                val message = "Generate Sampel gagal !"
+                Log.d(TAG, "Generate Sampel gagal !", e)
+                emit(message)
+                e.printStackTrace()
+            }
+        }
+    }
+
 }

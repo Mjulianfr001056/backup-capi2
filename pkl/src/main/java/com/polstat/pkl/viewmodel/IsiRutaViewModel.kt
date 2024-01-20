@@ -2,7 +2,7 @@ package com.polstat.pkl.viewmodel
 
 import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
+//import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -24,7 +24,7 @@ import com.polstat.pkl.ui.event.IsiRutaScreenEvent
 import com.polstat.pkl.ui.state.IsiRutaScreenState
 import com.polstat.pkl.utils.Result
 import com.polstat.pkl.utils.UtilFunctions
-import com.polstat.pkl.utils.location.GetLocationUseCase
+//import com.polstat.pkl.utils.location.GetLocationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,7 +38,7 @@ class IsiRutaViewModel @Inject constructor(
     private val localRutaRepository: LocalRutaRepository,
     private val wilayahRepository: WilayahRepository,
     private val keluargaRepository: KeluargaRepository,
-    private val getLocationUseCase: GetLocationUseCase,
+//    private val getLocationUseCase: GetLocationUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel(){
     private val _session = sessionRepository.getActiveSession()
@@ -63,6 +63,10 @@ class IsiRutaViewModel @Inject constructor(
 
     val lastRuta = _lastRuta.asStateFlow()
 
+    private val _ruta = MutableStateFlow(RutaEntity())
+
+    val ruta = _ruta.asStateFlow()
+
     private val _lokasi = MutableStateFlow(Lokasi())
 
     val lokasi = _lokasi.asStateFlow()
@@ -70,6 +74,7 @@ class IsiRutaViewModel @Inject constructor(
     private val _wilayahWithAll = MutableStateFlow(WilayahWithAll())
 
     val wilayahWithAll = _wilayahWithAll.asStateFlow()
+
 
     init {
         getLastKeluarga(noBS!!)
@@ -128,16 +133,16 @@ class IsiRutaViewModel @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
+//    @RequiresApi(Build.VERSION_CODES.S)
     fun getRutaLocation() {
-        viewModelScope.launch {
-            getLocationUseCase.invoke().collect { location ->
-                if (location != null) {
-                    _lokasi.value = location
-                }
-                Log.d(TAG, "getRutaLocation: $location")
-            }
-        }
+//        viewModelScope.launch {
+//            getLocationUseCase.invoke().collect { location ->
+//                if (location != null) {
+//                    _lokasi.value = location
+//                }
+//                Log.d(TAG, "getRutaLocation: $location")
+//            }
+//        }
     }
 
     fun updateRekapitulasiWilayah(
@@ -254,8 +259,28 @@ class IsiRutaViewModel @Inject constructor(
         }
     }
 
+    fun getRuta(noRuta: String) {
+        viewModelScope.launch {
+            localRutaRepository.getRuta(noRuta).collectLatest { result ->
+                when(result) {
+                    is Result.Success -> {
+                        _ruta.value = result.data!!
+                    }
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            Log.d(TAG, "Error getLastRuta: $error")
+                        }
+                    }
 
-    @RequiresApi(Build.VERSION_CODES.S)
+                    is Result.Loading -> {
+                        Log.d(TAG, "getLastRuta: Loading...")
+                    }
+                }
+            }
+        }
+    }
+
+//    @RequiresApi(Build.VERSION_CODES.S)
     suspend fun onEvent(
         event: IsiRutaScreenEvent,
         index: Int = 0

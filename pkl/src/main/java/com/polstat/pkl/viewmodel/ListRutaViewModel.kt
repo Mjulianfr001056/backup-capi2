@@ -70,6 +70,14 @@ class ListRutaViewModel @Inject constructor(
 
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
+    private val _showSuccessToastChannel = Channel<Boolean>()
+
+    val showSuccessToastChannel = _showSuccessToastChannel.receiveAsFlow()
+
+    private val _successMessage = MutableStateFlow("")
+
+    val successMessage = _successMessage.asStateFlow()
+
     init {
         getWilayahWithAll(noBS!!)
     }
@@ -181,7 +189,19 @@ class ListRutaViewModel @Inject constructor(
         }
     }
 
-    fun deleteRuta(kodeRuta: String) {
+    fun generateRuta(noBS: String) {
+        viewModelScope.launch {
+            remoteRutaRepository.generateRuta(noBS).collectLatest { message ->
+                _successMessage.value = message
+                _showSuccessToastChannel.send(true)
+                Log.d(TAG, message)
+            }
+        }
+    }
+
+    private fun deleteRuta(
+        kodeRuta: String
+    ) {
         viewModelScope.launch {
             val job = launch {
                 localRutaRepository.getRuta(kodeRuta).collectLatest { result ->
@@ -216,5 +236,4 @@ class ListRutaViewModel @Inject constructor(
             }
         }
     }
-
 }

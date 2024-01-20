@@ -314,14 +314,14 @@ private fun BlokSensus(
                             )
                         }
                     }
-                    Column (modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                        Row {
-                            Text(text = stringResource(R.string.total), fontFamily = PoppinsFontFamily, fontSize = 15.sp, color = Color.Gray)
-                        }
-                        Row {
-                            Text(text = "0", style = MaterialTheme.typography.headlineLarge, color = PklPrimary, fontWeight = FontWeight.Bold)
-                        }
-                    }
+//                    Column (modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+//                        Row {
+//                            Text(text = stringResource(R.string.total), fontFamily = PoppinsFontFamily, fontSize = 15.sp, color = Color.Gray)
+//                        }
+//                        Row {
+//                            Text(text = "0", style = MaterialTheme.typography.headlineLarge, color = PklPrimary, fontWeight = FontWeight.Bold)
+//                        }
+//                    }
                 }
             }
             Box(

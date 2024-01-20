@@ -2,7 +2,7 @@ package com.polstat.pkl.viewmodel
 
 import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
+//import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,14 +16,14 @@ import com.polstat.pkl.repository.AuthRepository
 import com.polstat.pkl.repository.DataTimRepository
 import com.polstat.pkl.repository.KeluargaRepository
 import com.polstat.pkl.repository.LocalRutaRepository
-import com.polstat.pkl.repository.LocationRepository
+//import com.polstat.pkl.repository.LocationRepository
 import com.polstat.pkl.repository.MahasiswaRepository
 import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.ui.event.LoginScreenEvent
 import com.polstat.pkl.ui.state.LoginScreenState
 import com.polstat.pkl.utils.Result
-import com.polstat.pkl.utils.location.GetLocationUseCase
+//import com.polstat.pkl.utils.location.GetLocationUseCase
 import com.polstat.pkl.utils.use_case.ValidateNim
 import com.polstat.pkl.utils.use_case.ValidatePassword
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,7 +37,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@RequiresApi(Build.VERSION_CODES.S)
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
@@ -49,8 +48,8 @@ class AuthViewModel @Inject constructor(
     private val localRutaRepository: LocalRutaRepository,
     private val validateNim: ValidateNim,
     private val validatePassword: ValidatePassword,
-    private val getLocationUseCase: GetLocationUseCase,
-    private val locationRepository: LocationRepository
+//    private val getLocationUseCase: GetLocationUseCase,
+//    private val locationRepository: LocationRepository
 ) : ViewModel() {
 
     var state by mutableStateOf(LoginScreenState())
@@ -79,25 +78,24 @@ class AuthViewModel @Inject constructor(
 
     val visiblePermissionDialogQueue = mutableListOf<String>()
 
-    init {
-        viewModelScope.launch {
-            while (true) {
-                delay(1000)
-                if (_countdown.value > 0) {
-                    _countdown.value--
-                } else {
-                    getLocationUseCase.invoke().collect { location ->
-                        if (location != null && _session?.nim != null) {
-                            locationRepository.updateLocation(_session.nim,location.longitude,location.latitude,location.accuracy)
-                        }
-                        Log.d(TAG, "getLocationUseCase: ${location!!.latitude}, ${location.longitude}, ${location.accuracy}")
-                    }
+//    init {
+//        viewModelScope.launch {
+//            while (true) {
+//                delay(1000)
+//                if (_countdown.value > 0) {
+//                    _countdown.value--
+//                } else {
+//                    getLocationUseCase.invoke().collect { location ->
+//                        if (location != null && _session?.nim != null) {
+//                            locationRepository.updateLocation(_session.nim,location.longitude,location.latitude,location.accuracy)
+//                        }
+//                        Log.d(TAG, "getLocationUseCase: ${location!!.latitude}, ${location.longitude}, ${location.accuracy}")
+//                    }
 //                    _countdown.value = 600
-                    _countdown.value = 600000 //Jangan berulan dulu
-                }
-            }
-        }
-    }
+//                }
+//            }
+//        }
+//    }
 
     @Suppress("NAME_SHADOWING")
     fun login(
