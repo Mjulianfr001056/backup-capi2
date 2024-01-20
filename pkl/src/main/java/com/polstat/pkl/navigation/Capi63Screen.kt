@@ -74,6 +74,7 @@ sealed class CapiScreen{
         const val LIST_RUTA = "list_ruta"
         const val LIST_SAMPLE = "list_sample"
         const val ISI_RUTA = "isi_ruta"
+        const val EDIT_RUTA = "edit_ruta"
     }
 
     object Password : CapiScreen() {

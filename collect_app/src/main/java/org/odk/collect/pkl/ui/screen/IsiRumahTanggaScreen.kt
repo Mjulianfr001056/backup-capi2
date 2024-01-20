@@ -1,6 +1,7 @@
 package org.odk.collect.pkl.ui.screen
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -50,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -83,6 +85,7 @@ fun IsiRumahTanggaScreen(
     val state = viewModel.state.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val noBS = viewModel.noBS
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = viewModel.getRutaLocation()) {
         viewModel.getRutaLocation()
@@ -537,6 +540,7 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(IsiRutaScreenEvent.submit)
                         }
+                        Toast.makeText(context, "Ruta berhasil ditambahkan", Toast.LENGTH_SHORT).show()
                         navController.navigate(Capi63Screen.ListRuta.route + "/${noBS}"){
                             popUpTo(Capi63Screen.ListRuta.route + "/${noBS}"){
                                 inclusive = true

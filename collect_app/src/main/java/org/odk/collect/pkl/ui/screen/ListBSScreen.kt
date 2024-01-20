@@ -56,6 +56,7 @@ import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.R
 import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.navigation.Capi63Screen
+import com.polstat.pkl.navigation.CapiScreen
 import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary
@@ -106,8 +107,8 @@ fun ListBSScreen(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.navigate(Capi63Screen.ListBs.route){
-                                popUpTo(Capi63Screen.ListBs.route){
+                            navController.navigate(CapiScreen.Sampling.START){
+                                popUpTo(CapiScreen.Sampling.LISTING){
                                     inclusive = false
                                 }
                             }

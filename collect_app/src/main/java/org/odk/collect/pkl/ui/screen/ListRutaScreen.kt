@@ -5,6 +5,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -70,6 +71,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.polstat.pkl.R
 import com.polstat.pkl.database.entity.KeluargaEntity
@@ -322,11 +324,7 @@ fun ListRutaScreen(
                 )
             }
 
-            if (checkedCheckbox) {
-                enableFinalisasiBSButton = true
-            } else {
-                enableFinalisasiBSButton = false
-            }
+            enableFinalisasiBSButton = checkedCheckbox
 
         },
         content = { innerPadding ->
@@ -386,7 +384,12 @@ fun ListRutaScreen(
                     }
 
                 }
-                RutaList(wilayahWithAll =  wilayahWithAll.value)
+                RutaList(
+                    wilayahWithAll =  wilayahWithAll.value,
+                    navController = navController,
+                    searchText = text
+                )
+
             }
         },
         floatingActionButton = {
@@ -412,11 +415,14 @@ fun ListRutaScreen(
 @Composable
 fun RutaRow(
     keluarga: KeluargaEntity,
-    ruta: RutaEntity
+    ruta: RutaEntity,
+    viewModel: ListRutaViewModel,
+    navController: NavHostController
 ) {
     var openActionDialog by remember { mutableStateOf(false) }
     var openDetail by remember { mutableStateOf(false) }
     var openPasswordMasterDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Row(
         modifier = Modifier
@@ -429,30 +435,43 @@ fun RutaRow(
         Arrangement.SpaceEvenly,
         Alignment.CenterVertically
     ) {
+//        Spacer(modifier = Modifier.size(20.dp))
+            Text(
+                modifier = Modifier.padding(start = 10.dp, end = 10.dp),
+                text = "${keluarga.noBgFisik}",
+                fontFamily = PoppinsFontFamily,
+                fontWeight = FontWeight.Medium,
+                fontSize = 16.sp
+            )
+
+//        Spacer(modifier = Modifier.size(40.dp))
         Text(
-            text = "${keluarga.noBgFisik}",
-            fontFamily = PoppinsFontFamily,
-            fontWeight = FontWeight.Medium,
-            fontSize = 16.sp
-        )
-        Text(
+            modifier = Modifier.padding(start = 10.dp, end = 10.dp),
             text = "${keluarga.noBgSensus}",
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
         )
+
+//        Spacer(modifier = Modifier.size(40.dp))
         Text(
+            modifier = Modifier.padding(start = 10.dp, end = 10.dp),
             text = "${ruta.noUrutRuta}",
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
         )
+
+//        Spacer(modifier = Modifier.size(40.dp))
         Text(
+            modifier = Modifier.padding(start = 10.dp, end = 10.dp),
             text = ruta.namaKrt!!,
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
         )
+
+//        Spacer(modifier = Modifier.size(40.dp))
         IconButton(onClick = {
             openDetail = true
         }) {
@@ -644,6 +663,7 @@ fun RutaRow(
                                 .fillMaxWidth()
                                 .clickable {
 //                                    mungkin ini harusnya move ke screen buat ubah ruta
+                                    navController.navigate(CapiScreen.Listing.EDIT_RUTA + "/${ruta.noBS}/${keluarga.kodeKlg}/${ruta.kodeRuta}")
                                 }
                                 .padding(
                                     top = 10.dp,
@@ -687,7 +707,17 @@ fun RutaRow(
                     Button(
                         modifier = Modifier.fillMaxWidth(0.45f),
                         onClick = {
-
+                            viewModel.deleteRuta(
+                                kodeRuta = ruta.kodeRuta
+                            )
+                            openPasswordMasterDialog = false
+                            openActionDialog = false
+                            navController.navigate(Capi63Screen.ListRuta.route + "/${ruta.noBS}"){
+                                popUpTo(Capi63Screen.ListRuta.route + "/${ruta.noBS}"){
+                                    inclusive = true
+                                }
+                            }
+                            Toast.makeText(context, "Ruta ${ruta.namaKrt} berhasil dihapus", Toast.LENGTH_SHORT).show()
                         },
                         colors = ButtonDefaults.buttonColors(PklPrimary900)) {
                         Text(text = stringResource(id = R.string.hapus_pass_master))
@@ -760,52 +790,43 @@ fun RutaRow(
 
 @Composable
 fun RutaList(
-    wilayahWithAll: WilayahWithAll
+    wilayahWithAll: WilayahWithAll,
+    navController: NavHostController,
+    searchText: String
 ) {
-//    var no = 0
-//
-//    Column {
-//        if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
-//            wilayahWithAll.listKeluargaWithRuta.forEach { keluargaWithRuta ->
-//                if (keluargaWithRuta.listRuta.isNotEmpty()) {
-//                    keluargaWithRuta.listRuta.forEach {ruta ->
-//                        no++
-//                        RutaRow(
-//                            no = no,
-//                            keluarga = keluargaWithRuta.keluarga,
-//                            ruta = ruta
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//    }
+    val filteredList = wilayahWithAll.listKeluargaWithRuta
+        ?.filter { keluargaWithRuta ->
+            keluargaWithRuta.listRuta.any { ruta ->
+                ruta.kodeRuta.contains(searchText, ignoreCase = true) ||
+                ruta.namaKrt!!.contains(searchText, ignoreCase = true)
+            }
+        }
+        ?.sortedBy { keluargaWithRuta ->
+            keluargaWithRuta.listRuta.firstOrNull()?.kodeRuta
+        }
 
     LazyColumn(
-        modifier = Modifier.fillMaxHeight(),
+        modifier = Modifier
+            .fillMaxHeight()
+            .horizontalScroll(state = rememberScrollState(), enabled = true),
         content = {
             println("List Ruta Screen: ${wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()} ${wilayahWithAll.listKeluargaWithRuta!!.size}")
-            if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
-                wilayahWithAll.listKeluargaWithRuta!!.forEach { keluargaWithRuta ->
-                    if (keluargaWithRuta.listRuta.isNotEmpty()) {
-                        items(keluargaWithRuta.listRuta.size) { index ->
-                            val ruta = keluargaWithRuta.listRuta[index]
-                            RutaRow(
-                                keluarga = keluargaWithRuta.keluarga,
-                                ruta = ruta
-                            )
-                        }
+//            if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
+//                wilayahWithAll.listKeluargaWithRuta!!.forEach { keluargaWithRuta ->
+            filteredList?.forEach { keluargaWithRuta ->
+                if (keluargaWithRuta.listRuta.isNotEmpty()) {
+                    val daftarRuta = keluargaWithRuta.listRuta.filter { it.status != "delete" }
+                    items(daftarRuta.size) { index ->
+                        val ruta = daftarRuta[index]
+                        RutaRow(
+                            keluarga = keluargaWithRuta.keluarga,
+                            ruta = ruta,
+                            viewModel = hiltViewModel(),
+                            navController = navController
+                        )
                     }
                 }
             }
-//            items(listRuta.size) { index ->
-//                val ruta = listRuta[index]
-//                RutaRow(
-//                    no = index + 1,
-//                    ruta = ruta,
-//                    keluarga = keluarga
-//                )
-//            }
         }
     )
 }
@@ -857,4 +878,18 @@ fun DetailRutaTextField(
             shape = RoundedCornerShape(10.dp)
         )
     }
+}
+
+@Composable
+fun LimitedText(
+    searchText: String
+) {
+    val limitedText = searchText.take(10)
+
+    Text(
+        text = limitedText,
+        fontWeight = FontWeight.Medium,
+        fontFamily = PoppinsFontFamily,
+        fontSize = 14.sp
+    )
 }

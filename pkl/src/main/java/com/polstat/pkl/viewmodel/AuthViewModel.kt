@@ -237,7 +237,7 @@ class AuthViewModel @Inject constructor(
                     }
                 }
             }
-
+            Log.d(TAG, "Token: ${_session?.token} ")
             delay(2000)
             closeLoadingDialog()
         }
