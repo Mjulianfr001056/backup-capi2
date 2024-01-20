@@ -85,6 +85,7 @@ import com.polstat.pkl.ui.theme.PklPrimary300
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PklTertiary100
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
+import com.polstat.pkl.utils.UtilFunctions
 import com.polstat.pkl.viewmodel.ListRutaViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -272,7 +273,15 @@ fun ListRutaScreen(
                     confirmButton = {
                         Button(
                             modifier = Modifier.fillMaxWidth(),
-                            onClick = { },
+                            onClick = {
+                                openFinalisasiBSDialog = false
+                                viewModel.finalisasiBS(noBS!!)
+                                navController.navigate(Capi63Screen.ListBs.route){
+                                    popUpTo(Capi63Screen.ListBs.route){
+                                        inclusive = true
+                                    }
+                                }
+                            },
                             enabled = enableFinalisasiBSButton,
                             content = {
                                 Text(
@@ -533,15 +542,15 @@ fun RutaRow(
                             )
                             DetailRutaTextField(
                                 label = R.string.nomor_urut_bangunan_fisik_ruta,
-                                value = "${keluarga.noBgFisik}"
+                                value = UtilFunctions.convertTo3DigitsString(keluarga.noBgFisik!!)
                             )
                             DetailRutaTextField(
                                 label = R.string.nomor_urut_bangunan_sensus_ruta,
-                                value = "${keluarga.noBgSensus}"
+                                value = UtilFunctions.convertTo3DigitsString(keluarga.noBgSensus!!)
                             )
                             DetailRutaTextField(
                                 label = R.string.nomor_urut_keluarga,
-                                value = "${keluarga.noUrutKlg}"
+                                value = UtilFunctions.convertTo3DigitsString(keluarga.noUrutKlg!!)
                             )
                             DetailRutaTextField(
                                 label = R.string.nama_kepala_keluarga,
@@ -557,7 +566,7 @@ fun RutaRow(
                             )
                             DetailRutaTextField(
                                 label = R.string.no_urut_keluarga_egb,
-                                value = "${keluarga.noUrutKlgEgb}"
+                                value = UtilFunctions.convertTo3DigitsString(keluarga.noUrutKlgEgb!!)
                             )
                             DetailRutaTextField(
                                 label = R.string.jml_pengelolaan_makan_keluarga,
@@ -565,11 +574,11 @@ fun RutaRow(
                             )
                             DetailRutaTextField(
                                 label = R.string.nomor_urut_krt_ruta,
-                                value = "${ruta.noUrutRuta}"
+                                value = UtilFunctions.convertTo3DigitsString(ruta.noUrutRuta!!)
                             )
                             DetailRutaTextField(
                                 label = R.string.identifikasi_kk_krt,
-                                value = "${ruta.kkOrKrt}"
+                                value = if (ruta.kkOrKrt == "1") "Kepala Keluarga (KK) saja" else if (ruta.kkOrKrt == "2") "Kepala Rumah Tangga (KRT) saja" else "KK Sekaligus KRT",
                             )
                             DetailRutaTextField(
                                 label = R.string.nama_krt_ruta,
@@ -585,12 +594,12 @@ fun RutaRow(
                             )
                             DetailRutaTextField(
                                 label = R.string.nomor_urut_ruta_egb,
-                                value = "${ruta.noUrutEgb}"
+                                value = UtilFunctions.convertTo3DigitsString(ruta.noUrutEgb!!)
                             )
-                            DetailRutaTextField(
-                                label = R.string.catatan,
-                                value = ruta.catatan!!
-                            )
+//                            DetailRutaTextField(
+//                                label = R.string.catatan,
+//                                value = ruta.catatan!!
+//                            )
                         }
                         Text(modifier = Modifier
                             .fillMaxWidth()

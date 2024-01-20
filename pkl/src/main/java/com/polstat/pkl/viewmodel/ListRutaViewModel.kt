@@ -9,9 +9,11 @@ import com.polstat.pkl.database.relation.WilayahWithRuta
 import com.polstat.pkl.mapper.toKeluargaDto
 import com.polstat.pkl.mapper.toRuta
 import com.polstat.pkl.mapper.toRutaDtoList
+import com.polstat.pkl.mapper.toWilayah
 import com.polstat.pkl.model.domain.Ruta
 import com.polstat.pkl.model.request.JsonKlg
 import com.polstat.pkl.model.request.SyncRutaRequest
+import com.polstat.pkl.model.response.FinalisasiBSResponse
 import com.polstat.pkl.model.response.SyncRutaResponse
 import com.polstat.pkl.repository.LocalRutaRepository
 import com.polstat.pkl.repository.RemoteRutaRepository
@@ -55,6 +57,8 @@ class ListRutaViewModel @Inject constructor(
     val wilayahWithAll = _wilayahWithAll.asStateFlow()
 
     private val _synchronizeRuta = MutableStateFlow(SyncRutaResponse())
+
+    private val _finalisasiBSResponse = MutableStateFlow(FinalisasiBSResponse())
 
     private val _deleteRuta = MutableStateFlow(Ruta())
 
@@ -143,6 +147,10 @@ class ListRutaViewModel @Inject constructor(
     ) {
         val jsonKlgInstance = JsonKlg()
 
+        val wilayah = wilayahWithAll.wilayahWithKeluarga!!.wilayah
+
+        val updatedWilayah = wilayah!!.copy(status = "listing-selesai")
+
         if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
             wilayahWithAll.listKeluargaWithRuta.forEach{ keluargaWithRuta ->
                 jsonKlgInstance.add(keluargaWithRuta.keluarga.toKeluargaDto(keluargaWithRuta.listRuta.toRutaDtoList()))
@@ -155,51 +163,80 @@ class ListRutaViewModel @Inject constructor(
             json = jsonKlgInstance
         )
         viewModelScope.launch {
-            remoteRutaRepository.sinkronisasiRuta(syncRutaRequest).collectLatest { result ->
-                when (result) {
-                    is Result.Success -> {
-                        result.data?.let { response ->
-                            _synchronizeRuta.value = response
+            val job = launch {
+                remoteRutaRepository.sinkronisasiRuta(syncRutaRequest).collectLatest { result ->
+                    when (result) {
+                        is Result.Success -> {
+                            result.data?.let { response ->
+                                _synchronizeRuta.value = response
+                                _successMessage.value = "Berhasil melakukan sinkronisasi!"
+                                _showSuccessToastChannel.send(true)
+                                Log.d(
+                                    TAG, "synchronizeRuta succeed: $response"
+                                )
+                            }
+                        }
+
+                        is Result.Loading -> {
                             Log.d(
-                                TAG, "synchronizeRuta succeed: $response"
+                                TAG,
+                                "synchronizeRuta: Loading..."
+                            )
+                        }
+
+                        is Result.Error -> {
+                            result.message?.let { error ->
+                                _errorMessage.value = error
+                            }
+                            _showErrorToastChannel.send(true)
+                            Log.e(
+                                TAG,
+                                "synchronizeRuta: Error in synchronizeRuta"
                             )
                         }
                     }
-
-                    is Result.Loading -> {
-                        Log.d(
-                            TAG,
-                            "synchronizeRuta: Loading..."
-                        )
-                    }
-
-                    is Result.Error -> {
-                        result.message?.let { error ->
-                            _errorMessage.value = error
-                        }
-                        _showErrorToastChannel.send(true)
-                        Log.e(
-                            TAG,
-                            "synchronizeRuta: Error in synchronizeRuta"
-                        )
-                    }
-
                 }
             }
+            job.join()
+
+//            launch {
+//                wilayahRepository.updateWilayah(updatedWilayah.toWilayah(emptyList()), nim).collectLatest{ message ->
+//                    Log.d(TAG, message)
+//                }
+//            }
         }
     }
 
     fun generateRuta(noBS: String) {
+        val wilayah = _wilayahWithAll.value.wilayahWithKeluarga!!.wilayah
+
+        val updatedWilayah = wilayah!!.copy(status = "telah-disampel")
+
         viewModelScope.launch {
-            remoteRutaRepository.generateRuta(noBS).collectLatest { message ->
-                _successMessage.value = message
-                _showSuccessToastChannel.send(true)
-                Log.d(TAG, message)
+
+            val job = launch {
+                remoteRutaRepository.generateRuta(noBS).collectLatest { message ->
+                    _successMessage.value = message
+                    _showSuccessToastChannel.send(true)
+                    Log.d(TAG, message)
+                }
             }
+
+            job.join()
+
+            launch {
+                wilayahRepository.updateWilayah(updatedWilayah.toWilayah(emptyList()),
+                    _session!!.nim!!
+                )
+                    .collectLatest { message ->
+                        Log.d(TAG, message)
+                    }
+            }
+
         }
     }
 
-    private fun deleteRuta(
+    fun deleteRuta(
         kodeRuta: String
     ) {
         viewModelScope.launch {
@@ -236,4 +273,59 @@ class ListRutaViewModel @Inject constructor(
             }
         }
     }
+
+    fun finalisasiBS(
+        noBS: String
+    ) {
+        val wilayah = _wilayahWithAll.value.wilayahWithKeluarga!!.wilayah
+
+        val updatedWilayah = wilayah!!.copy(status = "listing-selesai")
+
+        viewModelScope.launch {
+            val job = launch {
+                remoteRutaRepository.finalisasiBS(noBS).collectLatest { result ->
+                    when (result) {
+                        is Result.Success -> {
+                            result.data?.let { response ->
+                                _finalisasiBSResponse.value = response
+                                Log.d(
+                                    TAG, "finalisasiBS succeed: $response"
+                                )
+                                _successMessage.value = "Berhasil melakukan finalisasi BS!"
+                                _showSuccessToastChannel.send(true)
+                            }
+                        }
+
+                        is Result.Loading -> {
+                            Log.d(
+                                TAG, "finalisasiBS: Loading..."
+                            )
+                        }
+
+                        is Result.Error -> {
+                            result.message?.let { error ->
+                                _errorMessage.value = error
+                            }
+                            _showErrorToastChannel.send(true)
+                            Log.e(
+                                TAG, "finalisasiBS: Error in finalisasiBS"
+                            )
+                        }
+                    }
+                }
+            }
+
+            job.join()
+
+            launch {
+                wilayahRepository.updateWilayah(updatedWilayah.toWilayah(emptyList()),
+                    _session!!.nim!!
+                )
+                    .collectLatest { message ->
+                        Log.d(TAG, message)
+                    }
+            }
+        }
+    }
+
 }

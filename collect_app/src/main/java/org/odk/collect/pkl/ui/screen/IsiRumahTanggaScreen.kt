@@ -540,7 +540,7 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(IsiRutaScreenEvent.submit)
                         }
-                        Toast.makeText(context, "Ruta berhasil ditambahkan", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Ruta berhasil ditambahkan!", Toast.LENGTH_SHORT).show()
                         navController.navigate(Capi63Screen.ListRuta.route + "/${noBS}"){
                             popUpTo(Capi63Screen.ListRuta.route + "/${noBS}"){
                                 inclusive = true

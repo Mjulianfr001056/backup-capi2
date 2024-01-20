@@ -67,7 +67,7 @@ class LocalRutaRepositoryImpl @Inject constructor(
                 val readyRuta = ruta.copy(status = "update")
                 capi63Database.capi63Dao.updateRuta(readyRuta.toRutaEntity())
                 val message = "Berhasil mengupdate ruta!"
-                Log.d(TAG, "updateRuta: $message")
+                Log.d(TAG, "updateRuta: $message $readyRuta")
             } catch (e: Exception) {
                 val message = "Gagal mengupdate ruta!"
                 Log.d(TAG, "updateRuta: $message (${e.message})")

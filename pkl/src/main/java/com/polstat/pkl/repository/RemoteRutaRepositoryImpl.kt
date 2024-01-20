@@ -2,6 +2,7 @@ package com.polstat.pkl.repository
 
 import android.util.Log
 import com.polstat.pkl.model.request.SyncRutaRequest
+import com.polstat.pkl.model.response.FinalisasiBSResponse
 import com.polstat.pkl.model.response.SyncRutaResponse
 import com.polstat.pkl.network.RutaApi
 import com.polstat.pkl.utils.Result
@@ -23,6 +24,7 @@ class RemoteRutaRepositoryImpl @Inject constructor(
         return flow {
             emit(Result.Loading(true))
             val syncRutaResponse = try {
+                Log.d(TAG, "Sync Ruta Request:  $syncRutaRequest")
                 val response = rutaApi.sinkronisasiRuta(syncRutaRequest)
                 Log.d(TAG, "Sync Ruta Response:  $response")
                 response
@@ -68,6 +70,34 @@ class RemoteRutaRepositoryImpl @Inject constructor(
                 emit(message)
                 e.printStackTrace()
             }
+        }
+    }
+
+    override suspend fun finalisasiBS(
+        noBS: String
+    ): Flow<Result<FinalisasiBSResponse>> {
+        return flow {
+            emit(Result.Loading(true))
+            val finalBSResponse = try {
+                val response = rutaApi.finalisasiBS(noBS)
+                Log.d(TAG, "Finalisasi BS Response berhasil:  $response")
+                response
+            } catch (e: IOException) {
+                e.printStackTrace()
+                emit(Result.Error(message = e.localizedMessage ?: "Finalisasi Error"))
+                return@flow
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                emit(Result.Error(message = e.localizedMessage ?: "Finalisasi Error"))
+                return@flow
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Result.Error(message = e.localizedMessage ?: "Finalisasi Error"))
+                return@flow
+            }
+
+            emit(Result.Success(finalBSResponse))
+            emit(Result.Loading(false))
         }
     }
 

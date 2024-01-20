@@ -49,7 +49,8 @@ fun RutaEntity.toRutaDto(): RutaDto {
         no_bs = noBS,
         no_urut_ruta = noUrutRuta,
         kat_genz = katGenz,
-        kk_or_krt = kkOrKrt
+        kk_or_krt = kkOrKrt,
+        status = status
     )
 }
 

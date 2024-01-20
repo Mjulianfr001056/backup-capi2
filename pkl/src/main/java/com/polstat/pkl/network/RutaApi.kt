@@ -1,6 +1,7 @@
 package com.polstat.pkl.network
 
 import com.polstat.pkl.model.request.SyncRutaRequest
+import com.polstat.pkl.model.response.FinalisasiBSResponse
 import com.polstat.pkl.model.response.SyncRutaResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -16,5 +17,11 @@ interface RutaApi {
     suspend fun generateSampel(
         @Path("noBS") noBS: String
     )
+
+    @GET("listing/finalisasi-bs/{noBS}")
+    suspend fun finalisasiBS(
+        @Path("noBS")
+        noBS: String
+    ) : FinalisasiBSResponse
 
 }

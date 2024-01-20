@@ -25,10 +25,12 @@ class KeluargaRepositoryImpl @Inject constructor(
     ): Flow<String> {
         return  flow {
             try {
-                Log.d(TAG, "Keluarga entity: ${keluarga.toKeluargaEntity()}")
-                capi63Database.capi63Dao.insertKeluarga(keluarga.toKeluargaEntity())
+                Log.d(TAG, "Keluarga: $keluarga")
+                val readyKlg = keluarga.copy(status = "insert")
+                Log.d(TAG, "Keluarga insert: $readyKlg")
+                Log.d(TAG, "insertKeluarga: ${readyKlg.toKeluargaEntity()}")
+                capi63Database.capi63Dao.insertKeluarga(readyKlg.toKeluargaEntity())
                 val message = "Berhasil menambahkan keluarga!"
-                Log.d(TAG, "insertKeluarga: $message $keluarga")
                 emit(message)
             } catch (e: SQLiteConstraintException) {
                 val message = "Gagal menambahkan keluarga! Constraint pelanggaran: ${e.message}"
@@ -46,7 +48,8 @@ class KeluargaRepositoryImpl @Inject constructor(
         return flow {
             try {
                 Log.d(TAG, "Keluarga entity: ${keluarga.toKeluargaEntity()}")
-                capi63Database.capi63Dao.updateKeluarga(keluarga.toKeluargaEntity())
+                val updatedKlg = keluarga.copy(status = "update")
+                capi63Database.capi63Dao.updateKeluarga(updatedKlg.toKeluargaEntity())
                 val message = "Berhasil mengubah keluarga!"
                 Log.d(TAG, "updateKeluarga: $message $keluarga")
                 emit(message)

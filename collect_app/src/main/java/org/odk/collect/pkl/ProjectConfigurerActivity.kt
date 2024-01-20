@@ -40,7 +40,7 @@ class ProjectConfigurerActivity : ComponentActivity(){
         settingsConnectionMatcher = SettingsConnectionMatcher(projectsRepository, settingsProvider)
 
         val settingsJson = appConfigurationGenerator.getAppConfigurationAsJsonWithServerDetails(
-            "https://central.pkl63.stis.ac.id/v1/key/1UX!Up233T7uaauSL9eXUfZb\$pNuz4G!DkPJiLQ!qw0lB3VG0\$n7q2gqiBWN0X8b/projects/1",
+            "https://central.pkl63.stis.ac.id/v1/key/fKaPJ9kmrHUJsZ0mv2jx3dQir4SygjeDHgfByQIjyidK12HALTvTrrzek5VlC\$qq/projects/2",
             "",
             ""
         )
