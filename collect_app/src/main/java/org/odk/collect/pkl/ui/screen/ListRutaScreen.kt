@@ -637,6 +637,7 @@ fun RutaRow(
                                 .fillMaxWidth()
                                 .clickable {
 //                                    mungkin ini harusnya move ke screen buat ubah ruta
+                                    navController.navigate(CapiScreen.Listing.EDIT_RUTA + "/${ruta.noBS}/${keluarga.kodeKlg}/${ruta.kodeRuta}")
                                 }
                                 .padding(
                                     top = 10.dp,
