@@ -36,7 +36,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -50,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.polstat.pkl.navigation.Capi63Screen
-import com.polstat.pkl.ui.event.IsiRutaScreenEvent
+import com.polstat.pkl.ui.event.EditRutaEvent
 import com.polstat.pkl.ui.theme.PklAccent
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary
@@ -59,23 +58,21 @@ import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PklSecondary
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.utils.UtilFunctions
-import com.polstat.pkl.viewmodel.IsiRutaViewModel
+import com.polstat.pkl.viewmodel.EditRutaViewModel
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IsiRumahTanggaScreen(
+fun EditRutaScreen(
     navController: NavHostController,
-    viewModel: IsiRutaViewModel
+    viewModel: EditRutaViewModel
 ) {
     val state = viewModel.state.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val noBS = viewModel.noBS
-
-    LaunchedEffect(key1 = viewModel.getRutaLocation()) {
-        viewModel.getRutaLocation()
-    }
+    val kodeRuta = viewModel.kodeRuta
+    val kodeKlg = viewModel.kodeKlg
 
     Scaffold(
         topBar = {
@@ -138,7 +135,7 @@ fun IsiRumahTanggaScreen(
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.SLSChanged(
+                                EditRutaEvent.SLSChanged(
                                     it
                                 )
                             )
@@ -174,7 +171,7 @@ fun IsiRumahTanggaScreen(
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.NoSegmenChanged(
+                                EditRutaEvent.NoSegmenChanged(
                                     it
                                 )
                             )
@@ -190,7 +187,7 @@ fun IsiRumahTanggaScreen(
                     onIncrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.NoSegmenChanged(
+                                EditRutaEvent.NoSegmenChanged(
                                     increment(
                                         state.value.noSegmen!!
                                     )
@@ -201,7 +198,7 @@ fun IsiRumahTanggaScreen(
                     onDecrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.NoSegmenChanged(
+                                EditRutaEvent.NoSegmenChanged(
                                     decrement(
                                         state.value.noSegmen!!
                                     )
@@ -218,7 +215,7 @@ fun IsiRumahTanggaScreen(
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.NoBgFisikChanged(
+                                EditRutaEvent.NoBgFisikChanged(
                                     it.toInt()
                                 )
                             )
@@ -234,7 +231,7 @@ fun IsiRumahTanggaScreen(
                     onIncrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.NoBgFisikChanged(
+                                EditRutaEvent.NoBgFisikChanged(
                                     increment(
                                         UtilFunctions.convertTo3DigitsString(
                                             state.value.noBgFisik!!
@@ -247,7 +244,7 @@ fun IsiRumahTanggaScreen(
                     onDecrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.NoBgFisikChanged(
+                                EditRutaEvent.NoBgFisikChanged(
                                     decrement(
                                         UtilFunctions.convertTo3DigitsString(
                                             state.value.noBgFisik!!
@@ -266,7 +263,7 @@ fun IsiRumahTanggaScreen(
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.NoBgSensusChanged(
+                                EditRutaEvent.NoBgSensusChanged(
                                     it.toInt()
                                 )
                             )
@@ -282,7 +279,7 @@ fun IsiRumahTanggaScreen(
                     onIncrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.NoBgSensusChanged(
+                                EditRutaEvent.NoBgSensusChanged(
                                     increment(
                                         UtilFunctions.convertTo3DigitsString(
                                             state.value.noBgSensus!!
@@ -295,7 +292,7 @@ fun IsiRumahTanggaScreen(
                     onDecrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.NoBgSensusChanged(
+                                EditRutaEvent.NoBgSensusChanged(
                                     decrement(
                                         UtilFunctions.convertTo3DigitsString(
                                             state.value.noBgSensus!!
@@ -309,12 +306,12 @@ fun IsiRumahTanggaScreen(
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                InputNomor(
+                ViewNomor(
                     value = state.value.noUrutKlg.toString(),
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.NoUrutKlgChanged(
+                                EditRutaEvent.NoUrutKlgChanged(
                                     it.toInt()
                                 )
                             )
@@ -326,32 +323,6 @@ fun IsiRumahTanggaScreen(
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.SemiBold
                         )
-                    },
-                    onIncrement = {
-                        coroutineScope.launch {
-                            viewModel.onEvent(
-                                IsiRutaScreenEvent.NoUrutKlgChanged(
-                                    increment(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.noUrutKlg!!
-                                        )
-                                    ).toInt()
-                                )
-                            )
-                        }
-                    },
-                    onDecrement = {
-                        coroutineScope.launch {
-                            viewModel.onEvent(
-                                IsiRutaScreenEvent.NoUrutKlgChanged(
-                                    decrement(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.noUrutKlg!!
-                                        )
-                                    ).toInt()
-                                )
-                            )
-                        }
                     }
                 )
 
@@ -362,7 +333,7 @@ fun IsiRumahTanggaScreen(
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.NamaKKChanged(
+                                EditRutaEvent.NamaKKChanged(
                                     it
                                 )
                             )
@@ -398,7 +369,7 @@ fun IsiRumahTanggaScreen(
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.AlamatChanged(
+                                EditRutaEvent.AlamatChanged(
                                     it
                                 )
                             )
@@ -434,7 +405,7 @@ fun IsiRumahTanggaScreen(
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.IsGenzOrtuChanged(
+                                EditRutaEvent.IsGenzOrtuChanged(
                                     it.toInt()
                                 )
                             )
@@ -450,7 +421,7 @@ fun IsiRumahTanggaScreen(
                     onIncrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.IsGenzOrtuChanged(
+                                EditRutaEvent.IsGenzOrtuChanged(
                                     increment(
                                         UtilFunctions.convertTo3DigitsString(
                                             state.value.isGenzOrtu!!
@@ -463,7 +434,7 @@ fun IsiRumahTanggaScreen(
                     onDecrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.IsGenzOrtuChanged(
+                                EditRutaEvent.IsGenzOrtuChanged(
                                     decrement(
                                         UtilFunctions.convertTo3DigitsString(
                                             state.value.isGenzOrtu!!
@@ -478,12 +449,12 @@ fun IsiRumahTanggaScreen(
                 if (state.value.isGenzOrtu.toString() != "0") {
                     Spacer(modifier = Modifier.padding(10.dp))
 
-                    InputNomor(
+                    ViewNomor(
                         value = state.value.noUrutKlgEgb.toString(),
                         onValueChange = {
                             coroutineScope.launch {
                                 viewModel.onEvent(
-                                    IsiRutaScreenEvent.NoUrutKlgEgbChanged(it.toInt())
+                                    EditRutaEvent.NoUrutKlgEgbChanged(it.toInt())
                                 )
                             }
                         },
@@ -493,42 +464,16 @@ fun IsiRumahTanggaScreen(
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.SemiBold
                             )
-                        },
-                        onIncrement = {
-                            coroutineScope.launch {
-                                viewModel.onEvent(
-                                    IsiRutaScreenEvent.NoUrutKlgEgbChanged(
-                                        increment(
-                                            UtilFunctions.convertTo3DigitsString(
-                                                state.value.noUrutKlgEgb!!
-                                            )
-                                        ).toInt()
-                                    )
-                                )
-                            }
-                        },
-                        onDecrement = {
-                            coroutineScope.launch {
-                                viewModel.onEvent(
-                                    IsiRutaScreenEvent.NoUrutKlgEgbChanged(
-                                        decrement(
-                                            UtilFunctions.convertTo3DigitsString(
-                                                state.value.noUrutKlgEgb!!
-                                            )
-                                        ).toInt()
-                                    )
-                                )
-                            }
                         }
                     )
                 }
 
-                InputNomor(
+                ViewNomor(
                     value = state.value.penglMkn.toString(),
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.PenglMknChanged(
+                                EditRutaEvent.PenglMknChanged(
                                     it.toInt()
                                 )
                             )
@@ -540,71 +485,43 @@ fun IsiRumahTanggaScreen(
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.SemiBold
                         )
-                    },
-                    onIncrement = {
-                        coroutineScope.launch {
-                            viewModel.onEvent(
-                                IsiRutaScreenEvent.PenglMknChanged(
-                                    increment(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.penglMkn!!
-                                        )
-                                    ).toInt()
-                                )
-                            )
-                        }
-                    },
-                    onDecrement = {
-                        coroutineScope.launch {
-                            viewModel.onEvent(
-                                IsiRutaScreenEvent.PenglMknChanged(
-                                    decrement(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.penglMkn!!
-                                        )
-                                    ).toInt()
-                                )
-                            )
-                        }
                     }
                 )
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                for (i in 1..state.value.penglMkn!!) {
-                    Card(
-                        border = BorderStroke(1.dp, PklSecondary),
-                        colors = CardDefaults.cardColors(
-                            containerColor = PklBase
-                        ),
-                        shape = RectangleShape,
+                Card(
+                    border = BorderStroke(1.dp, PklSecondary),
+                    colors = CardDefaults.cardColors(
+                        containerColor = PklBase
+                    ),
+                    shape = RectangleShape,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
                             .fillMaxWidth()
+                            .padding(15.dp)
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(15.dp)
-                        ) {
-                            Text(
-                                text = "Keterangan Rumah Tangga ke-$i",
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium
-                            )
-                            KeteranganRuta(viewModel = viewModel, index = i - 1)
-                        }
+                        Text(
+                            text = "Keterangan Rumah Tangga",
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium
+                        )
+                        KeteranganRuta(viewModel = viewModel)
                     }
-
-                    Spacer(modifier = Modifier.padding(10.dp))
                 }
+
+                Spacer(modifier = Modifier.padding(10.dp))
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 Button(
                     onClick = {
                         coroutineScope.launch {
-                            viewModel.onEvent(IsiRutaScreenEvent.submit)
+                            viewModel.onEvent(EditRutaEvent.submit)
                         }
                         navController.navigate(Capi63Screen.ListRuta.route + "/${noBS}") {
                             popUpTo(Capi63Screen.ListRuta.route + "/${noBS}") {
@@ -634,22 +551,21 @@ fun IsiRumahTanggaScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun KeteranganRuta(
-    viewModel: IsiRutaViewModel,
-    index: Int
+    viewModel: EditRutaViewModel
 ) {
     val state = viewModel.state.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val kkKrtOptions =
         listOf("Kepala Keluarga (KK) saja", "Kepala Rumah Tangga (KRT) saja", "KK Sekaligus KRT")
 
-    InputNomor(
-        value = UtilFunctions.convertTo3DigitsString(state.value.listNoUrutRuta!![index]),
+    ViewNomor(
+        value = UtilFunctions.convertTo3DigitsString(state.value.noUrutRuta!!),
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    IsiRutaScreenEvent.NoUrutRutaChanged(
+                    EditRutaEvent.NoUrutRutaChanged(
                         it.toInt()
-                    ), index
+                    )
                 )
             }
         },
@@ -659,32 +575,6 @@ fun KeteranganRuta(
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.SemiBold
             )
-        },
-        onIncrement = {
-            coroutineScope.launch {
-                viewModel.onEvent(
-                    IsiRutaScreenEvent.NoUrutRutaChanged(
-                        increment(
-                            UtilFunctions.convertTo3DigitsString(
-                                state.value.listNoUrutRuta!![index]
-                            )
-                        ).toInt()
-                    ), index
-                )
-            }
-        },
-        onDecrement = {
-            coroutineScope.launch {
-                viewModel.onEvent(
-                    IsiRutaScreenEvent.NoUrutRutaChanged(
-                        decrement(
-                            UtilFunctions.convertTo3DigitsString(
-                                state.value.listNoUrutRuta!![index]
-                            )
-                        ).toInt()
-                    ), index
-                )
-            }
         }
     )
 
@@ -701,12 +591,11 @@ fun KeteranganRuta(
 
         RadioButtons(
             options = kkKrtOptions,
-            selectedOption = state.value.listKkOrKrt!![index],
+            selectedOption = state.value.kkOrKrt!!,
             onOptionSelected = { option ->
                 coroutineScope.launch {
                     viewModel.onEvent(
-                        IsiRutaScreenEvent.KKOrKRTChanged(option),
-                        index
+                        EditRutaEvent.KKOrKRTChanged(option)
                     )
                 }
             }
@@ -716,13 +605,13 @@ fun KeteranganRuta(
     Spacer(modifier = Modifier.padding(10.dp))
 
     TextField(
-        value = state.value.listNamaKrt!![index],
+        value = state.value.namaKrt!!,
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    IsiRutaScreenEvent.NamaKRTChanged(
+                    EditRutaEvent.NamaKRTChanged(
                         it
-                    ), index
+                    )
                 )
             }
         },
@@ -752,13 +641,13 @@ fun KeteranganRuta(
     Spacer(modifier = Modifier.padding(10.dp))
 
     InputNomor(
-        value = UtilFunctions.convertTo3DigitsString(state.value.listGenzOrtu!![index]),
+        value = UtilFunctions.convertTo3DigitsString(state.value.genzOrtu!!),
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    IsiRutaScreenEvent.GenzOrtuChanged(
+                    EditRutaEvent.GenzOrtuChanged(
                         it.toInt()
-                    ), index
+                    )
                 )
             }
         },
@@ -772,22 +661,22 @@ fun KeteranganRuta(
         onIncrement = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    IsiRutaScreenEvent.GenzOrtuChanged(
+                    EditRutaEvent.GenzOrtuChanged(
                         increment(
-                            UtilFunctions.convertTo3DigitsString(state.value.listGenzOrtu!![index])
+                            UtilFunctions.convertTo3DigitsString(state.value.genzOrtu!!)
                         ).toInt()
-                    ), index
+                    )
                 )
             }
         },
         onDecrement = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    IsiRutaScreenEvent.GenzOrtuChanged(
+                    EditRutaEvent.GenzOrtuChanged(
                         decrement(
-                            UtilFunctions.convertTo3DigitsString(state.value.listGenzOrtu!![index])
+                            UtilFunctions.convertTo3DigitsString(state.value.genzOrtu!!)
                         ).toInt()
-                    ), index
+                    )
                 )
             }
         },
@@ -883,6 +772,33 @@ fun InputNomor(
             }
         },
         readOnly = readOnly
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ViewNomor(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: @Composable (() -> Unit),
+    modifier: Modifier = Modifier
+) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = label,
+        singleLine = true,
+        modifier = modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.textFieldColors(
+            containerColor = Color.Transparent,
+            focusedIndicatorColor = PklPrimary700,
+            unfocusedIndicatorColor = PklAccent
+        ),
+        textStyle = TextStyle.Default.copy(
+            fontFamily = PoppinsFontFamily,
+            fontWeight = FontWeight.SemiBold
+        ),
+        readOnly = true
     )
 }
 
