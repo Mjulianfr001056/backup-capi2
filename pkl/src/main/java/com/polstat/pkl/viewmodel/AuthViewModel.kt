@@ -95,6 +95,10 @@ class AuthViewModel @Inject constructor(
 //        }
 //    }
 
+    fun isLoggedIn() : Boolean {
+        return sessionRepository.isLoggedIn()
+    }
+
     @Suppress("NAME_SHADOWING")
     fun login(
         nim: String,
