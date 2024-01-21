@@ -4,11 +4,9 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -49,7 +47,7 @@ import org.odk.collect.pkl.openAppSettings
 import org.odk.collect.pkl.ui.screen.components.PermissionDialog
 
 
-@RequiresApi(Build.VERSION_CODES.S)
+//@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun OnBoardingScreen(
     navController: NavHostController,
@@ -96,16 +94,7 @@ fun OnBoardingScreen(
 
         }
     }
-    
-//    LaunchedEffect(key1 = viewModel.isActive) {
-//        if (viewModel.isActive.value) {
-//            navController.navigate(CapiScreen.Top.MAIN){
-//                popUpTo(CapiScreen.Top.AUTH){
-//                    inclusive = true
-//                }
-//            }
-//        }
-//    }
+
 
     dialogQueue
         .reversed()

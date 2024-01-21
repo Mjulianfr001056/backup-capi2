@@ -2,7 +2,6 @@ package com.polstat.pkl.viewmodel
 
 import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 //import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,20 +11,17 @@ import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.mapper.toMahasiswaEntity
 import com.polstat.pkl.model.domain.DataTim
 import com.polstat.pkl.model.domain.Mahasiswa
-import com.polstat.pkl.model.domain.Session
 import com.polstat.pkl.model.response.AuthResponse
 import com.polstat.pkl.repository.AuthRepository
 import com.polstat.pkl.repository.DataTimRepository
 import com.polstat.pkl.repository.KeluargaRepository
 import com.polstat.pkl.repository.LocalRutaRepository
-//import com.polstat.pkl.repository.LocationRepository
 import com.polstat.pkl.repository.MahasiswaRepository
 import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.ui.event.LoginScreenEvent
 import com.polstat.pkl.ui.state.LoginScreenState
 import com.polstat.pkl.utils.Result
-//import com.polstat.pkl.utils.location.GetLocationUseCase
 import com.polstat.pkl.utils.use_case.ValidateNim
 import com.polstat.pkl.utils.use_case.ValidatePassword
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,11 +33,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
-@RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
@@ -63,9 +56,6 @@ class AuthViewModel @Inject constructor(
         private const val TAG = "CAPI63_AUTH_VM"
     }
 
-    private val _isActive = MutableStateFlow(false)
-    val isActive = _isActive.asStateFlow()
-
     private val initialValue = AuthResponse()
 
     private val _authResponse = MutableStateFlow(initialValue)
@@ -86,7 +76,6 @@ class AuthViewModel @Inject constructor(
 
     val visiblePermissionDialogQueue = mutableListOf<String>()
 
-
 //    init {
 //        viewModelScope.launch {
 //            while (true) {
@@ -105,10 +94,6 @@ class AuthViewModel @Inject constructor(
 //            }
 //        }
 //    }
-
-    fun isLoggedIn() : Boolean {
-        return sessionRepository.isLoggedIn()
-    }
 
     @Suppress("NAME_SHADOWING")
     fun login(

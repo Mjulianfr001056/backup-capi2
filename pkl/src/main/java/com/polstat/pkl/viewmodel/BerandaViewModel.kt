@@ -1,5 +1,6 @@
 package com.polstat.pkl.viewmodel
 
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,7 +23,8 @@ import javax.inject.Inject
 class BerandaViewModel @Inject constructor(
     private val sessionRepository: SessionRepository,
     private val dataTimRepository: DataTimRepository,
-    private val wilayahRepository: WilayahRepository
+    private val wilayahRepository: WilayahRepository,
+    private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
     companion object {
@@ -50,9 +52,16 @@ class BerandaViewModel @Inject constructor(
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
     init {
+        try {
+            getDataTimWithAll(_session!!.idTim!!)
 
-        getDataTimWithAll(_session!!.idTim!!)
-
+            val allValues: Map<String, *> = sharedPreferences.all
+            for ((key, value) in allValues) {
+                Log.d(TAG, "Prefences -> $key : $value")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "init: Error in init", e)
+        }
     }
 
 
@@ -112,6 +121,12 @@ class BerandaViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            sessionRepository.clearSession()
         }
     }
 

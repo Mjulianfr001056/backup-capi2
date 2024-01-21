@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.screen.components.BottomNavBar
 import com.polstat.pkl.ui.screen.components.ListPplCard
 import com.polstat.pkl.ui.screen.components.PmlCard
@@ -153,9 +152,12 @@ fun BerandaScreen(
                                     coroutineScope.launch {
                                         val job = launch { viewModel.logout() }
                                         job.join()
-                                        delay(1000)
-                                        System.exit(0)
-//                                        navController.popBackStack(CapiScreen.Auth.LOGIN, inclusive = false)
+                                        delay(500)
+                                        rootController.navigate(CapiScreen.Top.AUTH) {
+                                            popUpTo(CapiScreen.Top.MAIN) {
+                                                inclusive = true
+                                            }
+                                        }
                                     }
                                 }
                             )
