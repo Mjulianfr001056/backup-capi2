@@ -55,6 +55,11 @@ class BerandaViewModel @Inject constructor(
 
     }
 
+
+    fun logout(){
+        sessionRepository.logOut()
+    }
+
     private fun getDataTimWithAll(
         idTim: String
     ) {

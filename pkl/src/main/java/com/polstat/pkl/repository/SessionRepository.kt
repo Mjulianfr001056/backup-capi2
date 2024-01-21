@@ -7,6 +7,9 @@ interface SessionRepository {
     fun saveSession(session: Session)
     fun getActiveSession(): Session?
     fun clearSession()
+    fun logIn()
+    fun logOut()
+    fun isLoggedIn() : Boolean
 
 
 }

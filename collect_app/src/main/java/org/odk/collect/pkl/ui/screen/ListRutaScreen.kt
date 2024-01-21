@@ -209,12 +209,14 @@ fun ListRutaScreen(
                             y = (-3).dp
                         )
                     ) {
-                        DropdownMenuItem(
-                            text = { Text(text = stringResource(id = R.string.finalisasi_bs)) },
-                            onClick = {
-                                openFinalisasiBSDialog = true
-                            }
-                        )
+                        if (session?.isKoor == true) {
+                            DropdownMenuItem(
+                                text = { Text(text = stringResource(id = R.string.finalisasi_bs)) },
+                                onClick = {
+                                    openFinalisasiBSDialog = true
+                                }
+                            )
+                        }
                         DropdownMenuItem(text = { Text(text = stringResource(id = R.string.ambil_sampel)) },
                             onClick = {
                                 if (noBS != null) {
@@ -594,7 +596,7 @@ fun RutaRow(
                             )
                             DetailRutaTextField(
                                 label = R.string.nomor_urut_ruta_egb,
-                                value = UtilFunctions.convertTo3DigitsString(ruta.noUrutEgb!!)
+                                value = UtilFunctions.convertTo3DigitsString(ruta.noUrutEgb)
                             )
 //                            DetailRutaTextField(
 //                                label = R.string.catatan,

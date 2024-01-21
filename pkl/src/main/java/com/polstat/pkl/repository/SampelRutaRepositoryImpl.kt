@@ -39,8 +39,8 @@ class SampelRutaRepositoryImpl @Inject constructor(
             } catch (e: HttpException) {
                 e.printStackTrace()
                 when (e.code()) {
-                    204 -> emit(Result.Error(message = "Data Sampel Tidak Ditemukan"))
-                    400 -> emit(Result.Error(message = "Terjadi Kesalahan Pengambilan Data"))
+                    204 -> emit(Result.Error(message = "Data Sampel Tidak Ditemukan!"))
+                    400 -> emit(Result.Error(message = "Data duplicate atau BS belum di finalisasi!"))
                     else -> emit(Result.Error(message = e.localizedMessage ?: "Fetch Sampel Ruta Error"))
                 }
                 Log.e(TAG, "getSampelRutaFromWS: Terjadi kesalahan!", e)

@@ -1,6 +1,8 @@
 package com.polstat.pkl.repository
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.polstat.pkl.model.domain.Session
 import com.polstat.pkl.model.response.AuthResponse
 import com.polstat.pkl.network.AuthApi
@@ -9,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import okio.IOException
 import retrofit2.HttpException
+import java.time.Instant
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -26,6 +29,8 @@ class AuthRepositoryImpl @Inject constructor(
         sessionRepository.saveSession(session)
     }
 
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun login(nim: String, password: String): Flow<Result<AuthResponse>> {
         return flow {
             emit(Result.Loading(true))
@@ -41,6 +46,7 @@ class AuthRepositoryImpl @Inject constructor(
                     token = response.token
                 )
                 saveSession(session)
+                sessionRepository.logIn()
                 Log.d(TAG, "Session was saved: $session")
                 response
             } catch (e: IOException) {

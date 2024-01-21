@@ -25,6 +25,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.screen.components.BottomNavBar
 import com.polstat.pkl.ui.screen.components.ListPplCard
 import com.polstat.pkl.ui.screen.components.PmlCard
@@ -47,6 +49,9 @@ import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.viewmodel.BerandaViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.odk.collect.pkl.navigation.CapiScreen
 
 @Preview
 @Composable
@@ -82,6 +87,9 @@ fun BerandaScreen(
 
     val dataTimWithAll = viewModel.dataTimWithAll.collectAsState()
 
+    val coroutineScope = rememberCoroutineScope()
+
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -116,24 +124,24 @@ fun BerandaScreen(
                             },
                             modifier = Modifier.background(Color.White)
                         ) {
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        text = "Panduan Bagi PPL",
-                                        color = Color.Gray
-                                    )
-                                },
-                                onClick = { /*TODO*/ }
-                            )
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        text = "Pengaturan",
-                                        color = Color.Gray
-                                    )
-                                },
-                                onClick = { /*TODO*/ }
-                            )
+//                            DropdownMenuItem(
+//                                text = {
+//                                    Text(
+//                                        text = "Panduan Bagi PPL",
+//                                        color = Color.Gray
+//                                    )
+//                                },
+//                                onClick = { /*TODO*/ }
+//                            )
+//                            DropdownMenuItem(
+//                                text = {
+//                                    Text(
+//                                        text = "Pengaturan",
+//                                        color = Color.Gray
+//                                    )
+//                                },
+//                                onClick = { /*TODO*/ }
+//                            )
                             DropdownMenuItem(
                                 text = {
                                     Text(
@@ -141,7 +149,15 @@ fun BerandaScreen(
                                         color = Color.Gray
                                     )
                                 },
-                                onClick = { /*TODO*/ }
+                                onClick = {
+                                    coroutineScope.launch {
+                                        val job = launch { viewModel.logout() }
+                                        job.join()
+                                        delay(1000)
+                                        System.exit(0)
+//                                        navController.popBackStack(CapiScreen.Auth.LOGIN, inclusive = false)
+                                    }
+                                }
                             )
                         }
                     }

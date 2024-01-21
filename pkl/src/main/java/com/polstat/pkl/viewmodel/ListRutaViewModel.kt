@@ -224,13 +224,26 @@ class ListRutaViewModel @Inject constructor(
 
             job.join()
 
-            launch {
-                wilayahRepository.updateWilayah(updatedWilayah.toWilayah(emptyList()),
-                    _session!!.nim!!
-                )
-                    .collectLatest { message ->
-                        Log.d(TAG, message)
+            val job2 = launch {
+                showErrorToastChannel.collectLatest { isError ->
+                    if (!isError) {
+                        launch {
+                            wilayahRepository.updateWilayah(
+                                updatedWilayah.toWilayah(emptyList()),
+                                _session!!.nim!!
+                            )
+                                .collectLatest { message ->
+                                    Log.d(TAG, message)
+                                }
+                        }
                     }
+                }
+            }
+
+            job2.join()
+
+            launch {
+                _showErrorToastChannel.send(false)
             }
 
         }
@@ -317,13 +330,36 @@ class ListRutaViewModel @Inject constructor(
 
             job.join()
 
-            launch {
-                wilayahRepository.updateWilayah(updatedWilayah.toWilayah(emptyList()),
-                    _session!!.nim!!
-                )
-                    .collectLatest { message ->
+            val job2 = launch {
+                _finalisasiBSResponse.value.data?.forEach { ruta ->
+                    localRutaRepository.updateRuta(ruta).collectLatest { message ->
                         Log.d(TAG, message)
                     }
+                }
+            }
+
+            job2.join()
+
+            val job3 = launch {
+                showErrorToastChannel.collectLatest { isError ->
+                    if (!isError) {
+                        launch {
+                            wilayahRepository.updateWilayah(
+                                updatedWilayah.toWilayah(emptyList()),
+                                _session!!.nim!!
+                            )
+                                .collectLatest { message ->
+                                    Log.d(TAG, message)
+                                }
+                        }
+                    }
+                }
+            }
+
+            job3.join()
+
+            launch {
+                _showErrorToastChannel.send(false)
             }
         }
     }

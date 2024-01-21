@@ -1,5 +1,7 @@
 package com.polstat.pkl.model.domain
 
+import java.time.Instant
+
 data class Session (
     val nama: String?,
     val nim: String?,

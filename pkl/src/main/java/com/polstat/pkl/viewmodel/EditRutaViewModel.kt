@@ -15,7 +15,6 @@ import com.polstat.pkl.repository.LocalRutaRepository
 import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.ui.event.EditRutaEvent
 import com.polstat.pkl.ui.state.EditRutaState
-import com.polstat.pkl.ui.state.IsiRutaScreenState
 import com.polstat.pkl.utils.Result
 import com.polstat.pkl.utils.UtilFunctions
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -275,15 +274,15 @@ class EditRutaViewModel @Inject constructor(
                 updateKeluarga(keluarga)
 
                 val ruta = Ruta(
-                    kodeRuta = "R" + noBS + UtilFunctions.convertTo3DigitsString(state.value.noUrutRuta!!),
-                    noUrutRuta = state.value.noUrutRuta!!,
+                    kodeRuta = "R" + noBS + UtilFunctions.convertTo3DigitsString(state.value.noUrutRuta),
+                    noUrutRuta = state.value.noUrutRuta,
                     noUrutEgb = 0,
-                    kkOrKrt = state.value.kkOrKrt!!,
-                    namaKrt = state.value.namaKrt!!,
-                    isGenzOrtu = state.value.genzOrtu!!,
+                    kkOrKrt = if (state.value.kkOrKrt == "Kepala Keluarga (KK) saja") "1" else if (state.value.kkOrKrt == "Kepala Rumah Tangga (KRT) saja") "2" else "3",
+                    namaKrt = state.value.namaKrt,
+                    isGenzOrtu = state.value.genzOrtu,
                     katGenz = if (state.value.genzOrtu!! >= 1 && state.value.genzOrtu!! <= 2) 1 else if (state.value.genzOrtu!! >= 3 && state.value.genzOrtu!! <= 4) 2 else if (state.value.genzOrtu!! > 4) 3 else 0,
-                    long = state.value.long!!,
-                    lat = state.value.lat!!,
+                    long = state.value.long,
+                    lat = state.value.lat,
                     noBS = noBS,
                     status = "update"
                 )

@@ -1,6 +1,5 @@
 package com.polstat.pkl.viewmodel
 
-import android.os.Build
 import android.util.Log
 //import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
@@ -77,9 +76,9 @@ class IsiRutaViewModel @Inject constructor(
 
 
     init {
-        getLastKeluarga(noBS!!)
-        getLastKeluargaEgb(noBS)
-        getLastRuta(noBS)
+//        getLastKeluarga(noBS!!)
+//        getLastKeluargaEgb(noBS)
+//        getLastRuta(noBS)
 
 //        viewModelScope.launch {
 //            _state.emit(
@@ -379,7 +378,7 @@ class IsiRutaViewModel @Inject constructor(
                             kodeRuta = "R" + noBS + UtilFunctions.convertTo3DigitsString(state.value.listNoUrutRuta!![it]),
                             noUrutRuta = state.value.listNoUrutRuta!![it],
                             noUrutEgb = 0,
-                            kkOrKrt = state.value.listKkOrKrt!![it],
+                            kkOrKrt = if (state.value.listKkOrKrt!![it] == "Kepala Keluarga (KK) saja") "1" else if (state.value.listKkOrKrt!![it] == "Kepala Rumah Tangga (KRT) saja") "2" else "3",
                             namaKrt = state.value.listNamaKrt!![it],
                             isGenzOrtu = genzOrtuRuta,
                             katGenz = if (genzOrtuRuta >= 1 && genzOrtuRuta <= 2) 1 else if (genzOrtuRuta >= 3 && genzOrtuRuta <= 4) 2 else if (genzOrtuRuta > 4) 3 else 0,

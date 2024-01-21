@@ -13,7 +13,6 @@ import com.polstat.pkl.model.domain.Ruta
 import com.polstat.pkl.repository.KeluargaRepository
 import com.polstat.pkl.repository.LocalRutaRepository
 import com.polstat.pkl.repository.SessionRepository
-import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.ui.event.SalinRutaEvent
 import com.polstat.pkl.ui.state.SalinRutaState
 import com.polstat.pkl.utils.Result

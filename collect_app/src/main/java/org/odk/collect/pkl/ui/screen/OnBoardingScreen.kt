@@ -28,6 +28,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.polstat.pkl.navigation.Capi63Screen
+import com.polstat.pkl.navigation.CapiScreen
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklQuaternary
 import com.polstat.pkl.ui.theme.PklSecondary
@@ -73,6 +77,17 @@ fun OnBoardingScreen(
         }
     )
 
+//    val isActive = viewModel.isActive.collectAsState()
+    val isLoggedIn by remember { mutableStateOf(viewModel.isLoggedIn()) }
+
+    if (isLoggedIn) {
+        navController.navigate(CapiScreen.Top.MAIN) {
+            popUpTo(CapiScreen.Top.AUTH) {
+                inclusive = true
+            }
+        }
+    }
+
     DisposableEffect(Unit){
         multiplePermissionResultLauncher.launch(
             permissionToRequest
@@ -81,7 +96,16 @@ fun OnBoardingScreen(
 
         }
     }
-
+    
+//    LaunchedEffect(key1 = viewModel.isActive) {
+//        if (viewModel.isActive.value) {
+//            navController.navigate(CapiScreen.Top.MAIN){
+//                popUpTo(CapiScreen.Top.AUTH){
+//                    inclusive = true
+//                }
+//            }
+//        }
+//    }
 
     dialogQueue
         .reversed()
