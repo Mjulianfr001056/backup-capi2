@@ -22,6 +22,7 @@ import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -330,6 +331,8 @@ class ListRutaViewModel @Inject constructor(
 
             job.join()
 
+            delay(1000)
+
             val job2 = launch {
                 _finalisasiBSResponse.value.data?.forEach { ruta ->
                     localRutaRepository.updateRuta(ruta).collectLatest { message ->
@@ -357,6 +360,8 @@ class ListRutaViewModel @Inject constructor(
             }
 
             job3.join()
+
+            delay(1000)
 
             launch {
                 _showErrorToastChannel.send(false)
