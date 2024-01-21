@@ -225,6 +225,8 @@ class ListRutaViewModel @Inject constructor(
 
             job.join()
 
+            delay(2000)
+
             val job2 = launch {
                 showErrorToastChannel.collectLatest { isError ->
                     if (!isError) {
@@ -242,6 +244,8 @@ class ListRutaViewModel @Inject constructor(
             }
 
             job2.join()
+
+            delay(1000)
 
             launch {
                 _showErrorToastChannel.send(false)
