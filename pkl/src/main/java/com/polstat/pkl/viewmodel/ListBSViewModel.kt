@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.database.entity.WilayahEntity
+import com.polstat.pkl.database.relation.MahasiswaWithWilayah
+import com.polstat.pkl.repository.MahasiswaRepository
 import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.utils.Result
@@ -19,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ListBSViewModel @Inject constructor(
     private val sessionRepository: SessionRepository,
-    private val wilayahRepository: WilayahRepository
+    private val wilayahRepository: WilayahRepository,
+    private val mahasiswaRepository: MahasiswaRepository
 ) : ViewModel() {
 
     companion object{
@@ -34,6 +37,10 @@ class ListBSViewModel @Inject constructor(
 
     val listWilayahByNIM = _listWilayahByNIM.asStateFlow()
 
+    private val _mahasiswaWithWilayah = MutableStateFlow(MahasiswaWithWilayah())
+
+    val mahasiswaWithWilayah = _mahasiswaWithWilayah.asStateFlow()
+
     private val _errorMessage = MutableStateFlow("")
 
     val errorMessage = _errorMessage.asStateFlow()
@@ -44,8 +51,9 @@ class ListBSViewModel @Inject constructor(
 
     init {
 
-        getWilayahByNIM(_session!!.nim!!)
+//        getWilayahByNIM(_session!!.nim!!)
 
+        getMahasiswaWithWilayah(_session!!.nim!!)
     }
 
     private fun getWilayahByNIM(
@@ -69,6 +77,33 @@ class ListBSViewModel @Inject constructor(
                         }
                         _showErrorToastChannel.send(true)
                         Log.e(TAG, "getDataWilayahByNIM: Error in getDataWilayahByNIM")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getMahasiswaWithWilayah(
+        nim: String
+    ) {
+        viewModelScope.launch {
+            mahasiswaRepository.getMahasiswaWithWilayah(nim).collectLatest { result ->
+                when(result) {
+                    is Result.Success -> {
+                        result.data?.let { response ->
+                            _mahasiswaWithWilayah.value = response
+                            Log.d(TAG, "getMahasiswaWithWilayah success: $response")
+                        }
+                    }
+                    is Result.Loading -> {
+                        Log.d(TAG, "getMahasiswaWithWilayah: Loading...")
+                    }
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            _errorMessage.value = error
+                        }
+                        _showErrorToastChannel.send(true)
+                        Log.e(TAG, "getMahasiswaWithWilayah: Error in getMahasiswaWithWilayah")
                     }
                 }
             }
