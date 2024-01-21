@@ -360,7 +360,7 @@ private fun BlokSensus(
                             colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)) {
                             Text(stringResource(R.string.lihat_ruta), fontFamily = PoppinsFontFamily, fontSize = 13.sp, color = Color.White, textAlign = TextAlign.Center)
                         }
-//                        if (wilayah.status == "telah-disampel") {
+                        if (wilayah.status == "telah-disampel") {
                         Button(onClick = {
                             onLihatSampleClicked()
                         },
@@ -370,7 +370,7 @@ private fun BlokSensus(
                             colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)) {
                             Text(stringResource(R.string.lihat_sampel), fontFamily = PoppinsFontFamily, fontSize = 13.sp, color = Color.White, textAlign = TextAlign.Center)
                         }
-//                        }
+                        }
                     }
                 }
             }

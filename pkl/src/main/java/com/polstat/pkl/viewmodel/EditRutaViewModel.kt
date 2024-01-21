@@ -203,7 +203,7 @@ class EditRutaViewModel @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
+//    @RequiresApi(Build.VERSION_CODES.S)
     suspend fun onEvent(
         event: EditRutaEvent,
         index: Int = 0

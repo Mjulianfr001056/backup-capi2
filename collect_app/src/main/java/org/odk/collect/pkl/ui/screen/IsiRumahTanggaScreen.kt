@@ -1,5 +1,6 @@
 package org.odk.collect.pkl.ui.screen
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -71,6 +72,7 @@ import com.polstat.pkl.utils.UtilFunctions
 import com.polstat.pkl.viewmodel.IsiRutaViewModel
 import kotlinx.coroutines.launch
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,10 +83,33 @@ fun IsiRumahTanggaScreen(
     val state = viewModel.state.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val noBS = viewModel.noBS
+    val lastKeluarga = viewModel.lastKeluarga.collectAsState()
+    val lastRuta = viewModel.lastRuta.collectAsState()
     val context = LocalContext.current
 
     LaunchedEffect(key1 = viewModel.getRutaLocation()) {
         viewModel.getRutaLocation()
+    }
+
+    LaunchedEffect(key1 = viewModel.state.value.isGenzOrtu) {
+        coroutineScope.launch {
+            viewModel.setInitialNoUrutKlgEgb()
+        }
+    }
+
+    LaunchedEffect(key1 = viewModel.state.value.penglMkn) {
+        if (state.value.penglMkn != 0) {
+            coroutineScope.launch {
+                viewModel.setInitialNoUrutRuta()
+            }
+        }
+    }
+
+    LaunchedEffect(key1 = viewModel.state.value.listKkOrKrt) {
+        coroutineScope.launch {
+            viewModel.setInitialNamaKrt()
+        }
+        println("ubah krt")
     }
 
     Scaffold(
@@ -106,7 +131,7 @@ fun IsiRumahTanggaScreen(
                     .padding(15.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                if (state.value.noSegmen != "S000" || state.value.noBgFisik != 0 || state.value.noBgSensus != 0) {
+                if (lastKeluarga.value.noUrutKlg != 0) {
                     Card(
                         border = BorderStroke(1.dp, PklSecondary),
                         colors = CardDefaults.cardColors(
@@ -124,7 +149,7 @@ fun IsiRumahTanggaScreen(
                                 .padding(15.dp)
                         ) {
                             Text(
-                                text = "Isian Listing Ruta Terakhir",
+                                text = "Isian Listing Keluarga Terakhir",
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium
                             )
@@ -132,7 +157,7 @@ fun IsiRumahTanggaScreen(
                             Spacer(modifier = Modifier.padding(10.dp))
 
                             Text(
-                                text = "No. Segmen: ${state.value.noSegmen} | No. BF: ${state.value.noBgFisik} | No. BS: ${state.value.noBgSensus}",
+                                text = "No. Segmen: ${lastKeluarga.value.noSegmen} | No. BF: ${lastKeluarga.value.noBgFisik} | No. BS: ${lastKeluarga.value.noBgSensus}",
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Light
                             )
@@ -561,7 +586,7 @@ fun IsiRumahTanggaScreen(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.S)
+//@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun KeteranganRuta(
@@ -770,7 +795,7 @@ fun InputNomor(
     modifier: Modifier = Modifier,
     onIncrement: () -> Unit = {},
     onDecrement: () -> Unit = {},
-    readOnly: Boolean = true
+    readOnly: Boolean = false
 ) {
     TextField(
         value = value,

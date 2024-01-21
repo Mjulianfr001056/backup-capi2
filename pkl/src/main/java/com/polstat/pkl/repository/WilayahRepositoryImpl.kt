@@ -6,6 +6,7 @@ import com.polstat.pkl.database.Capi63Database
 import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.database.relation.KeluargaWithRuta
 import com.polstat.pkl.database.relation.WilayahWithAll
+import com.polstat.pkl.database.relation.WilayahWithKeluarga
 import com.polstat.pkl.database.relation.WilayahWithRuta
 import com.polstat.pkl.mapper.toRutaEntity
 import com.polstat.pkl.mapper.toWilayahEntity
@@ -71,6 +72,24 @@ class WilayahRepositoryImpl @Inject constructor(
             } catch (e: Exception) {
                 Log.d(TAG, "Gagal getWilayahWithRuta: ${e.message}")
                 emit(Result.Error(null, "Error fetching WilayahWithRuta: ${e.message}"))
+            } finally {
+                emit(Result.Loading(false))
+            }
+        }
+    }
+
+    override suspend fun getWilayahWithKeluarga(
+        noBS: String
+    ): Flow<Result<WilayahWithKeluarga>> {
+        return flow {
+            try {
+                emit(Result.Loading(true))
+                val wilayahWithKeluarga = capi63Database.capi63Dao.getWilayahWithKeluarga(noBS)
+                Log.d(TAG, "Berhasil getWilayahWithKeluarga: $wilayahWithKeluarga")
+                emit(Result.Success(wilayahWithKeluarga))
+            } catch (e: Exception) {
+                Log.d(TAG, "Gagal getWilayahWithKeluarga: ${e.message}")
+                emit(Result.Error(null, "Error fetching getWilayahWithKeluarga: ${e.message}"))
             } finally {
                 emit(Result.Loading(false))
             }

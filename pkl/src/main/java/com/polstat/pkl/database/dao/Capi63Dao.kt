@@ -24,7 +24,7 @@ interface Capi63Dao {
 
     // Operasi database untuk entitas DataTim
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDataTim(dataTimEntity: DataTimEntity)
 
     @Query("SELECT * FROM data_tim WHERE idTim = :idTim")
@@ -32,12 +32,12 @@ interface Capi63Dao {
 
     // Operasi database untuk entitas Mahasiswa
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMahasiswa(mahasiswaEntity: MahasiswaEntity)
 
     // Operasi database untuk entitas Wilayah
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWilayah(wilayahEntity: WilayahEntity)
 
     @Update
@@ -45,7 +45,7 @@ interface Capi63Dao {
 
     // Operasi database untuk entitas Keluarga
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertKeluarga(keluargaEntity: KeluargaEntity)
 
     @Update
@@ -56,10 +56,10 @@ interface Capi63Dao {
 
     // Operasi database untuk entitas Ruta
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRuta(rutaEntity: RutaEntity)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSampelRuta(sampelRutaEntity: SampelRutaEntity)
 
     @Update
@@ -71,7 +71,7 @@ interface Capi63Dao {
 
     // Operasi database untuk entitas berelasi
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertKelurgaAndRuta(keluargaAndRutaEntity: KeluargaAndRutaEntity)
 
     @Transaction

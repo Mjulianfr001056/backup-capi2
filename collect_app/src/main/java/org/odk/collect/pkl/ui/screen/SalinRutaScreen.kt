@@ -1,5 +1,5 @@
-import android.os.Build
-import androidx.annotation.RequiresApi
+package org.odk.collect.pkl.ui.screen
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.polstat.pkl.navigation.Capi63Screen
-import com.polstat.pkl.ui.event.EditRutaEvent
+import com.polstat.pkl.ui.event.SalinRutaEvent
 import com.polstat.pkl.ui.theme.PklAccent
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary
@@ -58,15 +58,14 @@ import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PklSecondary
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.utils.UtilFunctions
-import com.polstat.pkl.viewmodel.EditRutaViewModel
+import com.polstat.pkl.viewmodel.SalinRutaViewModel
 import kotlinx.coroutines.launch
 
-//@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditRutaScreen(
+fun SalinRutaScreen(
     navController: NavHostController,
-    viewModel: EditRutaViewModel
+    viewModel: SalinRutaViewModel
 ) {
     val state = viewModel.state.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -76,7 +75,7 @@ fun EditRutaScreen(
 
     Scaffold(
         topBar = {
-            IsiRumahTanggaTopBar(
+            SalinRumahTanggaTopBar(
                 navController = navController,
                 noBS = noBS!!
             )
@@ -135,7 +134,7 @@ fun EditRutaScreen(
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.SLSChanged(
+                                SalinRutaEvent.SLSChanged(
                                     it
                                 )
                             )
@@ -166,12 +165,12 @@ fun EditRutaScreen(
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                InputNomor(
+                InputNomorSR(
                     value = state.value.noSegmen!!,
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.NoSegmenChanged(
+                                SalinRutaEvent.NoSegmenChanged(
                                     it
                                 )
                             )
@@ -187,8 +186,8 @@ fun EditRutaScreen(
                     onIncrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.NoSegmenChanged(
-                                    increment(
+                                SalinRutaEvent.NoSegmenChanged(
+                                    incrementSR(
                                         state.value.noSegmen!!
                                     )
                                 )
@@ -198,7 +197,7 @@ fun EditRutaScreen(
                     onDecrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.NoSegmenChanged(
+                                SalinRutaEvent.NoSegmenChanged(
                                     decrement(
                                         state.value.noSegmen!!
                                     )
@@ -210,12 +209,12 @@ fun EditRutaScreen(
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                InputNomor(
+                InputNomorSR(
                     value = UtilFunctions.convertTo3DigitsString(state.value.noBgFisik!!),
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.NoBgFisikChanged(
+                                SalinRutaEvent.NoBgFisikChanged(
                                     it.toInt()
                                 )
                             )
@@ -231,8 +230,8 @@ fun EditRutaScreen(
                     onIncrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.NoBgFisikChanged(
-                                    increment(
+                                SalinRutaEvent.NoBgFisikChanged(
+                                    incrementSR(
                                         UtilFunctions.convertTo3DigitsString(
                                             state.value.noBgFisik!!
                                         )
@@ -244,7 +243,7 @@ fun EditRutaScreen(
                     onDecrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.NoBgFisikChanged(
+                                SalinRutaEvent.NoBgFisikChanged(
                                     decrement(
                                         UtilFunctions.convertTo3DigitsString(
                                             state.value.noBgFisik!!
@@ -258,12 +257,12 @@ fun EditRutaScreen(
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                InputNomor(
+                InputNomorSR(
                     value = UtilFunctions.convertTo3DigitsString(state.value.noBgSensus!!),
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.NoBgSensusChanged(
+                                SalinRutaEvent.NoBgSensusChanged(
                                     it.toInt()
                                 )
                             )
@@ -279,8 +278,8 @@ fun EditRutaScreen(
                     onIncrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.NoBgSensusChanged(
-                                    increment(
+                                SalinRutaEvent.NoBgSensusChanged(
+                                    incrementSR(
                                         UtilFunctions.convertTo3DigitsString(
                                             state.value.noBgSensus!!
                                         )
@@ -292,7 +291,7 @@ fun EditRutaScreen(
                     onDecrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.NoBgSensusChanged(
+                                SalinRutaEvent.NoBgSensusChanged(
                                     decrement(
                                         UtilFunctions.convertTo3DigitsString(
                                             state.value.noBgSensus!!
@@ -306,12 +305,12 @@ fun EditRutaScreen(
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                ViewNomor(
+                InputNomorSR(
                     value = state.value.noUrutKlg.toString(),
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.NoUrutKlgChanged(
+                                SalinRutaEvent.NoUrutKlgChanged(
                                     it.toInt()
                                 )
                             )
@@ -323,6 +322,32 @@ fun EditRutaScreen(
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.SemiBold
                         )
+                    },
+                    onIncrement = {
+                        coroutineScope.launch {
+                            viewModel.onEvent(
+                                SalinRutaEvent.NoUrutKlgChanged(
+                                    increment(
+                                        UtilFunctions.convertTo3DigitsString(
+                                            state.value.noUrutKlg!!
+                                        )
+                                    ).toInt()
+                                )
+                            )
+                        }
+                    },
+                    onDecrement = {
+                        coroutineScope.launch {
+                            viewModel.onEvent(
+                                SalinRutaEvent.NoUrutKlgChanged(
+                                    decrement(
+                                        UtilFunctions.convertTo3DigitsString(
+                                            state.value.noUrutKlg!!
+                                        )
+                                    ).toInt()
+                                )
+                            )
+                        }
                     }
                 )
 
@@ -333,7 +358,7 @@ fun EditRutaScreen(
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.NamaKKChanged(
+                                SalinRutaEvent.NamaKKChanged(
                                     it
                                 )
                             )
@@ -369,7 +394,7 @@ fun EditRutaScreen(
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.AlamatChanged(
+                                SalinRutaEvent.AlamatChanged(
                                     it
                                 )
                             )
@@ -400,12 +425,12 @@ fun EditRutaScreen(
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                InputNomor(
+                InputNomorSR(
                     value = state.value.isGenzOrtu.toString(),
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.IsGenzOrtuChanged(
+                                SalinRutaEvent.IsGenzOrtuChanged(
                                     it.toInt()
                                 )
                             )
@@ -421,8 +446,8 @@ fun EditRutaScreen(
                     onIncrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.IsGenzOrtuChanged(
-                                    increment(
+                                SalinRutaEvent.IsGenzOrtuChanged(
+                                    incrementSR(
                                         UtilFunctions.convertTo3DigitsString(
                                             state.value.isGenzOrtu!!
                                         )
@@ -434,7 +459,7 @@ fun EditRutaScreen(
                     onDecrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.IsGenzOrtuChanged(
+                                SalinRutaEvent.IsGenzOrtuChanged(
                                     decrement(
                                         UtilFunctions.convertTo3DigitsString(
                                             state.value.isGenzOrtu!!
@@ -449,12 +474,12 @@ fun EditRutaScreen(
                 if (state.value.isGenzOrtu.toString() != "0") {
                     Spacer(modifier = Modifier.padding(10.dp))
 
-                    ViewNomor(
+                    InputNomor(
                         value = state.value.noUrutKlgEgb.toString(),
                         onValueChange = {
                             coroutineScope.launch {
                                 viewModel.onEvent(
-                                    EditRutaEvent.NoUrutKlgEgbChanged(it.toInt())
+                                    SalinRutaEvent.NoUrutKlgEgbChanged(it.toInt())
                                 )
                             }
                         },
@@ -464,16 +489,42 @@ fun EditRutaScreen(
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.SemiBold
                             )
+                        },
+                        onIncrement = {
+                            coroutineScope.launch {
+                                viewModel.onEvent(
+                                    SalinRutaEvent.NoUrutKlgEgbChanged(
+                                        increment(
+                                            UtilFunctions.convertTo3DigitsString(
+                                                state.value.noUrutKlgEgb!!
+                                            )
+                                        ).toInt()
+                                    )
+                                )
+                            }
+                        },
+                        onDecrement = {
+                            coroutineScope.launch {
+                                viewModel.onEvent(
+                                    SalinRutaEvent.NoUrutKlgEgbChanged(
+                                        decrement(
+                                            UtilFunctions.convertTo3DigitsString(
+                                                state.value.noUrutKlgEgb!!
+                                            )
+                                        ).toInt()
+                                    )
+                                )
+                            }
                         }
                     )
                 }
 
-                ViewNomor(
+                InputNomorSR(
                     value = state.value.penglMkn.toString(),
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.PenglMknChanged(
+                                SalinRutaEvent.PenglMknChanged(
                                     it.toInt()
                                 )
                             )
@@ -485,6 +536,32 @@ fun EditRutaScreen(
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.SemiBold
                         )
+                    },
+                    onIncrement = {
+                        coroutineScope.launch {
+                            viewModel.onEvent(
+                                SalinRutaEvent.PenglMknChanged(
+                                    increment(
+                                        UtilFunctions.convertTo3DigitsString(
+                                            state.value.penglMkn!!
+                                        )
+                                    ).toInt()
+                                )
+                            )
+                        }
+                    },
+                    onDecrement = {
+                        coroutineScope.launch {
+                            viewModel.onEvent(
+                                SalinRutaEvent.PenglMknChanged(
+                                    decrement(
+                                        UtilFunctions.convertTo3DigitsString(
+                                            state.value.penglMkn!!
+                                        )
+                                    ).toInt()
+                                )
+                            )
+                        }
                     }
                 )
 
@@ -521,7 +598,7 @@ fun EditRutaScreen(
                 Button(
                     onClick = {
                         coroutineScope.launch {
-                            viewModel.onEvent(EditRutaEvent.submit)
+                            viewModel.onEvent(SalinRutaEvent.submit)
                         }
                         navController.navigate(Capi63Screen.ListRuta.route + "/${noBS}") {
                             popUpTo(Capi63Screen.ListRuta.route + "/${noBS}") {
@@ -537,7 +614,7 @@ fun EditRutaScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)
                 ) {
                     Text(
-                        text = "Ubah",
+                        text = "Kirim",
                         fontFamily = PoppinsFontFamily,
                         fontWeight = FontWeight.Bold
                     )
@@ -551,7 +628,7 @@ fun EditRutaScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun KeteranganRuta(
-    viewModel: EditRutaViewModel
+    viewModel: SalinRutaViewModel
 ) {
     val state = viewModel.state.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -563,7 +640,7 @@ fun KeteranganRuta(
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    EditRutaEvent.NoUrutRutaChanged(
+                    SalinRutaEvent.NoUrutRutaChanged(
                         it.toInt()
                     )
                 )
@@ -589,16 +666,9 @@ fun KeteranganRuta(
             fontWeight = FontWeight.SemiBold
         )
 
-        RadioButtons(
+        ViewRadioButtonsSR(
             options = kkKrtOptions,
-            selectedOption = state.value.kkOrKrt!!,
-            onOptionSelected = { option ->
-                coroutineScope.launch {
-                    viewModel.onEvent(
-                        EditRutaEvent.KKOrKRTChanged(option)
-                    )
-                }
-            }
+            selectedOption = state.value.kkOrKrt!!
         )
     }
 
@@ -609,7 +679,7 @@ fun KeteranganRuta(
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    EditRutaEvent.NamaKRTChanged(
+                    SalinRutaEvent.NamaKRTChanged(
                         it
                     )
                 )
@@ -635,17 +705,18 @@ fun KeteranganRuta(
         ),
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Next
-        )
+        ),
+        readOnly = true
     )
 
     Spacer(modifier = Modifier.padding(10.dp))
 
-    InputNomor(
+    ViewNomor(
         value = UtilFunctions.convertTo3DigitsString(state.value.genzOrtu!!),
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    EditRutaEvent.GenzOrtuChanged(
+                    SalinRutaEvent.GenzOrtuChanged(
                         it.toInt()
                     )
                 )
@@ -657,36 +728,14 @@ fun KeteranganRuta(
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.SemiBold
             )
-        },
-        onIncrement = {
-            coroutineScope.launch {
-                viewModel.onEvent(
-                    EditRutaEvent.GenzOrtuChanged(
-                        increment(
-                            UtilFunctions.convertTo3DigitsString(state.value.genzOrtu!!)
-                        ).toInt()
-                    )
-                )
-            }
-        },
-        onDecrement = {
-            coroutineScope.launch {
-                viewModel.onEvent(
-                    EditRutaEvent.GenzOrtuChanged(
-                        decrement(
-                            UtilFunctions.convertTo3DigitsString(state.value.genzOrtu!!)
-                        ).toInt()
-                    )
-                )
-            }
-        },
+        }
     )
 
     Spacer(modifier = Modifier.padding(10.dp))
 }
 
 @Composable
-fun RadioButtons(
+fun RadioButtonsSR(
     options: List<String>,
     selectedOption: String,
     onOptionSelected: (String) -> Unit
@@ -720,9 +769,38 @@ fun RadioButtons(
     }
 }
 
+@Composable
+fun ViewRadioButtonsSR(
+    options: List<String>,
+    selectedOption: String
+) {
+    Column {
+        options.forEach { option ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = (option == selectedOption),
+                    onClick = {}
+                )
+                Text(
+                    text = option,
+                    style = MaterialTheme.typography.bodySmall.merge(),
+                    modifier = Modifier.padding(start = 16.dp),
+                    fontFamily = PoppinsFontFamily,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+    }
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputNomor(
+fun InputNomorSR(
     value: String,
     onValueChange: (String) -> Unit,
     label: @Composable (() -> Unit),
@@ -804,7 +882,7 @@ fun ViewNomor(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IsiRumahTanggaTopBar(
+fun SalinRumahTanggaTopBar(
     navController: NavHostController,
     noBS: String
 ) {
@@ -842,14 +920,14 @@ fun IsiRumahTanggaTopBar(
     )
 }
 
-fun increment(input: String): String {
+fun incrementSR(input: String): String {
     val numericPart = input.filter { it.isDigit() }
     val number = numericPart.toInt()
     val formattedNumber = String.format("%0${numericPart.length}d", number + 1)
     return input.replaceFirst(numericPart, formattedNumber)
 }
 
-fun decrement(input: String): String {
+fun decrementSR(input: String): String {
     val numericPart = input.filter { it.isDigit() }
     val number = numericPart.toInt()
     if (number < 1) {

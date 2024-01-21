@@ -27,6 +27,7 @@ import org.odk.collect.pkl.ui.screen.ListSampleScreen
 import org.odk.collect.pkl.ui.screen.LoginScreen
 import org.odk.collect.pkl.ui.screen.OnBoardingScreen
 import org.odk.collect.pkl.ui.screen.PasswordMasterScreen
+import org.odk.collect.pkl.ui.screen.SalinRutaScreen
 import org.odk.collect.pkl.ui.screen.SamplingScreen
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -162,6 +163,24 @@ fun SamplingNavHost(
                     viewModel = hiltViewModel()
                 )
             }
+
+            composable(
+                route = CapiScreen.Listing.SALIN_RUTA + "/{noBS}/{kodeRuta}",
+                arguments = listOf(
+                    navArgument("noBS") {
+                        type = NavType.StringType
+                    },
+                    navArgument("kodeRuta") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
+                SalinRutaScreen(
+                    navController = samplingNavController,
+                    viewModel = hiltViewModel()
+                )
+            }
+
         }
 
         navigation(

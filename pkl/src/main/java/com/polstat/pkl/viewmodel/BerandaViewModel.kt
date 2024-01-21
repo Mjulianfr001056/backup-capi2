@@ -123,11 +123,4 @@ class BerandaViewModel @Inject constructor(
             }
         }
     }
-
-    fun logout() {
-        viewModelScope.launch {
-            sessionRepository.clearSession()
-        }
-    }
-
 }

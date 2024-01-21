@@ -39,12 +39,12 @@ data class IsiRutaScreenState(
     val latError: String? = null,
 
     //state yang menyimpan data beberapa ruta
-    val listNoUrutRuta: List<Int>? = emptyList(),
-    val listKkOrKrt : List<String>? = emptyList(),
-    val listNamaKrt: List<String>? = emptyList(),
-    val listGenzOrtu: List<Int>? = emptyList(),
-    val listKatGenz: List<Int>? = emptyList(),
-    val listKodeRuta: List<String>? = emptyList(),
-    val listLong: List<Double>? = emptyList(),
-    val listLat: List<Double>? = emptyList()
+    val listNoUrutRuta: List<Int>? = listOf(0),
+    val listKkOrKrt : List<String>? = listOf(""),
+    val listNamaKrt: List<String>? = listOf(""),
+    val listGenzOrtu: List<Int>? = listOf(0),
+    val listKatGenz: List<Int>? = listOf(0),
+    val listKodeRuta: List<String>? = listOf(""),
+    val listLong: List<Double>? = listOf(0.0),
+    val listLat: List<Double>? = listOf(0.0)
 )

@@ -1,23 +1,24 @@
 package com.polstat.pkl.viewmodel
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.polstat.pkl.mapper.toKeluarga
+import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.mapper.toRuta
+import com.polstat.pkl.mapper.toWilayah
 import com.polstat.pkl.model.domain.Keluarga
 import com.polstat.pkl.model.domain.Ruta
 import com.polstat.pkl.repository.KeluargaRepository
 import com.polstat.pkl.repository.LocalRutaRepository
 import com.polstat.pkl.repository.SessionRepository
+import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.ui.event.SalinRutaEvent
 import com.polstat.pkl.ui.state.SalinRutaState
 import com.polstat.pkl.utils.Result
 import com.polstat.pkl.utils.UtilFunctions
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +33,7 @@ class SalinRutaViewModel @Inject constructor(
     private val sessionRepository: SessionRepository,
     private val localRutaRepository: LocalRutaRepository,
     private val keluargaRepository: KeluargaRepository,
+    private val wilayahRepository: WilayahRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     
@@ -57,9 +59,13 @@ class SalinRutaViewModel @Inject constructor(
 
     val salinRuta = _salinRuta.asStateFlow()
 
-    private val _klgBaru = MutableStateFlow(Keluarga())
+//    private val _klgBaru = MutableStateFlow(Keluarga())
+//
+//    val klgBaru = _klgBaru.asStateFlow()
 
-    val klgBaru = _klgBaru.asStateFlow()
+    private val _wilayahWithAll = MutableStateFlow(WilayahWithAll())
+
+    val wilayahWithAll = _wilayahWithAll.asStateFlow()
 
     private val _errorMessage = MutableStateFlow("")
 
@@ -76,14 +82,9 @@ class SalinRutaViewModel @Inject constructor(
     init {
         Log.d(TAG, "noBS: $noBS")
         Log.d(TAG, "kodeRuta: $kodeRuta")
-        Log.d(TAG, "kodeKlg: $kodeKlg")
 
         viewModelScope.launch {
-            val job = launch {
-                getRuta(kodeRuta!!)
-                getKeluarga(kodeKlg!!)
-            }
-            job.join()
+            getRuta(kodeRuta!!)
             delay(2000)
             setExistingValue()
         }
@@ -92,16 +93,6 @@ class SalinRutaViewModel @Inject constructor(
 
     fun setExistingValue() {
         _state.value = state.value.copy(
-            SLS = klgBaru.value.SLS,
-            noSegmen = klgBaru.value.noSegmen,
-            noBgFisik = klgBaru.value.noBgFisik,
-            noBgSensus = klgBaru.value.noBgSensus,
-            noUrutKlg = klgBaru.value.noUrutKlg,
-            namaKK = klgBaru.value.namaKK,
-            alamat = klgBaru.value.alamat,
-            isGenzOrtu = klgBaru.value.isGenzOrtu,
-            noUrutKlgEgb = klgBaru.value.noUrutKlgEgb,
-            penglMkn = klgBaru.value.penglMkn,
             noUrutRuta = salinRuta.value.noUrutRuta,
             kkOrKrt = if (salinRuta.value.kkOrKrt == "1") "Kepala Keluarga (KK) saja" else if (salinRuta.value.kkOrKrt == "2") "Kepala Rumah Tangga (KRT) saja" else "KK Sekaligus KRT",
             namaKrt = salinRuta.value.namaKrt,
@@ -148,62 +139,69 @@ class SalinRutaViewModel @Inject constructor(
         }
     }
 
-    fun getKeluarga(
-        kodeKlg: String
+    fun insertKeluarga(
+        keluarga: Keluarga
     ) {
         viewModelScope.launch {
-            keluargaRepository.getKeluarga(kodeKlg).collectLatest { result ->
-                when (result) {
+            keluargaRepository.insertKeluarga(keluarga).collectLatest { message ->
+                Log.d(TAG, message)
+            }
+        }
+    }
+
+    fun insertKeluargaAndRuta(
+        kodeKlg: String,
+        kodeRuta: String
+    ) {
+        viewModelScope.launch {
+            localRutaRepository.insertKeluargaAndRuta(kodeKlg, kodeRuta).collectLatest { message ->
+                Log.d(TAG, message)
+            }
+        }
+    }
+
+    fun updateRekapitulasiWilayah(
+        noBS: String,
+        nim: String
+    ) {
+        viewModelScope.launch {
+            wilayahRepository.getWilayahWithAll(noBS).collectLatest { result ->
+                when(result) {
                     is Result.Success -> {
                         result.data?.let { response ->
-                            _klgBaru.value = response.toKeluarga()
-                            Log.d(
-                                TAG, "getKeluarga succeed: $response"
-                            )
+                            _wilayahWithAll.value = response
+                            Log.d(TAG, "getWilayahWithAll success: $response")
                         }
                     }
-
                     is Result.Loading -> {
-                        Log.d(
-                            TAG, "getKeluarga: Loading..."
-                        )
+                        Log.d(TAG, "getWilayahWithAll: Loading...")
                     }
-
                     is Result.Error -> {
                         result.message?.let { error ->
-                            _errorMessage.value = error
+                            Log.e(TAG, "getWilayahWithAll: Error in getWilayahWithAll ($error)")
                         }
-                        _showErrorToastChannel.send(true)
-                        Log.e(
-                            TAG, "getKeluarga: Error in getKeluarga"
-                        )
                     }
                 }
             }
         }
-    }
 
-    private fun updateRuta(
-        ruta: Ruta
-    ) {
+        val wilayah = wilayahWithAll.value.wilayahWithKeluarga!!.wilayah!!.toWilayah(emptyList())
+        val updatedWilayah = wilayah.copy(
+            jmlKlg = wilayahWithAll.value.listKeluargaWithRuta!!.filter { it.keluarga.status != "delete" }.size,
+            jmlKlgEgb = wilayahWithAll.value.listKeluargaWithRuta!!.filter { it.keluarga.status != "delete" && it.keluarga.noUrutKlgEgb != 0 }.size,
+            jmlRuta = wilayahWithAll.value.listKeluargaWithRuta!!.flatMap { it.listRuta.filter { it.status != "delete" } }.size,
+            jmlRutaEgb = wilayahWithAll.value.listKeluargaWithRuta!!.flatMap { it.listRuta.filter { it.status != "delete" && it.noUrutEgb != 0 }}.size
+        )
+
         viewModelScope.launch {
-            localRutaRepository.updateRuta(ruta).collectLatest { message ->
+            wilayahRepository.updateWilayah(updatedWilayah, nim).collectLatest { message ->
                 Log.d(TAG, message)
             }
         }
+
     }
 
-    private fun updateKeluarga(
-        keluarga: Keluarga
-    ) {
-        viewModelScope.launch {
-            keluargaRepository.updateKeluarga(keluarga).collectLatest { message ->
-                Log.d(TAG, message)
-            }
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.S)
+//    @RequiresApi(Build.VERSION_CODES.S)
     suspend fun onEvent(
         event: SalinRutaEvent,
         index: Int = 0
@@ -268,26 +266,19 @@ class SalinRutaViewModel @Inject constructor(
                     penglMkn = state.value.penglMkn,
                     noBS = noBS,
                     kodeKlg = "K"+ noBS + UtilFunctions.convertTo3DigitsString(state.value.noUrutKlg!!),
-                    status = "update"
+                    status = "insert"
                 )
 
-                updateKeluarga(keluarga)
+                insertKeluarga(keluarga)
 
-                val ruta = Ruta(
-                    kodeRuta = "R" + noBS + UtilFunctions.convertTo3DigitsString(state.value.noUrutRuta!!),
-                    noUrutRuta = state.value.noUrutRuta!!,
-                    noUrutEgb = 0,
-                    kkOrKrt = state.value.kkOrKrt!!,
-                    namaKrt = state.value.namaKrt!!,
-                    isGenzOrtu = state.value.genzOrtu!!,
-                    katGenz = if (state.value.genzOrtu!! >= 1 && state.value.genzOrtu!! <= 2) 1 else if (state.value.genzOrtu!! >= 3 && state.value.genzOrtu!! <= 4) 2 else if (state.value.genzOrtu!! > 4) 3 else 0,
-                    long = state.value.long!!,
-                    lat = state.value.lat!!,
-                    noBS = noBS,
-                    status = "update"
+                val kodeRuta = "R" + noBS + UtilFunctions.convertTo3DigitsString(state.value.noUrutRuta!!)
+
+                insertKeluargaAndRuta(keluarga.kodeKlg, kodeRuta)
+
+                updateRekapitulasiWilayah(
+                    noBS = noBS!!,
+                    nim = session!!.nim!!
                 )
-
-                updateRuta(ruta)
 
             }
         }

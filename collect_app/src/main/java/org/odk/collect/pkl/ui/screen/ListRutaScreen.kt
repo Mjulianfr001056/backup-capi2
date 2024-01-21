@@ -686,6 +686,21 @@ fun RutaRow(
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium)
 
+                            Text(modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    navController.navigate(CapiScreen.Listing.SALIN_RUTA + "/${ruta.noBS}/${ruta.kodeRuta}")
+                                }
+                                .padding(
+                                    top = 10.dp,
+                                    bottom = 10.dp
+                                ),
+                                textAlign = TextAlign.Center,
+                                text = "Salin Ruta",
+                                fontSize = 16.sp,
+                                fontFamily = PoppinsFontFamily,
+                                fontWeight = FontWeight.Medium)
+
 //                          untuk menghapus ruta
                             Text(modifier = Modifier
                                 .fillMaxWidth()

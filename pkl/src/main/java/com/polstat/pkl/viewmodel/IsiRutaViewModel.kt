@@ -1,10 +1,8 @@
 package com.polstat.pkl.viewmodel
 
-import android.util.Log
 //import androidx.annotation.RequiresApi
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+//import com.polstat.pkl.utils.location.GetLocationUseCase
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,8 +21,8 @@ import com.polstat.pkl.ui.event.IsiRutaScreenEvent
 import com.polstat.pkl.ui.state.IsiRutaScreenState
 import com.polstat.pkl.utils.Result
 import com.polstat.pkl.utils.UtilFunctions
-//import com.polstat.pkl.utils.location.GetLocationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -40,6 +38,11 @@ class IsiRutaViewModel @Inject constructor(
 //    private val getLocationUseCase: GetLocationUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel(){
+
+    companion object {
+        private const val TAG = "CAPI63_ISI_RUTA_VM"
+    }
+
     private val _session = sessionRepository.getActiveSession()
 
     val session = _session
@@ -74,31 +77,69 @@ class IsiRutaViewModel @Inject constructor(
 
     val wilayahWithAll = _wilayahWithAll.asStateFlow()
 
-
     init {
-//        getLastKeluarga(noBS!!)
-//        getLastKeluargaEgb(noBS)
-//        getLastRuta(noBS)
-
-//        viewModelScope.launch {
-//            _state.emit(
-//                state.value.copy(
-//                    noUrutKlg = lastKeluarga.value.noUrutKlg!! + 1,
-//                    noUrutKlgEgb = lastKeluarga.value.noUrutKlgEgb!! + 1
-//                )
-//            )
-//        }
-
+        viewModelScope.launch {
+            getLastKeluarga()
+            getLastRuta()
+            delay(2000)
+            setInitialKlgValue()
+        }
     }
 
+    fun incrementStringNoSegmen(input: String): String {
+        val numberPart = input.filter { it.isDigit() }
+        val incrementedNumber = numberPart.toInt() + 1
+        return "S" + String.format("%03d", incrementedNumber)
+    }
 
+    fun setInitialKlgValue() {
+        _state.value = state.value.copy(
+            SLS = lastKeluarga.value.SLS,
+            noSegmen = incrementStringNoSegmen(lastKeluarga.value.noSegmen!!),
+            noBgFisik = lastKeluarga.value.noBgFisik,
+            noBgSensus = lastKeluarga.value.noBgSensus,
+            noUrutKlg = lastKeluarga.value.noUrutKlg?.plus(1),
+            noUrutKlgEgb = if (state.value.isGenzOrtu != 0) lastKeluargaEgb.value.noUrutKlgEgb?.plus(1) else 0,
+        )
+        Log.d(TAG, "setInitialKlgValue: ${state.value}")
+    }
 
-    var lat by mutableStateOf(0.0)
+    fun getIsGenzOrtuKlg() : Int? {
+        return state.value.isGenzOrtu
+    }
 
-    var long by mutableStateOf(0.0)
+    suspend fun setInitialNoUrutKlgEgb() {
+        _state.emit(state.value.copy(noUrutKlgEgb = lastKeluargaEgb.value.noUrutKlgEgb?.plus(1)))
+        Log.d(TAG, "setInitialNoUrutKlgEgb: ${state.value.noUrutKlgEgb}")
+    }
 
-    companion object {
-        private const val TAG = "CAPI63_ISI_RUTA_VM"
+    fun getPenglMkn() : Int? {
+        return state.value.penglMkn
+    }
+
+    suspend fun setInitialNoUrutRuta() {
+        val listNoUrutRuta = state.value.listNoUrutRuta?.toMutableList()
+        listNoUrutRuta!![0] = lastRuta.value.noUrutRuta?.plus(1)!!
+        if (listNoUrutRuta.size > 1) {
+            for (i in 1..listNoUrutRuta.size - 1) {
+                listNoUrutRuta[i] = listNoUrutRuta[i-1] + 1
+                Log.d(TAG, "setInitialNoUrutRuta: ${listNoUrutRuta[i]}")
+            }
+        }
+        _state.emit(state.value.copy(listNoUrutRuta = listNoUrutRuta))
+        Log.d(TAG, "setInitialNoUrutRuta: ${state.value.listNoUrutRuta}")
+    }
+
+    fun getKkOrKrt() : String? {
+        return state.value.kkOrKrt
+    }
+
+    suspend fun setInitialNamaKrt() {
+        Log.d(TAG, "setInitialNamaKrt: ${state.value.kkOrKrt}")
+        if (state.value.kkOrKrt == "KK Sekaligus KRT") {
+            _state.emit(state.value.copy(namaKrt = state.value.namaKK))
+            Log.d(TAG, "setInitialNamaKrt: dijalankan!")
+        }
     }
 
     fun insertRuta(
@@ -185,15 +226,14 @@ class IsiRutaViewModel @Inject constructor(
 
     }
 
-    fun getLastKeluarga(
-        noBS: String
-    ) {
+    fun getLastKeluarga() {
         viewModelScope.launch {
-            wilayahRepository.getWilayahWithAll(noBS).collectLatest { result ->
+            wilayahRepository.getWilayahWithKeluarga(noBS!!).collectLatest { result ->
                 when(result) {
                     is Result.Success -> {
-                        result.data?.wilayahWithKeluarga!!.listKeluarga?.let { listKeluarga ->
-                            _lastKeluarga.value = listKeluarga.filter { it.status != "delete" }.sortedBy { it.noUrutKlg }.lastOrNull()!!
+                        result.data?.listKeluarga?.let { listKeluarga ->
+                            _lastKeluarga.value = listKeluarga.filter { it.status != "delete" }.sortedBy { it.noUrutKlg }.lastOrNull() ?: KeluargaEntity()
+                            _lastKeluargaEgb.value = listKeluarga.filter { it.status != "delete" && it.noUrutKlgEgb != 0 }.sortedBy { it.noUrutKlg }.lastOrNull() ?: KeluargaEntity()
                         }
                     }
                     is Result.Loading -> {
@@ -209,39 +249,13 @@ class IsiRutaViewModel @Inject constructor(
         }
     }
 
-    fun getLastKeluargaEgb(
-        noBS: String
-    ) {
+    fun getLastRuta() {
         viewModelScope.launch {
-            wilayahRepository.getWilayahWithAll(noBS).collectLatest { result ->
-                when(result) {
-                    is Result.Success -> {
-                        result.data?.wilayahWithKeluarga!!.listKeluarga?.let { listKeluarga ->
-                            _lastKeluargaEgb.value = listKeluarga.filter { it.status != "delete" && it.noUrutKlgEgb != 0 }.sortedBy { it.noUrutKlgEgb }.lastOrNull()!!
-                        }
-                    }
-                    is Result.Loading -> {
-                        Log.d(TAG, "getLastKeluargaEgb: Loading...")
-                    }
-                    is Result.Error -> {
-                        result.message?.let { error ->
-                            Log.d(TAG, "Error getLastKeluargaEgb: $error")
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    fun getLastRuta(
-        noBS: String
-    ) {
-        viewModelScope.launch {
-            wilayahRepository.getWilayahWithRuta(noBS).collectLatest { result ->
+            wilayahRepository.getWilayahWithRuta(noBS!!).collectLatest { result ->
                 when(result) {
                     is Result.Success -> {
                         result.data?.listRuta?.let { listRuta ->
-                            _lastRuta.value = listRuta.filter { it.status != "delete" }.sortedBy { it.noUrutRuta }.lastOrNull()!!
+                            _lastRuta.value = listRuta.filter { it.status != "delete" }.sortedBy { it.noUrutRuta }.lastOrNull() ?: RutaEntity()
                         }
                     }
                     is Result.Error -> {
@@ -389,8 +403,6 @@ class IsiRutaViewModel @Inject constructor(
                             status = "insert"
                         )
 
-
-
                         insertRuta(ruta)
 
                         insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
@@ -402,14 +414,6 @@ class IsiRutaViewModel @Inject constructor(
                     nim = session!!.nim!!
                 )
             }
-        }
-    }
-
-    fun convertIsGenzOrtu(isGenzOrtu: String): String{
-        return when(isGenzOrtu){
-            "Ya" -> "1"
-            "Tidak" -> "0"
-            else -> ""
         }
     }
 }
