@@ -331,7 +331,7 @@ class ListRutaViewModel @Inject constructor(
 
             job.join()
 
-            delay(1000)
+            delay(2000)
 
             val job2 = launch {
                 _finalisasiBSResponse.value.data?.forEach { ruta ->
