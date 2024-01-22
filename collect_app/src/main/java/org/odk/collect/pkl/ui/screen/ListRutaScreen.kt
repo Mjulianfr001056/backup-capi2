@@ -380,8 +380,8 @@ fun ListRutaScreen(
         },
         content = { innerPadding ->
 
-            val colWeight1 = .1f
-            val colWeight2 = .7f
+            val colWeight1 = .15f
+            val colWeight2 = .55f
 
             val filteredList = wilayahWithAll.value.listKeluargaWithRuta
                 ?.filter { keluargaWithRuta ->
@@ -647,8 +647,8 @@ fun RutaRow(
 //            fontSize = 16.sp
 //        )
 
-    val colWeight1 = .1f
-    val colWeight2 = .7f
+    val colWeight1 = .15f
+    val colWeight2 = .55f
 
     Row(
         modifier = Modifier
