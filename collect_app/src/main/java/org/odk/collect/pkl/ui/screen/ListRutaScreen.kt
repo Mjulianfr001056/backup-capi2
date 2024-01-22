@@ -249,8 +249,10 @@ fun ListRutaScreen(
                                     coroutineScope.launch {
                                         val generateRutaJob = async { viewModel.generateRuta(noBS) }
                                         generateRutaJob.await()
+                                        delay(1000)
                                         val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
                                         lastJob.await()
+                                        delay(2000)
                                         navController.navigate(CapiScreen.Listing.LIST_BS){
                                             popUpTo(CapiScreen.Listing.LIST_BS){
                                                 inclusive = true
@@ -317,6 +319,10 @@ fun ListRutaScreen(
                                 coroutineScope.launch {
                                     val finalisasiBSJob = async { viewModel.finalisasiBS(noBS) }
                                     finalisasiBSJob.await()
+                                    delay(1000)
+                                    val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
+                                    lastJob.await()
+                                    delay(2000)
                                     navController.navigate(Capi63Screen.ListBs.route){
                                         popUpTo(Capi63Screen.ListBs.route){
                                             inclusive = true

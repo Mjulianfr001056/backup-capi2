@@ -102,7 +102,8 @@ fun SamplingNavHost(
             composable(CapiScreen.Listing.LIST_BS) {
                 ListBSScreen(
                     navController = samplingNavController,
-                    viewModel = hiltViewModel()
+                    viewModel = hiltViewModel(),
+                    authViewModel = hiltViewModel()
                 )
             }
             composable(

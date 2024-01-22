@@ -39,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,9 +64,12 @@ import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
+import com.polstat.pkl.viewmodel.AuthViewModel
 import com.polstat.pkl.viewmodel.ListBSViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.util.Date
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -73,7 +77,8 @@ import java.util.Date
 @Composable
 fun ListBSScreen(
     navController: NavHostController,
-    viewModel: ListBSViewModel
+    viewModel: ListBSViewModel,
+    authViewModel: AuthViewModel
 ) {
 
     val listWilayah = viewModel.listWilayahByNIM
@@ -81,6 +86,10 @@ fun ListBSScreen(
     val mahasiswaWithWilayah = viewModel.mahasiswaWithWilayah.collectAsState()
 
     val context = LocalContext.current
+
+    val session = viewModel.session
+
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
         viewModel.showErrorToastChannel.collectLatest { show ->
@@ -131,7 +140,21 @@ fun ListBSScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxHeight()
                     ) {
-                        IconButton(onClick = {}) {
+                        IconButton(
+                            onClick = {
+                                coroutineScope.launch {
+                                    val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
+                                    lastJob.await()
+                                    delay(2000)
+                                    navController.navigate(Capi63Screen.ListBs.route){
+                                        popUpTo(Capi63Screen.ListBs.route){
+                                            inclusive = true
+                                        }
+                                    }
+                                }
+
+                            }
+                        ) {
                             Icon(
                                 imageVector = Icons.Filled.Sync,
                                 tint = Color.White,
@@ -425,7 +448,7 @@ fun PreviewListBSScreen() {
             color = MaterialTheme.colorScheme.background
         ) {
             val navController = rememberNavController()
-            ListBSScreen(navController, viewModel = hiltViewModel())
+            ListBSScreen(navController, viewModel = hiltViewModel(), authViewModel = hiltViewModel())
         }
     }
 }
