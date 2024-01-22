@@ -9,6 +9,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -69,6 +70,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -377,22 +379,72 @@ fun ListRutaScreen(
 
         },
         content = { innerPadding ->
-            Column(
+
+            val colWeight1 = .1f
+            val colWeight2 = .7f
+
+            val filteredList = wilayahWithAll.value.listKeluargaWithRuta
+                ?.filter { keluargaWithRuta ->
+                    keluargaWithRuta.listRuta.any { ruta ->
+                        ruta.kodeRuta.contains(text, ignoreCase = true) ||
+                                ruta.namaKrt!!.contains(text, ignoreCase = true)
+                    }
+                }
+                ?.sortedBy { keluargaWithRuta ->
+                    keluargaWithRuta.listRuta.firstOrNull()?.kodeRuta
+                }
+
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(color = PklBase),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                Row(
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .background(PklPrimary300),
-                    Arrangement.SpaceEvenly,
-                    Alignment.CenterVertically,
-                ) {
+                item {
+                    Row(
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .background(PklPrimary300),
+                        Arrangement.SpaceEvenly,
+                        Alignment.CenterVertically,
+                    ) {
+                        TableCell(text = stringResource(id = R.string.no_bf_list_ruta), fontSize = 12.sp, color = Color.White, weight = colWeight1)
+                        TableCell(text = stringResource(id = R.string.no_bs_list_ruta), color = Color.White, fontSize = 12.sp, weight = colWeight1)
+                        TableCell(text = stringResource(id = R.string.no_ruta_list_ruta), color = Color.White, fontSize = 12.sp, weight = colWeight1)
+                        TableCell(text = stringResource(id = R.string.nama_krt_list_ruta), color = Color.White, fontSize = 12.sp, weight = colWeight2)
+//                        TableCell(text = stringResource(id = R.string.info), color = Color.White, fontSize = 12.sp, weight = colWeight1)
+                    }
+                }
+
+                filteredList?.forEach { keluargaWithRuta ->
+                    if (keluargaWithRuta.listRuta.isNotEmpty()) {
+                        val daftarRuta = keluargaWithRuta.listRuta.filter { it.status != "delete" }
+                        items(daftarRuta.size) { index ->
+                            val ruta = daftarRuta[index]
+                            RutaRow(
+                                keluarga = keluargaWithRuta.keluarga,
+                                ruta = ruta,
+                                viewModel = viewModel,
+                                navController = navController
+                            )
+                        }
+                    }
+                }
+
+
+
+//                Row(
+//                    modifier = Modifier
+//                        .padding(innerPadding)
+//                        .fillMaxWidth()
+//                        .height(50.dp)
+//                        .background(PklPrimary300),
+//                    Arrangement.SpaceEvenly,
+//                    Alignment.CenterVertically,
+//                ) {
                     // Ini header tabel
 //                    Row(
 //                        modifier = Modifier
@@ -406,11 +458,11 @@ fun ListRutaScreen(
 //                            R.string.no_bs_list_ruta,
 //                            R.string.no_ruta_list_ruta,
 //                            R.string.nama_krt_list_ruta,
-//                            "Info"
+//                            R.string.info
 //                        ).forEach { id ->
 //                            Text(
 //                                modifier = Modifier.weight(1f),
-//                                text = stringResource(id = id as Int),
+//                                text = stringResource(id = id),
 //                                color = Color.White,
 //                                fontFamily = PoppinsFontFamily,
 //                                fontWeight = FontWeight.Medium,
@@ -419,57 +471,64 @@ fun ListRutaScreen(
 //                        }
 //                    }
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(end = 10.dp),
-                        Arrangement.SpaceEvenly,
-                        Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.no_bf_list_ruta),
-                            color = Color.White,
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 14.sp
-                        )
-                        Text(
-                            text = stringResource(id = R.string.no_bs_list_ruta),
-                            color = Color.White,
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 14.sp
-                        )
-                        Text(
-                            text = stringResource(id = R.string.no_ruta_list_ruta),
-                            color = Color.White,
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 14.sp
-                        )
-                        Text(
-                            text = stringResource(id = R.string.nama_krt_list_ruta),
-                            color = Color.White,
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 14.sp
-                        )
-                        Text(
-                            text = "Info",
-                            color = Color.White,
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 14.sp
-                        )
+//                    Row(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(end = 10.dp),
+//                        Arrangement.SpaceEvenly,
+//                        Alignment.CenterVertically,
+//                    ) {
+//                        Text(
+//                            text = stringResource(id = R.string.no_bf_list_ruta),
+//                            color = Color.White,
+//                            fontFamily = PoppinsFontFamily,
+//                            fontWeight = FontWeight.Medium,
+//                            fontSize = 14.sp
+//                        )
+//                        Text(
+//                            text = stringResource(id = R.string.no_bs_list_ruta),
+//                            color = Color.White,
+//                            fontFamily = PoppinsFontFamily,
+//                            fontWeight = FontWeight.Medium,
+//                            fontSize = 14.sp
+//                        )
+//                        Text(
+//                            text = stringResource(id = R.string.no_ruta_list_ruta),
+//                            color = Color.White,
+//                            fontFamily = PoppinsFontFamily,
+//                            fontWeight = FontWeight.Medium,
+//                            fontSize = 14.sp
+//                        )
+//                        Text(
+//                            text = stringResource(id = R.string.nama_krt_list_ruta),
+//                            color = Color.White,
+//                            fontFamily = PoppinsFontFamily,
+//                            fontWeight = FontWeight.Medium,
+//                            fontSize = 14.sp
+//                        )
+//                        Text(
+//                            text = "Info",
+//                            color = Color.White,
+//                            fontFamily = PoppinsFontFamily,
+//                            fontWeight = FontWeight.Medium,
+//                            fontSize = 14.sp
+//                        )
+//
+//                    }
 
-                    }
+//                      TableCell(text = stringResource(id = R.string.no_bf_list_ruta), color = Color.White, weight = colWeight1)
+//                    TableCell(text = stringResource(id = R.string.no_bs_list_ruta), color = Color.White, weight = colWeight1)
+//                    TableCell(text = stringResource(id = R.string.no_ruta_list_ruta), color = Color.White, weight = colWeight1)
+//                    TableCell(text = stringResource(id = R.string.nama_krt_list_ruta), color = Color.White, weight = colWeight2)
+//                    TableCell(text = stringResource(id = R.string.info), color = Color.White, weight = colWeight1)
 
-                }
-                RutaList(
-                    wilayahWithAll =  wilayahWithAll.value,
-                    navController = navController,
-                    searchText = text
-                )
+//                }
+//                RutaList(
+//                    wilayahWithAll =  wilayahWithAll.value,
+//                    navController = navController,
+//                    viewModel = viewModel,
+//                    searchText = text
+//                )
 
             }
         },
@@ -541,6 +600,56 @@ fun RutaRow(
 //            )
 //        }
 
+//    Row(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .height(50.dp)
+//            .combinedClickable(onLongClick = {
+//                openActionDialog = true
+//            },
+//                onClick = { }),
+//        Arrangement.SpaceEvenly,
+//        Alignment.CenterVertically
+//    ) {
+////        Spacer(modifier = Modifier.size(20.dp))
+//            Text(
+//                modifier = Modifier.padding(start = 10.dp, end = 10.dp),
+//                text = "${keluarga.noBgFisik}",
+//                fontFamily = PoppinsFontFamily,
+//                fontWeight = FontWeight.Medium,
+//                fontSize = 16.sp
+//            )
+//
+////        Spacer(modifier = Modifier.size(40.dp))
+//        Text(
+//            modifier = Modifier.padding(start = 10.dp, end = 10.dp),
+//            text = "${keluarga.noBgSensus}",
+//            fontFamily = PoppinsFontFamily,
+//            fontWeight = FontWeight.Medium,
+//            fontSize = 16.sp
+//        )
+//
+////        Spacer(modifier = Modifier.size(40.dp))
+//        Text(
+//            modifier = Modifier.padding(start = 10.dp, end = 10.dp),
+//            text = "${ruta.noUrutRuta}",
+//            fontFamily = PoppinsFontFamily,
+//            fontWeight = FontWeight.Medium,
+//            fontSize = 16.sp
+//        )
+//
+////        Spacer(modifier = Modifier.size(40.dp))
+//        Text(
+//            modifier = Modifier.padding(start = 10.dp, end = 10.dp),
+//            text = viewModel.sederhanakanNama(ruta.namaKrt.toString()),
+//            fontFamily = PoppinsFontFamily,
+//            fontWeight = FontWeight.Medium,
+//            fontSize = 16.sp
+//        )
+
+    val colWeight1 = .1f
+    val colWeight2 = .7f
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -552,46 +661,19 @@ fun RutaRow(
         Arrangement.SpaceEvenly,
         Alignment.CenterVertically
     ) {
-//        Spacer(modifier = Modifier.size(20.dp))
-            Text(
-                modifier = Modifier.padding(start = 10.dp, end = 10.dp),
-                text = "${keluarga.noBgFisik}",
-                fontFamily = PoppinsFontFamily,
-                fontWeight = FontWeight.Medium,
-                fontSize = 16.sp
-            )
+        TableCell(text = "${keluarga.noBgFisik}", weight = colWeight1)
+        TableCell(text = "${keluarga.noBgSensus}", weight = colWeight1)
+        TableCell(text = "${ruta.noUrutRuta}", weight = colWeight1)
+        TableCell(text = viewModel.sederhanakanNama(ruta.namaKrt.toString()), weight = colWeight2)
+
 
 //        Spacer(modifier = Modifier.size(40.dp))
-        Text(
-            modifier = Modifier.padding(start = 10.dp, end = 10.dp),
-            text = "${keluarga.noBgSensus}",
-            fontFamily = PoppinsFontFamily,
-            fontWeight = FontWeight.Medium,
-            fontSize = 16.sp
-        )
-
-//        Spacer(modifier = Modifier.size(40.dp))
-        Text(
-            modifier = Modifier.padding(start = 10.dp, end = 10.dp),
-            text = "${ruta.noUrutRuta}",
-            fontFamily = PoppinsFontFamily,
-            fontWeight = FontWeight.Medium,
-            fontSize = 16.sp
-        )
-
-//        Spacer(modifier = Modifier.size(40.dp))
-        Text(
-            modifier = Modifier.padding(start = 10.dp, end = 10.dp),
-            text = viewModel.sederhanakanNama(ruta.namaKrt.toString()),
-            fontFamily = PoppinsFontFamily,
-            fontWeight = FontWeight.Medium,
-            fontSize = 16.sp
-        )
-
-//        Spacer(modifier = Modifier.size(40.dp))
-        IconButton(onClick = {
-            openDetail = true
-        }) {
+        IconButton(
+            modifier = Modifier.weight(colWeight1),
+            onClick = {
+                openDetail = true
+            }
+        ) {
             Icon(
                 imageVector = Icons.Outlined.Info,
                 contentDescription = stringResource(id = R.string.info_icon),
@@ -924,6 +1006,7 @@ fun RutaRow(
 fun RutaList(
     wilayahWithAll: WilayahWithAll,
     navController: NavHostController,
+    viewModel: ListRutaViewModel,
     searchText: String
 ) {
     val filteredList = wilayahWithAll.listKeluargaWithRuta
@@ -939,7 +1022,7 @@ fun RutaList(
 
     LazyColumn(
         modifier = Modifier
-            .fillMaxHeight()
+            .fillMaxSize()
             .horizontalScroll(state = rememberScrollState(), enabled = true),
         content = {
             println("List Ruta Screen: ${wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()} ${wilayahWithAll.listKeluargaWithRuta!!.size}")
@@ -953,7 +1036,7 @@ fun RutaList(
                         RutaRow(
                             keluarga = keluargaWithRuta.keluarga,
                             ruta = ruta,
-                            viewModel = hiltViewModel(),
+                            viewModel = viewModel,
                             navController = navController
                         )
                     }
@@ -1023,5 +1106,24 @@ fun LimitedText(
         fontWeight = FontWeight.Medium,
         fontFamily = PoppinsFontFamily,
         fontSize = 14.sp
+    )
+}
+
+@Composable
+fun RowScope.TableCell(
+    text: String,
+    fontSize: TextUnit = 16.sp,
+    color: Color = Color.Black,
+    weight: Float
+) {
+    Text(
+        modifier = Modifier
+            .padding(start = 10.dp, end = 10.dp)
+            .weight(weight),
+        text = text,
+        color = color,
+        fontFamily = PoppinsFontFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = fontSize
     )
 }
