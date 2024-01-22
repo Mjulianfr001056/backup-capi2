@@ -30,10 +30,16 @@ interface Capi63Dao {
     @Query("SELECT * FROM data_tim WHERE idTim = :idTim")
     suspend fun getDataTim(idTim: String) : DataTimEntity
 
+    @Query("DELETE FROM data_tim")
+    suspend fun deleteAllDataTim()
+
     // Operasi database untuk entitas Mahasiswa
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMahasiswa(mahasiswaEntity: MahasiswaEntity)
+
+    @Query("DELETE FROM mahasiswa")
+    suspend fun deleteAllMahasiswa()
 
     // Operasi database untuk entitas Wilayah
 
@@ -42,6 +48,9 @@ interface Capi63Dao {
 
     @Update
     suspend fun updateWilayah(wilayahEntity: WilayahEntity)
+
+    @Query("DELETE FROM wilayah")
+    suspend fun deleteAllWilayah()
 
     // Operasi database untuk entitas Keluarga
 
@@ -53,6 +62,9 @@ interface Capi63Dao {
 
     @Query("SELECT * FROM keluarga WHERE kodeKlg = :kodeKlg")
     suspend fun getKeluarga(kodeKlg: String) : KeluargaEntity
+
+    @Query("DELETE FROM keluarga")
+    suspend fun deleteAllKeluarga()
 
     // Operasi database untuk entitas Ruta
 
@@ -68,11 +80,17 @@ interface Capi63Dao {
     @Query("SELECT * FROM ruta WHERE kodeRuta = :kodeRuta")
     suspend fun getRuta(kodeRuta: String) : RutaEntity
 
+    @Query("DELETE FROM ruta")
+    suspend fun deleteAllRuta()
+
 
     // Operasi database untuk entitas berelasi
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertKelurgaAndRuta(keluargaAndRutaEntity: KeluargaAndRutaEntity)
+
+    @Query("DELETE FROM keluargaandrutaentity")
+    suspend fun deleteAllKeluargaAndRuta()
 
     @Transaction
     @Query("SELECT * FROM data_tim WHERE idTim = :idTim")
@@ -97,6 +115,9 @@ interface Capi63Dao {
     @Transaction
     @Query("SELECT * FROM sampel_ruta WHERE noBS = :noBS")
     suspend fun getSampelRutaByNoBS(noBS: String) : List<SampelRutaEntity>
+
+    @Query("DELETE FROM sampel_ruta")
+    suspend fun deleteAllSampelRuta()
 
     @Transaction
     @Query("SELECT * FROM keluarga WHERE kodeKlg = :kodeKlg")

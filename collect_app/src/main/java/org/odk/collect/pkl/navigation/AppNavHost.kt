@@ -115,7 +115,8 @@ fun SamplingNavHost(
             ) {
                 ListRutaScreen(
                     navController = samplingNavController,
-                    viewModel = hiltViewModel()
+                    viewModel = hiltViewModel(),
+                    authViewModel = hiltViewModel()
                 )
             }
             composable(

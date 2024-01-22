@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.Flow
 interface MahasiswaRepository {
     suspend fun insertMahasiswa(mahasiswa: Mahasiswa): Flow<String>
 
+    suspend fun deleteAllMahasiswa() : Flow<String>
+
     suspend fun getMahasiswaWithWilayah(nim: String): Flow<Result<MahasiswaWithWilayah>>
 
     suspend fun getMahasiswaWithAll(nim: String) : Flow<Result<MahasiswaWithAll>>

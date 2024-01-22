@@ -57,6 +57,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,6 +74,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.R
 import com.polstat.pkl.database.entity.KeluargaEntity
 import com.polstat.pkl.database.entity.RutaEntity
@@ -86,9 +88,12 @@ import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PklTertiary100
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.utils.UtilFunctions
+import com.polstat.pkl.viewmodel.AuthViewModel
 import com.polstat.pkl.viewmodel.ListRutaViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Preview
 @Composable
@@ -98,9 +103,9 @@ fun ListRutaPreview() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-//            val navController = rememberNavController()
 
-//            ListRutaScreen(navController)
+
+            ListRutaScreen(rememberNavController(), hiltViewModel(), hiltViewModel())
         }
     }
 }
@@ -109,7 +114,8 @@ fun ListRutaPreview() {
 @Composable
 fun ListRutaScreen(
     navController: NavHostController,
-    viewModel: ListRutaViewModel
+    viewModel: ListRutaViewModel,
+    authViewModel: AuthViewModel
 ) {
     var showMenu by remember { mutableStateOf(false) }
     var showSearchBar by remember { mutableStateOf(false) }
@@ -121,6 +127,7 @@ fun ListRutaScreen(
     val session = viewModel.session
     val wilayahWithAll = viewModel.wilayahWithAll.collectAsState()
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = viewModel.showSuccessToastChannel) {
         viewModel.showSuccessToastChannel.collectLatest { show ->
@@ -181,11 +188,27 @@ fun ListRutaScreen(
                         )
                     }
                     IconButton(onClick = {
-                        viewModel.synchronizeRuta(
-                            nim = session!!.nim!!,
-                            noBS = noBS!!,
-                            wilayahWithAll = wilayahWithAll.value
-                        )
+                        coroutineScope.launch {
+                            val synchronizeRutaJob = async {
+                                viewModel.synchronizeRuta(
+                                    nim = session!!.nim!!,
+                                    noBS = noBS!!,
+                                    wilayahWithAll = wilayahWithAll.value
+                                )
+                            }
+                            synchronizeRutaJob.await()
+                            delay(3000)
+                            val deleteAllJob = async { authViewModel.deleteAllLocalData() }
+                            deleteAllJob.await()
+                            val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
+                            lastJob.await()
+                            navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${noBS}"){
+                                popUpTo(CapiScreen.Listing.LIST_BS + "/${noBS}"){
+                                    inclusive = true
+                                }
+                            }
+                        }
+
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Sync,
@@ -220,7 +243,18 @@ fun ListRutaScreen(
                         DropdownMenuItem(text = { Text(text = stringResource(id = R.string.ambil_sampel)) },
                             onClick = {
                                 if (noBS != null) {
-                                    viewModel.generateRuta(noBS)
+
+                                    coroutineScope.launch {
+                                        val generateRutaJob = async { viewModel.generateRuta(noBS) }
+                                        generateRutaJob.await()
+                                        val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
+                                        lastJob.await()
+                                        navController.navigate(CapiScreen.Listing.LIST_BS){
+                                            popUpTo(CapiScreen.Listing.LIST_BS){
+                                                inclusive = true
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         )
@@ -278,9 +312,13 @@ fun ListRutaScreen(
                             onClick = {
                                 openFinalisasiBSDialog = false
                                 viewModel.finalisasiBS(noBS!!)
-                                navController.navigate(Capi63Screen.ListBs.route){
-                                    popUpTo(Capi63Screen.ListBs.route){
-                                        inclusive = true
+                                coroutineScope.launch {
+                                    val finalisasiBSJob = async { viewModel.finalisasiBS(noBS) }
+                                    finalisasiBSJob.await()
+                                    navController.navigate(Capi63Screen.ListBs.route){
+                                        popUpTo(Capi63Screen.ListBs.route){
+                                            inclusive = true
+                                        }
                                     }
                                 }
                             },
@@ -339,7 +377,13 @@ fun ListRutaScreen(
 
         },
         content = { innerPadding ->
-            Column {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = PklBase),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ) {
                 Row(
                     modifier = Modifier
                         .padding(innerPadding)
@@ -349,6 +393,32 @@ fun ListRutaScreen(
                     Arrangement.SpaceEvenly,
                     Alignment.CenterVertically,
                 ) {
+                    // Ini header tabel
+//                    Row(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(end = 10.dp),
+//                        horizontalArrangement = Arrangement.SpaceEvenly,
+//                        verticalAlignment = Alignment.CenterVertically,
+//                    ) {
+//                        listOf(
+//                            R.string.no_bf_list_ruta,
+//                            R.string.no_bs_list_ruta,
+//                            R.string.no_ruta_list_ruta,
+//                            R.string.nama_krt_list_ruta,
+//                            "Info"
+//                        ).forEach { id ->
+//                            Text(
+//                                modifier = Modifier.weight(1f),
+//                                text = stringResource(id = id as Int),
+//                                color = Color.White,
+//                                fontFamily = PoppinsFontFamily,
+//                                fontWeight = FontWeight.Medium,
+//                                fontSize = 14.sp
+//                            )
+//                        }
+//                    }
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -435,6 +505,42 @@ fun RutaRow(
     var openPasswordMasterDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
+    // Ini baris tabel yang akan berulang
+//    Row(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .height(50.dp)
+//            .combinedClickable(onLongClick = { openActionDialog = true }, onClick = { }),
+//        horizontalArrangement = Arrangement.SpaceEvenly,
+//        verticalAlignment = Alignment.CenterVertically
+//    ) {
+//        listOf(
+//            "${keluarga.noBgFisik}",
+//            "${keluarga.noBgSensus}",
+//            "${ruta.noUrutRuta}",
+//            viewModel.sederhanakanNama(ruta.namaKrt.toString())
+//        ).forEach { text ->
+//            Text(
+//                modifier = Modifier
+//                    .weight(1f)
+//                    .padding(start = 10.dp, end = 10.dp),
+//                text = text,
+//                fontFamily = PoppinsFontFamily,
+//                fontWeight = FontWeight.Medium,
+//                fontSize = 16.sp
+//            )
+//        }
+//
+//        IconButton(
+//            modifier = Modifier.weight(1f),
+//            onClick = { openDetail = true }
+//        ) {
+//            Icon(
+//                imageVector = Icons.Outlined.Info,
+//                contentDescription = stringResource(id = R.string.info_icon),
+//            )
+//        }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -476,7 +582,7 @@ fun RutaRow(
 //        Spacer(modifier = Modifier.size(40.dp))
         Text(
             modifier = Modifier.padding(start = 10.dp, end = 10.dp),
-            text = ruta.namaKrt!!,
+            text = viewModel.sederhanakanNama(ruta.namaKrt.toString()),
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp

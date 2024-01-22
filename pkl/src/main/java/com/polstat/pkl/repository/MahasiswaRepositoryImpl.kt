@@ -44,6 +44,19 @@ class MahasiswaRepositoryImpl @Inject constructor (
         }
     }
 
+    override suspend fun deleteAllMahasiswa(): Flow<String> {
+        return  flow {
+            try {
+                capi63Database.capi63Dao.deleteAllMahasiswa()
+                val message = "Berhasil menghapus seluruh mahasiswa!"
+                Log.d(TAG, "deleteAllMahasiswa: $message")
+            } catch (e: Exception) {
+                val message = "Gagal menghapus seluruh mahasiswa!"
+                Log.d(TAG, "deleteAllMahasiswa: $message (${e.message})")
+            }
+        }
+    }
+
 
     override suspend fun getMahasiswaWithWilayah(
         nim: String

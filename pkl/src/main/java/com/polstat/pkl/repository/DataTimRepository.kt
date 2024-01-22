@@ -13,6 +13,8 @@ interface DataTimRepository {
 
     suspend fun getDataTim(idTim: String) : Flow<Result<DataTimEntity>>
 
+    suspend fun deleteAllDataTim() : Flow<String>
+
     suspend fun getDataTimWithMahasiswa(idTim: String) : Flow<Result<DataTimWithMahasiswa>>
 
     suspend fun getDataTimWithAll(idTim: String) : Flow<Result<DataTimWithAll>>

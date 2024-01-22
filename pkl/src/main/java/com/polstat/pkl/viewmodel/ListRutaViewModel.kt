@@ -84,7 +84,10 @@ class ListRutaViewModel @Inject constructor(
     val successMessage = _successMessage.asStateFlow()
 
     init {
-        getWilayahWithAll(noBS!!)
+        viewModelScope.launch {
+            delay(1000)
+            getWilayahWithAll(noBS!!)
+        }
     }
 
     private fun getWilayahWithAll(
@@ -164,7 +167,7 @@ class ListRutaViewModel @Inject constructor(
             json = jsonKlgInstance
         )
         viewModelScope.launch {
-            val job = launch {
+//            val job = launch {
                 remoteRutaRepository.sinkronisasiRuta(syncRutaRequest).collectLatest { result ->
                     when (result) {
                         is Result.Success -> {
@@ -197,8 +200,8 @@ class ListRutaViewModel @Inject constructor(
                         }
                     }
                 }
-            }
-            job.join()
+//            }
+//            job.join()
 
 //            launch {
 //                wilayahRepository.updateWilayah(updatedWilayah.toWilayah(emptyList()), nim).collectLatest{ message ->
@@ -370,6 +373,16 @@ class ListRutaViewModel @Inject constructor(
             launch {
                 _showErrorToastChannel.send(false)
             }
+        }
+    }
+
+    fun sederhanakanNama(nama: String): String {
+        val kata = nama.split(" ")
+        return if (kata.size > 3) {
+            val inisial = kata.subList(3, kata.size).joinToString(".") { it[0].toString() }
+            kata.subList(0, 3).joinToString(" ") + " $inisial"
+        } else {
+            nama
         }
     }
 

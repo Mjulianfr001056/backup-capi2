@@ -23,7 +23,7 @@ class AuthRepositoryImpl @Inject constructor(
         private const val TAG = "AuthRepositoryImpl"
     }
 
-    val session get() = sessionRepository.getActiveSession()
+    val session = sessionRepository.getActiveSession()
 
     private fun saveSession(session: Session) {
         sessionRepository.saveSession(session)
@@ -36,16 +36,17 @@ class AuthRepositoryImpl @Inject constructor(
             emit(Result.Loading(true))
             val authResponse = try {
                 val response = authApi.login(nim, password)
-                val session = Session(
+                val newSession = Session(
                     nama = response.nama,
                     nim = response.nim,
+                    password = password,
                     avatar = response.avatar,
                     isKoor = response.isKoor,
                     id_kuesioner = response.idKuesioner,
                     idTim = response.dataTim.idTim,
                     token = response.token
                 )
-                saveSession(session)
+                saveSession(newSession)
                 sessionRepository.logIn()
                 Log.d(TAG, "Session was saved: $session")
                 response

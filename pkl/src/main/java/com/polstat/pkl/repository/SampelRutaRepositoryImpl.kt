@@ -102,4 +102,17 @@ class SampelRutaRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteAllSampelRuta(): Flow<String> {
+        return  flow {
+            try {
+                capi63Database.capi63Dao.deleteAllSampelRuta()
+                val message = "Berhasil menghapus seluruh sampel ruta!"
+                Log.d(TAG, "deleteAllSampelRuta: $message")
+            } catch (e: Exception) {
+                val message = "Gagal menghapus seluruh sampel ruta!"
+                Log.d(TAG, "deleteAllSampelRuta: $message (${e.message})")
+            }
+        }
+    }
+
 }

@@ -19,7 +19,7 @@ class LocalRutaRepositoryImpl @Inject constructor(
         private const val TAG = "CAPI63_LCLRUTAREPOIMPL"
     }
 
-    override fun insertRuta(
+    override suspend fun insertRuta(
         ruta: Ruta
     ): Flow<String> {
         return  flow {
@@ -38,7 +38,7 @@ class LocalRutaRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun insertKeluargaAndRuta(
+    override suspend fun insertKeluargaAndRuta(
         kodeKlg: String,
         kodeRuta: String
     ): Flow<String> {
@@ -61,7 +61,20 @@ class LocalRutaRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun updateRuta(ruta: Ruta): Flow<String> {
+    override suspend fun deleteAllKeluargaAndRuta(): Flow<String> {
+        return  flow {
+            try {
+                capi63Database.capi63Dao.deleteAllKeluargaAndRuta()
+                val message = "Berhasil menghapus seluruh keluargaandruta!"
+                Log.d(TAG, "deleteAllKeluargaAndRuta: $message")
+            } catch (e: Exception) {
+                val message = "Gagal menghapus seluruh keluargaandruta!"
+                Log.d(TAG, "deleteAllKeluargaAndRuta: $message (${e.message})")
+            }
+        }
+    }
+
+    override suspend fun updateRuta(ruta: Ruta): Flow<String> {
         return  flow {
             try {
                 val readyRuta = ruta.copy(status = "update")
@@ -75,7 +88,7 @@ class LocalRutaRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun fakeDeleteRuta(ruta: Ruta): Flow<String> {
+    override suspend fun fakeDeleteRuta(ruta: Ruta): Flow<String> {
         return  flow {
             try {
                 val updatedRuta = ruta.copy(status = "delete")
@@ -89,7 +102,7 @@ class LocalRutaRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getRuta(
+    override suspend fun getRuta(
         kodeRuta: String
     ): Flow<Result<RutaEntity>> {
         return flow {
@@ -109,4 +122,18 @@ class LocalRutaRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun deleteAllRuta(): Flow<String> {
+        return  flow {
+            try {
+                capi63Database.capi63Dao.deleteAllRuta()
+                val message = "Berhasil menghapus seluruh ruta!"
+                Log.d(TAG, "deleteAllRuta: $message")
+            } catch (e: Exception) {
+                val message = "Gagal menghapus seluruh ruta!"
+                Log.d(TAG, "deleteAllRuta: $message (${e.message})")
+            }
+        }
+    }
+
 }

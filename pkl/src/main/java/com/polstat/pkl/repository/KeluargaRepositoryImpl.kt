@@ -84,6 +84,19 @@ class KeluargaRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteAllKeluarga(): Flow<String> {
+        return  flow {
+            try {
+                capi63Database.capi63Dao.deleteAllKeluarga()
+                val message = "Berhasil menghapus seluruh keluarga!"
+                Log.d(TAG, "deleteAllKeluarga: $message")
+            } catch (e: Exception) {
+                val message = "Gagal menghapus seluruh keluarga!"
+                Log.d(TAG, "deleteAllKeluarga: $message (${e.message})")
+            }
+        }
+    }
+
     override suspend fun getKeluargaWithRuta(
         kodeKlg: String
     ): Flow<Result<KeluargaWithRuta>> {

@@ -59,6 +59,18 @@ class WilayahRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteAllWilayah(): Flow<String> {
+        return  flow {
+            try {
+                capi63Database.capi63Dao.deleteAllWilayah()
+                val message = "Berhasil menghapus seluruh wilayah!"
+                Log.d(TAG, "deleteAllWilayah: $message")
+            } catch (e: Exception) {
+                val message = "Gagal menghapus seluruh wilayah!"
+                Log.d(TAG, "deleteAllWilayah: $message (${e.message})")
+            }
+        }
+    }
 
     override suspend fun getWilayahWithRuta(
         noBS: String

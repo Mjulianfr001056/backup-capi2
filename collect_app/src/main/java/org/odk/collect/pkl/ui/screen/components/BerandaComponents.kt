@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.polstat.pkl.database.entity.DataTimEntity
+import com.polstat.pkl.database.entity.SampelRutaEntity
 import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.database.relation.DataTimWithAll
 import com.polstat.pkl.database.relation.MahasiswaWithAll
@@ -323,7 +324,8 @@ fun ListPplCard(
 
 @Composable
 fun WilayahKerjaCard(
-    listWilayah: List<WilayahEntity>
+    listWilayah: List<WilayahEntity>,
+    listSampelRutaEntity: List<SampelRutaEntity>
 ) {
     // Second Card - Add another Card element here
     Card(
@@ -405,7 +407,7 @@ fun WilayahKerjaCard(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Text(
-                                        text = "0",
+                                        text = "${listSampelRutaEntity.size}",
                                         fontFamily = PoppinsFontFamily,
                                         fontWeight = FontWeight.Medium,
                                         fontSize = 30.sp,

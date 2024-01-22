@@ -62,6 +62,19 @@ class DataTimRepositoryImpl @Inject constructor (
         }
     }
 
+    override suspend fun deleteAllDataTim(): Flow<String> {
+        return  flow {
+            try {
+                capi63Database.capi63Dao.deleteAllDataTim()
+                val message = "Berhasil menghapus seluruh data tim!"
+                Log.d(TAG, "deleteAllDataTim: $message")
+            } catch (e: Exception) {
+                val message = "Gagal menghapus seluruh data tim!"
+                Log.d(TAG, "deleteAllDataTim: $message (${e.message})")
+            }
+        }
+    }
+
     override suspend fun getDataTimWithMahasiswa(
         idTim: String
     ): Flow<Result<DataTimWithMahasiswa>> {

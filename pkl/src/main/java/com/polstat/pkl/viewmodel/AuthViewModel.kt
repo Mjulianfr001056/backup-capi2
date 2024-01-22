@@ -11,12 +11,14 @@ import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.mapper.toMahasiswaEntity
 import com.polstat.pkl.model.domain.DataTim
 import com.polstat.pkl.model.domain.Mahasiswa
+import com.polstat.pkl.model.domain.Session
 import com.polstat.pkl.model.response.AuthResponse
 import com.polstat.pkl.repository.AuthRepository
 import com.polstat.pkl.repository.DataTimRepository
 import com.polstat.pkl.repository.KeluargaRepository
 import com.polstat.pkl.repository.LocalRutaRepository
 import com.polstat.pkl.repository.MahasiswaRepository
+import com.polstat.pkl.repository.SampelRutaRepository
 import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.ui.event.LoginScreenEvent
@@ -26,6 +28,7 @@ import com.polstat.pkl.utils.use_case.ValidateNim
 import com.polstat.pkl.utils.use_case.ValidatePassword
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,6 +47,7 @@ class AuthViewModel @Inject constructor(
     private val wilayahRepository: WilayahRepository,
     private val keluargaRepository: KeluargaRepository,
     private val localRutaRepository: LocalRutaRepository,
+    private val sampelRutaRepository: SampelRutaRepository,
     private val validateNim: ValidateNim,
     private val validatePassword: ValidatePassword,
 //    private val getLocationUseCase: GetLocationUseCase,
@@ -99,6 +103,40 @@ class AuthViewModel @Inject constructor(
         return sessionRepository.isLoggedIn()
     }
 
+    fun deleteAllLocalData() {
+        viewModelScope.launch {
+
+            dataTimRepository.deleteAllDataTim().collectLatest { message ->
+                Log.d(TAG, "deleteAllLocalData: $message")
+            }
+
+            mahasiswaRepository.deleteAllMahasiswa().collectLatest { message ->
+                Log.d(TAG, "deleteAllLocalData: $message")
+            }
+
+            wilayahRepository.deleteAllWilayah().collectLatest { message ->
+                Log.d(TAG, "deleteAllLocalData: $message")
+            }
+
+            keluargaRepository.deleteAllKeluarga().collectLatest { message ->
+                Log.d(TAG, "deleteAllLocalData: $message")
+            }
+
+            localRutaRepository.deleteAllRuta().collectLatest { message ->
+                Log.d(TAG, "deleteAllLocalData: $message")
+            }
+
+            sampelRutaRepository.deleteAllSampelRuta().collectLatest { message ->
+                Log.d(TAG, "deleteAllLocalData: $message")
+            }
+
+            localRutaRepository.deleteAllKeluargaAndRuta().collectLatest { message ->
+                Log.d(TAG, "deleteAllLocalData: $message")
+            }
+
+        }
+    }
+
     @Suppress("NAME_SHADOWING")
     fun login(
         nim: String,
@@ -115,6 +153,8 @@ class AuthViewModel @Inject constructor(
 
                             Log.d(TAG, "Login successful: $response")
                         }
+                        state = state.copy(nim = "")
+                        state = state.copy(password = "")
                     }
 
                     is Result.Loading -> {

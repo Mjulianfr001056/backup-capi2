@@ -14,6 +14,8 @@ interface KeluargaRepository {
 
     suspend fun updateKeluarga(keluarga: Keluarga) : Flow<String>
 
+    suspend fun deleteAllKeluarga() : Flow<String>
+
     suspend fun getKeluargaWithRuta(kodeKlg: String) : Flow<Result<KeluargaWithRuta>>
 
 }

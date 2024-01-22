@@ -36,18 +36,19 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.polstat.pkl.ui.screen.components.BottomNavBar
-import com.polstat.pkl.ui.screen.components.ListPplCard
-import com.polstat.pkl.ui.screen.components.PmlCard
-import com.polstat.pkl.ui.screen.components.ProfileCard
-import com.polstat.pkl.ui.screen.components.ProgresListingCard
-import com.polstat.pkl.ui.screen.components.StatusListingCard
-import com.polstat.pkl.ui.screen.components.WilayahKerjaCard
+import org.odk.collect.pkl.ui.screen.components.BottomNavBar
+import org.odk.collect.pkl.ui.screen.components.ListPplCard
+import org.odk.collect.pkl.ui.screen.components.PmlCard
+import org.odk.collect.pkl.ui.screen.components.ProfileCard
+import org.odk.collect.pkl.ui.screen.components.ProgresListingCard
+import org.odk.collect.pkl.ui.screen.components.StatusListingCard
+import org.odk.collect.pkl.ui.screen.components.WilayahKerjaCard
 import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.viewmodel.BerandaViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
@@ -62,7 +63,7 @@ fun BerandaScreenPreview() {
         ) {
             val navController = rememberNavController()
             val rootController = rememberNavController()
-            com.polstat.pkl.ui.screen.BerandaScreen(
+            org.odk.collect.pkl.ui.screen.BerandaScreen(
                 rootController = rootController,
                 navController = navController,
                 viewModel = hiltViewModel()
@@ -85,6 +86,8 @@ fun BerandaScreen(
     val session = viewModel.session
 
     val dataTimWithAll = viewModel.dataTimWithAll.collectAsState()
+    
+    val listSampelRuta = viewModel.listSampelRuta.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -150,14 +153,18 @@ fun BerandaScreen(
                                 },
                                 onClick = {
                                     coroutineScope.launch {
-                                        val job = launch { viewModel.logout() }
-                                        job.join()
-                                        delay(500)
-                                        rootController.navigate(CapiScreen.Top.AUTH) {
-                                            popUpTo(CapiScreen.Top.MAIN) {
-                                                inclusive = true
-                                            }
-                                        }
+                                        val job = async { viewModel.logout() }
+                                        job.await()
+                                        delay(1000)
+                                        val job2 = async { viewModel.deleteAllLocalData() }
+                                        job2.await()
+//                                        rootController.navigate(CapiScreen.Top.AUTH) {
+//                                            popUpTo(CapiScreen.Top.MAIN) {
+//                                                inclusive = true
+//                                            }
+//                                        }
+                                        delay(1000)
+                                        System.exit(0)
                                     }
                                 }
                             )
@@ -187,7 +194,8 @@ fun BerandaScreen(
                 dataTimWithAll.value.listMahasiswaWithAll!!.forEach { mahasiswaWithAll ->
                     if (mahasiswaWithAll.mahasiswaWithWilayah!!.mahasiswa!!.nim == session.nim) {
                         WilayahKerjaCard(
-                            listWilayah = mahasiswaWithAll.mahasiswaWithWilayah!!.listWilayah!!
+                            listWilayah = mahasiswaWithAll.mahasiswaWithWilayah!!.listWilayah!!,
+                            listSampelRutaEntity = listSampelRuta.value
                         )
                     }
                 }
