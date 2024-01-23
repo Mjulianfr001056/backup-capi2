@@ -8,22 +8,19 @@ import java.util.Date
 data class WilayahEntity (
     @PrimaryKey(autoGenerate = false)
     val noBS: String = "",
-    val idKab: String? = "",
-    val namaKab: String? = "",
-    val idKec: String? = "",
-    val namaKec: String? = "",
-    val idKel: String? = "",
-    val namaKel: String? = "",
-    val jmlKlg: Int? = 0,
-    val jmlKlgEgb: Int? = 0,
-    val jmlRuta: Int? = 0,
-    val jmlRutaEgb: Int? = 0,
-    val tglListing: Date? = Date(),
-    val tglPeriksa: Date? = Date(),
-    val catatan: String? = "",
-    val status: String? = "",
-    val nim: String? = ""
+    val idKab: String = "[Not set]",
+    val namaKab: String = "[Not set]",
+    val idKec: String = "[Not set]",
+    val namaKec: String = "[Not set]",
+    val idKel: String = "[Not set]",
+    val namaKel: String = "[Not set]",
+    val jmlKlg: Int = -1,
+    val jmlKlgEgb: Int = -1,
+    val jmlRuta: Int = -1,
+    val jmlRutaEgb: Int = -1,
+    val tglListing: Date = Date(),
+    val tglPeriksa: Date = Date(),
+    val catatan: String = "[Not set]",
+    val status: String = "[Not set]",
+    val nim: String = "[Not set]"
 )
-{
-    constructor() : this("", "", "", "", "", "", "", 0, 0, 0, 0, Date(), Date(), "", "")
-}
