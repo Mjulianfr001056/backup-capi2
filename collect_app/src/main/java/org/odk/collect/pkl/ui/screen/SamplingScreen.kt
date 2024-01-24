@@ -43,6 +43,7 @@ import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.viewmodel.SamplingViewModel
+import org.odk.collect.pkl.ui.screen.components.BottomNavBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,7 +73,7 @@ fun SamplingScreen(
             )
         },
         bottomBar = {
-            com.polstat.pkl.ui.screen.components.BottomNavBar(rootNavController = rootController)
+            BottomNavBar(rootNavController = rootController)
         },
         content = { innerPadding ->
             Box(

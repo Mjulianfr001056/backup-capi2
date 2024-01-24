@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -81,8 +80,6 @@ import com.polstat.pkl.R
 import com.polstat.pkl.database.entity.KeluargaEntity
 import com.polstat.pkl.database.entity.RutaEntity
 import com.polstat.pkl.database.relation.WilayahWithAll
-import com.polstat.pkl.navigation.Capi63Screen
-import com.polstat.pkl.navigation.CapiScreen
 import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary300
@@ -96,6 +93,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.odk.collect.pkl.navigation.CapiScreen
 
 @Preview
 @Composable
@@ -167,8 +165,8 @@ fun ListRutaScreen(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.navigate(Capi63Screen.ListBs.route){
-                                popUpTo(Capi63Screen.ListBs.route){
+                            navController.navigate(CapiScreen.Listing.LIST_BS){
+                                popUpTo(CapiScreen.Listing.LIST_BS){
                                     inclusive = true
                                 }
                             }
@@ -323,8 +321,8 @@ fun ListRutaScreen(
                                     val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
                                     lastJob.await()
                                     delay(2000)
-                                    navController.navigate(Capi63Screen.ListBs.route){
-                                        popUpTo(Capi63Screen.ListBs.route){
+                                    navController.navigate(CapiScreen.Listing.LIST_BS){
+                                        popUpTo(CapiScreen.Listing.LIST_BS){
                                             inclusive = true
                                         }
                                     }
@@ -932,8 +930,8 @@ fun RutaRow(
                             )
                             openPasswordMasterDialog = false
                             openActionDialog = false
-                            navController.navigate(Capi63Screen.ListRuta.route + "/${ruta.noBS}"){
-                                popUpTo(Capi63Screen.ListRuta.route + "/${ruta.noBS}"){
+                            navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${ruta.noBS}"){
+                                popUpTo(CapiScreen.Listing.LIST_RUTA + "/${ruta.noBS}"){
                                     inclusive = true
                                 }
                             }

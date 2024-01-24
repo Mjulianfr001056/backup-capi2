@@ -58,7 +58,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.event.IsiRutaScreenEvent
 import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklAccent
@@ -71,6 +70,7 @@ import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.utils.UtilFunctions
 import com.polstat.pkl.viewmodel.IsiRutaViewModel
 import kotlinx.coroutines.launch
+import org.odk.collect.pkl.navigation.CapiScreen
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @RequiresApi(Build.VERSION_CODES.S)
@@ -562,8 +562,8 @@ fun IsiRumahTanggaScreen(
                             viewModel.onEvent(IsiRutaScreenEvent.submit)
                         }
                         Toast.makeText(context, "Ruta berhasil ditambahkan!", Toast.LENGTH_SHORT).show()
-                        navController.navigate(Capi63Screen.ListRuta.route + "/${noBS}"){
-                            popUpTo(Capi63Screen.ListRuta.route + "/${noBS}"){
+                        navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${noBS}"){
+                            popUpTo(CapiScreen.Listing.LIST_RUTA + "/${noBS}"){
                                 inclusive = true
                             }
                         }
@@ -863,8 +863,8 @@ fun IsiRumahTanggaTopBar(
         navigationIcon = {
             IconButton(
                 onClick = {
-                    navController.navigate(Capi63Screen.ListRuta.route + "/$noBS"){
-                        popUpTo(Capi63Screen.ListRuta.route + "/$noBS"){
+                    navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$noBS"){
+                        popUpTo(CapiScreen.Listing.LIST_RUTA + "/$noBS"){
                             inclusive = true
                         }
                     }
