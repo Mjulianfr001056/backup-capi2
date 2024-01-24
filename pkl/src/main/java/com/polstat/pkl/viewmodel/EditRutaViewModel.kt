@@ -1,8 +1,6 @@
 package com.polstat.pkl.viewmodel
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -39,38 +37,29 @@ class EditRutaViewModel @Inject constructor(
         private const val TAG = "CAPI63_EDITRUTA_VM"
     }
 
-    val noBS = savedStateHandle.get<String>("noBS")
-
-    val kodeRuta = savedStateHandle.get<String>("kodeRuta")
-
-    val kodeKlg = savedStateHandle.get<String>("kodeKlg")
+    val noBS = savedStateHandle.get<String>("noBS").orEmpty()
+    val kodeRuta = savedStateHandle.get<String>("kodeRuta").orEmpty()
+    val kodeKlg = savedStateHandle.get<String>("kodeKlg").orEmpty()
 
     private val _session = sessionRepository.getActiveSession()
-
     val session = _session
 
     private val _state = MutableStateFlow(EditRutaState())
-
     val state = _state.asStateFlow()
 
     private val _editRuta = MutableStateFlow(Ruta())
-
     val editRuta = _editRuta.asStateFlow()
 
     private val _editKlg = MutableStateFlow(Keluarga())
-
     val editKlg = _editKlg.asStateFlow()
 
     private val _errorMessage = MutableStateFlow("")
-
     val errorMessage = _errorMessage.asStateFlow()
 
     private val _showLoadingChannel = Channel<Boolean>()
-
     val showLoadingChannel = _showLoadingChannel.receiveAsFlow()
 
     private val _showErrorToastChannel = Channel<Boolean>()
-
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
     init {

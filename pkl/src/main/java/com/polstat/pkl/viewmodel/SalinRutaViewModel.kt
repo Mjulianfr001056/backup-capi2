@@ -18,7 +18,6 @@ import com.polstat.pkl.ui.state.SalinRutaState
 import com.polstat.pkl.utils.Result
 import com.polstat.pkl.utils.UtilFunctions
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +40,7 @@ class SalinRutaViewModel @Inject constructor(
         private const val TAG = "CAPI63_SalinRuta_VM"
     }
 
-    val noBS = savedStateHandle.get<String>("noBS")
+    val noBS = savedStateHandle.get<String>("noBS").orEmpty()
 
     val kodeRuta = savedStateHandle.get<String>("kodeRuta")
 

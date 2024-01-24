@@ -51,7 +51,7 @@ class IsiRutaViewModel @Inject constructor(
 
     val state = _state.asStateFlow()
 
-    val noBS = savedStateHandle.get<String>("noBS")
+    val noBS = savedStateHandle.get<String>("noBS").orEmpty()
 
     private val _lastKeluarga = MutableStateFlow(KeluargaEntity())
 
@@ -98,8 +98,8 @@ class IsiRutaViewModel @Inject constructor(
             noSegmen = incrementStringNoSegmen(lastKeluarga.value.noSegmen!!),
             noBgFisik = lastKeluarga.value.noBgFisik,
             noBgSensus = lastKeluarga.value.noBgSensus,
-            noUrutKlg = lastKeluarga.value.noUrutKlg?.plus(1),
-            noUrutKlgEgb = if (state.value.isGenzOrtu != 0) lastKeluargaEgb.value.noUrutKlgEgb?.plus(1) else 0,
+            noUrutKlg = lastKeluarga.value.noUrutKlg.plus(1),
+            noUrutKlgEgb = if (state.value.isGenzOrtu != 0) lastKeluargaEgb.value.noUrutKlgEgb.plus(1) else 0,
         )
         Log.d(TAG, "setInitialKlgValue: ${state.value}")
     }
@@ -109,7 +109,7 @@ class IsiRutaViewModel @Inject constructor(
     }
 
     suspend fun setInitialNoUrutKlgEgb() {
-        _state.emit(state.value.copy(noUrutKlgEgb = lastKeluargaEgb.value.noUrutKlgEgb?.plus(1)))
+        _state.emit(state.value.copy(noUrutKlgEgb = lastKeluargaEgb.value.noUrutKlgEgb.plus(1)))
         Log.d(TAG, "setInitialNoUrutKlgEgb: ${state.value.noUrutKlgEgb}")
     }
 

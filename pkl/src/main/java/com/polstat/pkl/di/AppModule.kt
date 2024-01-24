@@ -4,10 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.room.Room
-import com.google.android.gms.location.LocationServices
 import com.polstat.pkl.database.Capi63Database
 import com.polstat.pkl.database.dao.Capi63Dao
-import com.polstat.pkl.network.LocationApi
 import com.polstat.pkl.repository.DataTimRepository
 import com.polstat.pkl.repository.DataTimRepositoryImpl
 import com.polstat.pkl.repository.KeluargaRepository
@@ -79,8 +77,8 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideDataTimRepository(capi63Database: Capi63Database) : DataTimRepository {
-        return DataTimRepositoryImpl(capi63Database)
+    fun provideDataTimRepository(capi63Dao: Capi63Dao) : DataTimRepository {
+        return DataTimRepositoryImpl(capi63Dao)
     }
 
     @Provides
