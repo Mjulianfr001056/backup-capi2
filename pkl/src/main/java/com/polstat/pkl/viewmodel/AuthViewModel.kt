@@ -79,6 +79,7 @@ class AuthViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            delay(10000L)
             getLocationUseCase.invoke().collect { location ->
                 if (location != null && _session?.nim != null) {
                     Log.d(TAG, "getLocationUseCase: Nim = ${_session.nim}")
