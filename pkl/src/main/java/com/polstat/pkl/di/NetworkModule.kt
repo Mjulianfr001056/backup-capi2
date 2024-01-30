@@ -1,6 +1,7 @@
 package com.polstat.pkl.di
 
-import com.google.gson.FieldNamingPolicy
+import com.polstat.pkl.repository.LocationRepository
+import com.polstat.pkl.repository.LocationRepositoryImpl
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.polstat.pkl.database.Capi63Database
@@ -10,8 +11,6 @@ import com.polstat.pkl.network.RutaApi
 import com.polstat.pkl.network.SampelRutaApi
 import com.polstat.pkl.repository.AuthRepository
 import com.polstat.pkl.repository.AuthRepositoryImpl
-//import com.polstat.pkl.repository.LocationRepository
-//import com.polstat.pkl.repository.LocationRepositoryImpl
 import com.polstat.pkl.repository.RemoteRutaRepository
 import com.polstat.pkl.repository.RemoteRutaRepositoryImpl
 import com.polstat.pkl.repository.SampelRutaRepository
@@ -25,12 +24,12 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
+//    private val BASE_URL = "https://e30f-36-37-99-146.ngrok-free.app/"
     private val BASE_URL = "https://capi.pkl63.stis.ac.id/"
 
     @Provides
@@ -103,9 +102,9 @@ class NetworkModule {
         return SampelRutaRepositoryImpl(sampelRutaApi, capi63Database)
     }
 
-//    @Provides
-//    @Singleton
-//    fun provideLocationRepository(locationApi: LocationApi) : LocationRepository {
-//        return LocationRepositoryImpl(locationApi)
-//    }
+    @Provides
+    @Singleton
+    fun provideLocationRepository(locationApi: LocationApi) : LocationRepository {
+        return LocationRepositoryImpl(locationApi)
+    }
 }

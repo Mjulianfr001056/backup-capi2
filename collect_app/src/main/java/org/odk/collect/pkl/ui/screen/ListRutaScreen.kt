@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -105,8 +104,6 @@ fun ListRutaPreview() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-
-
             ListRutaScreen(rememberNavController(), hiltViewModel(), hiltViewModel())
         }
     }
@@ -193,17 +190,15 @@ fun ListRutaScreen(
                         coroutineScope.launch {
                             val synchronizeRutaJob = async {
                                 viewModel.synchronizeRuta(
-                                    nim = session!!.nim!!,
-                                    noBS = noBS!!,
+                                    nim = session?.nim.toString(),
+                                    noBS = noBS.toString(),
                                     wilayahWithAll = wilayahWithAll.value
                                 )
                             }
                             synchronizeRutaJob.await()
-                            delay(3000)
-                            val deleteAllJob = async { authViewModel.deleteAllLocalData() }
-                            deleteAllJob.await()
                             val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
                             lastJob.await()
+                            delay(1000L)
                             navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${noBS}"){
                                 popUpTo(CapiScreen.Listing.LIST_BS + "/${noBS}"){
                                     inclusive = true
@@ -249,10 +244,8 @@ fun ListRutaScreen(
                                     coroutineScope.launch {
                                         val generateRutaJob = async { viewModel.generateRuta(noBS) }
                                         generateRutaJob.await()
-                                        delay(1000)
                                         val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
                                         lastJob.await()
-                                        delay(2000)
                                         navController.navigate(CapiScreen.Listing.LIST_BS){
                                             popUpTo(CapiScreen.Listing.LIST_BS){
                                                 inclusive = true
@@ -315,16 +308,15 @@ fun ListRutaScreen(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
                                 openFinalisasiBSDialog = false
-                                viewModel.finalisasiBS(noBS!!)
                                 coroutineScope.launch {
-                                    val finalisasiBSJob = async { viewModel.finalisasiBS(noBS) }
+                                    val finalisasiBSJob = async { viewModel.finalisasiBS(noBS.toString()) }
                                     finalisasiBSJob.await()
                                     delay(1000)
                                     val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
                                     lastJob.await()
                                     delay(2000)
-                                    navController.navigate(Capi63Screen.ListBs.route){
-                                        popUpTo(Capi63Screen.ListBs.route){
+                                    navController.navigate(CapiScreen.Listing.LIST_BS){
+                                        popUpTo(CapiScreen.Listing.LIST_BS){
                                             inclusive = true
                                         }
                                     }

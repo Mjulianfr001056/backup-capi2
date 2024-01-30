@@ -1,7 +1,5 @@
 package com.polstat.pkl.viewmodel
 
-//import androidx.annotation.RequiresApi
-//import com.polstat.pkl.utils.location.GetLocationUseCase
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -21,6 +19,7 @@ import com.polstat.pkl.ui.event.IsiRutaScreenEvent
 import com.polstat.pkl.ui.state.IsiRutaScreenState
 import com.polstat.pkl.utils.Result
 import com.polstat.pkl.utils.UtilFunctions
+import com.polstat.pkl.utils.location.GetLocationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +34,7 @@ class IsiRutaViewModel @Inject constructor(
     private val localRutaRepository: LocalRutaRepository,
     private val wilayahRepository: WilayahRepository,
     private val keluargaRepository: KeluargaRepository,
-//    private val getLocationUseCase: GetLocationUseCase,
+    private val getLocationUseCase: GetLocationUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel(){
 
@@ -173,16 +172,15 @@ class IsiRutaViewModel @Inject constructor(
         }
     }
 
-//    @RequiresApi(Build.VERSION_CODES.S)
     fun getRutaLocation() {
-//        viewModelScope.launch {
-//            getLocationUseCase.invoke().collect { location ->
-//                if (location != null) {
-//                    _lokasi.value = location
-//                }
-//                Log.d(TAG, "getRutaLocation: $location")
-//            }
-//        }
+        viewModelScope.launch {
+            getLocationUseCase.invoke().collect { location ->
+                if (location != null) {
+                    _lokasi.value = location
+                }
+                Log.d(TAG, "getRutaLocation: $location")
+            }
+        }
     }
 
     fun updateRekapitulasiWilayah(
@@ -214,8 +212,8 @@ class IsiRutaViewModel @Inject constructor(
         val updatedWilayah = wilayah.copy(
             jmlKlg = wilayahWithAll.value.listKeluargaWithRuta!!.filter { it.keluarga.status != "delete" }.size,
             jmlKlgEgb = wilayahWithAll.value.listKeluargaWithRuta!!.filter { it.keluarga.status != "delete" && it.keluarga.noUrutKlgEgb != 0 }.size,
-            jmlRuta = wilayahWithAll.value.listKeluargaWithRuta!!.flatMap { it.listRuta.filter { it.status != "delete" } }.size,
-            jmlRutaEgb = wilayahWithAll.value.listKeluargaWithRuta!!.flatMap { it.listRuta.filter { it.status != "delete" && it.noUrutEgb != 0 }}.size
+            jmlRuta = wilayahWithAll.value.listKeluargaWithRuta!!.flatMap { it -> it.listRuta.filter { it.status != "delete" } }.size,
+            jmlRutaEgb = wilayahWithAll.value.listKeluargaWithRuta!!.flatMap { it -> it.listRuta.filter { it.status != "delete" && it.noUrutEgb != 0 }}.size
         )
 
         viewModelScope.launch {
@@ -384,7 +382,7 @@ class IsiRutaViewModel @Inject constructor(
 
                 insertKeluarga(keluarga)
 
-                state.value.penglMkn?.let {
+                state.value.penglMkn?.let { it ->
                     repeat(it) {
                         val genzOrtuRuta = state.value.listGenzOrtu!![it]
 
@@ -395,7 +393,7 @@ class IsiRutaViewModel @Inject constructor(
                             kkOrKrt = if (state.value.listKkOrKrt!![it] == "Kepala Keluarga (KK) saja") "1" else if (state.value.listKkOrKrt!![it] == "Kepala Rumah Tangga (KRT) saja") "2" else "3",
                             namaKrt = state.value.listNamaKrt!![it],
                             isGenzOrtu = genzOrtuRuta,
-                            katGenz = if (genzOrtuRuta >= 1 && genzOrtuRuta <= 2) 1 else if (genzOrtuRuta >= 3 && genzOrtuRuta <= 4) 2 else if (genzOrtuRuta > 4) 3 else 0,
+                            katGenz = if (genzOrtuRuta in 1..2) 1 else if (genzOrtuRuta in 3..4) 2 else if (genzOrtuRuta > 4) 3 else 0,
                             long = lokasi.value.longitude,
                             lat = lokasi.value.latitude,
                             catatan = "",

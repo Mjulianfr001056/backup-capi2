@@ -76,7 +76,6 @@ fun AppNavHost(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun SamplingNavHost(
     rootController : NavHostController

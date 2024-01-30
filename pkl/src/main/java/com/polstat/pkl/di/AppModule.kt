@@ -7,23 +7,20 @@ import androidx.room.Room
 import com.google.android.gms.location.LocationServices
 import com.polstat.pkl.database.Capi63Database
 import com.polstat.pkl.database.dao.Capi63Dao
-import com.polstat.pkl.network.LocationApi
 import com.polstat.pkl.repository.DataTimRepository
 import com.polstat.pkl.repository.DataTimRepositoryImpl
 import com.polstat.pkl.repository.KeluargaRepository
 import com.polstat.pkl.repository.KeluargaRepositoryImpl
 import com.polstat.pkl.repository.LocalRutaRepository
 import com.polstat.pkl.repository.LocalRutaRepositoryImpl
-//import com.polstat.pkl.repository.LocationRepository
-//import com.polstat.pkl.repository.LocationRepositoryImpl
 import com.polstat.pkl.repository.MahasiswaRepository
 import com.polstat.pkl.repository.MahasiswaRepositoryImpl
 import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.SessionRepositoryImpl
 import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.repository.WilayahRepositoryImpl
-//import com.polstat.pkl.utils.location.ILocationService
-//import com.polstat.pkl.utils.location.LocationService
+import com.polstat.pkl.utils.location.ILocationService
+import com.polstat.pkl.utils.location.LocationService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,14 +36,14 @@ class AppModule {
         private const val TAG = "CAPI63_APP_MODULE"
     }
 
-//    @Singleton
-//    @Provides
-//    fun provideLocationClient(
-//        @ApplicationContext context: Context
-//    ): ILocationService = LocationService(
-//        context,
-//        LocationServices.getFusedLocationProviderClient(context)
-//    )
+    @Singleton
+    @Provides
+    fun provideLocationClient(
+        @ApplicationContext context: Context
+    ): ILocationService = LocationService(
+        context,
+        LocationServices.getFusedLocationProviderClient(context)
+    )
 
     @Provides
     @Singleton

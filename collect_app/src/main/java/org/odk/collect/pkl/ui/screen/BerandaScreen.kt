@@ -1,5 +1,6 @@
 package org.odk.collect.pkl.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -52,6 +53,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
+import timber.log.Timber
 
 @Preview
 @Composable
@@ -155,16 +157,17 @@ fun BerandaScreen(
                                     coroutineScope.launch {
                                         val job = async { viewModel.logout() }
                                         job.await()
-                                        delay(1000)
+                                        Timber.tag("BerandaScreen").d("BerandaScreen: Berhasil logut dari beranda!")
                                         val job2 = async { viewModel.deleteAllLocalData() }
                                         job2.await()
-//                                        rootController.navigate(CapiScreen.Top.AUTH) {
-//                                            popUpTo(CapiScreen.Top.MAIN) {
-//                                                inclusive = true
-//                                            }
-//                                        }
-                                        delay(1000)
-                                        System.exit(0)
+                                        Timber.tag("BerandaScreen").d("BerandaScreen: Berhasil menghapus semua data lokal!")
+                                        rootController.navigate(CapiScreen.Top.AUTH) {
+                                            popUpTo(CapiScreen.Top.MAIN) {
+                                                inclusive = true
+                                            }
+                                        }
+//                                        delay(1000)
+//                                        System.exit(0)
                                     }
                                 }
                             )
