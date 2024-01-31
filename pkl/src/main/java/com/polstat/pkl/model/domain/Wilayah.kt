@@ -14,8 +14,8 @@ data class Wilayah(
     val jmlKlgEgb: Int = -1,
     val jmlRuta: Int = -1,
     val jmlRutaEgb: Int = -1,
-    val tglListing: Date = Date(),
-    val tglPeriksa: Date = Date(),
+    val tglListing: Date? = Date(),
+    val tglPeriksa: Date? = Date(),
     val catatan: String = "[not set]",
     val status: String = "[not set]",
     val keluarga: List<Keluarga> = emptyList()

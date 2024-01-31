@@ -18,8 +18,8 @@ data class WilayahEntity (
     val jmlKlgEgb: Int = -1,
     val jmlRuta: Int = -1,
     val jmlRutaEgb: Int = -1,
-    val tglListing: Date = Date(),
-    val tglPeriksa: Date = Date(),
+    val tglListing: Date? = Date(),
+    val tglPeriksa: Date? = Date(),
     val catatan: String = "[Not set]",
     val status: String = "[Not set]",
     val nim: String = "[Not set]"

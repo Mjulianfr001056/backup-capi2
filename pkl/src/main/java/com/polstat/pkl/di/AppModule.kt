@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.room.Room
+import com.google.android.gms.location.LocationServices
 import com.polstat.pkl.database.Capi63Database
 import com.polstat.pkl.database.dao.Capi63Dao
 import com.polstat.pkl.repository.DataTimRepository
