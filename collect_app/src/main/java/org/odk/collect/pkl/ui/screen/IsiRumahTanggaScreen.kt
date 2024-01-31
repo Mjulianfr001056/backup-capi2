@@ -345,7 +345,7 @@ fun IsiRumahTanggaScreen(
                     },
                     label = {
                         Text(
-                            text = "5. Nomor Urut Keluarga",
+                            text = "Banyaknya keluarga dalam satu bangunan",
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -380,151 +380,7 @@ fun IsiRumahTanggaScreen(
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                TextField(
-                    value = state.value.namaKK.toString(),
-                    onValueChange = { coroutineScope.launch { viewModel.onEvent(IsiRutaScreenEvent.NamaKKChanged(it)) } },
-                    label = {
-                        Text(
-                            text = "6. Nama Kepala Keluarga",
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.SemiBold
-                        ) },
-                    textStyle = TextStyle.Default.copy(
-                        fontFamily = PoppinsFontFamily,
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color.Transparent,
-                        focusedIndicatorColor = PklPrimary700,
-                        unfocusedIndicatorColor = PklAccent
-                    ),
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Next
-                    )
-                )
-
-                Spacer(modifier = Modifier.padding(10.dp))
-
-                TextField(
-                    value = state.value.alamat.toString(),
-                    onValueChange = { coroutineScope.launch { viewModel.onEvent(IsiRutaScreenEvent.AlamatChanged(it)) } },
-                    label = {
-                        Text(
-                            text = "7. Alamat",
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.SemiBold
-                        ) },
-                    textStyle = TextStyle.Default.copy(
-                        fontFamily = PoppinsFontFamily,
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    singleLine = false,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color.Transparent,
-                        focusedIndicatorColor = PklPrimary700,
-                        unfocusedIndicatorColor = PklAccent
-                    ),
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Next
-                    )
-                )
-
-                Spacer(modifier = Modifier.padding(10.dp))
-
-                InputNomor(
-                    value = state.value.isGenzOrtu.toString(),
-                    onValueChange = {
-                        coroutineScope.launch {
-                            viewModel.onEvent(
-                                IsiRutaScreenEvent.IsGenzOrtuChanged(
-                                    it.toInt()
-                                )
-                            )
-                        }
-                    },
-                    label = {
-                        Text(
-                            text = "8. Keberadaan Gen Z dan Orang Tua dalam Keluarga",
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    },
-                    onIncrement = {
-                        coroutineScope.launch {
-                            viewModel.onEvent(
-                                IsiRutaScreenEvent.IsGenzOrtuChanged(
-                                    increment(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.isGenzOrtu
-                                        )
-                                    ).toInt()
-                                )
-                            )
-                        }
-                    },
-                    onDecrement = {
-                        coroutineScope.launch {
-                            viewModel.onEvent(
-                                IsiRutaScreenEvent.IsGenzOrtuChanged(
-                                    decrement(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.isGenzOrtu
-                                        )
-                                    ).toInt()
-                                )
-                            )
-                        }
-                    }
-                )
-
-                if (state.value.isGenzOrtu.toString() != "0") {
-                    Spacer(modifier = Modifier.padding(10.dp))
-
-                    InputNomor(
-                        value = state.value.noUrutKlgEgb.toString(),
-                        onValueChange = { coroutineScope.launch { viewModel.onEvent(IsiRutaScreenEvent.NoUrutKlgEgbChanged(it.toInt())) } },
-                        label = {
-                            Text(
-                                text = "9. Nomor Urut Keluarga Eligible",
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.SemiBold
-                            ) },
-                        onIncrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.NoUrutKlgEgbChanged(increment(
-                            UtilFunctions.convertTo3DigitsString(
-                            state.value.noUrutKlgEgb
-                        )).toInt())) } },
-                        onDecrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.NoUrutKlgEgbChanged(decrement(
-                            UtilFunctions.convertTo3DigitsString(
-                            state.value.noUrutKlgEgb
-                        )).toInt())) } }
-                    )
-                }
-
-                InputNomor(
-                    value = state.value.penglMkn.toString(),
-                    onValueChange = { coroutineScope.launch { viewModel.onEvent(IsiRutaScreenEvent.PenglMknChanged(it.toInt())) } },
-                    label = {
-                        Text(
-                            text = "10. Jumlah Pengelolaan Makan/Minum dan Kebutuhan dalam Keluarga",
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.SemiBold
-                        ) },
-                    onIncrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.PenglMknChanged(increment(
-                        UtilFunctions.convertTo3DigitsString(
-                        state.value.penglMkn
-                    )).toInt())) } },
-                    onDecrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.PenglMknChanged(decrement(
-                        UtilFunctions.convertTo3DigitsString(
-                        state.value.penglMkn
-                    )).toInt())) } }
-                )
-
-                Spacer(modifier = Modifier.padding(10.dp))
-
-                for (i in 1..state.value.penglMkn!!) {
+                for (i in 1..state.value.noUrutKlg!!) {
                     Card(
                         border = BorderStroke(1.dp, PklSecondary),
                         colors = CardDefaults.cardColors(
@@ -541,11 +397,12 @@ fun IsiRumahTanggaScreen(
                                 .padding(15.dp)
                         ) {
                             Text(
-                                text = "Keterangan Rumah Tangga ke-$i",
+                                text = "Keterangan Keluarga ke-$i",
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium
                             )
-                            KeteranganRuta(viewModel = viewModel, index = i-1)
+//                            KeteranganRuta(viewModel = viewModel, index = i-1)
+                            KeteranganKeluarga(viewModel = viewModel)
                         }
                     }
 
@@ -581,6 +438,235 @@ fun IsiRumahTanggaScreen(
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun KeteranganKeluarga(
+    viewModel: IsiRutaViewModel
+){
+    val state = viewModel.state.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+
+    InputNomor(
+        value = state.value.noUrutKlg.toString(),
+        onValueChange = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    IsiRutaScreenEvent.NoUrutKlgChanged(
+                        it.toInt()
+                    )
+                )
+            }
+        },
+        label = {
+            Text(
+                text = "5. Nomor Urut Keluarga",
+                fontFamily = PoppinsFontFamily,
+                fontWeight = FontWeight.SemiBold
+            )
+        },
+        onIncrement = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    IsiRutaScreenEvent.NoUrutKlgChanged(
+                        increment(
+                            UtilFunctions.convertTo3DigitsString(
+                                state.value.noUrutKlg
+                            )
+                        ).toInt()
+                    )
+                )
+            }
+        },
+        onDecrement = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    IsiRutaScreenEvent.NoUrutKlgChanged(
+                        decrement(
+                            UtilFunctions.convertTo3DigitsString(
+                                state.value.noUrutKlg
+                            )
+                        ).toInt()
+                    )
+                )
+            }
+        }
+    )
+
+    Spacer(modifier = Modifier.padding(10.dp))
+
+    TextField(
+        value = state.value.namaKK.toString(),
+        onValueChange = { coroutineScope.launch { viewModel.onEvent(IsiRutaScreenEvent.NamaKKChanged(it)) } },
+        label = {
+            Text(
+                text = "6. Nama Kepala Keluarga",
+                fontFamily = PoppinsFontFamily,
+                fontWeight = FontWeight.SemiBold
+            ) },
+        textStyle = TextStyle.Default.copy(
+            fontFamily = PoppinsFontFamily,
+            fontWeight = FontWeight.SemiBold
+        ),
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.textFieldColors(
+            containerColor = Color.Transparent,
+            focusedIndicatorColor = PklPrimary700,
+            unfocusedIndicatorColor = PklAccent
+        ),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Next
+        )
+    )
+
+    Spacer(modifier = Modifier.padding(10.dp))
+
+    TextField(
+        value = state.value.alamat.toString(),
+        onValueChange = { coroutineScope.launch { viewModel.onEvent(IsiRutaScreenEvent.AlamatChanged(it)) } },
+        label = {
+            Text(
+                text = "7. Alamat",
+                fontFamily = PoppinsFontFamily,
+                fontWeight = FontWeight.SemiBold
+            ) },
+        textStyle = TextStyle.Default.copy(
+            fontFamily = PoppinsFontFamily,
+            fontWeight = FontWeight.SemiBold
+        ),
+        singleLine = false,
+        modifier = Modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.textFieldColors(
+            containerColor = Color.Transparent,
+            focusedIndicatorColor = PklPrimary700,
+            unfocusedIndicatorColor = PklAccent
+        ),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Next
+        )
+    )
+
+    Spacer(modifier = Modifier.padding(10.dp))
+
+    InputNomor(
+        value = state.value.isGenzOrtu.toString(),
+        onValueChange = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    IsiRutaScreenEvent.IsGenzOrtuChanged(
+                        it.toInt()
+                    )
+                )
+            }
+        },
+        label = {
+            Text(
+                text = "8. Keberadaan Gen Z dan Orang Tua dalam Keluarga",
+                fontFamily = PoppinsFontFamily,
+                fontWeight = FontWeight.SemiBold
+            )
+        },
+        onIncrement = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    IsiRutaScreenEvent.IsGenzOrtuChanged(
+                        increment(
+                            UtilFunctions.convertTo3DigitsString(
+                                state.value.isGenzOrtu
+                            )
+                        ).toInt()
+                    )
+                )
+            }
+        },
+        onDecrement = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    IsiRutaScreenEvent.IsGenzOrtuChanged(
+                        decrement(
+                            UtilFunctions.convertTo3DigitsString(
+                                state.value.isGenzOrtu
+                            )
+                        ).toInt()
+                    )
+                )
+            }
+        }
+    )
+
+    if (state.value.isGenzOrtu.toString() != "0") {
+        Spacer(modifier = Modifier.padding(10.dp))
+
+        InputNomor(
+            value = state.value.noUrutKlgEgb.toString(),
+            onValueChange = { coroutineScope.launch { viewModel.onEvent(IsiRutaScreenEvent.NoUrutKlgEgbChanged(it.toInt())) } },
+            label = {
+                Text(
+                    text = "9. Nomor Urut Keluarga Eligible",
+                    fontFamily = PoppinsFontFamily,
+                    fontWeight = FontWeight.SemiBold
+                ) },
+            onIncrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.NoUrutKlgEgbChanged(increment(
+                UtilFunctions.convertTo3DigitsString(
+                    state.value.noUrutKlgEgb
+                )).toInt())) } },
+            onDecrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.NoUrutKlgEgbChanged(decrement(
+                UtilFunctions.convertTo3DigitsString(
+                    state.value.noUrutKlgEgb
+                )).toInt())) } }
+        )
+    }
+
+    InputNomor(
+        value = state.value.penglMkn.toString(),
+        onValueChange = { coroutineScope.launch { viewModel.onEvent(IsiRutaScreenEvent.PenglMknChanged(it.toInt())) } },
+        label = {
+            Text(
+                text = "10. Jumlah Pengelolaan Makan/Minum dan Kebutuhan dalam Keluarga",
+                fontFamily = PoppinsFontFamily,
+                fontWeight = FontWeight.SemiBold
+            ) },
+        onIncrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.PenglMknChanged(increment(
+            UtilFunctions.convertTo3DigitsString(
+                state.value.penglMkn
+            )).toInt())) } },
+        onDecrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.PenglMknChanged(decrement(
+            UtilFunctions.convertTo3DigitsString(
+                state.value.penglMkn
+            )).toInt())) } }
+    )
+
+    Spacer(modifier = Modifier.padding(10.dp))
+
+    for (i in 1..state.value.penglMkn!!) {
+        Card(
+            border = BorderStroke(1.dp, PklSecondary),
+            colors = CardDefaults.cardColors(
+                containerColor = PklBase
+            ),
+            shape = RectangleShape,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(15.dp)
+            ) {
+                Text(
+                    text = "Keterangan Rumah Tangga ke-$i",
+                    fontFamily = PoppinsFontFamily,
+                    fontWeight = FontWeight.Medium
+                )
+                KeteranganRuta(viewModel = viewModel, index = i-1)
+            }
+        }
+
+        Spacer(modifier = Modifier.padding(10.dp))
     }
 }
 
