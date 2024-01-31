@@ -4,9 +4,11 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -46,7 +48,7 @@ import org.odk.collect.pkl.openAppSettings
 import org.odk.collect.pkl.ui.screen.components.PermissionDialog
 
 
-//@RequiresApi(Build.VERSION_CODES.S)
+@RequiresApi(Build.VERSION_CODES.M)
 @Composable
 fun OnBoardingScreen(
     navController: NavHostController,
@@ -74,7 +76,6 @@ fun OnBoardingScreen(
         }
     )
 
-//    val isActive = viewModel.isActive.collectAsState()
     val isLoggedIn by remember { mutableStateOf(viewModel.isLoggedIn()) }
 
     if (isLoggedIn) {

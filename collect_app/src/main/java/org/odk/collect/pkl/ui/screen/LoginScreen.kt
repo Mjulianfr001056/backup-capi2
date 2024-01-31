@@ -61,7 +61,8 @@ fun LoginScreen(
 
     LaunchedEffect(viewModel.authResponse) {
         viewModel.authResponse.collectLatest { response ->
-            if (response.status == "success") {
+            println("Login screen: $isLoginProcess")
+            if (response.status == "success" && isLoginProcess) {
                 isLoginProcess = false
                 delay(1000)
                 Toast.makeText(context, "Login Success", Toast.LENGTH_SHORT).show()
@@ -84,7 +85,8 @@ fun LoginScreen(
             .paint(
                 painter = painterResource(id = R.drawable.pb_bg_login),
                 contentScale = ContentScale.Crop
-            ).padding(bottom = 150.dp),
+            )
+            .padding(bottom = 150.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

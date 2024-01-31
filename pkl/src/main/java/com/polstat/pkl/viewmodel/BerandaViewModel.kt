@@ -72,9 +72,9 @@ class BerandaViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val getDataTimWithAllJob = async { getDataTimWithAll(_session!!.idTim!!) }
+            val getDataTimWithAllJob = async { getDataTimWithAll(_session?.idTim.toString()) }
             getDataTimWithAllJob.await()
-            val getMahasiswaWithWilayahJob = async { getMahasiswaWithWilayah(_session!!.nim!!) }
+            val getMahasiswaWithWilayahJob = async { getMahasiswaWithWilayah(_session?.nim.toString()) }
             getMahasiswaWithWilayahJob.await()
             _mahasiswaWithWilayah.value.listWilayah?.let {
                 if (it.isNotEmpty()) {
@@ -112,10 +112,12 @@ class BerandaViewModel @Inject constructor(
             }
 
         }
+
     }
 
     fun logout(){
         sessionRepository.logOut()
+        Log.d(TAG, "logout: Berhasil logout!")
     }
 
     private fun getDataTimWithAll(

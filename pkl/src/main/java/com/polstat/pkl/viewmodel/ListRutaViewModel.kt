@@ -21,6 +21,7 @@ import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -84,10 +85,7 @@ class ListRutaViewModel @Inject constructor(
     val successMessage = _successMessage.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            delay(1000)
-            getWilayahWithAll(noBS!!)
-        }
+        getWilayahWithAll(noBS.toString())
     }
 
     private fun getWilayahWithAll(
@@ -200,14 +198,6 @@ class ListRutaViewModel @Inject constructor(
                         }
                     }
                 }
-//            }
-//            job.join()
-
-//            launch {
-//                wilayahRepository.updateWilayah(updatedWilayah.toWilayah(emptyList()), nim).collectLatest{ message ->
-//                    Log.d(TAG, message)
-//                }
-//            }
         }
     }
 

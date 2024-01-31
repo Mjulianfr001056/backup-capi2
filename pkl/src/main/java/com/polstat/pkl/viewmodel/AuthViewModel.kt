@@ -1,9 +1,9 @@
 package com.polstat.pkl.viewmodel
 
-//import androidx.annotation.RequiresApi
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,6 +16,7 @@ import com.polstat.pkl.repository.AuthRepository
 import com.polstat.pkl.repository.DataTimRepository
 import com.polstat.pkl.repository.KeluargaRepository
 import com.polstat.pkl.repository.LocalRutaRepository
+import com.polstat.pkl.repository.LocationRepository
 import com.polstat.pkl.repository.MahasiswaRepository
 import com.polstat.pkl.repository.SampelRutaRepository
 import com.polstat.pkl.repository.SessionRepository
@@ -23,6 +24,7 @@ import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.ui.event.LoginScreenEvent
 import com.polstat.pkl.ui.state.LoginScreenState
 import com.polstat.pkl.utils.Result
+import com.polstat.pkl.utils.location.GetLocationUseCase
 import com.polstat.pkl.utils.use_case.ValidateNim
 import com.polstat.pkl.utils.use_case.ValidatePassword
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -48,8 +50,8 @@ class AuthViewModel @Inject constructor(
     private val sampelRutaRepository: SampelRutaRepository,
     private val validateNim: ValidateNim,
     private val validatePassword: ValidatePassword,
-//    private val getLocationUseCase: GetLocationUseCase,
-//    private val locationRepository: LocationRepository
+    private val getLocationUseCase: GetLocationUseCase,
+    private val locationRepository: LocationRepository
 ) : ViewModel() {
 
     var state by mutableStateOf(LoginScreenState())
@@ -74,28 +76,20 @@ class AuthViewModel @Inject constructor(
     private val _showErrorToastChannel = Channel<Boolean>()
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
-    private val _countdown = MutableStateFlow(5)
-
     val visiblePermissionDialogQueue = mutableListOf<String>()
 
-//    init {
-//        viewModelScope.launch {
-//            while (true) {
-//                delay(1000)
-//                if (_countdown.value > 0) {
-//                    _countdown.value--
-//                } else {
-//                    getLocationUseCase.invoke().collect { location ->
-//                        if (location != null && _session?.nim != null) {
-//                            locationRepository.updateLocation(_session.nim,location.longitude,location.latitude,location.accuracy)
-//                        }
-//                        Log.d(TAG, "getLocationUseCase: ${location!!.latitude}, ${location.longitude}, ${location.accuracy}")
-//                    }
-//                    _countdown.value = 600
-//                }
-//            }
-//        }
-//    }
+    init {
+        viewModelScope.launch {
+            delay(10000L)
+            getLocationUseCase.invoke().collect { location ->
+                if (location != null && _session?.nim != null) {
+                    Log.d(TAG, "getLocationUseCase: Nim = ${_session.nim}")
+                    locationRepository.updateLocation(_session.nim,location.longitude,location.latitude,location.accuracy)
+                }
+                Log.d(TAG, "getCurrentLocation: ${location?.latitude}, ${location?.longitude}, ${location?.accuracy}")
+            }
+        }
+    }
 
     fun isLoggedIn() : Boolean {
         return sessionRepository.isLoggedIn()
@@ -207,6 +201,8 @@ class AuthViewModel @Inject constructor(
             delay(2000)
             closeLoadingDialog()
         }
+
+
     }
 
     fun onEvent(event: LoginScreenEvent) {

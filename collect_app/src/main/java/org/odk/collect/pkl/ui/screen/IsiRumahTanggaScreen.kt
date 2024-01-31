@@ -1,9 +1,7 @@
 package org.odk.collect.pkl.ui.screen
 
 import android.annotation.SuppressLint
-import android.os.Build
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -73,7 +71,6 @@ import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
 
 @SuppressLint("StateFlowValueCalledInComposition")
-@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IsiRumahTanggaScreen(
@@ -87,7 +84,8 @@ fun IsiRumahTanggaScreen(
     val lastRuta = viewModel.lastRuta.collectAsState()
     val context = LocalContext.current
 
-    LaunchedEffect(key1 = viewModel.getRutaLocation()) {
+    viewModel.getRutaLocation()
+    LaunchedEffect(key1 = Unit) {
         viewModel.getRutaLocation()
     }
 
@@ -116,7 +114,7 @@ fun IsiRumahTanggaScreen(
         topBar = {
             IsiRumahTanggaTopBar(
                 navController = navController,
-                noBS = noBS!!
+                noBS = noBS
             )
         },
         modifier = Modifier.fillMaxSize()
@@ -168,7 +166,7 @@ fun IsiRumahTanggaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 TextField(
-                    value = state.value.SLS!!,
+                    value = state.value.SLS.toString(),
                     onValueChange = { coroutineScope.launch{viewModel.onEvent(IsiRutaScreenEvent.SLSChanged(it))} },
                     label = {
                         Text(
@@ -195,7 +193,7 @@ fun IsiRumahTanggaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 InputNomor(
-                    value = state.value.noSegmen!!,
+                    value = state.value.noSegmen,
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
@@ -217,7 +215,7 @@ fun IsiRumahTanggaScreen(
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoSegmenChanged(
                                     increment(
-                                        state.value.noSegmen!!
+                                        state.value.noSegmen
                                     )
                                 )
                             )
@@ -228,7 +226,7 @@ fun IsiRumahTanggaScreen(
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoSegmenChanged(
                                     decrement(
-                                        state.value.noSegmen!!
+                                        state.value.noSegmen
                                     )
                                 )
                             )
@@ -239,7 +237,7 @@ fun IsiRumahTanggaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 InputNomor(
-                    value = UtilFunctions.convertTo3DigitsString(state.value.noBgFisik!!),
+                    value = UtilFunctions.convertTo3DigitsString(state.value.noBgFisik),
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
@@ -262,7 +260,7 @@ fun IsiRumahTanggaScreen(
                                 IsiRutaScreenEvent.NoBgFisikChanged(
                                     increment(
                                         UtilFunctions.convertTo3DigitsString(
-                                            state.value.noBgFisik!!
+                                            state.value.noBgFisik
                                         )
                                     ).toInt()
                                 )
@@ -275,7 +273,7 @@ fun IsiRumahTanggaScreen(
                                 IsiRutaScreenEvent.NoBgFisikChanged(
                                     decrement(
                                         UtilFunctions.convertTo3DigitsString(
-                                            state.value.noBgFisik!!
+                                            state.value.noBgFisik
                                         )
                                     ).toInt()
                                 )
@@ -287,7 +285,7 @@ fun IsiRumahTanggaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 InputNomor(
-                    value = UtilFunctions.convertTo3DigitsString(state.value.noBgSensus!!),
+                    value = UtilFunctions.convertTo3DigitsString(state.value.noBgSensus),
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
@@ -310,7 +308,7 @@ fun IsiRumahTanggaScreen(
                                 IsiRutaScreenEvent.NoBgSensusChanged(
                                     increment(
                                         UtilFunctions.convertTo3DigitsString(
-                                            state.value.noBgSensus!!
+                                            state.value.noBgSensus
                                         )
                                     ).toInt()
                                 )
@@ -323,7 +321,7 @@ fun IsiRumahTanggaScreen(
                                 IsiRutaScreenEvent.NoBgSensusChanged(
                                     decrement(
                                         UtilFunctions.convertTo3DigitsString(
-                                            state.value.noBgSensus!!
+                                            state.value.noBgSensus
                                         )
                                     ).toInt()
                                 )
@@ -358,7 +356,7 @@ fun IsiRumahTanggaScreen(
                                 IsiRutaScreenEvent.NoUrutKlgChanged(
                                     increment(
                                         UtilFunctions.convertTo3DigitsString(
-                                            state.value.noUrutKlg!!
+                                            state.value.noUrutKlg
                                         )
                                     ).toInt()
                                 )
@@ -371,7 +369,7 @@ fun IsiRumahTanggaScreen(
                                 IsiRutaScreenEvent.NoUrutKlgChanged(
                                     decrement(
                                         UtilFunctions.convertTo3DigitsString(
-                                            state.value.noUrutKlg!!
+                                            state.value.noUrutKlg
                                         )
                                     ).toInt()
                                 )
@@ -383,7 +381,7 @@ fun IsiRumahTanggaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 TextField(
-                    value = state.value.namaKK!!,
+                    value = state.value.namaKK.toString(),
                     onValueChange = { coroutineScope.launch { viewModel.onEvent(IsiRutaScreenEvent.NamaKKChanged(it)) } },
                     label = {
                         Text(
@@ -410,7 +408,7 @@ fun IsiRumahTanggaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 TextField(
-                    value = state.value.alamat!!,
+                    value = state.value.alamat.toString(),
                     onValueChange = { coroutineScope.launch { viewModel.onEvent(IsiRutaScreenEvent.AlamatChanged(it)) } },
                     label = {
                         Text(
@@ -460,7 +458,7 @@ fun IsiRumahTanggaScreen(
                                 IsiRutaScreenEvent.IsGenzOrtuChanged(
                                     increment(
                                         UtilFunctions.convertTo3DigitsString(
-                                            state.value.isGenzOrtu!!
+                                            state.value.isGenzOrtu
                                         )
                                     ).toInt()
                                 )
@@ -473,7 +471,7 @@ fun IsiRumahTanggaScreen(
                                 IsiRutaScreenEvent.IsGenzOrtuChanged(
                                     decrement(
                                         UtilFunctions.convertTo3DigitsString(
-                                            state.value.isGenzOrtu!!
+                                            state.value.isGenzOrtu
                                         )
                                     ).toInt()
                                 )
@@ -496,11 +494,11 @@ fun IsiRumahTanggaScreen(
                             ) },
                         onIncrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.NoUrutKlgEgbChanged(increment(
                             UtilFunctions.convertTo3DigitsString(
-                            state.value.noUrutKlgEgb!!
+                            state.value.noUrutKlgEgb
                         )).toInt())) } },
                         onDecrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.NoUrutKlgEgbChanged(decrement(
                             UtilFunctions.convertTo3DigitsString(
-                            state.value.noUrutKlgEgb!!
+                            state.value.noUrutKlgEgb
                         )).toInt())) } }
                     )
                 }
@@ -516,11 +514,11 @@ fun IsiRumahTanggaScreen(
                         ) },
                     onIncrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.PenglMknChanged(increment(
                         UtilFunctions.convertTo3DigitsString(
-                        state.value.penglMkn!!
+                        state.value.penglMkn
                     )).toInt())) } },
                     onDecrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.PenglMknChanged(decrement(
                         UtilFunctions.convertTo3DigitsString(
-                        state.value.penglMkn!!
+                        state.value.penglMkn
                     )).toInt())) } }
                 )
 
@@ -598,7 +596,7 @@ fun KeteranganRuta(
     val kkKrtOptions = listOf("Kepala Keluarga (KK) saja", "Kepala Rumah Tangga (KRT) saja", "KK Sekaligus KRT")
 
     InputNomor(
-        value = UtilFunctions.convertTo3DigitsString(state.value.listNoUrutRuta!![index]),
+        value = UtilFunctions.convertTo3DigitsString(state.value.listNoUrutRuta?.get(index)),
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
@@ -621,7 +619,7 @@ fun KeteranganRuta(
                     IsiRutaScreenEvent.NoUrutRutaChanged(
                         increment(
                             UtilFunctions.convertTo3DigitsString(
-                                state.value.listNoUrutRuta!![index]
+                                state.value.listNoUrutRuta?.get(index)
                             )
                         ).toInt()
                     ), index
@@ -634,7 +632,7 @@ fun KeteranganRuta(
                     IsiRutaScreenEvent.NoUrutRutaChanged(
                         decrement(
                             UtilFunctions.convertTo3DigitsString(
-                                state.value.listNoUrutRuta!![index]
+                                state.value.listNoUrutRuta?.get(index)
                             )
                         ).toInt()
                     ), index
@@ -656,7 +654,7 @@ fun KeteranganRuta(
 
         RadioButtons(
             options = kkKrtOptions,
-            selectedOption = state.value.listKkOrKrt!![index],
+            selectedOption = state.value.listKkOrKrt?.get(index) ?: "",
             onOptionSelected = { option ->
                 coroutineScope.launch {
                     viewModel.onEvent(
@@ -671,7 +669,7 @@ fun KeteranganRuta(
     Spacer(modifier = Modifier.padding(10.dp))
 
     TextField(
-        value = state.value.listNamaKrt!![index],
+        value = state.value.listNamaKrt?.get(index) ?: "",
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
@@ -707,7 +705,7 @@ fun KeteranganRuta(
     Spacer(modifier = Modifier.padding(10.dp))
 
     InputNomor(
-        value = UtilFunctions.convertTo3DigitsString(state.value.listGenzOrtu!![index]),
+        value = UtilFunctions.convertTo3DigitsString(state.value.listGenzOrtu?.get(index)),
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
@@ -729,7 +727,7 @@ fun KeteranganRuta(
                 viewModel.onEvent(
                     IsiRutaScreenEvent.GenzOrtuChanged(
                         increment(
-                            UtilFunctions.convertTo3DigitsString(state.value.listGenzOrtu!![index])
+                            UtilFunctions.convertTo3DigitsString(state.value.listGenzOrtu?.get(index))
                         ).toInt()
                     ), index
                 )
@@ -740,7 +738,7 @@ fun KeteranganRuta(
                 viewModel.onEvent(
                     IsiRutaScreenEvent.GenzOrtuChanged(
                         decrement(
-                            UtilFunctions.convertTo3DigitsString(state.value.listGenzOrtu!![index])
+                            UtilFunctions.convertTo3DigitsString(state.value.listGenzOrtu?.get(index))
                         ).toInt()
                     ), index
                 )
@@ -789,7 +787,7 @@ fun RadioButtons(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputNomor(
-    value: String,
+    value: String?,
     onValueChange: (String) -> Unit,
     label: @Composable (() -> Unit),
     modifier: Modifier = Modifier,
@@ -798,7 +796,7 @@ fun InputNomor(
     readOnly: Boolean = false
 ) {
     TextField(
-        value = value,
+        value = value.toString(),
         onValueChange = onValueChange,
         label = label,
         singleLine = true,
@@ -845,7 +843,7 @@ fun InputNomor(
 @Composable
 fun IsiRumahTanggaTopBar(
     navController: NavHostController,
-    noBS: String
+    noBS: String?
 ) {
     TopAppBar(
         title = {
@@ -881,24 +879,25 @@ fun IsiRumahTanggaTopBar(
     )
 }
 
-fun increment(input: String): String {
-    val numericPart = input.filter { it.isDigit() }
-    val number = numericPart.toInt()
-    val formattedNumber = String.format("%0${numericPart.length}d", number + 1)
-    return input.replaceFirst(numericPart, formattedNumber)
+fun increment(input: String?): String {
+    val numericPart = input?.filter { it.isDigit() }
+    val number = numericPart?.toInt()
+    val formattedNumber = String.format("%0${numericPart?.length}d", number?.plus(1) ?: 0)
+    return input?.replaceFirst(numericPart.toString(), formattedNumber) ?: ""
 }
 
-fun decrement(input: String): String {
-    val numericPart = input.filter { it.isDigit() }
-    val number = numericPart.toInt()
-    if (number < 1) {
-        return input
+fun decrement(input: String?): String {
+    val numericPart = input?.filter { it.isDigit() }
+    val number = numericPart?.toInt()
+    if (number != null) {
+        if (number < 1) {
+            return input.toString()
+        }
     }
-    val formattedNumber = String.format("%0${numericPart.length}d", number - 1)
-    return input.replaceFirst(numericPart, formattedNumber)
+    val formattedNumber = String.format("%0${numericPart?.length}d", number?.minus(1) ?: 0)
+    return input?.replaceFirst(numericPart.toString(), formattedNumber) ?: ""
 }
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Preview
 @Composable
 fun IsiRumahTanggaPreview() {
