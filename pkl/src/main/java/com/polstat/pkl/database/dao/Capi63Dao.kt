@@ -23,7 +23,6 @@ import com.polstat.pkl.database.relation.WilayahWithRuta
 interface Capi63Dao {
 
     // Operasi database untuk entitas DataTim
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDataTim(dataTimEntity: DataTimEntity)
 
@@ -34,7 +33,6 @@ interface Capi63Dao {
     suspend fun deleteAllDataTim()
 
     // Operasi database untuk entitas Mahasiswa
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMahasiswa(mahasiswaEntity: MahasiswaEntity)
 

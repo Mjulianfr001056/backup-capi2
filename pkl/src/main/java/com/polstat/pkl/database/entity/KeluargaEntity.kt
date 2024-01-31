@@ -7,19 +7,22 @@ import androidx.room.PrimaryKey
 data class KeluargaEntity (
     @PrimaryKey(autoGenerate = false)
     val kodeKlg: String = "",
-    val SLS: String? = "",
-    val noBgFisik: Int? = 0,
-    val noBgSensus: Int? = 0,
-    val noSegmen: String? = "S000",
-    val noUrutKlg: Int? = 0,
-    val noUrutKlgEgb: Int? = 0,
-    val namaKK: String? = "",
-    val alamat: String? = "",
-    val isGenzOrtu: Int? = 0,
-    val penglMkn: Int? = 0,
-    val noBS: String? = "",
-    val status: String? =""
+    val SLS: String = "[Not set]",
+    val noBgFisik: Int = -1,
+    val noBgSensus: Int = -1,
+    val noSegmen: String = "S000",
+    val noUrutKlg: Int = -1,
+    val noUrutKlgEgb: Int = -1,
+    val namaKK: String = "[Not set]",
+    val alamat: String = "[Not set]",
+    val isGenzOrtu: Int = -1,
+    val penglMkn: Int = -1,
+    val noBS: String = "[Not set]",
+    val status: String = "[Not set]"
 )
-{
-    constructor() : this("", "", 0, 0, "S000", 0, 0, "", "", 0, 0, "", "")
-}
+
+/** QC 23/Jan/2024
+ * Pakai non-nullables semua karena udah dikasih default value
+ * Secondary constructor juga ga perlu karena udah ada default value
+ * Kasih default value di luar domain supaya tau kalo ada data yang belum diisi
+ **/

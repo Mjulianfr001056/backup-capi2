@@ -1,7 +1,5 @@
 package org.odk.collect.pkl.ui.screen.components
 
-import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,7 +42,6 @@ import com.polstat.pkl.model.domain.Session
 import com.polstat.pkl.ui.theme.PklPrimary100
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
-import timber.log.Timber
 import java.util.Locale
 
 @Composable
@@ -626,7 +622,7 @@ fun ProgresListingCard(
                                     }
                                 }
 
-                                com.polstat.pkl.ui.screen.components.AnimatedCircularProgressIndicator(
+                                AnimatedCircularProgressIndicator(
                                     currentValue = jmlRuta,
                                     maxValue = (if (wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.jmlRuta == 0) 99 else wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.jmlRuta)!!,
                                     progressBackgroundColor = PklPrimary100,

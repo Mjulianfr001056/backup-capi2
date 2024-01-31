@@ -21,11 +21,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.HomeWork
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Button
@@ -66,12 +62,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.R
 import com.polstat.pkl.database.entity.SampelRutaEntity
-import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.viewmodel.ListSampelViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import org.odk.collect.pkl.navigation.CapiScreen
 
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -130,8 +126,8 @@ fun ListSampleScreen(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.navigate(Capi63Screen.ListBs.route){
-                                popUpTo(Capi63Screen.ListBs.route){
+                            navController.navigate(CapiScreen.Listing.LIST_BS){
+                                popUpTo(CapiScreen.Listing.LIST_BS){
                                     inclusive = false
                                 }
                             }
@@ -172,7 +168,7 @@ fun ListSampleScreen(
                             )
                         }
                         IconButton(onClick = {
-                            navController.navigate(Capi63Screen.ListSample.route + "/${noBS}")
+                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${noBS}")
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Sync,

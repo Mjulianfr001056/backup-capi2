@@ -39,12 +39,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.polstat.pkl.navigation.Capi63Screen
-import com.polstat.pkl.navigation.CapiScreen
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklQuaternary
 import com.polstat.pkl.ui.theme.PklSecondary
 import com.polstat.pkl.viewmodel.AuthViewModel
+import org.odk.collect.pkl.navigation.CapiScreen
 import org.odk.collect.pkl.openAppSettings
 import org.odk.collect.pkl.ui.screen.components.PermissionDialog
 
@@ -164,7 +163,7 @@ fun OnBoardingScreen(
                         .fillMaxWidth()
                         .requiredHeight(48.dp),
                     onClick = {
-                        navController.navigate(Capi63Screen.Login.route)
+                        navController.navigate(CapiScreen.Auth.LOGIN)
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = PklSecondary

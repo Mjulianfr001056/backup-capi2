@@ -12,7 +12,12 @@ class DateConverter {
 
     @TypeConverter
     fun dateToTimestamp(date: Date?): Long? {
-        return date?.time?.toLong()
+        return date?.time
     }
 
 }
+
+/**
+ * QC 23/Jan/2024
+ * Hapus redundant date?.time.toLong() ke date?.time
+ */

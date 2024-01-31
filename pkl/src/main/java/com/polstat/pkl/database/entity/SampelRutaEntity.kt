@@ -7,22 +7,25 @@ import androidx.room.PrimaryKey
 data class SampelRutaEntity (
     @PrimaryKey(autoGenerate = false)
     var kodeRuta: String = "",
-    var noBS: String? = "",
-    var SLS: String? = "",
-    var noSegmen: String? = "",
-    var noBgFisik: String? = "",
-    var noBgSensus: String? = "",
-    var noUrutKlg: String? = "",
-    var noUrutRuta: Int? = 0,
-    var noUrutRutaEgb: Int? = 0,
-    var genzOrtuKeluarga: String? = "",
-    var alamat: String? = "",
-    var namaKrt: String? = "",
-    var genzOrtuRuta: Int? = 0,
-    var long: Double? = 0.0,
-    var lat: Double? = 0.0,
-    var status: String? = ""
+    var noBS: String = "[Not set]",
+    var SLS: String = "[Not set]",
+    var noSegmen: String = "[Not set]",
+    var noBgFisik: String = "[Not set]",
+    var noBgSensus: String = "[Not set]",
+    var noUrutKlg: String = "[Not set]",
+    var noUrutRuta: Int = -1,
+    var noUrutRutaEgb: Int = -1,
+    var genzOrtuKeluarga: String = "[Not set]",
+    var alamat: String = "[Not set]",
+    var namaKrt: String = "[Not set]",
+    var genzOrtuRuta: Int = -1,
+    var long: Double = -1.0,
+    var lat: Double = -1.0,
+    var status: String = "[Not set]"
 )
-{
-    constructor() : this("", "", "", "", "", "", "", 0, 0,"", "", "",0, 0.0, 0.0, "")
-}
+
+/** QC 23/Jan/2024
+ * Pakai non-nullables semua karena udah dikasih default value
+ * Secondary constructor juga ga perlu karena udah ada default value
+ * Kasih default value di luar domain supaya tau kalo ada data yang belum diisi
+ **/

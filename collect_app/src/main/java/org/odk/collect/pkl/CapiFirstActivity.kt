@@ -15,18 +15,7 @@ import org.odk.collect.pkl.navigation.AppNavHost
 @AndroidEntryPoint
 class CapiFirstActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-//        CrashHandler.getInstance(this)?.also {
-//            if (it.hasCrashed(this)) {
-//                super.onCreate(null)
-//                ActivityUtils.startActivityAndCloseAllOthers(this, CrashHandlerActivity::class.java)
-//                return
-//            }
-//        }
-
         super.onCreate(savedInstanceState)
-
-//        intent = Intent(this, ProjectConfigurerActivity::class.java)
-//        startActivity(intent)
         setContent {
             Capi63Theme {
                 // A surface container using the 'background' color from the theme

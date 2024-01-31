@@ -1,5 +1,4 @@
-import android.os.Build
-import androidx.annotation.RequiresApi
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -48,7 +47,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.event.EditRutaEvent
 import com.polstat.pkl.ui.theme.PklAccent
 import com.polstat.pkl.ui.theme.PklBase
@@ -60,6 +58,7 @@ import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.utils.UtilFunctions
 import com.polstat.pkl.viewmodel.EditRutaViewModel
 import kotlinx.coroutines.launch
+import org.odk.collect.pkl.navigation.CapiScreen
 
 //@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -523,8 +522,8 @@ fun EditRutaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(EditRutaEvent.submit)
                         }
-                        navController.navigate(Capi63Screen.ListRuta.route + "/${noBS}") {
-                            popUpTo(Capi63Screen.ListRuta.route + "/${noBS}") {
+                        navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${noBS}") {
+                            popUpTo(CapiScreen.Listing.LIST_RUTA + "/${noBS}") {
                                 inclusive = true
                             }
                         }
@@ -824,8 +823,8 @@ fun IsiRumahTanggaTopBar(
         navigationIcon = {
             IconButton(
                 onClick = {
-                    navController.navigate(Capi63Screen.ListRuta.route + "/$noBS") {
-                        popUpTo(Capi63Screen.ListRuta.route + "/$noBS") {
+                    navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$noBS") {
+                        popUpTo(CapiScreen.Listing.LIST_RUTA + "/$noBS") {
                             inclusive = true
                         }
                     }

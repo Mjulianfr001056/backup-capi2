@@ -57,8 +57,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.R
 import com.polstat.pkl.database.entity.WilayahEntity
-import com.polstat.pkl.navigation.Capi63Screen
-import com.polstat.pkl.navigation.CapiScreen
 import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary
@@ -70,6 +68,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.odk.collect.pkl.navigation.CapiScreen
 import java.util.Date
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -146,8 +145,8 @@ fun ListBSScreen(
                                     val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
                                     lastJob.await()
                                     delay(2000)
-                                    navController.navigate(Capi63Screen.ListBs.route){
-                                        popUpTo(Capi63Screen.ListBs.route){
+                                    navController.navigate(CapiScreen.Listing.LIST_BS){
+                                        popUpTo(CapiScreen.Listing.LIST_BS){
                                             inclusive = true
                                         }
                                     }
@@ -425,10 +424,10 @@ private fun ListBS(
                     val wilayah = listWilayah[index]
                     BlokSensus(
                         onLihatRutaClicked = {
-                            navController.navigate(Capi63Screen.ListRuta.route + "/${wilayah.noBS}")
+                            navController.navigate(CapiScreen.Listing.LIST_BS + "/${wilayah.noBS}")
                         },
                         onLihatSampleClicked = {
-                            navController.navigate(Capi63Screen.ListSample.route + "/${wilayah.noBS}")
+                            navController.navigate(CapiScreen.Listing.LIST_BS + "/${wilayah.noBS}")
 //                            navController.navigate(Capi63Screen.ListSample.route + "/444B")
                         },
                         wilayah = wilayah

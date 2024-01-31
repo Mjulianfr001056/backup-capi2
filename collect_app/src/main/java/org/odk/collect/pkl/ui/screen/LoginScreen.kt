@@ -26,16 +26,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.polstat.pkl.R
-import com.polstat.pkl.navigation.CapiScreen
 import com.polstat.pkl.ui.event.LoginScreenEvent
-import com.polstat.pkl.ui.screen.components.LoadingDialog
-import com.polstat.pkl.ui.screen.components.LoginButton
-import com.polstat.pkl.ui.screen.components.LogoTitle
-import com.polstat.pkl.ui.screen.components.NimTextField
-import com.polstat.pkl.ui.screen.components.PasswordTextField
 import com.polstat.pkl.viewmodel.AuthViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import org.odk.collect.pkl.navigation.CapiScreen
+import org.odk.collect.pkl.ui.screen.components.LoadingDialog
+import org.odk.collect.pkl.ui.screen.components.LoginButton
+import org.odk.collect.pkl.ui.screen.components.LogoTitle
+import org.odk.collect.pkl.ui.screen.components.NimTextField
+import org.odk.collect.pkl.ui.screen.components.PasswordTextField
 
 //@Preview(showBackground = true, apiLevel = 28)
 @RequiresApi(Build.VERSION_CODES.S)

@@ -5,9 +5,13 @@ import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -35,8 +39,6 @@ import org.odk.collect.pkl.ui.screen.SamplingScreen
 fun AppNavHost(
     navController: NavHostController
 ) {
-    val authViewModel: AuthViewModel = hiltViewModel()
-
     NavHost(
         navController = navController,
         startDestination = CapiScreen.Top.AUTH
@@ -46,15 +48,17 @@ fun AppNavHost(
             route = CapiScreen.Top.AUTH
         ){
             composable(CapiScreen.Auth.ONBOARDING){
+                val viewModel = it.SharedViewModel<AuthViewModel>(navController = navController)
                 OnBoardingScreen(
                     navController = navController,
-                    viewModel = authViewModel
+                    viewModel = viewModel
                 )
             }
             composable(CapiScreen.Auth.LOGIN) {
+                val viewModel = it.SharedViewModel<AuthViewModel>(navController = navController)
                 LoginScreen(
                     navController = navController,
-                    viewModel = authViewModel
+                    viewModel = viewModel
                 )
             }
         }
@@ -70,7 +74,8 @@ fun AppNavHost(
                 SamplingNavHost(navController)
             }
             composable(CapiScreen.Main.KUESIONER) {
-                KuesionerNavHost(navController)
+                KuesionerNavHost()
+                //KuesionerNavHost(navController)
             }
         }
     }
@@ -220,7 +225,7 @@ fun BerandaNavHost(
 
 @Composable
 fun KuesionerNavHost(
-    rootController : NavHostController
+    //rootController : NavHostController
 ){
     val kuesionerNavController = rememberNavController()
     val kuesionerViewModel: KuesionerViewModel = hiltViewModel()
@@ -239,3 +244,13 @@ fun KuesionerNavHost(
         }
     }
 }
+
+@Composable
+inline fun  <reified T : ViewModel> NavBackStackEntry.SharedViewModel(navController : NavController) : T{
+    val navGraphRoute = destination.parent?.route ?: return hiltViewModel()
+    val parentEntry = remember(this){
+        navController.getBackStackEntry(navGraphRoute)
+    }
+    return hiltViewModel(parentEntry)
+}
+

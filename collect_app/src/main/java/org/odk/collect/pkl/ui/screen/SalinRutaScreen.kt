@@ -48,7 +48,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.event.SalinRutaEvent
 import com.polstat.pkl.ui.theme.PklAccent
 import com.polstat.pkl.ui.theme.PklBase
@@ -60,6 +59,7 @@ import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.utils.UtilFunctions
 import com.polstat.pkl.viewmodel.SalinRutaViewModel
 import kotlinx.coroutines.launch
+import org.odk.collect.pkl.navigation.CapiScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -600,8 +600,8 @@ fun SalinRutaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(SalinRutaEvent.submit)
                         }
-                        navController.navigate(Capi63Screen.ListRuta.route + "/${noBS}") {
-                            popUpTo(Capi63Screen.ListRuta.route + "/${noBS}") {
+                        navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${noBS}") {
+                            popUpTo(CapiScreen.Listing.LIST_RUTA + "/${noBS}") {
                                 inclusive = true
                             }
                         }
@@ -902,8 +902,8 @@ fun SalinRumahTanggaTopBar(
         navigationIcon = {
             IconButton(
                 onClick = {
-                    navController.navigate(Capi63Screen.ListRuta.route + "/$noBS") {
-                        popUpTo(Capi63Screen.ListRuta.route + "/$noBS") {
+                    navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$noBS") {
+                        popUpTo(CapiScreen.Listing.LIST_RUTA + "/$noBS") {
                             inclusive = true
                         }
                     }

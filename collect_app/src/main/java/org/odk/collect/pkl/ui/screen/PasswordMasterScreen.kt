@@ -46,12 +46,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.polstat.pkl.navigation.Capi63Screen
 import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.viewmodel.PasswordMasterViewModel
+import org.odk.collect.pkl.navigation.CapiScreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,8 +89,8 @@ fun PasswordMasterScreen(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.navigate(Capi63Screen.Sampling.route) {
-                                popUpTo(Capi63Screen.Sampling.route) {
+                            navController.navigate(CapiScreen.Sampling.START) {
+                                popUpTo(CapiScreen.Sampling.START) {
                                     inclusive = true
                                 }
                             }

@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.mapper.toMahasiswaEntity
 import com.polstat.pkl.model.domain.DataTim
 import com.polstat.pkl.model.domain.Mahasiswa
+import com.polstat.pkl.model.domain.Tim
 import com.polstat.pkl.model.response.AuthResponse
 import com.polstat.pkl.repository.AuthRepository
 import com.polstat.pkl.repository.DataTimRepository
@@ -128,7 +129,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    @Suppress("NAME_SHADOWING")
+//    @Suppress("NAME_SHADOWING")
     fun login(
         nim: String,
         password: String
@@ -139,10 +140,8 @@ class AuthViewModel @Inject constructor(
                 when (result) {
                     is Result.Success -> {
                         result.data?.let { response ->
-                            Log.d(TAG, "$response")
                             _authResponse.value = response
-
-                            Log.d(TAG, "Login successful: $response")
+                            Log.d(TAG, "Login successful")
                         }
                         state = state.copy(nim = "")
                         state = state.copy(password = "")
@@ -159,86 +158,14 @@ class AuthViewModel @Inject constructor(
                         _showErrorToastChannel.send(true)
                         Log.e(TAG, "Error in login")
                     }
-
                 }
             }
 
-            val mahasiswa = Mahasiswa(
-                alamat = "",
-                email = "",
-                foto = authResponse.value.avatar,
-                id_tim = authResponse.value.dataTim.idTim,
-                isKoor = authResponse.value.isKoor,
-                nama = authResponse.value.nama,
-                nim = authResponse.value.nim,
-                no_hp = "",
-                password = "",
-                wilayah_kerja = emptyList()
-            )
-            mahasiswaRepository.insertMahasiswa(mahasiswa)
-                .collectLatest { message ->
-                    Log.d(TAG, "${message}: ${mahasiswa.toMahasiswaEntity()}")
-                }
-
-            if (authResponse.value.dataTim.idTim != "") {
-
-                val dataTim = if (authResponse.value.isKoor) DataTim(
-                    idTim = authResponse.value.dataTim.idTim,
-                    namaTim = authResponse.value.dataTim.namaTim,
-                    passPML = authResponse.value.dataTim.passPML,
-                    namaPML = authResponse.value.nama,
-                    nimPML = authResponse.value.nim,
-                    teleponPML = "",
-                    anggota = authResponse.value.dataTim.anggota
-                ) else authResponse.value.dataTim
-
-                dataTimRepository.insertDataTim(dataTim).collectLatest { message ->
-                    Log.d(TAG, message)
-                }
-
-                if (authResponse.value.dataTim.anggota!!.isNotEmpty()) {
-                    authResponse.value.dataTim.anggota!!.forEach { mahasiswa ->
-                        mahasiswaRepository.insertMahasiswa(mahasiswa)
-                            .collectLatest { message ->
-                                Log.d(TAG, message)
-                            }
-
-                        if (mahasiswa.wilayah_kerja?.isNotEmpty() == true) {
-                            mahasiswa.wilayah_kerja.forEach { wilayah ->
-                                wilayahRepository.insertWilayah(
-                                    wilayah,
-                                    mahasiswa.nim
-                                ).collectLatest { message ->
-                                    Log.d(TAG, message)
-                                }
-
-                                if(wilayah.keluarga!!.isNotEmpty()) {
-                                    wilayah.keluarga.forEach { keluarga ->
-                                        keluargaRepository.insertKeluarga(keluarga)
-                                            .collectLatest { message ->
-                                                Log.d(TAG, message)
-                                            }
-
-                                        if (keluarga.ruta!!.isNotEmpty()) {
-                                            keluarga.ruta.forEach { ruta ->
-                                                localRutaRepository.insertRuta(ruta)
-                                                    .collectLatest { message ->
-                                                        Log.d(TAG, message)
-                                                    }
-                                                localRutaRepository.insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
-                                                    .collectLatest { message ->
-                                                        Log.d(TAG, message)
-                                                    }
-                                            }
-                                        }
-
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            saveMahasiswa(authResponse.value.dataTim)
+            /**
+             * TODO(Data team langsung ganti ke format PPL atau PML)
+             */
+            saveDataTim()
 
             if (authResponse.value.wilayah.isNotEmpty()) {
                 authResponse.value.wilayah.forEach { wilayah ->
@@ -318,6 +245,146 @@ class AuthViewModel @Inject constructor(
 
     private fun closeLoadingDialog() {
         _showLoadingChannel.trySend(false)
+    }
+
+    private suspend fun saveMahasiswa(dataTim: DataTim){
+        val mahasiswa = Mahasiswa(
+            foto = authResponse.value.avatar,
+            id_tim = dataTim.idTim,
+            isKoor = authResponse.value.isKoor,
+            nama = authResponse.value.nama,
+            nim = authResponse.value.nim,
+        )
+
+        /**
+         * TODO(Perpendek authResponse.value.xxx telescoping-nya)
+         */
+
+        mahasiswaRepository.insertMahasiswa(mahasiswa)
+            .collectLatest { message ->
+                Log.d(TAG, "${message}: ${mahasiswa.toMahasiswaEntity()}")
+            }
+
+        /**
+         * TODO(Cek lagi, apa mau disimpan semua property-nya?)
+         * TODO(Cek juga log nya mau sebanyak itu?)
+         */
+
+    }
+
+    private suspend fun saveDataTim(){
+        val dataTim = if (authResponse.value.isKoor) Tim.Pml(
+            idTim = authResponse.value.dataTim.idTim,
+            namaTim = authResponse.value.dataTim.namaTim,
+            passPML = authResponse.value.dataTim.passPML,
+            namaPML = authResponse.value.nama,
+            nimPML = authResponse.value.nim,
+            teleponPML = "",
+            anggota = authResponse.value.dataTim.anggota
+        ) else Tim.Ppl(
+            idTim = authResponse.value.dataTim.idTim,
+            namaTim = authResponse.value.dataTim.namaTim,
+            namaPML = authResponse.value.dataTim.namaPML,
+            nimPML = authResponse.value.dataTim.nimPML,
+            teleponPML = authResponse.value.dataTim.teleponPML
+        )
+
+        /**
+         * TODO(Perpendek authResponse.value.xxx telescoping-nya)
+         */
+
+
+        dataTimRepository.insertTim(dataTim).collectLatest { message ->
+            Log.d(TAG, message)
+        }
+
+        if (authResponse.value.dataTim.anggota!!.isNotEmpty()) {
+            authResponse.value.dataTim.anggota!!.forEach { mahasiswa ->
+                mahasiswaRepository.insertMahasiswa(mahasiswa)
+                    .collectLatest { message ->
+                        Log.d(TAG, message)
+                    }
+
+                if (mahasiswa.wilayah_kerja?.isNotEmpty() == true) {
+                    mahasiswa.wilayah_kerja.forEach { wilayah ->
+                        wilayahRepository.insertWilayah(
+                            wilayah,
+                            mahasiswa.nim
+                        ).collectLatest { message ->
+                            Log.d(TAG, message)
+                        }
+
+                        if(wilayah.keluarga!!.isNotEmpty()) {
+                            wilayah.keluarga.forEach { keluarga ->
+                                keluargaRepository.insertKeluarga(keluarga)
+                                    .collectLatest { message ->
+                                        Log.d(TAG, message)
+                                    }
+
+                                if (keluarga.ruta!!.isNotEmpty()) {
+                                    keluarga.ruta.forEach { ruta ->
+                                        localRutaRepository.insertRuta(ruta)
+                                            .collectLatest { message ->
+                                                Log.d(TAG, message)
+                                            }
+                                        localRutaRepository.insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
+                                            .collectLatest { message ->
+                                                Log.d(TAG, message)
+                                            }
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        when (dataTim) {
+            is Tim.Pml -> {
+                dataTim.anggota.forEach { mahasiswa ->
+                    mahasiswaRepository.insertMahasiswa(mahasiswa)
+                        .collectLatest { message ->
+                            Log.d(TAG, message)
+                        }
+
+                    mahasiswa.wilayah_kerja.forEach {wilayah ->
+                        wilayahRepository.insertWilayah(
+                            wilayah,
+                            mahasiswa.nim
+                        ).collectLatest { message ->
+                            Log.d(TAG, message)
+                        }
+
+                        wilayah.keluarga.forEach { keluarga ->
+                            keluargaRepository.insertKeluarga(keluarga)
+                                .collectLatest { message ->
+                                    Log.d(TAG, message)
+                                }
+
+                            keluarga.ruta.forEach { ruta ->
+                                localRutaRepository.insertRuta(ruta)
+                                    .collectLatest { message ->
+                                        Log.d(TAG, message)
+                                    }
+                                localRutaRepository.insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
+                                    .collectLatest { message ->
+                                        Log.d(TAG, message)
+                                    }
+                            }
+
+                        }
+                    }
+
+
+                }
+
+            }
+            else -> {
+                return
+            }
+        }
     }
 
     fun dismissPermissionDialog() {
