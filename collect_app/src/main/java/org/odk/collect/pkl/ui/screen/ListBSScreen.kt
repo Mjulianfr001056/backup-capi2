@@ -427,7 +427,7 @@ private fun ListBS(
                             navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${wilayah.noBS}")
                         },
                         onLihatSampleClicked = {
-                            navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${wilayah.noBS}")
+                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${wilayah.noBS}")
 //                            navController.navigate(Capi63Screen.ListSample.route + "/444B")
                         },
                         wilayah = wilayah
