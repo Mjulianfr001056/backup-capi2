@@ -9,7 +9,6 @@ import com.polstat.pkl.database.relation.RutaWithKeluarga
 import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.database.relation.WilayahWithKeluarga
 import com.polstat.pkl.database.relation.WilayahWithRuta
-import com.polstat.pkl.mapper.toRutaEntity
 import com.polstat.pkl.mapper.toWilayahEntity
 import com.polstat.pkl.model.domain.Wilayah
 import com.polstat.pkl.utils.Result
