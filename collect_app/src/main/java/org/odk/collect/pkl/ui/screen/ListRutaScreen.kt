@@ -129,6 +129,8 @@ fun ListRutaScreen(
     var enableFinalisasiBSButton by remember { mutableStateOf(false) }
     var checkedCheckbox by remember { mutableStateOf(false) }
     val noBS = viewModel.noBS
+    val navArgs = navController.currentBackStackEntry?.arguments
+    val isMonitoring = navArgs?.getString("isMonitoring") ?: "false"
     val session = viewModel.session
     val wilayahWithAll = viewModel.wilayahWithAll.collectAsState()
     val context = LocalContext.current
@@ -342,80 +344,81 @@ fun ListRutaScreen(
                     )
                 }
             }
-
-            if ( openFinalisasiBSDialog ) {
-                AlertDialog(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    onDismissRequest = { openFinalisasiBSDialog = false },
-                    confirmButton = {
-                        Button(
-                            modifier = Modifier.fillMaxWidth(),
-                            onClick = {
-                                openFinalisasiBSDialog = false
-                                coroutineScope.launch {
-                                    val finalisasiBSJob = async { viewModel.finalisasiBS(noBS.toString()) }
-                                    finalisasiBSJob.await()
-                                    delay(1000)
-                                    val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
-                                    lastJob.await()
-                                    delay(2000)
-                                    navController.navigate(CapiScreen.Listing.LIST_BS){
-                                        popUpTo(CapiScreen.Listing.LIST_BS){
-                                            inclusive = true
+            if(session?.isKoor == true && isMonitoring.toBoolean() == true){
+                if ( openFinalisasiBSDialog ) {
+                    AlertDialog(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        onDismissRequest = { openFinalisasiBSDialog = false },
+                        confirmButton = {
+                            Button(
+                                modifier = Modifier.fillMaxWidth(),
+                                onClick = {
+                                    openFinalisasiBSDialog = false
+                                    coroutineScope.launch {
+                                        val finalisasiBSJob = async { viewModel.finalisasiBS(noBS.toString()) }
+                                        finalisasiBSJob.await()
+                                        delay(1000)
+                                        val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
+                                        lastJob.await()
+                                        delay(2000)
+                                        navController.navigate(CapiScreen.Listing.LIST_BS){
+                                            popUpTo(CapiScreen.Listing.LIST_BS){
+                                                inclusive = true
+                                            }
                                         }
                                     }
-                                }
-                            },
-                            enabled = enableFinalisasiBSButton,
-                            content = {
+                                },
+                                enabled = enableFinalisasiBSButton,
+                                content = {
+                                    Text(
+                                        text = stringResource(id = R.string.kirim_hasil_listing).uppercase(),
+                                        fontFamily = PoppinsFontFamily,
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 16.sp,
+                                        color = PklBase
+                                    )
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = PklPrimary900)
+                            )
+                        },
+                        title = {
+                            Text(
+                                text = stringResource(id = R.string.konfirmasi_finalisasi_bs),
+                                fontFamily = PoppinsFontFamily,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 18.sp,
+                                color = PklPrimary900,
+                                textAlign = TextAlign.Center
+                            )
+                        },
+                        text = {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                Arrangement.Start,
+                                Alignment.CenterVertically
+                            ) {
+                                Checkbox(
+                                    checked = checkedCheckbox,
+                                    onCheckedChange = { checkedCheckbox = it },
+                                    colors = CheckboxDefaults.colors(
+                                        checkedColor = PklPrimary900,
+                                        checkmarkColor = PklBase,
+                                    )
+                                )
                                 Text(
-                                    text = stringResource(id = R.string.kirim_hasil_listing).uppercase(),
+                                    text = stringResource(id = R.string.pernyataan_konfirmasi_finalisasi_bs),
                                     fontFamily = PoppinsFontFamily,
                                     fontWeight = FontWeight.Medium,
-                                    fontSize = 16.sp,
-                                    color = PklBase
+                                    fontSize = 14.sp,
+                                    color = Color.Black
                                 )
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = PklPrimary900)
-                        )
-                    },
-                    title = {
-                        Text(
-                            text = stringResource(id = R.string.konfirmasi_finalisasi_bs),
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 18.sp,
-                            color = PklPrimary900,
-                            textAlign = TextAlign.Center
-                        )
-                    },
-                    text = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            Arrangement.Start,
-                            Alignment.CenterVertically
-                        ) {
-                            Checkbox(
-                                checked = checkedCheckbox,
-                                onCheckedChange = { checkedCheckbox = it },
-                                colors = CheckboxDefaults.colors(
-                                    checkedColor = PklPrimary900,
-                                    checkmarkColor = PklBase,
-                                )
-                            )
-                            Text(
-                                text = stringResource(id = R.string.pernyataan_konfirmasi_finalisasi_bs),
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp,
-                                color = Color.Black
-                            )
-                        }
-                    },
-                    shape = RoundedCornerShape(15.dp),
-                    containerColor = PklBase
-                )
+                            }
+                        },
+                        shape = RoundedCornerShape(15.dp),
+                        containerColor = PklBase
+                    )
+                }
             }
             enableFinalisasiBSButton = checkedCheckbox
         },
@@ -524,19 +527,21 @@ fun ListRutaScreen(
             }
         },
         floatingActionButton = {
-            FloatingActionButton(
-                modifier = Modifier
-                    .padding(all = 16.dp),
-                onClick = {
-                    navController.navigate(CapiScreen.Listing.ISI_RUTA + "/$noBS")
-                },
-                containerColor = PklPrimary900
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = stringResource(id = R.string.fab),
-                    tint = Color.White
-                )
+            if (isMonitoring == "false" && session?.isKoor == true){
+                FloatingActionButton(
+                    modifier = Modifier
+                        .padding(all = 16.dp),
+                    onClick = {
+                        navController.navigate(CapiScreen.Listing.ISI_RUTA + "/$noBS")
+                    },
+                    containerColor = PklPrimary900
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = stringResource(id = R.string.fab),
+                        tint = Color.White
+                    )
+                }
             }
         }
     )

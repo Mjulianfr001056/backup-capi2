@@ -189,14 +189,34 @@ fun SamplingNavHost(
 
         }
 
+//        navigation(
+//            startDestination = CapiScreen.Password.PASSWORD_MASTER,
+//            route = CapiScreen.Sampling.PASSWORD
+//        ){
+//            composable(CapiScreen.Password.PASSWORD_MASTER) {
+//                PasswordMasterScreen(
+//                    navController = samplingNavController,
+//                    passwordMasterViewModel = passwordMasterViewModel
+//                )
+//            }
+//        }
+
         navigation(
-            startDestination = CapiScreen.Password.PASSWORD_MASTER,
-            route = CapiScreen.Sampling.PASSWORD
+            startDestination = CapiScreen.Listing.LIST_BS,
+            route = CapiScreen.Sampling.LISTING
         ){
-            composable(CapiScreen.Password.PASSWORD_MASTER) {
-                PasswordMasterScreen(
+            composable(
+                route = CapiScreen.Listing.LIST_BS + "/{isMonitoring}",
+                arguments = listOf(
+                    navArgument("isMonitoring") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
+                ListBSScreen(
                     navController = samplingNavController,
-                    passwordMasterViewModel = passwordMasterViewModel
+                    viewModel = hiltViewModel(),
+                    authViewModel = hiltViewModel()
                 )
             }
         }
