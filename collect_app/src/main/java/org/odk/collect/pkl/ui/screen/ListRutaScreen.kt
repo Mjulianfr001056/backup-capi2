@@ -1,6 +1,7 @@
 package org.odk.collect.pkl.ui.screen
 
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,10 +21,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.TextSelectionColors
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.outlined.Info
@@ -31,6 +33,7 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
@@ -41,6 +44,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
@@ -65,6 +69,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -118,6 +123,8 @@ fun ListRutaScreen(
     var showMenu by remember { mutableStateOf(false) }
     var showSearchBar by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
+    var isListRuta by remember { mutableStateOf(true) }
+    var isListKeluarga by remember { mutableStateOf(false) }
     var openFinalisasiBSDialog by remember { mutableStateOf(false) }
     var enableFinalisasiBSButton by remember { mutableStateOf(false) }
     var checkedCheckbox by remember { mutableStateOf(false) }
@@ -149,12 +156,22 @@ fun ListRutaScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = stringResource(id = R.string.list_ruta_title).uppercase(),
-                        fontFamily = PoppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 20.sp
-                    )
+                    if (isListRuta) {
+                        Text(
+                            text = stringResource(id = R.string.list_ruta_title).uppercase(),
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 20.sp
+                        )
+                    }
+                    else if (isListKeluarga) {
+                        Text(
+                            text = stringResource(id = R.string.list_keluarga).uppercase(),
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 20.sp
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = PklPrimary900,
@@ -232,12 +249,14 @@ fun ListRutaScreen(
                             DropdownMenuItem(
                                 text = { Text(text = stringResource(id = R.string.finalisasi_bs)) },
                                 onClick = {
+                                    showMenu = false
                                     openFinalisasiBSDialog = true
                                 }
                             )
                         }
                         DropdownMenuItem(text = { Text(text = stringResource(id = R.string.ambil_sampel)) },
                             onClick = {
+                                showMenu = false
                                 if (noBS != null) {
 
                                     coroutineScope.launch {
@@ -254,6 +273,25 @@ fun ListRutaScreen(
                                 }
                             }
                         )
+                        if (isListRuta) {
+                            DropdownMenuItem(
+                                text = { Text(text = stringResource(id = R.string.tampilkan_list_keluarga)) },
+                                onClick = {
+                                    showMenu = false
+                                    isListRuta = false
+                                    isListKeluarga = true
+                                }
+                            )
+                        }
+                        else {
+                            DropdownMenuItem(
+                                text = { Text(text = stringResource(id = R.string.tampilkan_list_ruta)) },
+                                onClick = {
+                                    showMenu = false
+                                    isListKeluarga = false
+                                    isListRuta = true
+                                })    
+                        }
                     }
                 },
             )
@@ -267,19 +305,29 @@ fun ListRutaScreen(
                         query = text,
                         onQueryChange = {
                             text = it
-//                            listRutaViewModel.searchRuta(text)
                         },
-                        onSearch = { text = it
-//                            listRutaViewModel.searchRuta(text)
-                        },
+                        onSearch = { text = it },
                         active = false,
                         onActiveChange = { true },
-                        placeholder = { Text(
-                            text = stringResource(id = R.string.search_list_ruta),
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 14.sp,
-                            color = Color.White) },
+                        placeholder = {
+                            if (isListRuta) {
+                                Text(
+                                    text = stringResource(id = R.string.search_list_ruta),
+                                    fontFamily = PoppinsFontFamily,
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 14.sp,
+                                    color = Color.White
+                                )
+                            }
+                            else {
+                                Text(
+                                    text = stringResource(id = R.string.search_list_keluarga),
+                                    fontFamily = PoppinsFontFamily,
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 14.sp,
+                                    color = Color.White
+                                )
+                            } },
                         leadingIcon = {
                             IconButton(onClick = { showSearchBar = false }) {
                                 Icon(
@@ -290,9 +338,7 @@ fun ListRutaScreen(
                             }},
                         shape = RoundedCornerShape(0.dp),
                         colors = SearchBarDefaults.colors(containerColor = PklPrimary900, inputFieldColors = TextFieldDefaults.colors(Color.White)),
-                        content = {
-//                            listRutaViewModel.searchRuta(text)
-                        }
+                        content = { }
                     )
                 }
             }
@@ -371,26 +417,44 @@ fun ListRutaScreen(
                     containerColor = PklBase
                 )
             }
-
             enableFinalisasiBSButton = checkedCheckbox
-
         },
         content = { innerPadding ->
 
             val colWeight1 = .15f
             val colWeight2 = .55f
 
-            val filteredList = wilayahWithAll.value.listKeluargaWithRuta
-                ?.filter { keluargaWithRuta ->
+            val filteredRutaList = wilayahWithAll.value.listKeluargaWithRuta?.filter { keluargaWithRuta ->
                     keluargaWithRuta.listRuta.any { ruta ->
-                        ruta.kodeRuta.contains(text, ignoreCase = true) ||
-                                ruta.namaKrt!!.contains(text, ignoreCase = true)
+                        ruta.kodeRuta.contains(
+                            text,
+                            ignoreCase = true
+                        ) || ruta.namaKrt!!.contains(
+                            text,
+                            ignoreCase = true
+                        )
                     }
-                }
-                ?.sortedBy { keluargaWithRuta ->
+                }?.sortedBy { keluargaWithRuta ->
                     keluargaWithRuta.listRuta.firstOrNull()?.kodeRuta
                 }
 
+            val filteredKeluargaList = wilayahWithAll.value.listRutaWithKeluarga?.filter { rutaWithKeluarga ->
+                    rutaWithKeluarga.listKeluarga.any { keluarga ->
+                        keluarga.kodeKlg.contains(
+                            text,
+                            ignoreCase = true
+                        ) || keluarga.namaKK!!.contains(
+                            text,
+                            ignoreCase = true
+                        )
+                    }
+                }
+                ?.sortedBy { rutaWithKeluarga ->
+                    rutaWithKeluarga.listKeluarga.firstOrNull()?.kodeKlg
+                }
+                ?.distinctBy { rutaWithKeluarga ->
+                    rutaWithKeluarga.listKeluarga.firstOrNull()?.kodeKlg
+        }
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -410,123 +474,53 @@ fun ListRutaScreen(
                     ) {
                         TableCell(text = stringResource(id = R.string.no_bf_list_ruta), fontSize = 12.sp, color = Color.White, weight = colWeight1)
                         TableCell(text = stringResource(id = R.string.no_bs_list_ruta), color = Color.White, fontSize = 12.sp, weight = colWeight1)
-                        TableCell(text = stringResource(id = R.string.no_ruta_list_ruta), color = Color.White, fontSize = 12.sp, weight = colWeight1)
-                        TableCell(text = stringResource(id = R.string.nama_krt_list_ruta), color = Color.White, fontSize = 12.sp, weight = colWeight2)
-//                        TableCell(text = stringResource(id = R.string.info), color = Color.White, fontSize = 12.sp, weight = colWeight1)
-                    }
-                }
 
-                filteredList?.forEach { keluargaWithRuta ->
-                    if (keluargaWithRuta.listRuta.isNotEmpty()) {
-                        val daftarRuta = keluargaWithRuta.listRuta.filter { it.status != "delete" }
-                        items(daftarRuta.size) { index ->
-                            val ruta = daftarRuta[index]
-                            RutaRow(
-                                keluarga = keluargaWithRuta.keluarga,
-                                ruta = ruta,
-                                viewModel = viewModel,
-                                navController = navController
-                            )
+                        if (isListRuta) {
+                            TableCell(text = stringResource(id = R.string.no_ruta_list_ruta), color = Color.White, fontSize = 12.sp, weight = colWeight1)
+                            TableCell(text = stringResource(id = R.string.nama_krt_list_ruta), color = Color.White, fontSize = 12.sp, weight = colWeight2)
+//                        TableCell(text = stringResource(id = R.string.detail_list_ruta_klg), color = Color.White, fontSize = 12.sp, weight = colWeight1)
+                        }
+                        else {
+                            TableCell(text = stringResource(id = R.string.no_urut_klg), color = Color.White, fontSize = 12.sp, weight = colWeight1)
+                            TableCell(text = stringResource(id = R.string.nama_kepala_keluarga), color = Color.White, fontSize = 12.sp, weight = colWeight2)
+//                        TableCell(text = stringResource(id = R.string.detail_list_ruta_klg), color = Color.White, fontSize = 12.sp, weight = colWeight1)
                         }
                     }
                 }
 
-
-
-//                Row(
-//                    modifier = Modifier
-//                        .padding(innerPadding)
-//                        .fillMaxWidth()
-//                        .height(50.dp)
-//                        .background(PklPrimary300),
-//                    Arrangement.SpaceEvenly,
-//                    Alignment.CenterVertically,
-//                ) {
-                    // Ini header tabel
-//                    Row(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(end = 10.dp),
-//                        horizontalArrangement = Arrangement.SpaceEvenly,
-//                        verticalAlignment = Alignment.CenterVertically,
-//                    ) {
-//                        listOf(
-//                            R.string.no_bf_list_ruta,
-//                            R.string.no_bs_list_ruta,
-//                            R.string.no_ruta_list_ruta,
-//                            R.string.nama_krt_list_ruta,
-//                            R.string.info
-//                        ).forEach { id ->
-//                            Text(
-//                                modifier = Modifier.weight(1f),
-//                                text = stringResource(id = id),
-//                                color = Color.White,
-//                                fontFamily = PoppinsFontFamily,
-//                                fontWeight = FontWeight.Medium,
-//                                fontSize = 14.sp
-//                            )
-//                        }
-//                    }
-
-//                    Row(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(end = 10.dp),
-//                        Arrangement.SpaceEvenly,
-//                        Alignment.CenterVertically,
-//                    ) {
-//                        Text(
-//                            text = stringResource(id = R.string.no_bf_list_ruta),
-//                            color = Color.White,
-//                            fontFamily = PoppinsFontFamily,
-//                            fontWeight = FontWeight.Medium,
-//                            fontSize = 14.sp
-//                        )
-//                        Text(
-//                            text = stringResource(id = R.string.no_bs_list_ruta),
-//                            color = Color.White,
-//                            fontFamily = PoppinsFontFamily,
-//                            fontWeight = FontWeight.Medium,
-//                            fontSize = 14.sp
-//                        )
-//                        Text(
-//                            text = stringResource(id = R.string.no_ruta_list_ruta),
-//                            color = Color.White,
-//                            fontFamily = PoppinsFontFamily,
-//                            fontWeight = FontWeight.Medium,
-//                            fontSize = 14.sp
-//                        )
-//                        Text(
-//                            text = stringResource(id = R.string.nama_krt_list_ruta),
-//                            color = Color.White,
-//                            fontFamily = PoppinsFontFamily,
-//                            fontWeight = FontWeight.Medium,
-//                            fontSize = 14.sp
-//                        )
-//                        Text(
-//                            text = "Info",
-//                            color = Color.White,
-//                            fontFamily = PoppinsFontFamily,
-//                            fontWeight = FontWeight.Medium,
-//                            fontSize = 14.sp
-//                        )
-//
-//                    }
-
-//                      TableCell(text = stringResource(id = R.string.no_bf_list_ruta), color = Color.White, weight = colWeight1)
-//                    TableCell(text = stringResource(id = R.string.no_bs_list_ruta), color = Color.White, weight = colWeight1)
-//                    TableCell(text = stringResource(id = R.string.no_ruta_list_ruta), color = Color.White, weight = colWeight1)
-//                    TableCell(text = stringResource(id = R.string.nama_krt_list_ruta), color = Color.White, weight = colWeight2)
-//                    TableCell(text = stringResource(id = R.string.info), color = Color.White, weight = colWeight1)
-
-//                }
-//                RutaList(
-//                    wilayahWithAll =  wilayahWithAll.value,
-//                    navController = navController,
-//                    viewModel = viewModel,
-//                    searchText = text
-//                )
-
+                if (isListRuta) {
+                    filteredRutaList?.forEach { keluargaWithRuta ->
+                        if (isListRuta && keluargaWithRuta.listRuta.isNotEmpty()) {
+                            val daftarRuta = keluargaWithRuta.listRuta.filter { it.status != "delete" }
+                            items(daftarRuta.size) { index ->
+                                val ruta = daftarRuta[index]
+                                RutaRow(
+                                    keluarga = keluargaWithRuta.keluarga,
+                                    ruta = ruta,
+                                    viewModel = viewModel,
+                                    navController = navController,
+                                    isListRuta = isListRuta
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    filteredKeluargaList?.forEach { rutaWithKeluarga ->
+                        if (rutaWithKeluarga.listKeluarga.isNotEmpty()) {
+                            val daftarKeluarga = rutaWithKeluarga.listKeluarga.filter { it.status != "delete" }
+                            items(daftarKeluarga.size) { index ->
+                                val keluarga = daftarKeluarga[index]
+                                RutaRow(
+                                    keluarga = keluarga,
+                                    ruta = rutaWithKeluarga.ruta,
+                                    viewModel = viewModel,
+                                    navController = navController,
+                                    isListRuta = isListRuta
+                                )
+                            }
+                        }
+                    }
+                }
             }
         },
         floatingActionButton = {
@@ -554,98 +548,29 @@ fun RutaRow(
     keluarga: KeluargaEntity,
     ruta: RutaEntity,
     viewModel: ListRutaViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    isListRuta: Boolean
 ) {
     var openActionDialog by remember { mutableStateOf(false) }
     var openDetail by remember { mutableStateOf(false) }
     var openPasswordMasterDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
-
-    // Ini baris tabel yang akan berulang
-//    Row(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .height(50.dp)
-//            .combinedClickable(onLongClick = { openActionDialog = true }, onClick = { }),
-//        horizontalArrangement = Arrangement.SpaceEvenly,
-//        verticalAlignment = Alignment.CenterVertically
-//    ) {
-//        listOf(
-//            "${keluarga.noBgFisik}",
-//            "${keluarga.noBgSensus}",
-//            "${ruta.noUrutRuta}",
-//            viewModel.sederhanakanNama(ruta.namaKrt.toString())
-//        ).forEach { text ->
-//            Text(
-//                modifier = Modifier
-//                    .weight(1f)
-//                    .padding(start = 10.dp, end = 10.dp),
-//                text = text,
-//                fontFamily = PoppinsFontFamily,
-//                fontWeight = FontWeight.Medium,
-//                fontSize = 16.sp
-//            )
-//        }
-//
-//        IconButton(
-//            modifier = Modifier.weight(1f),
-//            onClick = { openDetail = true }
-//        ) {
-//            Icon(
-//                imageVector = Icons.Outlined.Info,
-//                contentDescription = stringResource(id = R.string.info_icon),
-//            )
-//        }
-
-//    Row(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .height(50.dp)
-//            .combinedClickable(onLongClick = {
-//                openActionDialog = true
-//            },
-//                onClick = { }),
-//        Arrangement.SpaceEvenly,
-//        Alignment.CenterVertically
-//    ) {
-////        Spacer(modifier = Modifier.size(20.dp))
-//            Text(
-//                modifier = Modifier.padding(start = 10.dp, end = 10.dp),
-//                text = "${keluarga.noBgFisik}",
-//                fontFamily = PoppinsFontFamily,
-//                fontWeight = FontWeight.Medium,
-//                fontSize = 16.sp
-//            )
-//
-////        Spacer(modifier = Modifier.size(40.dp))
-//        Text(
-//            modifier = Modifier.padding(start = 10.dp, end = 10.dp),
-//            text = "${keluarga.noBgSensus}",
-//            fontFamily = PoppinsFontFamily,
-//            fontWeight = FontWeight.Medium,
-//            fontSize = 16.sp
-//        )
-//
-////        Spacer(modifier = Modifier.size(40.dp))
-//        Text(
-//            modifier = Modifier.padding(start = 10.dp, end = 10.dp),
-//            text = "${ruta.noUrutRuta}",
-//            fontFamily = PoppinsFontFamily,
-//            fontWeight = FontWeight.Medium,
-//            fontSize = 16.sp
-//        )
-//
-////        Spacer(modifier = Modifier.size(40.dp))
-//        Text(
-//            modifier = Modifier.padding(start = 10.dp, end = 10.dp),
-//            text = viewModel.sederhanakanNama(ruta.namaKrt.toString()),
-//            fontFamily = PoppinsFontFamily,
-//            fontWeight = FontWeight.Medium,
-//            fontSize = 16.sp
-//        )
+    val wilayahWithAll = viewModel.wilayahWithAll.collectAsState()
 
     val colWeight1 = .15f
     val colWeight2 = .55f
+
+    val listKeluargaByKodeRuta = wilayahWithAll.value.listRutaWithKeluarga?.filter { rutaWithKeluarga ->
+        rutaWithKeluarga.listKeluarga.contains(keluarga)
+    }?.distinctBy { rutaWithKeluarga ->
+        rutaWithKeluarga.listKeluarga.firstOrNull()?.kodeKlg
+    }
+
+    val listRutaByKodeKlg = wilayahWithAll.value.listKeluargaWithRuta?.filter { keluargaWithRuta ->
+        keluargaWithRuta.listRuta.contains(ruta)
+    }?.distinctBy { keluargaWithRuta ->
+        keluargaWithRuta.listRuta.firstOrNull()?.kodeRuta
+    }
 
     Row(
         modifier = Modifier
@@ -660,11 +585,15 @@ fun RutaRow(
     ) {
         TableCell(text = "${keluarga.noBgFisik}", weight = colWeight1)
         TableCell(text = "${keluarga.noBgSensus}", weight = colWeight1)
-        TableCell(text = "${ruta.noUrutRuta}", weight = colWeight1)
-        TableCell(text = viewModel.sederhanakanNama(ruta.namaKrt.toString()), weight = colWeight2)
 
-
-//        Spacer(modifier = Modifier.size(40.dp))
+        if (isListRuta) {
+            TableCell(text = "${ruta.noUrutRuta}", weight = colWeight1)
+            TableCell(text = viewModel.sederhanakanNama(ruta.namaKrt.toString()), weight = colWeight2)
+        } else {
+            TableCell(text = "${keluarga.noUrutKlg}", weight = colWeight1)
+            TableCell(text = viewModel.sederhanakanNama(keluarga.namaKK.toString()), weight = colWeight2)
+        }
+        
         IconButton(
             modifier = Modifier.weight(colWeight1),
             onClick = {
@@ -677,144 +606,388 @@ fun RutaRow(
             )
         }
 
-//      menampilkan Pop Up Detail Ruta
+//      menampilkan pop up detail ruta atau keluarga
         if (openDetail) {
-//            RutaDetailPopup(showDialog = openDetail)
-            Dialog(onDismissRequest = { openDetail = false },
-                content = {
-                    Column(
-                        modifier = Modifier
-                            .background(
-                                color = PklBase,
-                                shape = RoundedCornerShape(15.dp)
-                            )
-                            .height(500.dp),
-                        Arrangement.Center,
-                        Alignment.CenterHorizontally
-                    ) {
-                        Text(
+            
+//          detail ruta
+            if (isListRuta) {
+                Dialog(onDismissRequest = { openDetail = false },
+                    content = {
+                        Column(
                             modifier = Modifier
+                                .background(
+                                    color = PklBase,
+                                    shape = RoundedCornerShape(15.dp)
+                                )
+                                .height(500.dp),
+                            Arrangement.Center,
+                            Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        color = PklPrimary900,
+                                        shape = RoundedCornerShape(
+                                            topStart = 15.dp,
+                                            topEnd = 15.dp
+                                        )
+                                    )
+                                    .padding(
+                                        top = 10.dp,
+                                        bottom = 10.dp
+                                    ),
+                                text = stringResource(id = R.string.detail_ruta).uppercase(),
+                                textAlign = TextAlign.Center,
+                                color = Color.White,
+                                fontFamily = PoppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 20.sp
+                            )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                            ) {
+                                LazyColumn(
+                                    content = {
+                                        item {
+                                            DetailRutaTextField(
+                                                label = R.string.kode_ruta,
+                                                value = ruta.kodeRuta!!
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.nomor_urut_krt_ruta,
+                                                value = UtilFunctions.convertTo3DigitsString(ruta.noUrutRuta!!)
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.nomor_urut_ruta_egb,
+                                                value = UtilFunctions.convertTo3DigitsString(ruta.noUrutEgb)
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.identifikasi_kk_krt,
+                                                value = if (ruta.kkOrKrt == "1") "Kepala Keluarga (KK) saja" else if (ruta.kkOrKrt == "2") "Kepala Rumah Tangga (KRT) saja" else "KK Sekaligus KRT",
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.nama_krt_ruta,
+                                                value = ruta.namaKrt!!
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.keberadaan_genz_ortu_ruta,
+                                                value = "${ruta.genzOrtu}"
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.kategori_jml_genz,
+                                                value = "${ruta.katGenz}"
+                                            ) 
+//                                          DetailRutaTextField(
+//                                              label = R.string.catatan,
+//                                              value = ruta.catatan!!
+//                                          )
+                                            Spacer(modifier = Modifier.size(5.dp))
+                                            Text(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                text = stringResource(id = R.string.daftar_klg_terkait).uppercase(),
+                                                fontFamily = PoppinsFontFamily,
+                                                fontWeight = FontWeight.Medium,
+                                                fontSize = 16.sp,
+                                                color = PklPrimary900,
+                                                textAlign = TextAlign.Center
+                                            )
+                                        }
+
+                                        listKeluargaByKodeRuta?.forEachIndexed { _, rutaWithKeluarga ->
+                                            if(rutaWithKeluarga.listKeluarga.isNotEmpty()) {
+                                                val daftarKeluargaByKodeRuta = rutaWithKeluarga.listKeluarga.filter { it.status != "delete" }
+                                                items(daftarKeluargaByKodeRuta.size) {itemIndex ->
+                                                    val keluargaByKodeRuta = daftarKeluargaByKodeRuta[itemIndex]
+                                                    var expanded by remember { mutableStateOf(false) }
+                                                    OutlinedCard(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .padding(
+                                                                start = 15.dp,
+                                                                end = 15.dp,
+                                                                top = 5.dp,
+                                                                bottom = 5.dp
+                                                            )
+                                                            .clickable { expanded = !expanded },
+                                                        shape = RoundedCornerShape(16.dp),
+                                                        border = BorderStroke(1.dp, color = PklPrimary900),
+                                                        colors = CardDefaults.outlinedCardColors(containerColor = PklBase),
+                                                        elevation = CardDefaults.cardElevation(4.dp),
+                                                        content = {
+                                                            Column(
+                                                                modifier = Modifier
+                                                                    .fillMaxSize()
+                                                                    .padding(16.dp)
+                                                            ) {
+                                                                Row(
+                                                                    modifier = Modifier
+                                                                        .fillMaxWidth(),
+                                                                    horizontalArrangement = Arrangement.SpaceBetween
+                                                                ) {
+                                                                    Text(
+                                                                        text = "${keluargaByKodeRuta.kodeKlg}",
+                                                                        fontFamily = PoppinsFontFamily,
+                                                                        fontWeight = FontWeight.Medium,
+                                                                        fontSize = 18.sp,
+                                                                    )
+                                                                    Icon(
+                                                                        imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                                                                        contentDescription = stringResource(id = R.string.toggle_icon),
+                                                                        modifier = Modifier.size(30.dp),
+                                                                        tint = PklPrimary900
+                                                                    )
+                                                                }
+                                                                Text(
+                                                                    text = "${keluargaByKodeRuta.namaKK}",
+                                                                    fontFamily = PoppinsFontFamily,
+                                                                    fontWeight = FontWeight.Medium,
+                                                                    fontSize = 16.sp
+                                                                )
+                                                                if (expanded) {
+                                                                    Spacer(modifier = Modifier.size(5.dp))
+                                                                    Divider(thickness = 1.dp, color = Color.Black)
+                                                                    Spacer(modifier = Modifier.height(8.dp))
+                                                                    DetailCard(
+                                                                        keluarga = keluargaByKodeRuta,
+                                                                        ruta = rutaWithKeluarga.ruta,
+                                                                        isListRuta = isListRuta
+                                                                    )
+                                                                }
+                                                            }
+                                                        }
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                )
+                            }
+
+                            Text(modifier = Modifier
                                 .fillMaxWidth()
                                 .background(
                                     color = PklPrimary900,
                                     shape = RoundedCornerShape(
-                                        topStart = 15.dp,
-                                        topEnd = 15.dp
+                                        bottomStart = 15.dp,
+                                        bottomEnd = 15.dp
                                     )
                                 )
+                                .clickable { openDetail = false }
                                 .padding(
                                     top = 10.dp,
                                     bottom = 10.dp
                                 ),
-                            text = stringResource(id = R.string.detail_ruta).uppercase(),
-                            textAlign = TextAlign.Center,
-                            color = Color.White,
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 20.sp
-                        )
+                                textAlign = TextAlign.Center,
+                                text = stringResource(id = R.string.close_popup_list_ruta).uppercase(),
+                                color = Color.White,
+                                fontFamily = PoppinsFontFamily,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Medium)
+                        }
+                    })
+            }
+                
+//          detail keluarga
+            else {
+                Dialog(onDismissRequest = { openDetail = false },
+                    content = {
                         Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .verticalScroll(rememberScrollState())
-                                .weight(1f)
-                        ) {
-                            DetailRutaTextField(
-                                label = R.string.sls,
-                                value = "${keluarga.SLS}"
-                            )
-                            DetailRutaTextField(
-                                label = R.string.nomor_segmen_ruta,
-                                value = "${keluarga.noSegmen}"
-                            )
-                            DetailRutaTextField(
-                                label = R.string.nomor_urut_bangunan_fisik_ruta,
-                                value = UtilFunctions.convertTo3DigitsString(keluarga.noBgFisik!!)
-                            )
-                            DetailRutaTextField(
-                                label = R.string.nomor_urut_bangunan_sensus_ruta,
-                                value = UtilFunctions.convertTo3DigitsString(keluarga.noBgSensus!!)
-                            )
-                            DetailRutaTextField(
-                                label = R.string.nomor_urut_keluarga,
-                                value = UtilFunctions.convertTo3DigitsString(keluarga.noUrutKlg!!)
-                            )
-                            DetailRutaTextField(
-                                label = R.string.nama_kepala_keluarga,
-                                value = "${keluarga.namaKK}"
-                            )
-                            DetailRutaTextField(
-                                label = R.string.alamat_ruta,
-                                value = keluarga.alamat!!
-                            )
-                            DetailRutaTextField(
-                                label = R.string.keberadaan_genz_ortu_keluarga,
-                                value = "${keluarga.isGenzOrtu}"
-                            )
-                            DetailRutaTextField(
-                                label = R.string.no_urut_keluarga_egb,
-                                value = UtilFunctions.convertTo3DigitsString(keluarga.noUrutKlgEgb!!)
-                            )
-                            DetailRutaTextField(
-                                label = R.string.jml_pengelolaan_makan_keluarga,
-                                value = "${keluarga.penglMkn}"
-                            )
-                            DetailRutaTextField(
-                                label = R.string.nomor_urut_krt_ruta,
-                                value = UtilFunctions.convertTo3DigitsString(ruta.noUrutRuta!!)
-                            )
-                            DetailRutaTextField(
-                                label = R.string.identifikasi_kk_krt,
-                                value = if (ruta.kkOrKrt == "1") "Kepala Keluarga (KK) saja" else if (ruta.kkOrKrt == "2") "Kepala Rumah Tangga (KRT) saja" else "KK Sekaligus KRT",
-                            )
-                            DetailRutaTextField(
-                                label = R.string.nama_krt_ruta,
-                                value = ruta.namaKrt!!
-                            )
-                            DetailRutaTextField(
-                                label = R.string.keberadaan_genz_ortu_ruta,
-                                value = "${ruta.genzOrtu}"
-                            )
-                            DetailRutaTextField(
-                                label = R.string.kategori_jml_genz,
-                                value = "${ruta.katGenz}"
-                            )
-                            DetailRutaTextField(
-                                label = R.string.nomor_urut_ruta_egb,
-                                value = UtilFunctions.convertTo3DigitsString(ruta.noUrutEgb)
-                            )
-//                            DetailRutaTextField(
-//                                label = R.string.catatan,
-//                                value = ruta.catatan!!
-//                            )
-                        }
-                        Text(modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                color = PklPrimary900,
-                                shape = RoundedCornerShape(
-                                    bottomStart = 15.dp,
-                                    bottomEnd = 15.dp
+                                .background(
+                                    color = PklBase,
+                                    shape = RoundedCornerShape(15.dp)
                                 )
+                                .height(500.dp),
+                            Arrangement.Center,
+                            Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        color = PklPrimary900,
+                                        shape = RoundedCornerShape(
+                                            topStart = 15.dp,
+                                            topEnd = 15.dp
+                                        )
+                                    )
+                                    .padding(
+                                        top = 10.dp,
+                                        bottom = 10.dp
+                                    ),
+                                text = stringResource(id = R.string.detail_keluarga).uppercase(),
+                                textAlign = TextAlign.Center,
+                                color = Color.White,
+                                fontFamily = PoppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 20.sp
                             )
-                            .clickable { openDetail = false }
-                            .padding(
-                                top = 10.dp,
-                                bottom = 10.dp
-                            ),
-                            textAlign = TextAlign.Center,
-                            text = stringResource(id = R.string.close_popup_list_ruta).uppercase(),
-                            color = Color.White,
-                            fontFamily = PoppinsFontFamily,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Medium)
-                    }
-                })
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                            ) {
+                                LazyColumn(
+                                    content = {
+                                        item {
+                                            DetailRutaTextField(
+                                                label = R.string.kode_klg,
+                                                value = "${keluarga.kodeKlg}"
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.sls,
+                                                value = "${keluarga.SLS}"
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.nomor_segmen_ruta,
+                                                value = "${keluarga.noSegmen}"
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.nomor_urut_bangunan_fisik_ruta,
+                                                value = UtilFunctions.convertTo3DigitsString(keluarga.noBgFisik!!)
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.nomor_urut_bangunan_sensus_ruta,
+                                                value = UtilFunctions.convertTo3DigitsString(keluarga.noBgSensus!!)
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.nomor_urut_keluarga,
+                                                value = UtilFunctions.convertTo3DigitsString(keluarga.noUrutKlg!!)
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.nama_kepala_keluarga,
+                                                value = "${keluarga.namaKK}"
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.alamat_ruta,
+                                                value = keluarga.alamat!!
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.keberadaan_genz_ortu_keluarga,
+                                                value = "${keluarga.isGenzOrtu}"
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.no_urut_keluarga_egb,
+                                                value = UtilFunctions.convertTo3DigitsString(keluarga.noUrutKlgEgb!!)
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.jml_pengelolaan_makan_keluarga,
+                                                value = "${keluarga.penglMkn}"
+                                            )
+                                            Text(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                text = stringResource(id = R.string.daftar_ruta_terkait).uppercase(),
+                                                fontFamily = PoppinsFontFamily,
+                                                fontWeight = FontWeight.Medium,
+                                                fontSize = 16.sp,
+                                                color = PklPrimary900,
+                                                textAlign = TextAlign.Center
+                                            )
+                                        }
+
+                                        listRutaByKodeKlg?.forEachIndexed { _, keluargaWithRuta ->
+                                            if(keluargaWithRuta.listRuta.isNotEmpty()) {
+                                                val daftarRutaByKodeKlg = keluargaWithRuta.listRuta.filter { it.status != "delete" }
+                                                items(daftarRutaByKodeKlg.size) {itemIndex ->
+                                                    val rutaByKodeKlg = daftarRutaByKodeKlg[itemIndex]
+                                                    var expanded by remember { mutableStateOf(false) }
+                                                    OutlinedCard(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .padding(
+                                                                start = 15.dp,
+                                                                end = 15.dp,
+                                                                top = 5.dp,
+                                                                bottom = 5.dp
+                                                            )
+                                                            .clickable { expanded = !expanded },
+                                                        shape = RoundedCornerShape(16.dp),
+                                                        border = BorderStroke(1.dp, color = PklPrimary900),
+                                                        colors = CardDefaults.outlinedCardColors(
+                                                            containerColor = PklBase,
+                                                        ),
+                                                        elevation = CardDefaults.cardElevation(4.dp),
+                                                        content = {
+                                                            Column(
+                                                                modifier = Modifier
+                                                                    .fillMaxSize()
+                                                                    .padding(16.dp)
+                                                            ) {
+                                                                Row(
+                                                                    modifier = Modifier
+                                                                        .fillMaxWidth(),
+                                                                    horizontalArrangement = Arrangement.SpaceBetween
+                                                                ) {
+                                                                    Text(
+                                                                        text = "${rutaByKodeKlg.kodeRuta}",
+                                                                        fontFamily = PoppinsFontFamily,
+                                                                        fontWeight = FontWeight.Medium,
+                                                                        fontSize = 18.sp,
+                                                                    )
+                                                                    Icon(
+                                                                        imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                                                                        contentDescription = stringResource(id = R.string.toggle_icon),
+                                                                        modifier = Modifier.size(30.dp),
+                                                                        tint = PklPrimary900
+                                                                    )
+                                                                }
+                                                                Text(
+                                                                    text = "${rutaByKodeKlg.namaKrt}",
+                                                                    fontFamily = PoppinsFontFamily,
+                                                                    fontWeight = FontWeight.Medium,
+                                                                    fontSize = 16.sp
+                                                                )
+                                                                if (expanded) {
+                                                                    Spacer(modifier = Modifier.size(5.dp))
+                                                                    Divider(thickness = 1.dp, color = Color.Black)
+                                                                    Spacer(modifier = Modifier.height(8.dp))
+                                                                    DetailCard(
+                                                                        keluarga = keluargaWithRuta.keluarga,
+                                                                        ruta = rutaByKodeKlg,
+                                                                        isListRuta = isListRuta
+                                                                    )
+                                                                }
+                                                            }
+                                                        }
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                )
+
+                            }
+                            Text(modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    color = PklPrimary900,
+                                    shape = RoundedCornerShape(
+                                        bottomStart = 15.dp,
+                                        bottomEnd = 15.dp
+                                    )
+                                )
+                                .clickable { openDetail = false }
+                                .padding(
+                                    top = 10.dp,
+                                    bottom = 10.dp
+                                ),
+                                textAlign = TextAlign.Center,
+                                text = stringResource(id = R.string.close_popup_list_ruta).uppercase(),
+                                color = Color.White,
+                                fontFamily = PoppinsFontFamily,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Medium)
+                        }
+                    })
+            }
+
         }
 
-//      menampilkan Action Dialog
+//      menampilkan action dialog
         if (openActionDialog) {
-//            RutaActionDialog(showDialog = openActionDialog)
             Dialog(onDismissRequest = { openActionDialog = false },
                 content = {
                     Column(
@@ -858,7 +1031,6 @@ fun RutaRow(
                             Text(modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-//                                    mungkin ini harusnya move ke screen buat ubah ruta
                                     navController.navigate(CapiScreen.Listing.EDIT_RUTA + "/${ruta.noBS}/${keluarga.kodeKlg}/${ruta.kodeRuta}")
                                 }
                                 .padding(
@@ -881,7 +1053,7 @@ fun RutaRow(
                                     bottom = 10.dp
                                 ),
                                 textAlign = TextAlign.Center,
-                                text = "Salin Ruta",
+                                text = stringResource(id = R.string.salin_action_art),
                                 fontSize = 16.sp,
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium)
@@ -1020,11 +1192,13 @@ fun RutaList(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .horizontalScroll(state = rememberScrollState(), enabled = true),
+            .horizontalScroll(
+                state = rememberScrollState(),
+                enabled = true
+            ),
         content = {
             println("List Ruta Screen: ${wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()} ${wilayahWithAll.listKeluargaWithRuta!!.size}")
-//            if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
-//                wilayahWithAll.listKeluargaWithRuta!!.forEach { keluargaWithRuta ->
+
             filteredList?.forEach { keluargaWithRuta ->
                 if (keluargaWithRuta.listRuta.isNotEmpty()) {
                     val daftarRuta = keluargaWithRuta.listRuta.filter { it.status != "delete" }
@@ -1034,7 +1208,8 @@ fun RutaList(
                             keluarga = keluargaWithRuta.keluarga,
                             ruta = ruta,
                             viewModel = viewModel,
-                            navController = navController
+                            navController = navController,
+                            isListRuta = true
                         )
                     }
                 }
@@ -1093,17 +1268,57 @@ fun DetailRutaTextField(
 }
 
 @Composable
-fun LimitedText(
-    searchText: String
+fun DetailCard(
+    keluarga: KeluargaEntity,
+    ruta: RutaEntity,
+    isListRuta: Boolean,
+    fontFamily: FontFamily = PoppinsFontFamily,
+    fontWeight: FontWeight = FontWeight.Medium,
+    fontSize: TextUnit = 14.sp,
+    titleColor: Color = PklPrimary900,
+    contentColor: Color = Color.Black
 ) {
-    val limitedText = searchText.take(10)
-
-    Text(
-        text = limitedText,
-        fontWeight = FontWeight.Medium,
-        fontFamily = PoppinsFontFamily,
-        fontSize = 14.sp
-    )
+    if (isListRuta) {
+        Text(text = stringResource(id = R.string.kode_klg), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${keluarga.kodeKlg}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = stringResource(id = R.string.sls), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${keluarga.SLS}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = stringResource(id = R.string.no_bf_list_ruta), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${keluarga.noBgFisik}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = stringResource(id = R.string.no_bs_list_ruta), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${keluarga.noBgSensus}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = stringResource(id = R.string.nomor_segmen_ruta), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${keluarga.noSegmen}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = stringResource(id = R.string.nomor_urut_keluarga), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${keluarga.noUrutKlg}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = stringResource(id = R.string.no_urut_keluarga_egb), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${keluarga.noUrutKlgEgb}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = stringResource(id = R.string.nama_kepala_keluarga), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${keluarga.namaKK}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = stringResource(id = R.string.alamat_ruta), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${keluarga.alamat}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = stringResource(id = R.string.keberadaan_genz_ortu_keluarga), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${keluarga.isGenzOrtu}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = stringResource(id = R.string.jml_pengelolaan_makan_keluarga), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${keluarga.penglMkn}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+    } else {
+        Text(text = stringResource(id = R.string.kode_ruta), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${ruta.kodeRuta}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = stringResource(id = R.string.no_list_ruta), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${ruta.noUrutRuta}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = stringResource(id = R.string.nomor_urut_ruta_egb), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${ruta.noUrutEgb}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = stringResource(id = R.string.identifikasi_kk_krt), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${ruta.kkOrKrt}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = stringResource(id = R.string.nama_krt_list_ruta), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${ruta.namaKrt}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = stringResource(id = R.string.keberadaan_genz_ortu_ruta), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${ruta.genzOrtu}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = stringResource(id = R.string.kategori_jml_genz), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${ruta.katGenz}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = stringResource(id = R.string.catatan), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
+        Text(text = "${ruta.catatan}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+    }
 }
 
 @Composable
@@ -1115,12 +1330,16 @@ fun RowScope.TableCell(
 ) {
     Text(
         modifier = Modifier
-            .padding(start = 10.dp, end = 10.dp)
+            .padding(
+                start = 10.dp,
+                end = 10.dp
+            )
             .weight(weight),
         text = text,
         color = color,
         fontFamily = PoppinsFontFamily,
         fontWeight = FontWeight.Medium,
-        fontSize = fontSize
+        fontSize = fontSize,
+        textAlign = TextAlign.Center
     )
 }

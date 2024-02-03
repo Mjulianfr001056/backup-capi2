@@ -5,6 +5,7 @@ import android.util.Log
 import com.polstat.pkl.database.Capi63Database
 import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.database.relation.KeluargaWithRuta
+import com.polstat.pkl.database.relation.RutaWithKeluarga
 import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.database.relation.WilayahWithKeluarga
 import com.polstat.pkl.database.relation.WilayahWithRuta
@@ -137,9 +138,16 @@ class WilayahRepositoryImpl @Inject constructor(
                     val ruta = capi63Database.capi63Dao.getKeluargaWithRuta(keluarga.kodeKlg)
                     KeluargaWithRuta(keluarga, ruta.listRuta)
                 }
+                val wilayahWithRuta = capi63Database.capi63Dao.getWilayahWithRuta(noBS)
+                val listRutaWithKeluarga = wilayahWithRuta.listRuta?.map { ruta ->
+                    val keluarga = capi63Database.capi63Dao.getRutaWithKeluarga(ruta.kodeRuta)
+                    RutaWithKeluarga(ruta, keluarga.listKeluarga)
+                }
                 val wilayahWithAll = WilayahWithAll(
                     wilayahWithKeluarga = wilayahWithKeluarga,
-                    listKeluargaWithRuta = listKeluargaWithRuta
+                    wilayahWithRuta = wilayahWithRuta,
+                    listKeluargaWithRuta = listKeluargaWithRuta,
+                    listRutaWithKeluarga = listRutaWithKeluarga
                 )
                 Log.d(TAG, "Berhasil getWilayahWithAll: $wilayahWithAll")
                 emit(Result.Success(wilayahWithAll))

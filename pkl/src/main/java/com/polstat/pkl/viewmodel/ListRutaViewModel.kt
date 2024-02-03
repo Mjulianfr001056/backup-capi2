@@ -50,6 +50,10 @@ class ListRutaViewModel @Inject constructor(
 
     val noBS = savedStateHandle.get<String>("noBS")
 
+    val kodeRuta = savedStateHandle.get<String>("kodeRuta")
+
+    val kodeKlg = savedStateHandle.get<String>("kodeKlg")
+
     private val _wilayahWithRuta = MutableStateFlow(WilayahWithRuta())
 
     val wilayahWithRuta = _wilayahWithRuta.asStateFlow()

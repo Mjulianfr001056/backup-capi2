@@ -9,7 +9,6 @@
     <string name="masuk">masuk</string>
     <string name="show_password">Show password</string>
     <string name="hide_password">Hide password</string>
-
     <string name="list_ruta_title">list ruta</string>
     <string name="no_list_ruta">No</string>
     <string name="info">Info</string>
@@ -78,4 +77,17 @@
     <string name="konfirmasi_pass_master">Konfirmasi</string>
     <string name="ket_konfirm_hapus_pass_master">Hapus Rumah Tangga membutuhkan persetujuan PML. Harap hubungi PML untuk memperoleh password master.</string>
     <string name="input_pass_master">Masukkan password master</string>
+    <string name="tampilkan_list_keluarga">Tampilkan List Keluarga</string>
+    <string name="tampilkan_list_ruta">Tampilkan List Ruta</string>
+    <string name="search_list_keluarga">Masukkan kode klg atau nama KK</string>
+    <string name="no_urut_klg">No Klg</string>
+    <string name="detail_list_ruta_klg">Detail</string>
+    <string name="salin_action_art">Salin Ruta</string>
+    <string name="detail_keluarga">detail keluarga</string>
+    <string name="kode_ruta">Kode Ruta</string>
+    <string name="daftar_klg_terkait">Daftar Keluarga Terkait</string>
+    <string name="kode_klg">Kode Keluarga</string>
+    <string name="daftar_ruta_terkait">Daftar Ruta Terkait</string>
+    <string name="toggle_icon">Toggle Icon</string>
+    <string name="list_keluarga">List Keluarga</string>
 </resources>
