@@ -68,6 +68,7 @@ import com.polstat.pkl.viewmodel.ListSampelViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import org.odk.collect.pkl.navigation.CapiScreen
+import org.odk.collect.pkl.ui.screen.components.LoadingDialog
 
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -88,6 +89,10 @@ fun ListSampleScreen(
 
     var showSearchBar by remember { mutableStateOf(false) }
 
+    val showLoading by viewModel.showLoadingChannel.collectAsState(true)
+
+    val isDataInserted = viewModel.isDataInserted.collectAsState()
+
     LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
         viewModel.showErrorToastChannel.collectLatest { show ->
             if (show) {
@@ -97,13 +102,19 @@ fun ListSampleScreen(
         }
     }
 
-    LaunchedEffect(key1 = viewModel.sampelRutaResponse) {
+    LaunchedEffect(key1 = isDataInserted.value) {
+        viewModel.updateShowLoading(isDataInserted.value)
+
         viewModel.sampelRutaResponse.collectLatest { response ->
-            if (response.isNotEmpty() && listSampelRuta.value.isEmpty()) {
+            if (isDataInserted.value) {
                 viewModel.getSampelByBSFromDB(noBS!!)
             }
         }
     }
+
+    LoadingDialog(
+        showDialog = showLoading
+    )
 
     var isDescending by remember { mutableStateOf(false) }
 
