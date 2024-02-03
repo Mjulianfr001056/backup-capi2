@@ -21,7 +21,6 @@ import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,6 +48,10 @@ class ListRutaViewModel @Inject constructor(
     val session = _session
 
     val noBS = savedStateHandle.get<String>("noBS")
+
+    val kodeRuta = savedStateHandle.get<String>("kodeRuta")
+
+    val kodeKlg = savedStateHandle.get<String>("kodeKlg")
 
     private val _wilayahWithRuta = MutableStateFlow(WilayahWithRuta())
 
