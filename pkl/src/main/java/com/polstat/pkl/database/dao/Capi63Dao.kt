@@ -16,6 +16,7 @@ import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.database.relation.DataTimWithMahasiswa
 import com.polstat.pkl.database.relation.KeluargaWithRuta
 import com.polstat.pkl.database.relation.MahasiswaWithWilayah
+import com.polstat.pkl.database.relation.RutaWithKeluarga
 import com.polstat.pkl.database.relation.WilayahWithKeluarga
 import com.polstat.pkl.database.relation.WilayahWithRuta
 
@@ -129,4 +130,8 @@ interface Capi63Dao {
     @Transaction
     @Query("SELECT * FROM keluarga WHERE kodeKlg = :kodeKlg")
     suspend fun getKeluargaWithRuta(kodeKlg: String) : KeluargaWithRuta
+
+    @Transaction
+    @Query("SELECT * FROM ruta WHERE kodeRuta = :kodeRuta")
+    suspend fun getRutaWithKeluarga(kodeRuta: String) : RutaWithKeluarga
 }

@@ -106,11 +106,18 @@ fun HorizontalMenu(navController: NavHostController, isPml: Boolean?) {
                     }
                 )
                 Spacer(modifier = Modifier.width(30.dp))
+//                MenuButton(
+//                    image = painterResource(R.drawable.password_master),
+//                    name = "Password Master",
+//                    onCardClicked = {
+//                        navController.navigate("password")
+//                    }
+//                )
                 MenuButton(
                     image = painterResource(R.drawable.password_master),
-                    name = "Password Master",
+                    name = "Monitoring",
                     onCardClicked = {
-                        navController.navigate("password")
+                        navController.navigate("list_bs" + "/true")
                     }
                 )
             } else {
@@ -169,7 +176,7 @@ fun MenuButton(image: Painter, name: String, onCardClicked: () -> Unit) {
 
 @Preview
 @Composable
-fun SamlingScreenPreview () {
+fun SamplingScreenPreview () {
     Capi63Theme {
         Surface (
             modifier = Modifier.fillMaxSize(),

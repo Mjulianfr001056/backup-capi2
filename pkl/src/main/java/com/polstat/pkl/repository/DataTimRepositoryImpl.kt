@@ -7,6 +7,7 @@ import com.polstat.pkl.database.relation.DataTimWithAll
 import com.polstat.pkl.database.relation.DataTimWithMahasiswa
 import com.polstat.pkl.database.relation.KeluargaWithRuta
 import com.polstat.pkl.database.relation.MahasiswaWithAll
+import com.polstat.pkl.database.relation.RutaWithKeluarga
 import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.mapper.toDataTimEntity
 import com.polstat.pkl.model.domain.DataTim
@@ -133,6 +134,8 @@ class DataTimRepositoryImpl @Inject constructor (
 
                         val wilayahWithKeluarga = dao.getWilayahWithKeluarga(wilayah.noBS)
 
+                        val wilayahWithRuta = dao.getWilayahWithRuta(wilayah.noBS)
+
                         val listKeluargaWithRuta = wilayahWithKeluarga.listKeluarga?.map { keluarga ->
 
                             val ruta = dao.getKeluargaWithRuta(keluarga.kodeKlg)
@@ -141,7 +144,15 @@ class DataTimRepositoryImpl @Inject constructor (
 
                         }
 
-                        WilayahWithAll(wilayahWithKeluarga, listKeluargaWithRuta)
+                        val listRutaWithKeluarga = wilayahWithRuta.listRuta?.map {ruta ->
+
+                            val keluarga = dao.getRutaWithKeluarga(ruta.kodeRuta)
+
+                            RutaWithKeluarga(ruta, keluarga.listKeluarga)
+
+                        }
+
+                        WilayahWithAll(wilayahWithKeluarga, wilayahWithRuta, listKeluargaWithRuta, listRutaWithKeluarga)
 
                     }
 

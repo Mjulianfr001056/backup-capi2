@@ -87,6 +87,9 @@ fun ListBSScreen(
     val context = LocalContext.current
 
     val session = viewModel.session
+    //val isPml = viewModel.session?.isKoor
+    val navArgs = navController.currentBackStackEntry?.arguments
+    val isMonitoring = navArgs?.getBoolean("isMonitoring") ?: false
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -166,11 +169,24 @@ fun ListBSScreen(
             )
         },
         content = { innerPadding ->
-            ListBS(
-                listWilayah = mahasiswaWithWilayah.value.listWilayah,
-                navController = navController,
-                modifier = Modifier.padding(innerPadding)
-            )
+            if (isMonitoring) {
+                ListBS(
+                    listWilayah = listWilayah.value,
+                    navController = navController,
+                    modifier = Modifier.padding(innerPadding)
+                )
+            } else {
+                ListBS(
+                    listWilayah = mahasiswaWithWilayah.value.listWilayah,
+                    navController = navController,
+                    modifier = Modifier.padding(innerPadding)
+                )
+            }
+//            ListBS(
+//                listWilayah = mahasiswaWithWilayah.value.listWilayah,
+//                navController = navController,
+//                modifier = Modifier.padding(innerPadding)
+//            )
         },
     )
 }
@@ -407,6 +423,7 @@ private fun BlokSensus(
 private fun ListBS(
     listWilayah: List<WilayahEntity>?,
     navController: NavHostController,
+    isMonitoring : Boolean = false,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -424,10 +441,10 @@ private fun ListBS(
                     val wilayah = listWilayah[index]
                     BlokSensus(
                         onLihatRutaClicked = {
-                            navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${wilayah.noBS}")
+                            navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${wilayah.noBS}?isMonitoring=$isMonitoring")
                         },
                         onLihatSampleClicked = {
-                            navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${wilayah.noBS}")
+                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${wilayah.noBS}")
 //                            navController.navigate(Capi63Screen.ListSample.route + "/444B")
                         },
                         wilayah = wilayah

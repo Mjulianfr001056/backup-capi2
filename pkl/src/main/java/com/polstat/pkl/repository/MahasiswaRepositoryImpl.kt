@@ -6,6 +6,7 @@ import com.polstat.pkl.database.Capi63Database
 import com.polstat.pkl.database.relation.KeluargaWithRuta
 import com.polstat.pkl.database.relation.MahasiswaWithAll
 import com.polstat.pkl.database.relation.MahasiswaWithWilayah
+import com.polstat.pkl.database.relation.RutaWithKeluarga
 import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.mapper.toMahasiswaEntity
 import com.polstat.pkl.model.domain.Mahasiswa
@@ -94,6 +95,8 @@ class MahasiswaRepositoryImpl @Inject constructor (
 
                     val wilayahWithKeluarga = capi63Database.capi63Dao.getWilayahWithKeluarga(wilayah.noBS)
 
+                    val wilayahWithRuta = capi63Database.capi63Dao.getWilayahWithRuta(wilayah.noBS)
+
                     val listKeluargaWithRuta = wilayahWithKeluarga.listKeluarga?.map { keluarga ->
 
                         val ruta = capi63Database.capi63Dao.getKeluargaWithRuta(keluarga.kodeKlg)
@@ -102,7 +105,15 @@ class MahasiswaRepositoryImpl @Inject constructor (
 
                     }
 
-                    WilayahWithAll(wilayahWithKeluarga, listKeluargaWithRuta)
+                    val listRutaWithKeluarga = wilayahWithRuta.listRuta?.map {ruta ->
+
+                        val keluarga = capi63Database.capi63Dao.getRutaWithKeluarga(ruta.kodeRuta)
+
+                        RutaWithKeluarga(ruta, keluarga.listKeluarga)
+
+                    }
+
+                    WilayahWithAll(wilayahWithKeluarga, wilayahWithRuta, listKeluargaWithRuta, listRutaWithKeluarga)
 
                 }
 

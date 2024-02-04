@@ -54,6 +54,10 @@ class ListSampelViewModel @Inject constructor(
 
     val isSyncing: StateFlow<Boolean> get() = _isSyncing
 
+    private val _isDataInserted = MutableStateFlow(false)
+
+    val isDataInserted = _isDataInserted.asStateFlow()
+
     init {
         getSampelRutaFromWSAndInsertThem(noBS!!)
     }
@@ -96,6 +100,7 @@ class ListSampelViewModel @Inject constructor(
                         Log.d(TAG, message)
                     }
                 }
+                _isDataInserted.value = true
             }
         }
     }
@@ -152,5 +157,9 @@ class ListSampelViewModel @Inject constructor(
 
     private fun closeLoadingDialog() {
         _showLoadingChannel.trySend(false)
+    }
+
+    fun updateShowLoading(isDataInserted: Boolean) {
+        _showLoadingChannel.trySend(!isDataInserted)
     }
 }
