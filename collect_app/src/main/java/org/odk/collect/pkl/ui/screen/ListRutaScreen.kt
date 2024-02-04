@@ -729,11 +729,11 @@ fun RutaRow(
                             )
                             DetailRutaTextField(
                                 label = R.string.nomor_urut_bangunan_fisik_ruta,
-                                value = UtilFunctions.convertTo3DigitsString(keluarga.noBgFisik!!)
+                                value = UtilFunctions.padWithZeros(keluarga.noBgFisik)
                             )
                             DetailRutaTextField(
                                 label = R.string.nomor_urut_bangunan_sensus_ruta,
-                                value = UtilFunctions.convertTo3DigitsString(keluarga.noBgSensus!!)
+                                value = UtilFunctions.padWithZeros(keluarga.noBgSensus)
                             )
                             DetailRutaTextField(
                                 label = R.string.nomor_urut_keluarga,

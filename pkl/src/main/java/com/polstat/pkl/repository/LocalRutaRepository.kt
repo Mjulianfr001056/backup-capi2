@@ -9,6 +9,8 @@ interface LocalRutaRepository {
 
     suspend fun insertRuta(ruta: Ruta) : Flow<String>
 
+    suspend fun fetchRutaFromServer(ruta: Ruta) : Flow<String>
+
     suspend fun insertKeluargaAndRuta(kodeKlg: String, kodeRuta: String) : Flow<String>
 
     suspend fun deleteAllKeluargaAndRuta() : Flow<String>
@@ -20,4 +22,6 @@ interface LocalRutaRepository {
     suspend fun fakeDeleteRuta(ruta: Ruta) : Flow<String>
 
     suspend fun getRuta(kodeRuta: String) : Flow<Result<RutaEntity>>
+
+    suspend fun getLastRuta() : Flow<Result<RutaEntity>>
 }

@@ -3,8 +3,8 @@ package com.polstat.pkl.ui.event
 sealed class EditRutaEvent {
     data class SLSChanged(val sls: String) : EditRutaEvent()
     data class NoSegmenChanged(val noSegmen: String) : EditRutaEvent()
-    data class NoBgFisikChanged(val noBgFisik: Int) : EditRutaEvent()
-    data class NoBgSensusChanged(val noBgSensus: Int) : EditRutaEvent()
+    data class NoBgFisikChanged(val noBgFisik: String) : EditRutaEvent()
+    data class NoBgSensusChanged(val noBgSensus: String) : EditRutaEvent()
     data class NoUrutKlgChanged(val noUrutKlg: Int) : EditRutaEvent()
     data class NamaKKChanged(val namaKK: String) : EditRutaEvent()
     data class AlamatChanged(val alamat: String) : EditRutaEvent()

@@ -176,14 +176,14 @@ class AuthViewModel @Inject constructor(
 
                     if(wilayah.keluarga!!.isNotEmpty()) {
                         wilayah.keluarga.forEach { keluarga ->
-                            keluargaRepository.insertKeluarga(keluarga)
+                            keluargaRepository.fetchKeluargaFromServer(keluarga)
                                 .collectLatest { message ->
                                     Log.d(TAG, message)
                                 }
 
                             if (keluarga.ruta!!.isNotEmpty()) {
                                 keluarga.ruta.forEach { ruta ->
-                                    localRutaRepository.insertRuta(ruta)
+                                    localRutaRepository.fetchRutaFromServer(ruta)
                                         .collectLatest { message ->
                                             Log.d(TAG, message)
                                         }
@@ -316,14 +316,14 @@ class AuthViewModel @Inject constructor(
 
                         if(wilayah.keluarga!!.isNotEmpty()) {
                             wilayah.keluarga.forEach { keluarga ->
-                                keluargaRepository.insertKeluarga(keluarga)
+                                keluargaRepository.fetchKeluargaFromServer(keluarga)
                                     .collectLatest { message ->
                                         Log.d(TAG, message)
                                     }
 
                                 if (keluarga.ruta!!.isNotEmpty()) {
                                     keluarga.ruta.forEach { ruta ->
-                                        localRutaRepository.insertRuta(ruta)
+                                        localRutaRepository.fetchRutaFromServer(ruta)
                                             .collectLatest { message ->
                                                 Log.d(TAG, message)
                                             }

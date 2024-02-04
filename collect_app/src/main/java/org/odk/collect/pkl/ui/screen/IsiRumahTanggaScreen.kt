@@ -3,7 +3,11 @@ package org.odk.collect.pkl.ui.screen
 import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,8 +49,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -67,11 +74,11 @@ import com.polstat.pkl.ui.theme.PklSecondary
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.utils.UtilFunctions
 import com.polstat.pkl.viewmodel.IsiRutaViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
 
 @SuppressLint("StateFlowValueCalledInComposition")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IsiRumahTanggaScreen(
     navController: NavHostController,
@@ -81,33 +88,13 @@ fun IsiRumahTanggaScreen(
     val coroutineScope = rememberCoroutineScope()
     val noBS = viewModel.noBS
     val lastKeluarga = viewModel.lastKeluarga.collectAsState()
+    val lastKeluargaEgb = viewModel.lastKeluargaEgb.collectAsState()
     val lastRuta = viewModel.lastRuta.collectAsState()
     val context = LocalContext.current
 
     viewModel.getRutaLocation()
     LaunchedEffect(key1 = Unit) {
         viewModel.getRutaLocation()
-    }
-
-    LaunchedEffect(key1 = viewModel.state.value.isGenzOrtu) {
-        coroutineScope.launch {
-            viewModel.setInitialNoUrutKlgEgb()
-        }
-    }
-
-    LaunchedEffect(key1 = viewModel.state.value.penglMkn) {
-        if (state.value.penglMkn != 0) {
-            coroutineScope.launch {
-                viewModel.setInitialNoUrutRuta()
-            }
-        }
-    }
-
-    LaunchedEffect(key1 = viewModel.state.value.listKkOrKrt) {
-        coroutineScope.launch {
-            viewModel.setInitialNamaKrt()
-        }
-        println("ubah krt")
     }
 
     Scaffold(
@@ -119,10 +106,11 @@ fun IsiRumahTanggaScreen(
         },
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
-        Box(modifier = Modifier
-            .padding(paddingValues)
-            .fillMaxSize()
-            .background(color = PklBase)
+        Box(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .background(color = PklBase)
         ) {
             Column(
                 modifier = Modifier
@@ -147,18 +135,58 @@ fun IsiRumahTanggaScreen(
                                 .padding(15.dp)
                         ) {
                             Text(
-                                text = "Isian Listing Keluarga Terakhir",
+                                text = "Isian Listing Terakhir",
                                 fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.SemiBold
                             )
 
                             Spacer(modifier = Modifier.padding(10.dp))
 
-                            Text(
-                                text = "No. Segmen: ${lastKeluarga.value.noSegmen} | No. BF: ${lastKeluarga.value.noBgFisik} | No. BS: ${lastKeluarga.value.noBgSensus}",
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Light
-                            )
+                            val weight = 0.5f
+                            Row {
+                                TableCellForm(
+                                    label = "No. Segmen",
+                                    value = ": ${lastKeluarga.value.noSegmen}",
+                                    fontSize = 14.sp,
+                                    weight = weight
+                                )
+                                TableCellForm(
+                                    label = "No. Klg",
+                                    value = ": ${UtilFunctions.convertTo3DigitsString(lastKeluarga.value.noUrutKlg)}",
+                                    fontSize = 14.sp,
+                                    weight = weight
+                                )
+                            }
+                            Row {
+                                TableCellForm(
+                                    label = "No. Bg Fisik",
+                                    value = ": ${UtilFunctions.padWithZeros(lastKeluarga.value.noBgFisik, 3)}",
+                                    fontSize = 14.sp,
+                                    weight = weight
+                                )
+                                TableCellForm(
+                                    label = "No. Klg Egb",
+                                    value = ": ${
+                                        UtilFunctions.convertTo3DigitsString(lastKeluargaEgb.value.noUrutKlgEgb)
+                                    }",
+                                    fontSize = 14.sp,
+                                    weight = weight
+                                )
+                            }
+                            Row {
+                                TableCellForm(
+                                    label = "No. Bg Sensus",
+                                    value = ": ${UtilFunctions.padWithZeros(lastKeluarga.value.noBgSensus, 3)}",
+                                    fontSize = 14.sp,
+                                    weight = weight
+                                )
+                                TableCellForm(
+                                    label = "No. Ruta",
+                                    value = ": ${UtilFunctions.convertTo3DigitsString(lastRuta.value.noUrutRuta)}",
+                                    fontSize = 14.sp,
+                                    weight = weight
+                                )
+                            }
                         }
                     }
                 }
@@ -166,24 +194,33 @@ fun IsiRumahTanggaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 TextField(
-                    value = state.value.SLS.toString(),
-                    onValueChange = { coroutineScope.launch{viewModel.onEvent(IsiRutaScreenEvent.SLSChanged(it))} },
+                    value = state.value.SLS,
+                    onValueChange = {
+                        coroutineScope.launch {
+                            viewModel.onEvent(
+                                IsiRutaScreenEvent.SLSChanged(it)
+                            )
+                        }
+                    },
                     label = {
                         Text(
                             text = "1. Satuan Lingkungan Setempat (SLS)",
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.SemiBold
-                        ) },
+                        )
+                    },
                     textStyle = TextStyle.Default.copy(
                         fontFamily = PoppinsFontFamily,
                         fontWeight = FontWeight.SemiBold
                     ),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color.Transparent,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
                         focusedIndicatorColor = PklPrimary700,
-                        unfocusedIndicatorColor = PklAccent
+                        unfocusedIndicatorColor = PklAccent,
                     ),
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Next
@@ -214,7 +251,7 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoSegmenChanged(
-                                    increment(
+                                    incrementNoSegmen(
                                         state.value.noSegmen
                                     )
                                 )
@@ -225,7 +262,7 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoSegmenChanged(
-                                    decrement(
+                                    decrementNoSegmen(
                                         state.value.noSegmen
                                     )
                                 )
@@ -236,14 +273,12 @@ fun IsiRumahTanggaScreen(
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                InputNomor(
-                    value = UtilFunctions.convertTo3DigitsString(state.value.noBgFisik),
+                InputNomorHuruf(
+                    value = UtilFunctions.padWithZeros(state.value.noBgFisik, 3),
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.NoBgFisikChanged(
-                                    it.toInt()
-                                )
+                                IsiRutaScreenEvent.NoBgFisikChanged(it)
                             )
                         }
                     },
@@ -258,11 +293,16 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoBgFisikChanged(
-                                    increment(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.noBgFisik
-                                        )
-                                    ).toInt()
+                                    increment(state.value.noBgFisik)
+                                )
+                            )
+                        }
+                    },
+                    onIncrementHuruf = {
+                        coroutineScope.launch {
+                            viewModel.onEvent(
+                                IsiRutaScreenEvent.NoBgFisikChanged(
+                                    incrementHuruf(state.value.noBgFisik)
                                 )
                             )
                         }
@@ -271,11 +311,16 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoBgFisikChanged(
-                                    decrement(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.noBgFisik
-                                        )
-                                    ).toInt()
+                                    decrement(state.value.noBgFisik)
+                                )
+                            )
+                        }
+                    },
+                    onDecrementHuruf = {
+                        coroutineScope.launch {
+                            viewModel.onEvent(
+                                IsiRutaScreenEvent.NoBgFisikChanged(
+                                    decrementHuruf(state.value.noBgFisik)
                                 )
                             )
                         }
@@ -284,14 +329,12 @@ fun IsiRumahTanggaScreen(
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                InputNomor(
-                    value = UtilFunctions.convertTo3DigitsString(state.value.noBgSensus),
+                InputNomorHuruf(
+                    value = UtilFunctions.padWithZeros(state.value.noBgSensus, 3),
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.NoBgSensusChanged(
-                                    it.toInt()
-                                )
+                                IsiRutaScreenEvent.NoBgSensusChanged(it)
                             )
                         }
                     },
@@ -306,11 +349,16 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoBgSensusChanged(
-                                    increment(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.noBgSensus
-                                        )
-                                    ).toInt()
+                                    increment(state.value.noBgSensus)
+                                )
+                            )
+                        }
+                    },
+                    onIncrementHuruf = {
+                        coroutineScope.launch {
+                            viewModel.onEvent(
+                                IsiRutaScreenEvent.NoBgSensusChanged(
+                                    incrementHuruf(state.value.noBgSensus)
                                 )
                             )
                         }
@@ -319,11 +367,16 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoBgSensusChanged(
-                                    decrement(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.noBgSensus
-                                        )
-                                    ).toInt()
+                                    decrement(state.value.noBgSensus)
+                                )
+                            )
+                        }
+                    },
+                    onDecrementHuruf = {
+                        coroutineScope.launch {
+                            viewModel.onEvent(
+                                IsiRutaScreenEvent.NoBgSensusChanged(
+                                    decrementHuruf(state.value.noBgSensus)
                                 )
                             )
                         }
@@ -333,19 +386,19 @@ fun IsiRumahTanggaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 InputNomor(
-                    value = state.value.noUrutKlg.toString(),
+                    value = state.value.jmlKlg.toString(),
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.NoUrutKlgChanged(
-                                    it.toInt()
+                                IsiRutaScreenEvent.JmlKlgChanged(
+                                    it.toIntOrNull() ?: 0
                                 )
                             )
                         }
                     },
                     label = {
                         Text(
-                            text = "Banyaknya keluarga dalam satu bangunan",
+                            text = "5. Banyaknya keluarga dalam satu bangunan",
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -353,12 +406,8 @@ fun IsiRumahTanggaScreen(
                     onIncrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.NoUrutKlgChanged(
-                                    increment(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.noUrutKlg
-                                        )
-                                    ).toInt()
+                                IsiRutaScreenEvent.JmlKlgChanged(
+                                    increment(state.value.jmlKlg.toString()).toInt()
                                 )
                             )
                         }
@@ -366,12 +415,8 @@ fun IsiRumahTanggaScreen(
                     onDecrement = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.NoUrutKlgChanged(
-                                    decrement(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.noUrutKlg
-                                        )
-                                    ).toInt()
+                                IsiRutaScreenEvent.JmlKlgChanged(
+                                    decrement(state.value.jmlKlg.toString()).toInt()
                                 )
                             )
                         }
@@ -380,7 +425,7 @@ fun IsiRumahTanggaScreen(
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                for (i in 1..state.value.noUrutKlg!!) {
+                for (i in 1..state.value.jmlKlg) {
                     Card(
                         border = BorderStroke(1.dp, PklSecondary),
                         colors = CardDefaults.cardColors(
@@ -401,8 +446,7 @@ fun IsiRumahTanggaScreen(
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium
                             )
-//                            KeteranganRuta(viewModel = viewModel, index = i-1)
-                            KeteranganKeluarga(viewModel = viewModel)
+                            KeteranganKeluarga(viewModel = viewModel, index = i - 1)
                         }
                     }
 
@@ -416,9 +460,10 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(IsiRutaScreenEvent.submit)
                         }
-                        Toast.makeText(context, "Ruta berhasil ditambahkan!", Toast.LENGTH_SHORT).show()
-                        navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${noBS}"){
-                            popUpTo(CapiScreen.Listing.LIST_RUTA + "/${noBS}"){
+                        Toast.makeText(context, "Ruta berhasil ditambahkan!", Toast.LENGTH_SHORT)
+                            .show()
+                        navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${noBS}") {
+                            popUpTo(CapiScreen.Listing.LIST_RUTA + "/${noBS}") {
                                 inclusive = true
                             }
                         }
@@ -441,28 +486,29 @@ fun IsiRumahTanggaScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun KeteranganKeluarga(
-    viewModel: IsiRutaViewModel
-){
+    viewModel: IsiRutaViewModel,
+    index: Int
+) {
     val state = viewModel.state.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
     InputNomor(
-        value = state.value.noUrutKlg.toString(),
+        value = state.value.listNoUrutKlg[index].toString(),
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    IsiRutaScreenEvent.NoUrutKlgChanged(
-                        it.toInt()
-                    )
+                    event = IsiRutaScreenEvent.NoUrutKlgChanged(
+                        it.toIntOrNull() ?: 0
+                    ),
+                    index = index
                 )
             }
         },
         label = {
             Text(
-                text = "5. Nomor Urut Keluarga",
+                text = "6. Nomor Urut Keluarga",
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.SemiBold
             )
@@ -470,26 +516,20 @@ fun KeteranganKeluarga(
         onIncrement = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    IsiRutaScreenEvent.NoUrutKlgChanged(
-                        increment(
-                            UtilFunctions.convertTo3DigitsString(
-                                state.value.noUrutKlg
-                            )
-                        ).toInt()
-                    )
+                    event = IsiRutaScreenEvent.NoUrutKlgChanged(
+                        increment(state.value.listNoUrutKlg[index].toString()).toInt()
+                    ),
+                    index = index
                 )
             }
         },
         onDecrement = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    IsiRutaScreenEvent.NoUrutKlgChanged(
-                        decrement(
-                            UtilFunctions.convertTo3DigitsString(
-                                state.value.noUrutKlg
-                            )
-                        ).toInt()
-                    )
+                    event = IsiRutaScreenEvent.NoUrutKlgChanged(
+                        decrement(state.value.listNoUrutKlg[index].toString()).toInt()
+                    ),
+                    index = index
                 )
             }
         }
@@ -498,24 +538,36 @@ fun KeteranganKeluarga(
     Spacer(modifier = Modifier.padding(10.dp))
 
     TextField(
-        value = state.value.namaKK.toString(),
-        onValueChange = { coroutineScope.launch { viewModel.onEvent(IsiRutaScreenEvent.NamaKKChanged(it)) } },
+        value = state.value.listNamaKK[index],
+        onValueChange = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    event = IsiRutaScreenEvent.NamaKKChanged(
+                        it
+                    ),
+                    index = index
+                )
+            }
+        },
         label = {
             Text(
-                text = "6. Nama Kepala Keluarga",
+                text = "7. Nama Kepala Keluarga",
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.SemiBold
-            ) },
+            )
+        },
         textStyle = TextStyle.Default.copy(
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.SemiBold
         ),
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
-        colors = TextFieldDefaults.textFieldColors(
-            containerColor = Color.Transparent,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
             focusedIndicatorColor = PklPrimary700,
-            unfocusedIndicatorColor = PklAccent
+            unfocusedIndicatorColor = PklAccent,
         ),
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Next
@@ -525,24 +577,36 @@ fun KeteranganKeluarga(
     Spacer(modifier = Modifier.padding(10.dp))
 
     TextField(
-        value = state.value.alamat.toString(),
-        onValueChange = { coroutineScope.launch { viewModel.onEvent(IsiRutaScreenEvent.AlamatChanged(it)) } },
+        value = state.value.listAlamat[index],
+        onValueChange = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    event = IsiRutaScreenEvent.AlamatChanged(
+                        it
+                    ),
+                    index = index
+                )
+            }
+        },
         label = {
             Text(
-                text = "7. Alamat",
+                text = "8. Alamat",
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.SemiBold
-            ) },
+            )
+        },
         textStyle = TextStyle.Default.copy(
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.SemiBold
         ),
         singleLine = false,
         modifier = Modifier.fillMaxWidth(),
-        colors = TextFieldDefaults.textFieldColors(
-            containerColor = Color.Transparent,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
             focusedIndicatorColor = PklPrimary700,
-            unfocusedIndicatorColor = PklAccent
+            unfocusedIndicatorColor = PklAccent,
         ),
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Next
@@ -552,19 +616,20 @@ fun KeteranganKeluarga(
     Spacer(modifier = Modifier.padding(10.dp))
 
     InputNomor(
-        value = state.value.isGenzOrtu.toString(),
+        value = state.value.listIsGenzOrtu[index].toString(),
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    IsiRutaScreenEvent.IsGenzOrtuChanged(
-                        it.toInt()
-                    )
+                    event = IsiRutaScreenEvent.IsGenzOrtuChanged(
+                        it.toIntOrNull() ?: 0
+                    ),
+                    index = index
                 )
             }
         },
         label = {
             Text(
-                text = "8. Keberadaan Gen Z dan Orang Tua dalam Keluarga",
+                text = "9. Keberadaan Gen Z dan Orang Tua dalam Keluarga",
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.SemiBold
             )
@@ -572,76 +637,114 @@ fun KeteranganKeluarga(
         onIncrement = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    IsiRutaScreenEvent.IsGenzOrtuChanged(
-                        increment(
-                            UtilFunctions.convertTo3DigitsString(
-                                state.value.isGenzOrtu
-                            )
-                        ).toInt()
-                    )
+                    event = IsiRutaScreenEvent.IsGenzOrtuChanged(
+                        increment(state.value.listIsGenzOrtu[index].toString()).toInt()
+                    ),
+                    index = index
                 )
             }
         },
         onDecrement = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    IsiRutaScreenEvent.IsGenzOrtuChanged(
-                        decrement(
-                            UtilFunctions.convertTo3DigitsString(
-                                state.value.isGenzOrtu
-                            )
-                        ).toInt()
-                    )
+                    event = IsiRutaScreenEvent.IsGenzOrtuChanged(
+                        decrement(state.value.listIsGenzOrtu[index].toString()).toInt()
+                    ),
+                    index = index
                 )
             }
         }
     )
 
-    if (state.value.isGenzOrtu.toString() != "0") {
+    if (state.value.listIsGenzOrtu[index].toString() != "0") {
         Spacer(modifier = Modifier.padding(10.dp))
 
         InputNomor(
-            value = state.value.noUrutKlgEgb.toString(),
-            onValueChange = { coroutineScope.launch { viewModel.onEvent(IsiRutaScreenEvent.NoUrutKlgEgbChanged(it.toInt())) } },
+            value = state.value.listNoUrutKlgEgb[index].toString(),
+            onValueChange = {
+                coroutineScope.launch {
+                    viewModel.onEvent(
+                        event = IsiRutaScreenEvent.NoUrutKlgEgbChanged(
+                            it.toIntOrNull() ?: 0
+                        ),
+                        index = index
+                    )
+                }
+            },
             label = {
                 Text(
-                    text = "9. Nomor Urut Keluarga Eligible",
+                    text = "10. Nomor Urut Keluarga Eligible",
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.SemiBold
-                ) },
-            onIncrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.NoUrutKlgEgbChanged(increment(
-                UtilFunctions.convertTo3DigitsString(
-                    state.value.noUrutKlgEgb
-                )).toInt())) } },
-            onDecrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.NoUrutKlgEgbChanged(decrement(
-                UtilFunctions.convertTo3DigitsString(
-                    state.value.noUrutKlgEgb
-                )).toInt())) } }
+                )
+            },
+            onIncrement = {
+                coroutineScope.launch {
+                    viewModel.onEvent(
+                        event = IsiRutaScreenEvent.NoUrutKlgEgbChanged(
+                            increment(state.value.listNoUrutKlgEgb[index].toString()).toInt()
+                        ),
+                        index = index
+                    )
+                }
+            },
+            onDecrement = {
+                coroutineScope.launch {
+                    viewModel.onEvent(
+                        event = IsiRutaScreenEvent.NoUrutKlgEgbChanged(
+                            decrement(state.value.listNoUrutKlgEgb[index].toString()).toInt()
+                        ),
+                        index = index
+                    )
+                }
+            }
         )
     }
 
     InputNomor(
-        value = state.value.penglMkn.toString(),
-        onValueChange = { coroutineScope.launch { viewModel.onEvent(IsiRutaScreenEvent.PenglMknChanged(it.toInt())) } },
+        value = state.value.listPenglMkn[index].toString(),
+        onValueChange = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    event = IsiRutaScreenEvent.PenglMknChanged(
+                        it.toIntOrNull() ?: 0
+                    ),
+                    index = index
+                )
+            }
+        },
         label = {
             Text(
-                text = "10. Jumlah Pengelolaan Makan/Minum dan Kebutuhan dalam Keluarga",
+                text = "11. Jumlah Pengelolaan Makan/Minum dan Kebutuhan dalam Keluarga",
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.SemiBold
-            ) },
-        onIncrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.PenglMknChanged(increment(
-            UtilFunctions.convertTo3DigitsString(
-                state.value.penglMkn
-            )).toInt())) } },
-        onDecrement = { coroutineScope.launch{ viewModel.onEvent(IsiRutaScreenEvent.PenglMknChanged(decrement(
-            UtilFunctions.convertTo3DigitsString(
-                state.value.penglMkn
-            )).toInt())) } }
+            )
+        },
+        onIncrement = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    event = IsiRutaScreenEvent.PenglMknChanged(
+                        increment(state.value.listPenglMkn[index].toString()).toInt()
+                    ),
+                    index = index
+                )
+            }
+        },
+        onDecrement = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    event = IsiRutaScreenEvent.PenglMknChanged(
+                        decrement(state.value.listPenglMkn[index].toString()).toInt()
+                    ),
+                    index = index
+                )
+            }
+        }
     )
 
     Spacer(modifier = Modifier.padding(10.dp))
 
-    for (i in 1..state.value.penglMkn!!) {
+    for (i in 1..state.value.listPenglMkn[index]) {
         Card(
             border = BorderStroke(1.dp, PklSecondary),
             colors = CardDefaults.cardColors(
@@ -662,7 +765,11 @@ fun KeteranganKeluarga(
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium
                 )
-                KeteranganRuta(viewModel = viewModel, index = i-1)
+                KeteranganRuta(
+                    viewModel = viewModel,
+                    indexRuta = i - 1,
+                    indexKlg = index
+                )
             }
         }
 
@@ -670,31 +777,33 @@ fun KeteranganKeluarga(
     }
 }
 
-//@RequiresApi(Build.VERSION_CODES.S)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun KeteranganRuta(
     viewModel: IsiRutaViewModel,
-    index: Int
-){
+    indexKlg: Int,
+    indexRuta: Int
+) {
     val state = viewModel.state.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    val kkKrtOptions = listOf("Kepala Keluarga (KK) saja", "Kepala Rumah Tangga (KRT) saja", "KK Sekaligus KRT")
+    val kkKrtOptions =
+        listOf("Kepala Keluarga (KK) saja", "Kepala Rumah Tangga (KRT) saja", "KK Sekaligus KRT")
 
     InputNomor(
-        value = UtilFunctions.convertTo3DigitsString(state.value.listNoUrutRuta?.get(index)),
+        value = state.value.listNoUrutRuta[indexKlg][indexRuta].toString(),
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
                     IsiRutaScreenEvent.NoUrutRutaChanged(
-                        it.toInt()
-                    ), index
+                        it.toIntOrNull() ?: 0
+                    ),
+                    indexKlg,
+                    indexRuta
                 )
             }
         },
         label = {
             Text(
-                text = "11. Nomor Urut Rumah Tangga",
+                text = "12. Nomor Urut Rumah Tangga",
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.SemiBold
             )
@@ -703,12 +812,10 @@ fun KeteranganRuta(
             coroutineScope.launch {
                 viewModel.onEvent(
                     IsiRutaScreenEvent.NoUrutRutaChanged(
-                        increment(
-                            UtilFunctions.convertTo3DigitsString(
-                                state.value.listNoUrutRuta?.get(index)
-                            )
-                        ).toInt()
-                    ), index
+                        increment(state.value.listNoUrutRuta[indexKlg][indexRuta].toString()).toInt()
+                    ),
+                    indexKlg,
+                    indexRuta
                 )
             }
         },
@@ -716,12 +823,10 @@ fun KeteranganRuta(
             coroutineScope.launch {
                 viewModel.onEvent(
                     IsiRutaScreenEvent.NoUrutRutaChanged(
-                        decrement(
-                            UtilFunctions.convertTo3DigitsString(
-                                state.value.listNoUrutRuta?.get(index)
-                            )
-                        ).toInt()
-                    ), index
+                        decrement(state.value.listNoUrutRuta[indexKlg][indexRuta].toString()).toInt()
+                    ),
+                    indexKlg,
+                    indexRuta
                 )
             }
         }
@@ -733,20 +838,37 @@ fun KeteranganRuta(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
         Text(
-            text = "12. Identifikasi KK/KRT",
+            text = "13. Identifikasi KK/KRT",
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.SemiBold
         )
 
         RadioButtons(
             options = kkKrtOptions,
-            selectedOption = state.value.listKkOrKrt?.get(index) ?: "",
+            selectedOption = state.value.listKkOrKrt[indexKlg][indexRuta],
             onOptionSelected = { option ->
                 coroutineScope.launch {
-                    viewModel.onEvent(
-                        IsiRutaScreenEvent.KKOrKRTChanged(option),
-                        index
-                    )
+                    val task1 = async {
+                        viewModel.onEvent(
+                            IsiRutaScreenEvent.KKOrKRTChanged(option),
+                            indexKlg,
+                            indexRuta
+                        )
+                    }
+                    task1.await()
+                    if (option == "KK Sekaligus KRT") {
+                        viewModel.onEvent(
+                            IsiRutaScreenEvent.NamaKRTChanged(state.value.listNamaKK[indexKlg]),
+                            indexKlg,
+                            indexRuta
+                        )
+                    } else {
+                        viewModel.onEvent(
+                            IsiRutaScreenEvent.NamaKRTChanged(""),
+                            indexKlg,
+                            indexRuta
+                        )
+                    }
                 }
             }
         )
@@ -755,19 +877,19 @@ fun KeteranganRuta(
     Spacer(modifier = Modifier.padding(10.dp))
 
     TextField(
-        value = state.value.listNamaKrt?.get(index) ?: "",
+        value = state.value.listNamaKrt[indexKlg][indexRuta],
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    IsiRutaScreenEvent.NamaKRTChanged(
-                        it
-                    ), index
+                    IsiRutaScreenEvent.NamaKRTChanged(it),
+                    indexKlg,
+                    indexRuta
                 )
             }
         },
         label = {
             Text(
-                text = "13. Nama Kepala Rumah Tangga",
+                text = "14. Nama Kepala Rumah Tangga",
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.SemiBold
             )
@@ -778,10 +900,12 @@ fun KeteranganRuta(
         ),
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
-        colors = TextFieldDefaults.textFieldColors(
-            containerColor = Color.Transparent,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
             focusedIndicatorColor = PklPrimary700,
-            unfocusedIndicatorColor = PklAccent
+            unfocusedIndicatorColor = PklAccent,
         ),
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Next
@@ -791,19 +915,19 @@ fun KeteranganRuta(
     Spacer(modifier = Modifier.padding(10.dp))
 
     InputNomor(
-        value = UtilFunctions.convertTo3DigitsString(state.value.listGenzOrtu?.get(index)),
+        value = state.value.listGenzOrtu[indexKlg][indexRuta].toString(),
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    IsiRutaScreenEvent.GenzOrtuChanged(
-                        it.toInt()
-                    ), index
+                    IsiRutaScreenEvent.GenzOrtuChanged(it.toIntOrNull() ?: 0),
+                    indexKlg,
+                    indexRuta
                 )
             }
         },
         label = {
             Text(
-                text = "14. Keberadaan Gen Z dan Orang Tua dalam Rumah Tangga",
+                text = "15. Keberadaan Gen Z dan Orang Tua dalam Rumah Tangga",
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.SemiBold
             )
@@ -812,10 +936,10 @@ fun KeteranganRuta(
             coroutineScope.launch {
                 viewModel.onEvent(
                     IsiRutaScreenEvent.GenzOrtuChanged(
-                        increment(
-                            UtilFunctions.convertTo3DigitsString(state.value.listGenzOrtu?.get(index))
-                        ).toInt()
-                    ), index
+                        increment(state.value.listGenzOrtu[indexKlg][indexRuta].toString()).toInt()
+                    ),
+                    indexKlg,
+                    indexRuta
                 )
             }
         },
@@ -823,10 +947,10 @@ fun KeteranganRuta(
             coroutineScope.launch {
                 viewModel.onEvent(
                     IsiRutaScreenEvent.GenzOrtuChanged(
-                        decrement(
-                            UtilFunctions.convertTo3DigitsString(state.value.listGenzOrtu?.get(index))
-                        ).toInt()
-                    ), index
+                        decrement(state.value.listGenzOrtu[indexKlg][indexRuta].toString()).toInt()
+                    ),
+                    indexKlg,
+                    indexRuta
                 )
             }
         },
@@ -870,7 +994,7 @@ fun RadioButtons(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun InputNomor(
     value: String?,
@@ -887,10 +1011,12 @@ fun InputNomor(
         label = label,
         singleLine = true,
         modifier = modifier.fillMaxWidth(),
-        colors = TextFieldDefaults.textFieldColors(
-            containerColor = Color.Transparent,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
             focusedIndicatorColor = PklPrimary700,
-            unfocusedIndicatorColor = PklAccent
+            unfocusedIndicatorColor = PklAccent,
         ),
         textStyle = TextStyle.Default.copy(
             fontFamily = PoppinsFontFamily,
@@ -898,23 +1024,39 @@ fun InputNomor(
         ),
         trailingIcon = {
             Row {
-                IconButton(onClick = onDecrement) {
+                Box(
+                    modifier = Modifier
+                        .combinedClickable(
+                            onClick = { onDecrement() },
+                            onLongClick = {}
+                        )
+                        .clip(RoundedCornerShape(10.dp))
+                ) {
                     Icon(
                         imageVector = Icons.Filled.Remove,
                         contentDescription = null,
                         modifier = Modifier
-                            .background(PklPrimary, RoundedCornerShape(1.dp))
+                            .background(PklPrimary, RoundedCornerShape(3.dp))
                             .padding(5.dp),
                         tint = PklBase
                     )
                 }
 
-                IconButton(onClick = onIncrement) {
+                Spacer(modifier = Modifier.width(15.dp))
+
+                Box(
+                    modifier = Modifier
+                        .combinedClickable(
+                            onClick = { onIncrement() },
+                            onLongClick = {}
+                        )
+                        .clip(RoundedCornerShape(10.dp))
+                ) {
                     Icon(
                         imageVector = Icons.Filled.Add,
                         contentDescription = null,
                         modifier = Modifier
-                            .background(PklPrimary, RoundedCornerShape(1.dp))
+                            .background(PklPrimary, RoundedCornerShape(3.dp))
                             .padding(5.dp),
                         tint = PklBase
                     )
@@ -924,6 +1066,107 @@ fun InputNomor(
         readOnly = readOnly
     )
 }
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun InputNomorHuruf(
+    value: String?,
+    onValueChange: (String) -> Unit,
+    label: @Composable (() -> Unit),
+    modifier: Modifier = Modifier,
+    onIncrement: () -> Unit = {},
+    onIncrementHuruf: () -> Unit = {},
+    onDecrement: () -> Unit = {},
+    onDecrementHuruf: () -> Unit = {},
+    readOnly: Boolean = false
+) {
+    TextField(
+        value = value.toString(),
+        onValueChange = onValueChange,
+        label = label,
+        singleLine = true,
+        modifier = modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
+            focusedIndicatorColor = PklPrimary700,
+            unfocusedIndicatorColor = PklAccent,
+        ),
+        textStyle = TextStyle.Default.copy(
+            fontFamily = PoppinsFontFamily,
+            fontWeight = FontWeight.SemiBold
+        ),
+        trailingIcon = {
+            Row {
+                Box(
+                    modifier = Modifier
+                        .combinedClickable(
+                            onClick = { onDecrement() },
+                            onLongClick = { onDecrementHuruf() }
+                        )
+                        .clip(RoundedCornerShape(10.dp))
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Remove,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .background(PklPrimary, RoundedCornerShape(3.dp))
+                            .padding(5.dp),
+                        tint = PklBase
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(15.dp))
+
+                Box(
+                    modifier = Modifier
+                        .combinedClickable(
+                            onClick = { onIncrement() },
+                            onLongClick = { onIncrementHuruf() }
+                        )
+                        .clip(RoundedCornerShape(10.dp))
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .background(PklPrimary, RoundedCornerShape(3.dp))
+                            .padding(5.dp),
+                        tint = PklBase
+                    )
+                }
+            }
+        },
+        readOnly = readOnly
+    )
+}
+
+fun incrementHuruf(input: String): String {
+    val lastChar = input.last()
+    return if (lastChar.isDigit()) {
+        input + "A"
+    } else {
+        val nextChar = if (lastChar == 'Z') 'A' else lastChar + 1
+        if (nextChar == 'A') {
+            input.dropLast(1) + nextChar + "A"
+        } else {
+            input.dropLast(1) + nextChar
+        }
+    }
+}
+
+fun decrementHuruf(input: String): String {
+    val lastChar = input.last()
+    return if (lastChar == 'A' && input.length > 1) {
+        input.dropLast(1)
+    } else if (lastChar > 'A') {
+        input.dropLast(1) + (lastChar - 1)
+    } else {
+        input
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -947,8 +1190,8 @@ fun IsiRumahTanggaTopBar(
         navigationIcon = {
             IconButton(
                 onClick = {
-                    navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$noBS"){
-                        popUpTo(CapiScreen.Listing.LIST_RUTA + "/$noBS"){
+                    navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$noBS") {
+                        popUpTo(CapiScreen.Listing.LIST_RUTA + "/$noBS") {
                             inclusive = true
                         }
                     }
@@ -984,13 +1227,32 @@ fun decrement(input: String?): String {
     return input?.replaceFirst(numericPart.toString(), formattedNumber) ?: ""
 }
 
+fun incrementNoSegmen(input: String?): String {
+    val numericPart = input?.filter { it.isDigit() }
+    val number = numericPart?.toInt()
+    val formattedNumber = String.format("%0${numericPart?.length}d", number?.plus(10) ?: 0)
+    return input?.replaceFirst(numericPart.toString(), formattedNumber) ?: ""
+}
+
+fun decrementNoSegmen(input: String?): String {
+    val numericPart = input?.filter { it.isDigit() }
+    val number = numericPart?.toInt()
+    if (number != null) {
+        if (number < 10) {
+            return input.toString()
+        }
+    }
+    val formattedNumber = String.format("%0${numericPart?.length}d", number?.minus(10) ?: 0)
+    return input?.replaceFirst(numericPart.toString(), formattedNumber) ?: ""
+}
+
 @Preview
 @Composable
 fun IsiRumahTanggaPreview() {
     val navController = rememberNavController()
 
     Capi63Theme {
-        Surface (
+        Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {

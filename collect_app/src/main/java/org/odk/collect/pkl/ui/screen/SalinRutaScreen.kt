@@ -93,7 +93,7 @@ fun SalinRutaScreen(
                     .padding(15.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                if (state.value.noSegmen != "S000" || state.value.noBgFisik != 0 || state.value.noBgSensus != 0) {
+                if (state.value.noSegmen != "S000" || state.value.noBgFisik != "0" || state.value.noBgSensus != "0") {
                     Card(
                         border = BorderStroke(1.dp, PklSecondary),
                         colors = CardDefaults.cardColors(
@@ -210,13 +210,11 @@ fun SalinRutaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 InputNomorSR(
-                    value = UtilFunctions.convertTo3DigitsString(state.value.noBgFisik!!),
+                    value = state.value.noBgFisik,
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                SalinRutaEvent.NoBgFisikChanged(
-                                    it.toInt()
-                                )
+                                SalinRutaEvent.NoBgFisikChanged(it)
                             )
                         }
                     },
@@ -231,11 +229,7 @@ fun SalinRutaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 SalinRutaEvent.NoBgFisikChanged(
-                                    incrementSR(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.noBgFisik!!
-                                        )
-                                    ).toInt()
+                                    incrementSR(state.value.noBgFisik)
                                 )
                             )
                         }
@@ -244,11 +238,7 @@ fun SalinRutaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 SalinRutaEvent.NoBgFisikChanged(
-                                    decrement(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.noBgFisik!!
-                                        )
-                                    ).toInt()
+                                    decrement(state.value.noBgFisik)
                                 )
                             )
                         }
@@ -258,13 +248,11 @@ fun SalinRutaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 InputNomorSR(
-                    value = UtilFunctions.convertTo3DigitsString(state.value.noBgSensus!!),
+                    value = state.value.noBgSensus,
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                SalinRutaEvent.NoBgSensusChanged(
-                                    it.toInt()
-                                )
+                                SalinRutaEvent.NoBgSensusChanged(it)
                             )
                         }
                     },
@@ -279,11 +267,7 @@ fun SalinRutaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 SalinRutaEvent.NoBgSensusChanged(
-                                    incrementSR(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.noBgSensus!!
-                                        )
-                                    ).toInt()
+                                    incrementSR(state.value.noBgSensus)
                                 )
                             )
                         }
@@ -292,11 +276,7 @@ fun SalinRutaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 SalinRutaEvent.NoBgSensusChanged(
-                                    decrement(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.noBgSensus!!
-                                        )
-                                    ).toInt()
+                                    decrement(state.value.noBgSensus)
                                 )
                             )
                         }

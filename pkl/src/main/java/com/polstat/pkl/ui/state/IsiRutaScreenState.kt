@@ -1,50 +1,50 @@
 package com.polstat.pkl.ui.state
 
 data class IsiRutaScreenState(
+    /**
+     * Ini adalah state nilai tunggal untuk informasi bangunan yang merupakan atribut dari entitas keluarga
+     */
     val SLS: String = "",
     val SLSError: String? = null,
     val noSegmen: String = "S000",
     val noSegmenError: String? = null,
-    val noBgFisik: Int = 0,
+    val noBgFisik: String = "",
     val noBgFisikError: String? = null,
-    val noBgSensus: Int = 0,
+    val noBgSensus: String = "",
     val noBgSensusError: String? = null,
-    val noUrutKlg: Int = 0,
-    val noUrutKlgError: String? = null,
-    val namaKK: String = "",
-    val namaKKError: String? = null,
-    val alamat: String = "",
-    val alamatError: String? = null,
-    val isGenzOrtu: Int = 0,
-    val isGenzOrtuError: String? = null,
-    val noUrutKlgEgb: Int = 0,
-    val noUrutKlgEgbError: String? = null,
-    val penglMkn: Int = 0,
-    val penglMknError: String? = null,
-    val noUrutRuta: Int = 0,
-    val noUrutRutaError: String? = null,
-    val kkOrKrt : String = "",
-    val kkOrKrtError: String? = null,
-    val namaKrt: String = "",
-    val namaKrtError: String? = null,
-    val genzOrtu: Int = 0,
-    val genzOrtuError: String? = null,
-    val katGenz: Int = 0,
-    val katGenzError: String? = null,
-    val kodeRuta: String = "",
-    val kodeRutaError: String? = null,
-    val long: Double = 0.0,
-    val longError : String? = null,
-    val lat: Double = 0.0,
-    val latError: String? = null,
+    val jmlKlg: Int = 0,
 
-    //state yang menyimpan data beberapa ruta
-    val listNoUrutRuta: List<Int> = listOf(0),
-    val listKkOrKrt : List<String> = listOf(""),
-    val listNamaKrt: List<String> = listOf(""),
-    val listGenzOrtu: List<Int> = listOf(0),
-    val listKatGenz: List<Int> = listOf(0),
-    val listKodeRuta: List<String> = listOf(""),
-    val listLong: List<Double> = listOf(0.0),
-    val listLat: List<Double> = listOf(0.0)
+    /**
+     * Ini adalah state untuk menyimpan data beberapa keluarga
+     */
+    val listNoUrutKlg: List<Int> = emptyList(),
+    val listNoUrutKlgError: List<String> = emptyList(),
+    val listNamaKK: List<String> = emptyList(),
+    val listNamaKKError: List<String> = emptyList(),
+    val listAlamat: List<String> = emptyList(),
+    val listAlamatError: List<String> = emptyList(),
+    val listIsGenzOrtu: List<Int> = emptyList(),
+    val listIsGenzOrtuError: List<String> = emptyList(),
+    val listNoUrutKlgEgb: List<Int> = emptyList(),
+    val listNoUrutKlgEgbError: List<String> = emptyList(),
+    val listPenglMkn: List<Int> = emptyList(),
+    val listPenglMknError: List<String> = emptyList(),
+
+    /**
+     * Ini adalah state untuk menyimpan data beberapa ruta dalam list dua dimensi
+     */
+    val listNoUrutRuta: List<List<Int>> = emptyList(),
+    val listNoUrutRutaError: List<List<String>> = emptyList(),
+    val listKkOrKrt : List<List<String>> = emptyList(),
+    val listKkOrKrtError: List<List<String>> = emptyList(),
+    val listNamaKrt: List<List<String>> = emptyList(),
+    val listNamaKrtError: List<List<String>> = emptyList(),
+    val listGenzOrtu: List<List<Int>> = emptyList(),
+    val listGenzOrtuError: List<List<String>> = emptyList(),
+    val listKatGenz: List<List<Int>> = emptyList(),
+    val listKatGenzError: List<List<String>> = emptyList(),
+    val listKodeRuta: List<List<String>> = emptyList(),
+    val listKodeRutaError: List<List<String>> = emptyList(),
+    val listLong: List<List<Double>> = emptyList(),
+    val listLat: List<List<Double>> = emptyList()
 )

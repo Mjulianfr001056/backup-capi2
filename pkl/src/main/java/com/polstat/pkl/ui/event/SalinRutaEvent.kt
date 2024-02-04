@@ -3,8 +3,8 @@ package com.polstat.pkl.ui.event
 sealed class SalinRutaEvent {
     data class SLSChanged(val sls: String) : SalinRutaEvent()
     data class NoSegmenChanged(val noSegmen: String) : SalinRutaEvent()
-    data class NoBgFisikChanged(val noBgFisik: Int) : SalinRutaEvent()
-    data class NoBgSensusChanged(val noBgSensus: Int) : SalinRutaEvent()
+    data class NoBgFisikChanged(val noBgFisik: String) : SalinRutaEvent()
+    data class NoBgSensusChanged(val noBgSensus: String) : SalinRutaEvent()
     data class NoUrutKlgChanged(val noUrutKlg: Int) : SalinRutaEvent()
     data class NamaKKChanged(val namaKK: String) : SalinRutaEvent()
     data class AlamatChanged(val alamat: String) : SalinRutaEvent()

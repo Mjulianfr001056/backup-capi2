@@ -3,8 +3,8 @@ package com.polstat.pkl.model.domain
 data class Keluarga (
     val kodeKlg: String = "[not set]",
     val SLS: String = "[not set]",
-    val noBgFisik: Int = -1,
-    val noBgSensus: Int = -1,
+    val noBgFisik: String = "[not set]",
+    val noBgSensus: String = "[not set]",
     val noSegmen: String = "[not set]",
     val noUrutKlg: Int = -1,
     val noUrutKlgEgb: Int = -1,

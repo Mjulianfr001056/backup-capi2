@@ -3,8 +3,9 @@ package com.polstat.pkl.ui.event
 sealed class IsiRutaScreenEvent {
     data class SLSChanged(val sls: String) : IsiRutaScreenEvent()
     data class NoSegmenChanged(val noSegmen: String) : IsiRutaScreenEvent()
-    data class NoBgFisikChanged(val noBgFisik: Int) : IsiRutaScreenEvent()
-    data class NoBgSensusChanged(val noBgSensus: Int) : IsiRutaScreenEvent()
+    data class NoBgFisikChanged(val noBgFisik: String) : IsiRutaScreenEvent()
+    data class NoBgSensusChanged(val noBgSensus: String) : IsiRutaScreenEvent()
+    data class JmlKlgChanged(val jmlKlg: Int) : IsiRutaScreenEvent()
     data class NoUrutKlgChanged(val noUrutKlg: Int) : IsiRutaScreenEvent()
     data class NamaKKChanged(val namaKK: String) : IsiRutaScreenEvent()
     data class AlamatChanged(val alamat: String) : IsiRutaScreenEvent()

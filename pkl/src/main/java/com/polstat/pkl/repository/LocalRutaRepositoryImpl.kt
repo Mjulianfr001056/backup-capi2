@@ -38,6 +38,23 @@ class LocalRutaRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun fetchRutaFromServer(ruta: Ruta): Flow<String> {
+        return  flow {
+            try {
+                val readyRuta = ruta.copy(status = "fetch")
+                capi63Database.capi63Dao.insertRuta(readyRuta.toRutaEntity())
+                val message = "Berhasil fetching ruta!"
+                Log.d(TAG, "fetchRuta: $message $readyRuta")
+                emit(message)
+            } catch (e: Exception) {
+                val message = "Gagal fetching ruta!"
+                Log.d(TAG, "fetchRuta: $message (${e.message})")
+                emit(message)
+                return@flow
+            }
+        }
+    }
+
     override suspend fun insertKeluargaAndRuta(
         kodeKlg: String,
         kodeRuta: String
@@ -117,6 +134,25 @@ class LocalRutaRepositoryImpl @Inject constructor(
             } catch (e: Exception) {
                 Log.d(TAG, "Gagal getKodeRuta: ${e.message}")
                 emit(Result.Error(null, "Error fetching DataRuta: ${e.message}"))
+            } finally {
+                emit(Result.Loading(false))
+            }
+        }
+    }
+
+    override suspend fun getLastRuta(): Flow<Result<RutaEntity>> {
+        return flow {
+            try {
+                emit(Result.Loading(true))
+
+                val lastRuta = capi63Database.capi63Dao.getLastRuta()
+
+                Log.d(TAG, "Berhasil getLastRuta: $lastRuta")
+
+                emit(Result.Success(lastRuta))
+            } catch (e: Exception) {
+                Log.d(TAG, "Gagal getLastRuta: ${e.message}")
+                emit(Result.Error(null, "Error fetching Last Ruta: ${e.message}"))
             } finally {
                 emit(Result.Loading(false))
             }

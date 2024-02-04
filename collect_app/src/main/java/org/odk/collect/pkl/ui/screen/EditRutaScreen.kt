@@ -93,7 +93,7 @@ fun EditRutaScreen(
                     .padding(15.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                if (state.value.noSegmen != "S000" || state.value.noBgFisik != 0 || state.value.noBgSensus != 0) {
+                if (state.value.noSegmen != "S000" || state.value.noBgFisik != "0" || state.value.noBgSensus != "0") {
                     Card(
                         border = BorderStroke(1.dp, PklSecondary),
                         colors = CardDefaults.cardColors(
@@ -210,13 +210,11 @@ fun EditRutaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 InputNomor(
-                    value = UtilFunctions.convertTo3DigitsString(state.value.noBgFisik!!),
+                    value = state.value.noBgFisik,
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.NoBgFisikChanged(
-                                    it.toInt()
-                                )
+                                EditRutaEvent.NoBgFisikChanged(it)
                             )
                         }
                     },
@@ -231,11 +229,7 @@ fun EditRutaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 EditRutaEvent.NoBgFisikChanged(
-                                    increment(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.noBgFisik!!
-                                        )
-                                    ).toInt()
+                                    increment(state.value.noBgFisik)
                                 )
                             )
                         }
@@ -244,11 +238,7 @@ fun EditRutaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 EditRutaEvent.NoBgFisikChanged(
-                                    decrement(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.noBgFisik!!
-                                        )
-                                    ).toInt()
+                                    decrement(state.value.noBgFisik)
                                 )
                             )
                         }
@@ -258,13 +248,11 @@ fun EditRutaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 InputNomor(
-                    value = UtilFunctions.convertTo3DigitsString(state.value.noBgSensus!!),
+                    value = state.value.noBgSensus,
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                EditRutaEvent.NoBgSensusChanged(
-                                    it.toInt()
-                                )
+                                EditRutaEvent.NoBgSensusChanged(it)
                             )
                         }
                     },
@@ -279,11 +267,7 @@ fun EditRutaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 EditRutaEvent.NoBgSensusChanged(
-                                    increment(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.noBgSensus!!
-                                        )
-                                    ).toInt()
+                                    increment(state.value.noBgSensus)
                                 )
                             )
                         }
@@ -292,11 +276,7 @@ fun EditRutaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 EditRutaEvent.NoBgSensusChanged(
-                                    decrement(
-                                        UtilFunctions.convertTo3DigitsString(
-                                            state.value.noBgSensus!!
-                                        )
-                                    ).toInt()
+                                    decrement(state.value.noBgSensus)
                                 )
                             )
                         }

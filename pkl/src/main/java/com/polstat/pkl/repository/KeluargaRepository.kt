@@ -10,7 +10,13 @@ interface KeluargaRepository {
 
     suspend fun insertKeluarga(keluarga: Keluarga) : Flow<String>
 
+    suspend fun fetchKeluargaFromServer(keluarga: Keluarga) : Flow<String>
+
     suspend fun getKeluarga(kodeKlg: String) : Flow<Result<KeluargaEntity>>
+
+    suspend fun getLastKeluarga() : Flow<Result<KeluargaEntity>>
+
+    suspend fun getLastKeluargaEgb() : Flow<Result<KeluargaEntity>>
 
     suspend fun updateKeluarga(keluarga: Keluarga) : Flow<String>
 

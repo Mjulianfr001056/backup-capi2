@@ -61,6 +61,12 @@ interface Capi63Dao {
     @Query("SELECT * FROM keluarga WHERE kodeKlg = :kodeKlg")
     suspend fun getKeluarga(kodeKlg: String) : KeluargaEntity
 
+    @Query("SELECT * FROM keluarga WHERE status != 'delete' ORDER BY noUrutKlg DESC LIMIT 1")
+    suspend fun getLastKeluarga(): KeluargaEntity
+
+    @Query("SELECT * FROM keluarga WHERE status != 'delete' ORDER BY noUrutKlgEgb DESC LIMIT 1")
+    suspend fun getLastKeluargaEgb(): KeluargaEntity
+
     @Query("DELETE FROM keluarga")
     suspend fun deleteAllKeluarga()
 
@@ -77,6 +83,9 @@ interface Capi63Dao {
 
     @Query("SELECT * FROM ruta WHERE kodeRuta = :kodeRuta")
     suspend fun getRuta(kodeRuta: String) : RutaEntity
+
+    @Query("SELECT * FROM ruta WHERE status != 'delete' ORDER BY noUrutRuta DESC LIMIT 1")
+    suspend fun getLastRuta(): RutaEntity
 
     @Query("DELETE FROM ruta")
     suspend fun deleteAllRuta()
