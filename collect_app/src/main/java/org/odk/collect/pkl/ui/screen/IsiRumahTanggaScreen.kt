@@ -465,8 +465,9 @@ fun IsiRumahTanggaScreen(
                         }
                         Toast.makeText(context, "Ruta berhasil ditambahkan!", Toast.LENGTH_SHORT)
                             .show()
-                        navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${noBS}") {
-                            popUpTo(CapiScreen.Listing.LIST_RUTA + "/${noBS}") {
+                        val isMonitoring = false
+                        navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${noBS}/$isMonitoring") {
+                            popUpTo(CapiScreen.Listing.LIST_RUTA + "/${noBS}/$isMonitoring") {
                                 inclusive = true
                             }
                         }
