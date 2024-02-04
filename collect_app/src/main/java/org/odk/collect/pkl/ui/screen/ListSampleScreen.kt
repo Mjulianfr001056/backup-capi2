@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -17,13 +18,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddLocation
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.HomeWork
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -35,6 +41,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -55,6 +62,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -64,7 +72,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.R
 import com.polstat.pkl.database.entity.SampelRutaEntity
+import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary900
+import com.polstat.pkl.ui.theme.PklTertiary100
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.viewmodel.ListSampelViewModel
 import kotlinx.coroutines.delay
@@ -285,10 +295,11 @@ fun PreviewSample(){
             genzOrtuRuta = 2,
             long = 0.0,
             lat = 0.0,
-            status = ""
+            status = "0"
         ),
         onPetunjukArahClicked = {},
-        context = context
+        context = context,
+        navController = rememberNavController()
     )
 }
 
@@ -322,7 +333,8 @@ private fun ListSample(
             Sample(
                 onPetunjukArahClicked = {},
                 sampelRuta = sampelRuta,
-                context
+                context,
+                navController
             )
         }
 
@@ -333,8 +345,11 @@ private fun ListSample(
 private fun Sample(
     onPetunjukArahClicked: () -> Unit,
     sampelRuta: SampelRutaEntity,
-    context: Context
+    context: Context,
+    navController: NavController
 ){
+
+    var showConfirmDialog by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -518,36 +533,148 @@ private fun Sample(
                 )
             }
             Spacer(modifier = Modifier.height(4.dp))
-            Button(
-                onClick = {
-                    val latitude = sampelRuta.lat
-                    val longitude = sampelRuta.long
-
-                    val gmmIntentUri = Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude")
-
-                    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-                    mapIntent.setPackage("com.google.android.apps.maps")
-
-                    if (mapIntent.resolveActivity(context.packageManager) != null) {
-                        context.startActivity(mapIntent)
-                    } else {
-                        Toast.makeText(context, "Google Maps tidak terinstal.", Toast.LENGTH_SHORT).show()
-                    }
-                },
-                shape = MaterialTheme.shapes.small,
+            Row (
                 modifier = Modifier
-                    .padding(horizontal = 20.dp)
                     .fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = PklPrimary900)
-            ) {
-                Text(
-                    text ="PETUNJUK ARAH",
-                    color = Color.White,
-                    fontFamily = PoppinsFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontSize = 18.sp
-                )
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Column (
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 3.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            val latitude = sampelRuta.lat
+                            val longitude = sampelRuta.long
+
+                            val gmmIntentUri = Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude")
+
+                            val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                            mapIntent.setPackage("com.google.android.apps.maps")
+
+                            if (mapIntent.resolveActivity(context.packageManager) != null) {
+                                context.startActivity(mapIntent)
+                            } else {
+                                Toast.makeText(context, "Google Maps tidak terinstal.", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        shape = MaterialTheme.shapes.small,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = PklPrimary900)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AddLocation,
+                            contentDescription = "Location",
+                            tint = Color.White,
+                            modifier = Modifier.size(22.dp).padding(3.dp)
+                        )
+                        Text(
+                            text ="PETA",
+                            color = Color.White,
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontSize = 13.sp
+                        )
+                    }
+                }
+
+                if (sampelRuta.status == "0") {
+                    Column (
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 3.dp)
+                    ) {
+                        Button(
+                            onClick = {
+                                showConfirmDialog = true
+                            },
+                            shape = MaterialTheme.shapes.small,
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = PklPrimary900)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = "Location",
+                                tint = Color.White,
+                                modifier = Modifier.size(22.dp).padding(3.dp)
+                            )
+
+                            Text(
+                                text ="DICACAH",
+                                color = Color.White,
+                                fontFamily = PoppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 13.sp
+                            )
+                        }
+                    }
+                }
+
+                if (sampelRuta.status == "1") {
+                    Column (
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 3.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = "Location",
+                            tint = Color.Green,
+                            modifier = Modifier.size(40.dp).fillMaxWidth()
+                        )
+                    }
+                }
+
+                if (showConfirmDialog) {
+                    AlertDialog(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        onDismissRequest = { showConfirmDialog = false },
+                        confirmButton = {
+                            Button(
+                                modifier = Modifier.fillMaxWidth(0.45f),
+                                onClick = {
+
+                                    showConfirmDialog = false
+                                    navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${sampelRuta.noBS}"){
+                                        popUpTo(CapiScreen.Listing.LIST_SAMPLE + "/${sampelRuta.noBS}"){
+                                            inclusive = true
+                                        }
+                                    }
+                                    Toast.makeText(context, "Ruta ${sampelRuta.noBS} berhasil dicacah", Toast.LENGTH_SHORT).show()
+                                },
+                                colors = ButtonDefaults.buttonColors(PklPrimary900)) {
+                                Text(text = "Yakin")
+                            } },
+                        dismissButton = {
+                            Button(
+                                modifier = Modifier.fillMaxWidth(0.45f),
+                                onClick = { showConfirmDialog = false },
+                                colors = ButtonDefaults.buttonColors(containerColor = PklTertiary100, contentColor = PklPrimary900)
+                            ) {
+                                Text(text = stringResource(id = R.string.batal_pass_master))
+                            }},
+                        title = { Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = stringResource(id = R.string.konfirmasi_pass_master),
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 24.sp,
+                            textAlign = TextAlign.Center,
+                        ) },
+                        containerColor = PklBase,
+                        titleContentColor = PklPrimary900,
+                        textContentColor = Color.Black,
+                    )
+                }
             }
         }
     }
