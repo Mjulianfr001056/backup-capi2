@@ -52,6 +52,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -80,6 +82,8 @@ fun ListSampleScreen(
 ){
 
     val noBS = viewModel.noBS
+
+    val isMonitoring = viewModel.isMonitoring
 
     val context = LocalContext.current
 
@@ -128,17 +132,22 @@ fun ListSampleScreen(
                 title = {
                     Text(
                         text = "List Sample-${noBS}",
-                        fontFamily = PoppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 20.sp,
-                        color = Color.White,
+                        style = TextStyle(
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 20.sp,
+                            platformStyle = PlatformTextStyle(
+                                includeFontPadding = false
+                            )
+                        ),
+                        color = Color.White
                     )
                 },
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.navigate(CapiScreen.Listing.LIST_BS){
-                                popUpTo(CapiScreen.Listing.LIST_BS){
+                            navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring"){
+                                popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring"){
                                     inclusive = false
                                 }
                             }

@@ -68,6 +68,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -100,18 +101,18 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
 
-@Preview
-@Composable
-fun ListRutaPreview() {
-    Capi63Theme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            ListRutaScreen(rememberNavController(), hiltViewModel(), hiltViewModel())
-        }
-    }
-}
+//@Preview
+//@Composable
+//fun ListRutaPreview() {
+//    Capi63Theme {
+//        Surface(
+//            modifier = Modifier.fillMaxSize(),
+//            color = MaterialTheme.colorScheme.background
+//        ) {
+//            ListRutaScreen(rememberNavController(), hiltViewModel(), hiltViewModel())
+//        }
+//    }
+//}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -129,8 +130,7 @@ fun ListRutaScreen(
     var enableFinalisasiBSButton by remember { mutableStateOf(false) }
     var checkedCheckbox by remember { mutableStateOf(false) }
     val noBS = viewModel.noBS
-    val navArgs = navController.currentBackStackEntry?.arguments
-    val isMonitoring = navArgs?.getString("isMonitoring") ?: "false"
+    val isMonitoring = viewModel.isMonitoring
     val session = viewModel.session
     val wilayahWithAll = viewModel.wilayahWithAll.collectAsState()
     val context = LocalContext.current
@@ -158,22 +158,21 @@ fun ListRutaScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    if (isListRuta) {
-                        Text(
-                            text = stringResource(id = R.string.list_ruta_title).uppercase(),
+                    val textId = if (isListRuta) R.string.list_ruta_title else R.string.list_keluarga
+                    val status = if (isMonitoring == true) stringResource(R.string.monitoring) else stringResource(R.string.listing)
+
+                    Text(
+                        text = stringResource(id = textId).uppercase() + " ($status)",
+                        style = TextStyle(
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.Medium,
-                            fontSize = 20.sp
-                        )
-                    }
-                    else if (isListKeluarga) {
-                        Text(
-                            text = stringResource(id = R.string.list_keluarga).uppercase(),
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 20.sp
-                        )
-                    }
+                            fontSize = 20.sp,
+                            platformStyle = PlatformTextStyle(
+                                includeFontPadding = false
+                            )
+                        ),
+                        color = Color.White
+                    )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = PklPrimary900,
@@ -182,8 +181,8 @@ fun ListRutaScreen(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.navigate(CapiScreen.Listing.LIST_BS){
-                                popUpTo(CapiScreen.Listing.LIST_BS){
+                            navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring"){
+                                popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring"){
                                     inclusive = true
                                 }
                             }
@@ -255,26 +254,27 @@ fun ListRutaScreen(
                                     openFinalisasiBSDialog = true
                                 }
                             )
-                        }
-                        DropdownMenuItem(text = { Text(text = stringResource(id = R.string.ambil_sampel)) },
-                            onClick = {
-                                showMenu = false
-                                if (noBS != null) {
+                            DropdownMenuItem(
+                                text = { Text(text = stringResource(id = R.string.ambil_sampel)) },
+                                onClick = {
+                                    showMenu = false
+                                    if (noBS != null) {
 
-                                    coroutineScope.launch {
-                                        val generateRutaJob = async { viewModel.generateRuta(noBS) }
-                                        generateRutaJob.await()
-                                        val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
-                                        lastJob.await()
-                                        navController.navigate(CapiScreen.Listing.LIST_BS){
-                                            popUpTo(CapiScreen.Listing.LIST_BS){
-                                                inclusive = true
+                                        coroutineScope.launch {
+                                            val generateRutaJob = async { viewModel.generateRuta(noBS) }
+                                            generateRutaJob.await()
+                                            val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
+                                            lastJob.await()
+                                            navController.navigate(CapiScreen.Listing.LIST_BS){
+                                                popUpTo(CapiScreen.Listing.LIST_BS){
+                                                    inclusive = true
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
-                        )
+                            )
+                        }
                         if (isListRuta) {
                             DropdownMenuItem(
                                 text = { Text(text = stringResource(id = R.string.tampilkan_list_keluarga)) },
@@ -292,7 +292,8 @@ fun ListRutaScreen(
                                     showMenu = false
                                     isListKeluarga = false
                                     isListRuta = true
-                                })
+                                }
+                            )
                         }
                     }
                 },
@@ -344,7 +345,7 @@ fun ListRutaScreen(
                     )
                 }
             }
-            if(session?.isKoor == true && isMonitoring.toBoolean() == true){
+            if(session?.isKoor == true && isMonitoring == true){
                 if ( openFinalisasiBSDialog ) {
                     AlertDialog(
                         modifier = Modifier
@@ -359,7 +360,7 @@ fun ListRutaScreen(
                                         val finalisasiBSJob = async { viewModel.finalisasiBS(noBS.toString()) }
                                         finalisasiBSJob.await()
                                         delay(1000)
-                                        val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
+                                        val lastJob = async { authViewModel.login(session.nim.toString(), session?.password.toString()) }
                                         lastJob.await()
                                         delay(2000)
                                         navController.navigate(CapiScreen.Listing.LIST_BS){
@@ -527,7 +528,7 @@ fun ListRutaScreen(
             }
         },
         floatingActionButton = {
-            if (isMonitoring == "false" && session?.isKoor == true){
+            if (isMonitoring == false && session?.isKoor == true){
                 FloatingActionButton(
                     modifier = Modifier
                         .padding(all = 16.dp),
@@ -852,11 +853,11 @@ fun RutaRow(
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_urut_bangunan_fisik_ruta,
-                                                value = UtilFunctions.convertTo3DigitsString(keluarga.noBgFisik!!)
+                                                value = UtilFunctions.padWithZeros(keluarga.noBgFisik, 3)
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_urut_bangunan_sensus_ruta,
-                                                value = UtilFunctions.convertTo3DigitsString(keluarga.noBgSensus!!)
+                                                value = UtilFunctions.padWithZeros(keluarga.noBgSensus, 3)
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_urut_keluarga,

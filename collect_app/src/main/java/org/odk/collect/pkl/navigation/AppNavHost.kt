@@ -103,7 +103,14 @@ fun SamplingNavHost(
             startDestination = CapiScreen.Listing.LIST_BS,
             route = CapiScreen.Sampling.LISTING
         ){
-            composable(CapiScreen.Listing.LIST_BS) {
+            composable(
+                route = CapiScreen.Listing.LIST_BS + "/{isMonitoring}",
+                arguments = listOf(
+                    navArgument("isMonitoring") {
+                        type = NavType.BoolType
+                    }
+                )
+            ) {
                 ListBSScreen(
                     navController = samplingNavController,
                     viewModel = hiltViewModel(),
@@ -111,10 +118,13 @@ fun SamplingNavHost(
                 )
             }
             composable(
-                route = CapiScreen.Listing.LIST_RUTA + "/{noBS}",
+                route = CapiScreen.Listing.LIST_RUTA + "/{noBS}/{isMonitoring}",
                 arguments = listOf(
                     navArgument("noBS") {
                         type = NavType.StringType
+                    },
+                    navArgument("isMonitoring") {
+                        type = NavType.BoolType
                     }
                 )
             ) {
@@ -125,10 +135,13 @@ fun SamplingNavHost(
                 )
             }
             composable(
-                route = CapiScreen.Listing.LIST_SAMPLE + "/{noBS}",
+                route = CapiScreen.Listing.LIST_SAMPLE + "/{noBS}/{isMonitoring}",
                 arguments = listOf(
                     navArgument("noBS") {
                         type = NavType.StringType
+                    },
+                    navArgument("isMonitoring") {
+                        type = NavType.BoolType
                     }
                 )
             ){
@@ -201,25 +214,25 @@ fun SamplingNavHost(
 //            }
 //        }
 
-        navigation(
-            startDestination = CapiScreen.Listing.LIST_BS,
-            route = CapiScreen.Sampling.LISTING
-        ){
-            composable(
-                route = CapiScreen.Listing.LIST_BS + "/{isMonitoring}",
-                arguments = listOf(
-                    navArgument("isMonitoring") {
-                        type = NavType.StringType
-                    }
-                )
-            ) {
-                ListBSScreen(
-                    navController = samplingNavController,
-                    viewModel = hiltViewModel(),
-                    authViewModel = hiltViewModel()
-                )
-            }
-        }
+//        navigation(
+//            startDestination = CapiScreen.Listing.LIST_BS,
+//            route = CapiScreen.Sampling.LISTING
+//        ){
+//            composable(
+//                route = CapiScreen.Listing.LIST_BS + "/{isMonitoring}",
+//                arguments = listOf(
+//                    navArgument("isMonitoring") {
+//                        type = NavType.StringType
+//                    }
+//                )
+//            ) {
+//                ListBSScreen(
+//                    navController = samplingNavController,
+//                    viewModel = hiltViewModel(),
+//                    authViewModel = hiltViewModel()
+//                )
+//            }
+//        }
     }
 }
 

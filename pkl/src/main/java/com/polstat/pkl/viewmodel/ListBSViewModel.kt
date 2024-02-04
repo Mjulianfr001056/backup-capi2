@@ -1,6 +1,7 @@
 package com.polstat.pkl.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.database.entity.WilayahEntity
@@ -22,7 +23,8 @@ import javax.inject.Inject
 class ListBSViewModel @Inject constructor(
     private val sessionRepository: SessionRepository,
     private val wilayahRepository: WilayahRepository,
-    private val mahasiswaRepository: MahasiswaRepository
+    private val mahasiswaRepository: MahasiswaRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     companion object{
@@ -32,6 +34,8 @@ class ListBSViewModel @Inject constructor(
     private val _session = sessionRepository.getActiveSession()
 
     val session = _session
+
+    val isMonitoring = savedStateHandle.get<Boolean>("isMonitoring")
 
     private val _listWilayahByNIM = MutableStateFlow<List<WilayahEntity>>(emptyList())
 
@@ -50,10 +54,9 @@ class ListBSViewModel @Inject constructor(
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
     init {
-
-//        getWilayahByNIM(_session!!.nim!!)
-
-        getMahasiswaWithWilayah(_session!!.nim!!)
+        getMahasiswaWithWilayah(_session?.nim.toString())
+        getWilayahByNIM(_session?.nim.toString())
+        Log.d(TAG, "isMonitoring: $isMonitoring")
     }
 
     private fun getWilayahByNIM(

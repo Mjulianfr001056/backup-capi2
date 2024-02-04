@@ -47,6 +47,8 @@ class ListRutaViewModel @Inject constructor(
 
     val session = _session
 
+    val isMonitoring = savedStateHandle.get<Boolean>("isMonitoring")
+
     val noBS = savedStateHandle.get<String>("noBS")
 
     val kodeRuta = savedStateHandle.get<String>("kodeRuta")
@@ -89,6 +91,7 @@ class ListRutaViewModel @Inject constructor(
 
     init {
         getWilayahWithAll(noBS.toString())
+        Log.d(TAG, "isMonitoring: $isMonitoring")
     }
 
     private fun getWilayahWithAll(

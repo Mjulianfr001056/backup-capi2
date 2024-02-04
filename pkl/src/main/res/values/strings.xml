@@ -16,7 +16,9 @@
     <string name="no_bs_list_ruta">No BS</string>
     <string name="no_ruta_list_ruta">No Ruta</string>
     <string name="nama_krt_list_ruta">Nama KRT</string>
-    <string name="title_list_bs">List Blok Sensus</string>
+    <string name="title_list_bs">List BS</string>
+    <string name="monitoring">Mon</string>
+    <string name="listing">List</string>
     <string name="back_icon">Back Icon</string>
     <string name="sync_icon">Sync Icon</string>
     <string name="blok_sensus">Blok Sensus&#xa0;</string>
@@ -89,5 +91,6 @@
     <string name="kode_klg">Kode Keluarga</string>
     <string name="daftar_ruta_terkait">Daftar Ruta Terkait</string>
     <string name="toggle_icon">Toggle Icon</string>
-    <string name="list_keluarga">List Keluarga</string>
+    <string name="list_keluarga">List Klg</string>
+    <string name="isi_klg_ruta">isi keluarga dan ruta</string>
 </resources>

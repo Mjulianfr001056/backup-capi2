@@ -30,6 +30,8 @@ class ListSampelViewModel @Inject constructor(
 
     val noBS = savedStateHandle.get<String>("noBS")
 
+    val isMonitoring = savedStateHandle.get<Boolean>("isMonitoring")
+
     private val _sampelRutaResponse = MutableStateFlow(SampelRutaResponse())
 
     val sampelRutaResponse = _sampelRutaResponse.asStateFlow()

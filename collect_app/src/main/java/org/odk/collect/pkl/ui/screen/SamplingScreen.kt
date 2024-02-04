@@ -102,7 +102,8 @@ fun HorizontalMenu(navController: NavHostController, isPml: Boolean?) {
                     image = painterResource(R.drawable.listing),
                     name = "Listing",
                     onCardClicked = {
-                        navController.navigate("list_bs")
+                        val isMonitoring = false
+                        navController.navigate("list_bs/$isMonitoring")
                     }
                 )
                 Spacer(modifier = Modifier.width(30.dp))
@@ -117,7 +118,8 @@ fun HorizontalMenu(navController: NavHostController, isPml: Boolean?) {
                     image = painterResource(R.drawable.password_master),
                     name = "Monitoring",
                     onCardClicked = {
-                        navController.navigate("list_bs" + "/true")
+                        val isMonitoring = true
+                        navController.navigate("list_bs/$isMonitoring")
                     }
                 )
             } else {
@@ -125,7 +127,8 @@ fun HorizontalMenu(navController: NavHostController, isPml: Boolean?) {
                     image = painterResource(R.drawable.listing),
                     name = "Listing",
                     onCardClicked = {
-                        navController.navigate("list_bs")
+                        val isMonitoring = false
+                        navController.navigate("list_bs/$isMonitoring")
                     }
                 )
             }

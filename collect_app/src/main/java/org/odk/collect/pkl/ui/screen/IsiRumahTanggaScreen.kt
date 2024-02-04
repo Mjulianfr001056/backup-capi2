@@ -54,6 +54,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -63,6 +65,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.polstat.pkl.R
 import com.polstat.pkl.ui.event.IsiRutaScreenEvent
 import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklAccent
@@ -1177,10 +1180,16 @@ fun IsiRumahTanggaTopBar(
     TopAppBar(
         title = {
             Text(
-                text = "ISI RUMAH TANGGA",
-                fontFamily = PoppinsFontFamily,
-                fontWeight = FontWeight.Medium,
-                fontSize = 20.sp
+                text = stringResource(id = R.string.isi_klg_ruta).uppercase(),
+                style = TextStyle(
+                    fontFamily = PoppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 20.sp,
+                    platformStyle = PlatformTextStyle(
+                        includeFontPadding = false
+                    )
+                ),
+                color = Color.White
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -1190,8 +1199,9 @@ fun IsiRumahTanggaTopBar(
         navigationIcon = {
             IconButton(
                 onClick = {
-                    navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$noBS") {
-                        popUpTo(CapiScreen.Listing.LIST_RUTA + "/$noBS") {
+                    val isMonitoring = false
+                    navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$noBS/$isMonitoring") {
+                        popUpTo(CapiScreen.Listing.LIST_RUTA + "/$noBS/$isMonitoring") {
                             inclusive = true
                         }
                     }

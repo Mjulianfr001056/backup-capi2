@@ -47,6 +47,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -87,9 +89,8 @@ fun ListBSScreen(
     val context = LocalContext.current
 
     val session = viewModel.session
-    //val isPml = viewModel.session?.isKoor
-    val navArgs = navController.currentBackStackEntry?.arguments
-    val isMonitoring = navArgs?.getBoolean("isMonitoring") ?: false
+
+    val isMonitoring = viewModel.isMonitoring
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -111,11 +112,16 @@ fun ListBSScreen(
                 modifier = Modifier.shadow(10.dp),
                 title = {
                     Text(
-                        text = stringResource(R.string.title_list_bs),
-                        fontFamily = PoppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 20.sp,
-                        color = Color.White,
+                        text = stringResource(R.string.title_list_bs) + " (" + if (isMonitoring == true) { stringResource(R.string.monitoring) } else { stringResource(R.string.listing) } + ")",
+                        style = TextStyle(
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 20.sp,
+                            platformStyle = PlatformTextStyle(
+                                includeFontPadding = false
+                            )
+                        ),
+                        color = Color.White
                     )
                 },
                 navigationIcon = {
@@ -148,8 +154,8 @@ fun ListBSScreen(
                                     val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
                                     lastJob.await()
                                     delay(2000)
-                                    navController.navigate(CapiScreen.Listing.LIST_BS){
-                                        popUpTo(CapiScreen.Listing.LIST_BS){
+                                    navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring"){
+                                        popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring"){
                                             inclusive = true
                                         }
                                     }
@@ -169,19 +175,17 @@ fun ListBSScreen(
             )
         },
         content = { innerPadding ->
-            if (isMonitoring) {
+            if (isMonitoring != null) {
+                val listWilayahValue = if (isMonitoring) listWilayah.value else mahasiswaWithWilayah.value.listWilayah
+
                 ListBS(
-                    listWilayah = listWilayah.value,
+                    listWilayah = listWilayahValue,
                     navController = navController,
-                    modifier = Modifier.padding(innerPadding)
-                )
-            } else {
-                ListBS(
-                    listWilayah = mahasiswaWithWilayah.value.listWilayah,
-                    navController = navController,
-                    modifier = Modifier.padding(innerPadding)
+                    modifier = Modifier.padding(innerPadding),
+                    isMonitoring = isMonitoring
                 )
             }
+
 //            ListBS(
 //                listWilayah = mahasiswaWithWilayah.value.listWilayah,
 //                navController = navController,
@@ -423,7 +427,7 @@ private fun BlokSensus(
 private fun ListBS(
     listWilayah: List<WilayahEntity>?,
     navController: NavHostController,
-    isMonitoring : Boolean = false,
+    isMonitoring : Boolean,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -436,20 +440,17 @@ private fun ListBS(
         listWilayah?.let { wilayahList ->
             val sortedList = wilayahList.sortedBy { it.noBS }
 
-            sortedList.size.let {
-                items(it) { index ->
-                    val wilayah = listWilayah[index]
-                    BlokSensus(
-                        onLihatRutaClicked = {
-                            navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${wilayah.noBS}?isMonitoring=$isMonitoring")
-                        },
-                        onLihatSampleClicked = {
-                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${wilayah.noBS}")
-//                            navController.navigate(Capi63Screen.ListSample.route + "/444B")
-                        },
-                        wilayah = wilayah
-                    )
-                }
+            items(sortedList.size) { index ->
+                val wilayah = listWilayah[index]
+                BlokSensus(
+                    onLihatRutaClicked = {
+                        navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${wilayah.noBS}/$isMonitoring")
+                    },
+                    onLihatSampleClicked = {
+                        navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${wilayah.noBS}/$isMonitoring")
+                    },
+                    wilayah = wilayah
+                )
             }
         }
     }
@@ -464,7 +465,11 @@ fun PreviewListBSScreen() {
             color = MaterialTheme.colorScheme.background
         ) {
             val navController = rememberNavController()
-            ListBSScreen(navController, viewModel = hiltViewModel(), authViewModel = hiltViewModel())
+            ListBSScreen(
+                navController = navController,
+                viewModel = hiltViewModel(),
+                authViewModel = hiltViewModel()
+            )
         }
     }
 }
