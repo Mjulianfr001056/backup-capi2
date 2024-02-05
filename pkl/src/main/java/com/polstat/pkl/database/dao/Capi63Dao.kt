@@ -121,8 +121,8 @@ interface Capi63Dao {
     suspend fun getWilayahByNIM(nim: String) : List<WilayahEntity>
 
     @Transaction
-    @Query("SELECT * FROM sampel_ruta WHERE noBS = :noBS")
-    suspend fun getSampelRutaByNoBS(noBS: String) : List<SampelRutaEntity>
+    @Query("SELECT * FROM sampel_ruta WHERE idBS = :idBS")
+    suspend fun getSampelRutaByNoBS(idBS: String) : List<SampelRutaEntity>
 
     @Query("DELETE FROM sampel_ruta")
     suspend fun deleteAllSampelRuta()

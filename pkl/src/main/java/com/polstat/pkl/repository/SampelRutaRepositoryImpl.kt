@@ -25,12 +25,12 @@ class SampelRutaRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getSampelRutaFromWS(
-        noBS: String
+        idBS: String
     ): Flow<Result<SampelRutaResponse>> {
         return flow {
             emit(Result.Loading(true))
             val sampelRutaResponse = try {
-                sampelRutaApi.getSampel(noBS)
+                sampelRutaApi.getSampel(idBS)
             }  catch (e: IOException) {
                 e.printStackTrace()
                 emit(Result.Error(message = e.localizedMessage ?: "Fetch Sampel Ruta Error"))
@@ -82,13 +82,13 @@ class SampelRutaRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getSampelRuta(
-        noBS: String
+        idBS: String
     ): Flow<Result<List<SampelRutaEntity>>> {
         return flow {
             try {
                 emit(Result.Loading(true))
 
-                val sampelRuta = capi63Database.capi63Dao.getSampelRutaByNoBS(noBS)
+                val sampelRuta = capi63Database.capi63Dao.getSampelRutaByNoBS(idBS)
 
                 Log.d(TAG, "Berhasil getSampelRuta: $sampelRuta")
 
@@ -98,6 +98,32 @@ class SampelRutaRepositoryImpl @Inject constructor(
                 emit(Result.Error(null, "Error fetching Sampel Ruta: ${e.message}"))
             } finally {
                 emit(Result.Loading(false))
+            }
+        }
+    }
+
+    override suspend fun confirmSampel(kodeRuta: String): Flow<String> {
+        return flow {
+            try {
+                sampelRutaApi.confirmSampel(kodeRuta)
+                val message = "Berhasil Konfirmasi Sampel"
+                Log.d(TAG, "Konfirmasi Sampel berhasil !")
+                emit(message)
+            } catch (e: IOException) {
+                val message = "Konfirmasi Sampel gagal !"
+                Log.d(TAG, "Konfirmasi Sampel gagal !", e)
+                emit(message)
+                e.printStackTrace()
+            } catch (e: HttpException) {
+                val message = "Konfirmasi Sampel gagal !"
+                Log.d(TAG, "Konfirmasi Sampel gagal !", e)
+                emit(message)
+                e.printStackTrace()
+            } catch (e: Exception) {
+                val message = "Konfirmasi Sampel gagal !"
+                Log.d(TAG, "Konfirmasi Sampel gagal !", e)
+                emit(message)
+                e.printStackTrace()
             }
         }
     }

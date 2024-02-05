@@ -121,7 +121,8 @@ fun ListSampleScreen(
 
         viewModel.sampelRutaResponse.collectLatest { response ->
             if (isDataInserted.value) {
-                viewModel.getSampelByBSFromDB(noBS!!)
+//                viewModel.getSampelByBSFromDB(noBS!!)
+                viewModel.getSampelByBSFromDB("5104030014007B")
             }
         }
     }
@@ -198,7 +199,8 @@ fun ListSampleScreen(
                             )
                         }
                         IconButton(onClick = {
-                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${noBS}")
+//                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${noBS}")
+                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/5104030014007B")
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Sync,
@@ -295,18 +297,19 @@ fun PreviewSample(){
             genzOrtuRuta = 2,
             long = 0.0,
             lat = 0.0,
-            status = "0"
+            status = "1"
         ),
         onPetunjukArahClicked = {},
         context = context,
-        navController = rememberNavController()
+        navController = rememberNavController(),
+        viewModel = hiltViewModel()
     )
 }
 
 @Composable
 private fun ListSample(
     viewModel: ListSampelViewModel,
-    navController: NavController,
+    navController: NavHostController,
     modifier: Modifier = Modifier,
     listSampelRuta: List<SampelRutaEntity>,
     searchText: String,
@@ -334,7 +337,8 @@ private fun ListSample(
                 onPetunjukArahClicked = {},
                 sampelRuta = sampelRuta,
                 context,
-                navController
+                navController,
+                viewModel
             )
         }
 
@@ -346,7 +350,8 @@ private fun Sample(
     onPetunjukArahClicked: () -> Unit,
     sampelRuta: SampelRutaEntity,
     context: Context,
-    navController: NavController
+    navController: NavHostController,
+    viewModel: ListSampelViewModel
 ){
 
     var showConfirmDialog by remember { mutableStateOf(false) }
@@ -569,7 +574,9 @@ private fun Sample(
                             imageVector = Icons.Default.AddLocation,
                             contentDescription = "Location",
                             tint = Color.White,
-                            modifier = Modifier.size(22.dp).padding(3.dp)
+                            modifier = Modifier
+                                .size(22.dp)
+                                .padding(3.dp)
                         )
                         Text(
                             text ="PETA",
@@ -582,7 +589,7 @@ private fun Sample(
                     }
                 }
 
-                if (sampelRuta.status == "0") {
+                if (sampelRuta.status == "1") {
                     Column (
                         modifier = Modifier
                             .weight(1f)
@@ -601,7 +608,9 @@ private fun Sample(
                                 imageVector = Icons.Default.CheckCircle,
                                 contentDescription = "Location",
                                 tint = Color.White,
-                                modifier = Modifier.size(22.dp).padding(3.dp)
+                                modifier = Modifier
+                                    .size(22.dp)
+                                    .padding(3.dp)
                             )
 
                             Text(
@@ -616,7 +625,7 @@ private fun Sample(
                     }
                 }
 
-                if (sampelRuta.status == "1") {
+                if (sampelRuta.status == "2") {
                     Column (
                         modifier = Modifier
                             .weight(1f)
@@ -628,7 +637,9 @@ private fun Sample(
                             imageVector = Icons.Default.CheckCircle,
                             contentDescription = "Location",
                             tint = Color.Green,
-                            modifier = Modifier.size(40.dp).fillMaxWidth()
+                            modifier = Modifier
+                                .size(40.dp)
+                                .fillMaxWidth()
                         )
                     }
                 }
@@ -642,14 +653,14 @@ private fun Sample(
                             Button(
                                 modifier = Modifier.fillMaxWidth(0.45f),
                                 onClick = {
-
+                                    viewModel.confirmSampel(sampelRuta.kodeRuta)
                                     showConfirmDialog = false
-                                    navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${sampelRuta.noBS}"){
-                                        popUpTo(CapiScreen.Listing.LIST_SAMPLE + "/${sampelRuta.noBS}"){
+                                    navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${sampelRuta.idBS}"){
+                                        popUpTo(CapiScreen.Listing.LIST_SAMPLE + "/${sampelRuta.idBS}"){
                                             inclusive = true
                                         }
                                     }
-                                    Toast.makeText(context, "Ruta ${sampelRuta.noBS} berhasil dicacah", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Ruta ${sampelRuta.kodeRuta} berhasil dicacah", Toast.LENGTH_SHORT).show()
                                 },
                                 colors = ButtonDefaults.buttonColors(PklPrimary900)) {
                                 Text(text = "Yakin")
