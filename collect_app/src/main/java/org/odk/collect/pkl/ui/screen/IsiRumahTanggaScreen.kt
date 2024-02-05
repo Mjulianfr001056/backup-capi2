@@ -1,13 +1,13 @@
 package org.odk.collect.pkl.ui.screen
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,7 +26,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -34,7 +37,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -46,13 +51,23 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.addOutline
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
@@ -60,6 +75,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -71,6 +87,8 @@ import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklAccent
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary
+import com.polstat.pkl.ui.theme.PklPrimary100
+import com.polstat.pkl.ui.theme.PklPrimary300
 import com.polstat.pkl.ui.theme.PklPrimary700
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PklSecondary
@@ -150,13 +168,13 @@ fun IsiRumahTanggaScreen(
                                 TableCellForm(
                                     label = "No. Segmen",
                                     value = ": ${lastKeluarga.value.noSegmen}",
-                                    fontSize = 14.sp,
+                                    fontSize = 10.sp,
                                     weight = weight
                                 )
                                 TableCellForm(
                                     label = "No. Klg",
                                     value = ": ${UtilFunctions.convertTo3DigitsString(lastKeluarga.value.noUrutKlg)}",
-                                    fontSize = 14.sp,
+                                    fontSize = 10.sp,
                                     weight = weight
                                 )
                             }
@@ -164,7 +182,7 @@ fun IsiRumahTanggaScreen(
                                 TableCellForm(
                                     label = "No. Bg Fisik",
                                     value = ": ${UtilFunctions.padWithZeros(lastKeluarga.value.noBgFisik, 3)}",
-                                    fontSize = 14.sp,
+                                    fontSize = 10.sp,
                                     weight = weight
                                 )
                                 TableCellForm(
@@ -172,7 +190,7 @@ fun IsiRumahTanggaScreen(
                                     value = ": ${
                                         UtilFunctions.convertTo3DigitsString(lastKeluargaEgb.value.noUrutKlgEgb)
                                     }",
-                                    fontSize = 14.sp,
+                                    fontSize = 10.sp,
                                     weight = weight
                                 )
                             }
@@ -180,13 +198,13 @@ fun IsiRumahTanggaScreen(
                                 TableCellForm(
                                     label = "No. Bg Sensus",
                                     value = ": ${UtilFunctions.padWithZeros(lastKeluarga.value.noBgSensus, 3)}",
-                                    fontSize = 14.sp,
+                                    fontSize = 10.sp,
                                     weight = weight
                                 )
                                 TableCellForm(
                                     label = "No. Ruta",
                                     value = ": ${UtilFunctions.convertTo3DigitsString(lastRuta.value.noUrutRuta)}",
-                                    fontSize = 14.sp,
+                                    fontSize = 10.sp,
                                     weight = weight
                                 )
                             }
@@ -465,8 +483,9 @@ fun IsiRumahTanggaScreen(
                         }
                         Toast.makeText(context, "Ruta berhasil ditambahkan!", Toast.LENGTH_SHORT)
                             .show()
-                        navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${noBS}") {
-                            popUpTo(CapiScreen.Listing.LIST_RUTA + "/${noBS}") {
+                        val isMonitoring = false
+                        navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${noBS}/$isMonitoring") {
+                            popUpTo(CapiScreen.Listing.LIST_RUTA + "/${noBS}/$isMonitoring") {
                                 inclusive = true
                             }
                         }
@@ -764,7 +783,7 @@ fun KeteranganKeluarga(
                     .padding(15.dp)
             ) {
                 Text(
-                    text = "Keterangan Rumah Tangga ke-$i",
+                    text = "Keterangan Ruta ke-$i",
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium
                 )
@@ -960,6 +979,33 @@ fun KeteranganRuta(
     )
 
     Spacer(modifier = Modifier.padding(10.dp))
+
+    if (state.value.listGenzOrtu[indexKlg][indexRuta] > 0) {
+        Column(
+            modifier = Modifier.padding(horizontal = 14.dp)
+        ) {
+            Text(
+                text = "16. Unggah Foto",
+                fontFamily = PoppinsFontFamily,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            var imageUri by remember { mutableStateOf(EMPTY_IMAGE_URI) }
+            if (imageUri != EMPTY_IMAGE_URI) {
+
+            } else {
+                ImagePicker(onCameraClicked = {}, onGaleryClicked = {})
+                var showGallerySelect by remember { mutableStateOf(false) }
+                if (showGallerySelect) {
+
+                } else {
+
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.padding(10.dp))
+    }
 }
 
 @Composable
@@ -1218,6 +1264,113 @@ fun IsiRumahTanggaTopBar(
     )
 }
 
+@Composable
+fun ImagePicker(
+    onCameraClicked: () -> Unit,
+    onGaleryClicked: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .background(
+                color = PklPrimary100.copy(alpha = 0.2f),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .padding(4.dp)
+            .dashedBorder(
+                color = PklSecondary,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(8.dp)
+            .size(250.dp, 75.dp),
+        contentAlignment = Alignment.Center,
+        content = {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Upload,
+                    contentDescription = "Upload",
+                    tint = PklPrimary300
+                )
+                Text(
+                    text = "Unggah Foto Rumah Tangga",
+                    color = PklSecondary,
+                    fontFamily = PoppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 10.sp,
+                    modifier = Modifier.padding(vertical = 5.dp)
+                )
+                Row {
+                    OutlinedIconButton(
+                        onClick = { onCameraClicked() },
+                        colors = IconButtonDefaults.outlinedIconButtonColors(
+                            containerColor = PklPrimary300,
+                            contentColor = PklBase
+                        ),
+                        border = BorderStroke(width = 1.dp, color = PklPrimary900),
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PhotoCamera,
+                            contentDescription = "Camera",
+                            modifier = Modifier.size(12.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    OutlinedIconButton(
+                        onClick = { onGaleryClicked() },
+                        colors = IconButtonDefaults.outlinedIconButtonColors(
+                            containerColor = PklPrimary300,
+                            contentColor = PklBase
+                        ),
+                        border = BorderStroke(width = 1.dp, color = PklPrimary900),
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PhotoLibrary,
+                            contentDescription = "PhotoLibrary",
+                            modifier = Modifier.size(12.dp)
+                        )
+                    }
+                }
+            }
+        }
+    )
+}
+
+fun Modifier.dashedBorder(
+    color: Color,
+    shape: Shape,
+    strokeWidth: Dp = 1.dp,
+    dashWidth: Dp = 4.dp,
+    gapWidth: Dp = 4.dp,
+    cap: StrokeCap = StrokeCap.Round
+) = this.drawWithContent {
+    val outline = shape.createOutline(size, layoutDirection, this)
+
+    val path = Path()
+    path.addOutline(outline)
+
+    val stroke = Stroke(
+        cap = cap,
+        width = strokeWidth.toPx(),
+        pathEffect = PathEffect.dashPathEffect(
+            intervals = floatArrayOf(dashWidth.toPx(), gapWidth.toPx()),
+            phase = 0f
+        )
+    )
+
+    this.drawContent()
+
+    drawPath(
+        path = path,
+        style = stroke,
+        color = color
+    )
+}
+
 fun increment(input: String?): String {
     val numericPart = input?.filter { it.isDigit() }
     val number = numericPart?.toInt()
@@ -1273,3 +1426,5 @@ fun IsiRumahTanggaPreview() {
         }
     }
 }
+
+val EMPTY_IMAGE_URI: Uri = Uri.parse("file://dev/null")

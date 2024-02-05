@@ -91,6 +91,6 @@
     <string name="kode_klg">Kode Keluarga</string>
     <string name="daftar_ruta_terkait">Daftar Ruta Terkait</string>
     <string name="toggle_icon">Toggle Icon</string>
-    <string name="list_keluarga">List Klg</string>
+    <string name="list_keluarga">list klg</string>
     <string name="isi_klg_ruta">isi keluarga dan ruta</string>
 </resources>
