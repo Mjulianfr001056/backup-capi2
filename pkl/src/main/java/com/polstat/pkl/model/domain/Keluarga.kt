@@ -6,14 +6,15 @@ data class Keluarga (
     val noBgFisik: String = "[not set]",
     val noBgSensus: String = "[not set]",
     val noSegmen: String = "[not set]",
-    val noUrutKlg: Int = -1,
+    val noUrutKlg: String = "[not set]",
     val noUrutKlgEgb: Int = -1,
     val namaKK: String = "[not set]",
     val alamat: String = "[not set]",
     val isGenzOrtu: Int = -1,
     val penglMkn: Int = -1,
-    val noBS: String = "[not set]",
+    val idBS: String = "[not set]",
     val ruta: List<Ruta> = emptyList(),
+    val nimPencacah: String = "[not set]",
     val status: String = "[not set]"
 )
 

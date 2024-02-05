@@ -19,7 +19,8 @@ fun Keluarga.toKeluargaEntity(): KeluargaEntity {
         alamat = alamat,
         isGenzOrtu = isGenzOrtu,
         penglMkn = penglMkn,
-        noBS = noBS,
+        idBS = idBS,
+        nimPencacah = nimPencacah,
         status = status
     )
 }
@@ -39,7 +40,8 @@ fun KeluargaEntity.toKeluarga(
         alamat = alamat,
         isGenzOrtu = isGenzOrtu,
         penglMkn = penglMkn,
-        noBS = noBS,
+        idBS = idBS,
+        nimPencacah = nimPencacah,
         ruta = ruta,
         status = status
     )
@@ -56,11 +58,12 @@ fun KeluargaEntity.toKeluargaDto(
         nama_kk = namaKK,
         no_bg_fisik = noBgFisik,
         no_bg_sensus = noBgSensus,
-        no_bs = noBS,
+        id_bs = idBS,
         no_segmen = noSegmen,
         no_urut_klg = noUrutKlg,
         no_urut_klg_egb = noUrutKlgEgb,
         ruta = ruta,
+        nim_pencacah = nimPencacah,
         status = status
     )
 }

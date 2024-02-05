@@ -9,7 +9,8 @@ data class RutaDto (
     val lat: Double?,
     val long: Double?,
     val nama_krt: String?,
-    val no_bs: String?,
     val no_urut_ruta: Int?,
+    val id_bs: String?,
+    val nim_pencacah: String?,
     val status: String?
 )

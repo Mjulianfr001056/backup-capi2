@@ -21,6 +21,7 @@ import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,7 +38,7 @@ class ListRutaViewModel @Inject constructor(
     private val localRutaRepository: LocalRutaRepository,
     private val remoteRutaRepository: RemoteRutaRepository,
     private val savedStateHandle: SavedStateHandle
-): ViewModel() {
+) : ViewModel() {
 
     companion object {
         private const val TAG = "CAPI63_LISTRUTA_VM"
@@ -64,6 +65,8 @@ class ListRutaViewModel @Inject constructor(
     val wilayahWithAll = _wilayahWithAll.asStateFlow()
 
     private val _synchronizeRuta = MutableStateFlow(SyncRutaResponse())
+
+    val synchronizeRuta = _synchronizeRuta.asStateFlow()
 
     private val _finalisasiBSResponse = MutableStateFlow(FinalisasiBSResponse())
 
@@ -99,16 +102,18 @@ class ListRutaViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             wilayahRepository.getWilayahWithAll(noBS).collectLatest { result ->
-                when(result) {
+                when (result) {
                     is Result.Success -> {
                         result.data?.let { response ->
                             _wilayahWithAll.value = response
                             Log.d(TAG, "getWilayahWithAll success: $response")
                         }
                     }
+
                     is Result.Loading -> {
                         Log.d(TAG, "getWilayahWithAll: Loading...")
                     }
+
                     is Result.Error -> {
                         result.message?.let { error ->
                             _errorMessage.value = error
@@ -126,16 +131,18 @@ class ListRutaViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             wilayahRepository.getWilayahWithRuta(noBS).collectLatest { result ->
-                when(result) {
+                when (result) {
                     is Result.Success -> {
                         result.data?.let { response ->
                             _wilayahWithRuta.value = response
                             Log.d(TAG, "getWilayahWithRuta success: $response")
                         }
                     }
+
                     is Result.Loading -> {
                         Log.d(TAG, "getWilayahWithRuta: Loading...")
                     }
+
                     is Result.Error -> {
                         result.message?.let { error ->
                             _errorMessage.value = error
@@ -155,13 +162,15 @@ class ListRutaViewModel @Inject constructor(
     ) {
         val jsonKlgInstance = JsonKlg()
 
-        val wilayah = wilayahWithAll.wilayahWithKeluarga!!.wilayah
+//        val wilayah = wilayahWithAll.wilayahWithKeluarga!!.wilayah
 
-        val updatedWilayah = wilayah!!.copy(status = "listing-selesai")
+//        val updatedWilayah = wilayah!!.copy(status = "listing-selesai")
 
         if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
-            wilayahWithAll.listKeluargaWithRuta.forEach{ keluargaWithRuta ->
-                jsonKlgInstance.add(keluargaWithRuta.keluarga.toKeluargaDto(keluargaWithRuta.listRuta.toRutaDtoList()))
+            wilayahWithAll.listKeluargaWithRuta.forEach { keluargaWithRuta ->
+                if (keluargaWithRuta.keluarga.status != "fetch") {
+                    jsonKlgInstance.add(keluargaWithRuta.keluarga.toKeluargaDto(keluargaWithRuta.listRuta.toRutaDtoList()))
+                }
             }
         }
 
@@ -170,8 +179,9 @@ class ListRutaViewModel @Inject constructor(
             no_bs = noBS,
             json = jsonKlgInstance
         )
+        Log.d(TAG, "synchronizeRuta: SyncRutaRequest $syncRutaRequest")
         viewModelScope.launch {
-//            val job = launch {
+            val job1 = async {
                 remoteRutaRepository.sinkronisasiRuta(syncRutaRequest).collectLatest { result ->
                     when (result) {
                         is Result.Success -> {
@@ -204,6 +214,13 @@ class ListRutaViewModel @Inject constructor(
                         }
                     }
                 }
+            }
+
+            job1.await()
+
+            wilayahRepository.insertWilayah(synchronizeRuta.value.toWilayah()).collectLatest { message ->
+                Log.d(TAG, message)
+            }
         }
     }
 
@@ -231,8 +248,7 @@ class ListRutaViewModel @Inject constructor(
                     if (!isError) {
                         launch {
                             wilayahRepository.updateWilayah(
-                                updatedWilayah.toWilayah(emptyList()),
-                                _session!!.nim!!
+                                updatedWilayah.toWilayah(emptyList())
                             )
                                 .collectLatest { message ->
                                     Log.d(TAG, message)
@@ -266,9 +282,11 @@ class ListRutaViewModel @Inject constructor(
                                 Log.d(TAG, "getRuta succeed: $response")
                             }
                         }
+
                         is Result.Loading -> {
                             Log.d(TAG, "getRuta: Loading...")
                         }
+
                         is Result.Error -> {
                             result.message?.let { error ->
                                 _errorMessage.value = error
@@ -351,8 +369,7 @@ class ListRutaViewModel @Inject constructor(
                     if (!isError) {
                         launch {
                             wilayahRepository.updateWilayah(
-                                updatedWilayah.toWilayah(emptyList()),
-                                _session!!.nim!!
+                                updatedWilayah.toWilayah(emptyList())
                             )
                                 .collectLatest { message ->
                                     Log.d(TAG, message)

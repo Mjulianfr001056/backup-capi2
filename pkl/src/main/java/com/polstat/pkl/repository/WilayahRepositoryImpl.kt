@@ -25,12 +25,11 @@ class WilayahRepositoryImpl @Inject constructor(
     }
 
     override suspend fun insertWilayah(
-        wilayah: Wilayah,
-        nim: String
+        wilayah: Wilayah
     ): Flow<String> {
         return flow {
             try {
-                capi63Database.capi63Dao.insertWilayah(wilayah.toWilayahEntity(nim))
+                capi63Database.capi63Dao.insertWilayah(wilayah.toWilayahEntity())
                 val message = "Berhasil menambahkan wilayah!"
                 Log.d(TAG, "insertWilayah: $message $wilayah")
                 emit(message)
@@ -46,10 +45,10 @@ class WilayahRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateWilayah(wilayah: Wilayah, nim: String): Flow<String> {
+    override suspend fun updateWilayah(wilayah: Wilayah): Flow<String> {
         return  flow {
             try {
-                capi63Database.capi63Dao.updateWilayah(wilayah.toWilayahEntity(nim))
+                capi63Database.capi63Dao.updateWilayah(wilayah.toWilayahEntity())
                 val message = "Berhasil mengupdate wilayah!"
                 Log.d(TAG, "updateWilayah: $message")
             } catch (e: Exception) {

@@ -167,19 +167,21 @@ class AuthViewModel @Inject constructor(
              */
             saveDataTim()
 
-            if (authResponse.value.wilayah.isNotEmpty()) {
-                authResponse.value.wilayah.forEach { wilayah ->
-                    wilayahRepository.insertWilayah(wilayah, authResponse.value.nim)
-                        .collectLatest { message ->
-                            Log.d(TAG, message)
-                        }
+            if (authResponse.value.wilayah.isEmpty()) {
+            }
 
-                    if(wilayah.keluarga!!.isNotEmpty()) {
-                        wilayah.keluarga.forEach { keluarga ->
-                            keluargaRepository.fetchKeluargaFromServer(keluarga)
-                                .collectLatest { message ->
-                                    Log.d(TAG, message)
-                                }
+            authResponse.value.wilayah.forEach { wilayah ->
+                wilayahRepository.insertWilayah(wilayah)
+                    .collectLatest { message ->
+                        Log.d(TAG, message)
+                    }
+
+                if(wilayah.keluarga!!.isNotEmpty()) {
+                    wilayah.keluarga.forEach { keluarga ->
+                        keluargaRepository.fetchKeluargaFromServer(keluarga)
+                            .collectLatest { message ->
+                                Log.d(TAG, message)
+                            }
 
                             if (keluarga.ruta!!.isNotEmpty()) {
                                 keluarga.ruta.forEach { ruta ->
@@ -196,7 +198,7 @@ class AuthViewModel @Inject constructor(
                         }
                     }
                 }
-            }
+
             Log.d(TAG, "Token: ${_session?.token} ")
             delay(2000)
             closeLoadingDialog()
@@ -293,7 +295,7 @@ class AuthViewModel @Inject constructor(
          * TODO(Perpendek authResponse.value.xxx telescoping-nya)
          */
 
-
+        //Hapusss selain nim, nama, notlp
         dataTimRepository.insertTim(dataTim).collectLatest { message ->
             Log.d(TAG, message)
         }

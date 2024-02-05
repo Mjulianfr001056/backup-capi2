@@ -10,9 +10,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface WilayahRepository {
 
-    suspend fun insertWilayah(wilayah: Wilayah, nim: String) : Flow<String>
+    suspend fun insertWilayah(wilayah: Wilayah) : Flow<String>
 
-    suspend fun updateWilayah(wilayah: Wilayah, nim: String) : Flow<String>
+    suspend fun updateWilayah(wilayah: Wilayah) : Flow<String>
 
     suspend fun deleteAllWilayah() : Flow<String>
 
