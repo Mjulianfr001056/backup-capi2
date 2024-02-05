@@ -199,8 +199,8 @@ fun ListSampleScreen(
                             )
                         }
                         IconButton(onClick = {
-//                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${noBS}")
-                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/5104030014007B")
+//                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${noBS}/$isMonitoring")
+                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/5104030014007B/$isMonitoring")
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Sync,
@@ -355,6 +355,8 @@ private fun Sample(
 ){
 
     var showConfirmDialog by remember { mutableStateOf(false) }
+
+    val isMonitoring = viewModel.isMonitoring
 
     Box(
         modifier = Modifier
@@ -655,8 +657,8 @@ private fun Sample(
                                 onClick = {
                                     viewModel.confirmSampel(sampelRuta.kodeRuta)
                                     showConfirmDialog = false
-                                    navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${sampelRuta.idBS}"){
-                                        popUpTo(CapiScreen.Listing.LIST_SAMPLE + "/${sampelRuta.idBS}"){
+                                    navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${sampelRuta.idBS}/$isMonitoring"){
+                                        popUpTo(CapiScreen.Listing.LIST_SAMPLE + "/${sampelRuta.idBS}/$isMonitoring"){
                                             inclusive = true
                                         }
                                     }
