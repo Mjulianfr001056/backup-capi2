@@ -23,7 +23,7 @@ import com.polstat.pkl.database.entity.WilayahEntity
         SampelRutaEntity::class,
         KeluargaAndRutaEntity::class
     ],
-    version = 1
+    version = 2 // Setelah SP
 )
 @TypeConverters(DateConverter::class)
 abstract class Capi63Database : RoomDatabase() {
