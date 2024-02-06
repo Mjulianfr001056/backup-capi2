@@ -88,8 +88,8 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideWilayahRepository(capi63Database: Capi63Database) : WilayahRepository {
-        return WilayahRepositoryImpl(capi63Database)
+    fun provideWilayahRepository(capi63Dao: Capi63Dao) : WilayahRepository {
+        return WilayahRepositoryImpl(capi63Dao)
     }
 
     @Provides

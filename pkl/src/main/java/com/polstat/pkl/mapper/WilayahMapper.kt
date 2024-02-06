@@ -9,13 +9,9 @@ fun Wilayah.toWilayahEntity(): WilayahEntity {
     return WilayahEntity(
         idBS = idBS,
         noBS = noBS,
-        idKab = idKab,
-        idKec = idKec,
-        idKel = idKel,
         namaKab = namaKab,
         namaKec = namaKec,
         namaKel = namaKel,
-        catatan = catatan,
         jmlKlg = jmlKlg,
         jmlKlgEgb = jmlKlgEgb,
         jmlRuta = jmlRuta,
@@ -23,6 +19,10 @@ fun Wilayah.toWilayahEntity(): WilayahEntity {
         status = status,
         tglListing = tglListing,
         tglPeriksa = tglPeriksa
+//        idKab = idKab,
+//        idKec = idKec,
+//        idKel = idKel,
+//        catatan = catatan,
     )
 }
 
@@ -32,13 +32,9 @@ fun WilayahEntity.toWilayah(
     return Wilayah(
         idBS = idBS,
         noBS = noBS,
-        idKab = idKab,
-        idKec = idKec,
-        idKel = idKel,
         namaKab = namaKab,
         namaKec = namaKec,
         namaKel = namaKel,
-        catatan = catatan,
         jmlKlg = jmlKlg,
         jmlKlgEgb = jmlKlgEgb,
         jmlRuta = jmlRuta,
@@ -47,6 +43,10 @@ fun WilayahEntity.toWilayah(
         tglListing = tglListing,
         tglPeriksa = tglPeriksa,
         keluarga = keluarga
+//        idKab = idKab,
+//        idKec = idKec,
+//        idKel = idKel,
+//        catatan = catatan,
     )
 }
 

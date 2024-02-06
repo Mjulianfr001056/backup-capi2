@@ -2,8 +2,7 @@ package com.polstat.pkl.repository
 
 import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
-import com.polstat.pkl.database.Capi63Database
-import com.polstat.pkl.database.entity.WilayahEntity
+import com.polstat.pkl.database.dao.Capi63Dao
 import com.polstat.pkl.database.relation.KeluargaWithRuta
 import com.polstat.pkl.database.relation.RutaWithKeluarga
 import com.polstat.pkl.database.relation.WilayahWithAll
@@ -17,7 +16,7 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class WilayahRepositoryImpl @Inject constructor(
-    private val capi63Database: Capi63Database
+    private val capi63Dao: Capi63Dao
 ) : WilayahRepository {
 
     companion object {
@@ -29,7 +28,7 @@ class WilayahRepositoryImpl @Inject constructor(
     ): Flow<String> {
         return flow {
             try {
-                capi63Database.capi63Dao.insertWilayah(wilayah.toWilayahEntity())
+                capi63Dao.insertWilayah(wilayah.toWilayahEntity())
                 val message = "Berhasil menambahkan wilayah!"
                 Log.d(TAG, "insertWilayah: $message $wilayah")
                 emit(message)
@@ -48,7 +47,7 @@ class WilayahRepositoryImpl @Inject constructor(
     override suspend fun updateWilayah(wilayah: Wilayah): Flow<String> {
         return  flow {
             try {
-                capi63Database.capi63Dao.updateWilayah(wilayah.toWilayahEntity())
+                capi63Dao.updateWilayah(wilayah.toWilayahEntity())
                 val message = "Berhasil mengupdate wilayah!"
                 Log.d(TAG, "updateWilayah: $message")
             } catch (e: Exception) {
@@ -61,7 +60,7 @@ class WilayahRepositoryImpl @Inject constructor(
     override suspend fun deleteAllWilayah(): Flow<String> {
         return  flow {
             try {
-                capi63Database.capi63Dao.deleteAllWilayah()
+                capi63Dao.deleteAllWilayah()
                 val message = "Berhasil menghapus seluruh wilayah!"
                 Log.d(TAG, "deleteAllWilayah: $message")
             } catch (e: Exception) {
@@ -77,7 +76,7 @@ class WilayahRepositoryImpl @Inject constructor(
         return flow {
             try {
                 emit(Result.Loading(true))
-                val wilayahWithRuta = capi63Database.capi63Dao.getWilayahWithRuta(noBS)
+                val wilayahWithRuta = capi63Dao.getWilayahWithRuta(noBS)
                 Log.d(TAG, "Berhasil getWilayahWithRuta: $wilayahWithRuta")
                 emit(Result.Success(wilayahWithRuta))
             } catch (e: Exception) {
@@ -95,7 +94,7 @@ class WilayahRepositoryImpl @Inject constructor(
         return flow {
             try {
                 emit(Result.Loading(true))
-                val wilayahWithKeluarga = capi63Database.capi63Dao.getWilayahWithKeluarga(noBS)
+                val wilayahWithKeluarga = capi63Dao.getWilayahWithKeluarga(noBS)
                 Log.d(TAG, "Berhasil getWilayahWithKeluarga: $wilayahWithKeluarga")
                 emit(Result.Success(wilayahWithKeluarga))
             } catch (e: Exception) {
@@ -113,7 +112,7 @@ class WilayahRepositoryImpl @Inject constructor(
 //        return flow {
 //            try {
 //                emit(Result.Loading(true))
-//                val wilayahList = capi63Database.capi63Dao.getWilayahByNIM(nim)
+//                val wilayahList = capi63Dao.getWilayahByNIM(nim)
 //                Log.d(TAG, "Berhasil getWilayahByNIM: $wilayahList")
 //                emit(Result.Success(wilayahList))
 //            } catch (e: Exception) {
@@ -131,14 +130,14 @@ class WilayahRepositoryImpl @Inject constructor(
         return flow {
             try {
                 emit(Result.Loading(true))
-                val wilayahWithKeluarga = capi63Database.capi63Dao.getWilayahWithKeluarga(noBS)
+                val wilayahWithKeluarga = capi63Dao.getWilayahWithKeluarga(noBS)
                 val listKeluargaWithRuta = wilayahWithKeluarga.listKeluarga?.map { keluarga ->
-                    val ruta = capi63Database.capi63Dao.getKeluargaWithRuta(keluarga.kodeKlg)
+                    val ruta = capi63Dao.getKeluargaWithRuta(keluarga.kodeKlg)
                     KeluargaWithRuta(keluarga, ruta.listRuta)
                 }
-                val wilayahWithRuta = capi63Database.capi63Dao.getWilayahWithRuta(noBS)
+                val wilayahWithRuta = capi63Dao.getWilayahWithRuta(noBS)
                 val listRutaWithKeluarga = wilayahWithRuta.listRuta?.map { ruta ->
-                    val keluarga = capi63Database.capi63Dao.getRutaWithKeluarga(ruta.kodeRuta)
+                    val keluarga = capi63Dao.getRutaWithKeluarga(ruta.kodeRuta)
                     RutaWithKeluarga(ruta, keluarga.listKeluarga)
                 }
                 val wilayahWithAll = WilayahWithAll(
