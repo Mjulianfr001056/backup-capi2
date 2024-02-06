@@ -837,7 +837,7 @@ fun RutaRow(
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.sls,
-                                                value = "${keluarga.SLS}"
+                                                value = "${keluarga.banjar}"
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_segmen_ruta,
@@ -1281,7 +1281,7 @@ fun DetailCard(
         Text(text = stringResource(id = R.string.kode_klg), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
         Text(text = "${keluarga.kodeKlg}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
         Text(text = stringResource(id = R.string.sls), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
-        Text(text = "${keluarga.SLS}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
+        Text(text = "${keluarga.banjar}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
         Text(text = stringResource(id = R.string.no_bf_list_ruta), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)
         Text(text = "${keluarga.noBgFisik}", fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = contentColor)
         Text(text = stringResource(id = R.string.no_bs_list_ruta), fontFamily =  fontFamily, fontWeight = fontWeight, fontSize = fontSize, color = titleColor)

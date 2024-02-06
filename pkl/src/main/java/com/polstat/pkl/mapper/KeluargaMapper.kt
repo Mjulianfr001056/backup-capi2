@@ -9,7 +9,7 @@ import com.polstat.pkl.model.domain.RutaDto
 fun Keluarga.toKeluargaEntity(): KeluargaEntity {
     return KeluargaEntity(
         kodeKlg = kodeKlg,
-        SLS = SLS,
+        banjar = SLS,
         noBgFisik = noBgFisik,
         noBgSensus = noBgSensus,
         noSegmen = noSegmen,
@@ -30,7 +30,7 @@ fun KeluargaEntity.toKeluarga(
 ): Keluarga {
     return Keluarga(
         kodeKlg = kodeKlg,
-        SLS = SLS,
+        SLS = banjar,
         noBgFisik = noBgFisik,
         noBgSensus = noBgSensus,
         noSegmen = noSegmen,
@@ -51,7 +51,7 @@ fun KeluargaEntity.toKeluargaDto(
     ruta: List<RutaDto>?
 ) : KeluargaDto {
     return KeluargaDto(
-        SLS = SLS,
+        SLS = banjar,
         alamat = alamat,
         is_genz_ortu = isGenzOrtu,
         kode_klg = kodeKlg,

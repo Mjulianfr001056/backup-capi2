@@ -2,7 +2,7 @@ package com.polstat.pkl.repository
 
 import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
-import com.polstat.pkl.database.Capi63Database
+import com.polstat.pkl.database.dao.Capi63Dao
 import com.polstat.pkl.database.entity.KeluargaEntity
 import com.polstat.pkl.database.relation.KeluargaWithRuta
 import com.polstat.pkl.mapper.toKeluargaEntity
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class KeluargaRepositoryImpl @Inject constructor(
-    private val capi63Database: Capi63Database
+    private val capi63Dao: Capi63Dao
 ) : KeluargaRepository {
 
     companion object {
@@ -21,16 +21,16 @@ class KeluargaRepositoryImpl @Inject constructor(
     }
 
     override suspend fun insertKeluarga(
-        keluarga: Keluarga
+        keluarga: Keluarga,
+        method: KeluargaRepository.Method
     ): Flow<String> {
         return  flow {
             try {
-                Log.d(TAG, "Keluarga: $keluarga")
-                val readyKlg = keluarga.copy(status = "insert")
-                Log.d(TAG, "Keluarga insert: $readyKlg")
-                Log.d(TAG, "insertKeluarga: ${readyKlg.toKeluargaEntity()}")
-                capi63Database.capi63Dao.insertKeluarga(readyKlg.toKeluargaEntity())
+                val status = method.retrieveMethod()
+                val readyKlg = keluarga.copy(status = status)
                 val message = "Berhasil menambahkan keluarga!"
+
+                capi63Dao.insertKeluarga(readyKlg.toKeluargaEntity())
                 emit(message)
             } catch (e: SQLiteConstraintException) {
                 val message = "Gagal menambahkan keluarga! Constraint pelanggaran: ${e.message}"
@@ -44,34 +44,12 @@ class KeluargaRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun fetchKeluargaFromServer(keluarga: Keluarga): Flow<String> {
-        return  flow {
-            try {
-                Log.d(TAG, "Keluarga: $keluarga")
-                val readyKlg = keluarga.copy(status = "fetch")
-                Log.d(TAG, "Keluarga fetch: $readyKlg")
-                Log.d(TAG, "fetchKeluarga: ${readyKlg.toKeluargaEntity()}")
-                capi63Database.capi63Dao.insertKeluarga(readyKlg.toKeluargaEntity())
-                val message = "Berhasil fetching keluarga!"
-                emit(message)
-            } catch (e: SQLiteConstraintException) {
-                val message = "Gagal fetching keluarga! Constraint pelanggaran: ${e.message}"
-                Log.d(TAG, "fetchKeluarga: $message")
-                emit(message)
-            } catch (e: Exception) {
-                val message = "Gagal fetching keluarga! Kesalahan umum: ${e.message}"
-                Log.d(TAG, "fetchKeluarga: $message")
-                emit(message)
-            }
-        }
-    }
-
     override suspend fun updateKeluarga(keluarga: Keluarga): Flow<String> {
         return flow {
             try {
                 Log.d(TAG, "Keluarga entity: ${keluarga.toKeluargaEntity()}")
                 val updatedKlg = keluarga.copy(status = "update")
-                capi63Database.capi63Dao.updateKeluarga(updatedKlg.toKeluargaEntity())
+                capi63Dao.updateKeluarga(updatedKlg.toKeluargaEntity())
                 val message = "Berhasil mengubah keluarga!"
                 Log.d(TAG, "updateKeluarga: $message $keluarga")
                 emit(message)
@@ -92,7 +70,7 @@ class KeluargaRepositoryImpl @Inject constructor(
             try {
                 emit(Result.Loading(true))
 
-                val keluarga = capi63Database.capi63Dao.getKeluarga(kodeKlg)
+                val keluarga = capi63Dao.getKeluarga(kodeKlg)
 
                 Log.d(TAG, "Berhasil getKeluarga: $keluarga")
 
@@ -111,7 +89,7 @@ class KeluargaRepositoryImpl @Inject constructor(
             try {
                 emit(Result.Loading(true))
 
-                val lastKeluarga = capi63Database.capi63Dao.getLastKeluarga()
+                val lastKeluarga = capi63Dao.getLastKeluarga()
 
                 Log.d(TAG, "Berhasil getLastKeluarga: $lastKeluarga")
 
@@ -130,7 +108,7 @@ class KeluargaRepositoryImpl @Inject constructor(
             try {
                 emit(Result.Loading(true))
 
-                val lastKeluargaEgb = capi63Database.capi63Dao.getLastKeluargaEgb()
+                val lastKeluargaEgb = capi63Dao.getLastKeluargaEgb()
 
                 Log.d(TAG, "Berhasil getLastKeluargaEgb: $lastKeluargaEgb")
 
@@ -147,7 +125,7 @@ class KeluargaRepositoryImpl @Inject constructor(
     override suspend fun deleteAllKeluarga(): Flow<String> {
         return  flow {
             try {
-                capi63Database.capi63Dao.deleteAllKeluarga()
+                capi63Dao.deleteAllKeluarga()
                 val message = "Berhasil menghapus seluruh keluarga!"
                 Log.d(TAG, "deleteAllKeluarga: $message")
             } catch (e: Exception) {
@@ -164,7 +142,7 @@ class KeluargaRepositoryImpl @Inject constructor(
             try {
                 emit(Result.Loading(true))
 
-                val keluargaWithRuta = capi63Database.capi63Dao.getKeluargaWithRuta(kodeKlg)
+                val keluargaWithRuta = capi63Dao.getKeluargaWithRuta(kodeKlg)
 
                 Log.d(TAG, "Berhasil getKeluargaWithRuta: $keluargaWithRuta")
 

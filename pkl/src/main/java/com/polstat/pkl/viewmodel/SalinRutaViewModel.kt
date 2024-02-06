@@ -142,8 +142,9 @@ class SalinRutaViewModel @Inject constructor(
         keluarga: Keluarga
     ) {
         viewModelScope.launch {
-            keluargaRepository.insertKeluarga(keluarga).collectLatest { message ->
-                Log.d(TAG, message)
+            keluargaRepository.insertKeluarga(keluarga, KeluargaRepository.Method.Insert)
+                .collectLatest { message ->
+                    Log.d(TAG, message)
             }
         }
     }

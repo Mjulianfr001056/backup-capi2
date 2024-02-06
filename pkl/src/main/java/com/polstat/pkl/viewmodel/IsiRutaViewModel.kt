@@ -95,7 +95,7 @@ class IsiRutaViewModel @Inject constructor(
 
     fun setInitialKlgValue() {
         _state.value = state.value.copy(
-            SLS = lastKeluarga.value.SLS,
+            SLS = lastKeluarga.value.banjar,
             noSegmen = incrementStringNoSegmen(lastKeluarga.value.noSegmen),
             noBgFisik = lastKeluarga.value.noBgFisik,
             noBgSensus = lastKeluarga.value.noBgSensus
@@ -117,8 +117,9 @@ class IsiRutaViewModel @Inject constructor(
         keluarga: Keluarga
     ) {
         viewModelScope.launch {
-            keluargaRepository.insertKeluarga(keluarga).collectLatest { message ->
-                Log.d(TAG, message)
+            keluargaRepository.insertKeluarga(keluarga, KeluargaRepository.Method.Insert)
+                .collectLatest { message ->
+                    Log.d(TAG, message)
             }
         }
     }
@@ -148,7 +149,7 @@ class IsiRutaViewModel @Inject constructor(
     suspend fun getLastKeluarga(): KeluargaEntity {
         var keluargaEntity = KeluargaEntity(
             kodeKlg = "",
-            SLS = "",
+            banjar = "",
             noBgFisik = "",
             noBgSensus = "",
             noSegmen = "",
@@ -184,7 +185,7 @@ class IsiRutaViewModel @Inject constructor(
     suspend fun getLastKeluargaEgb(): KeluargaEntity {
         var keluargaEntity = KeluargaEntity(
             kodeKlg = "",
-            SLS = "",
+            banjar = "",
             noBgFisik = "",
             noBgSensus = "",
             noSegmen = "",

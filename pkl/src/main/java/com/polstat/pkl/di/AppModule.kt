@@ -100,7 +100,7 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideKeluargaRepository(capi63Database: Capi63Database) : KeluargaRepository {
-        return KeluargaRepositoryImpl(capi63Database)
+    fun provideKeluargaRepository(capi63Dao: Capi63Dao) : KeluargaRepository {
+        return KeluargaRepositoryImpl(capi63Dao)
     }
 }

@@ -2,13 +2,12 @@ package com.polstat.pkl.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.polstat.pkl.model.domain.Ruta
 
 @Entity(tableName = "keluarga")
 data class KeluargaEntity (
     @PrimaryKey(autoGenerate = false)
     val kodeKlg: String = "[not set]",
-    val SLS: String = "[not set]",
+    val banjar: String = "[not set]",
     val noBgFisik: String = "[not set]",
     val noBgSensus: String = "[not set]",
     val noSegmen: String = "[not set]",

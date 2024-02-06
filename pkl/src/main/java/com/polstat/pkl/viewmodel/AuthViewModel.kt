@@ -158,31 +158,24 @@ class AuthViewModel @Inject constructor(
 
             saveDataTim()
 
+            //Redundant but preferred
             if (authResponse.value.wilayah.isEmpty()) {
                 return@launch
             }
 
-            for (wilayah in authResponse.value.wilayah){
+            authResponse.value.wilayah.forEach { wilayah ->
                 wilayahRepository.insertWilayah(wilayah)
                     .collectLatest { message ->
                         Log.d(TAG, message)
                     }
 
-                if (wilayah.keluarga.isEmpty()){
-                    continue
-                }
-
-                for (keluarga in wilayah.keluarga){
-                    keluargaRepository.fetchKeluargaFromServer(keluarga)
+                wilayah.keluarga.forEach { keluarga ->
+                    keluargaRepository.insertKeluarga(keluarga, KeluargaRepository.Method.Fetch)
                         .collectLatest { message ->
                             Log.d(TAG, message)
                         }
 
-                    if (keluarga.ruta.isEmpty()){
-                        continue
-                    }
-
-                    for (ruta in keluarga.ruta){
+                    keluarga.ruta.forEach { ruta ->
                         localRutaRepository.fetchRutaFromServer(ruta)
                             .collectLatest { message ->
                                 Log.d(TAG, message)
@@ -194,42 +187,6 @@ class AuthViewModel @Inject constructor(
                     }
                 }
             }
-
-//            authResponse.value.wilayah.forEach { wilayah ->
-//                wilayahRepository.insertWilayah(wilayah)
-//                    .collectLatest { message ->
-//                        Log.d(TAG, message)
-//                    }
-//
-//                if (wilayah.keluarga.isEmpty()){
-//                    return@forEach
-//                }
-//
-//
-//                wilayah.keluarga.forEach { keluarga ->
-//                    keluargaRepository.fetchKeluargaFromServer(keluarga)
-//                        .collectLatest { message ->
-//                            Log.d(TAG, message)
-//                        }
-//
-//                    if (keluarga.ruta.isEmpty()){
-//                        return@forEach
-//                    }
-//
-//
-//                        keluarga.ruta.forEach { ruta ->
-//                            localRutaRepository.fetchRutaFromServer(ruta)
-//                                .collectLatest { message ->
-//                                    Log.d(TAG, message)
-//                                }
-//                            localRutaRepository.insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
-//                                .collectLatest { message ->
-//                                    Log.d(TAG, message)
-//                                }
-//                        }
-//
-//                    }
-//                }
 
             Log.d(TAG, "Token: ${_session?.token} ")
             delay(2000)
