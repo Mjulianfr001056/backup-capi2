@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.Date
 
+//Digunakan untuk menyimpan data blok sensus
 @Entity(tableName = "wilayah")
 data class WilayahEntity (
     @PrimaryKey(autoGenerate = false)

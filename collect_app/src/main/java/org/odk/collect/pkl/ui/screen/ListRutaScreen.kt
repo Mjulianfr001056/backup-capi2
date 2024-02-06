@@ -89,10 +89,8 @@ import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.utils.UtilFunctions
 import com.polstat.pkl.viewmodel.AuthViewModel
 import com.polstat.pkl.viewmodel.ListRutaViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
 
 //@Preview
@@ -198,24 +196,24 @@ fun ListRutaScreen(
                         )
                     }
                     IconButton(onClick = {
-                        coroutineScope.launch {
-                            val synchronizeRutaJob = async {
-                                viewModel.synchronizeRuta(
-                                    nim = session?.nim.toString(),
-                                    noBS = noBS.toString(),
-                                    wilayahWithAll = wilayahWithAll.value
-                                )
-                            }
-                            synchronizeRutaJob.await()
-                            val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
-                            lastJob.await()
-                            delay(1000L)
-                            navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${noBS}"){
-                                popUpTo(CapiScreen.Listing.LIST_BS + "/${noBS}"){
-                                    inclusive = true
-                                }
-                            }
-                        }
+//                        coroutineScope.launch {
+//                            val synchronizeRutaJob = async {
+//                                viewModel.synchronizeRuta(
+//                                    nim = session?.nim.toString(),
+//                                    noBS = noBS.toString(),
+//                                    wilayahWithAll = wilayahWithAll.value
+//                                )
+//                            }
+//                            synchronizeRutaJob.await()
+//                            val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
+//                            lastJob.await()
+//                            delay(1000L)
+//                            navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${noBS}"){
+//                                popUpTo(CapiScreen.Listing.LIST_BS + "/${noBS}"){
+//                                    inclusive = true
+//                                }
+//                            }
+//                        }
 
                     }) {
                         Icon(
@@ -251,21 +249,21 @@ fun ListRutaScreen(
                             DropdownMenuItem(
                                 text = { Text(text = stringResource(id = R.string.ambil_sampel)) },
                                 onClick = {
-                                    showMenu = false
-                                    if (noBS != null) {
-
-                                        coroutineScope.launch {
-                                            val generateRutaJob = async { viewModel.generateRuta(noBS) }
-                                            generateRutaJob.await()
-                                            val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
-                                            lastJob.await()
-                                            navController.navigate(CapiScreen.Listing.LIST_BS){
-                                                popUpTo(CapiScreen.Listing.LIST_BS){
-                                                    inclusive = true
-                                                }
-                                            }
-                                        }
-                                    }
+//                                    showMenu = false
+//                                    if (noBS != null) {
+//
+//                                        coroutineScope.launch {
+//                                            val generateRutaJob = async { viewModel.generateRuta(noBS) }
+//                                            generateRutaJob.await()
+//                                            val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
+//                                            lastJob.await()
+//                                            navController.navigate(CapiScreen.Listing.LIST_BS){
+//                                                popUpTo(CapiScreen.Listing.LIST_BS){
+//                                                    inclusive = true
+//                                                }
+//                                            }
+//                                        }
+//                                    }
                                 }
                             )
                         }
@@ -349,20 +347,20 @@ fun ListRutaScreen(
                             Button(
                                 modifier = Modifier.fillMaxWidth(),
                                 onClick = {
-                                    openFinalisasiBSDialog = false
-                                    coroutineScope.launch {
-                                        val finalisasiBSJob = async { viewModel.finalisasiBS(noBS.toString()) }
-                                        finalisasiBSJob.await()
-                                        delay(1000)
-                                        val lastJob = async { authViewModel.login(session.nim.toString(), session?.password.toString()) }
-                                        lastJob.await()
-                                        delay(2000)
-                                        navController.navigate(CapiScreen.Listing.LIST_BS){
-                                            popUpTo(CapiScreen.Listing.LIST_BS){
-                                                inclusive = true
-                                            }
-                                        }
-                                    }
+//                                    openFinalisasiBSDialog = false
+//                                    coroutineScope.launch {
+//                                        val finalisasiBSJob = async { viewModel.finalisasiBS(noBS.toString()) }
+//                                        finalisasiBSJob.await()
+//                                        delay(1000)
+//                                        val lastJob = async { authViewModel.login(session.nim.toString(), session?.password.toString()) }
+//                                        lastJob.await()
+//                                        delay(2000)
+//                                        navController.navigate(CapiScreen.Listing.LIST_BS){
+//                                            popUpTo(CapiScreen.Listing.LIST_BS){
+//                                                inclusive = true
+//                                            }
+//                                        }
+//                                    }
                                 },
                                 enabled = enableFinalisasiBSButton,
                                 content = {
@@ -855,7 +853,8 @@ fun RutaRow(
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_urut_keluarga,
-                                                value = UtilFunctions.convertTo3DigitsString(keluarga.noUrutKlg!!)
+//                                                value = UtilFunctions.convertTo3DigitsString(keluarga.noUrutKlg!!)
+                                                value = keluarga.noUrutKlg
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nama_kepala_keluarga,
@@ -1031,7 +1030,7 @@ fun RutaRow(
                             Text(modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    navController.navigate(CapiScreen.Listing.EDIT_RUTA + "/${ruta.noBS}/${keluarga.kodeKlg}/${ruta.kodeRuta}")
+//                                    navController.navigate(CapiScreen.Listing.EDIT_RUTA + "/${ruta.noBS}/${keluarga.kodeKlg}/${ruta.kodeRuta}")
                                 }
                                 .padding(
                                     top = 10.dp,
@@ -1046,7 +1045,7 @@ fun RutaRow(
                             Text(modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    navController.navigate(CapiScreen.Listing.SALIN_RUTA + "/${ruta.noBS}/${ruta.kodeRuta}")
+//                                    navController.navigate(CapiScreen.Listing.SALIN_RUTA + "/${ruta.noBS}/${ruta.kodeRuta}")
                                 }
                                 .padding(
                                     top = 10.dp,
@@ -1090,17 +1089,17 @@ fun RutaRow(
                     Button(
                         modifier = Modifier.fillMaxWidth(0.45f),
                         onClick = {
-                            viewModel.deleteRuta(
-                                kodeRuta = ruta.kodeRuta
-                            )
-                            openPasswordMasterDialog = false
-                            openActionDialog = false
-                            navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${ruta.noBS}"){
-                                popUpTo(CapiScreen.Listing.LIST_RUTA + "/${ruta.noBS}"){
-                                    inclusive = true
-                                }
-                            }
-                            Toast.makeText(context, "Ruta ${ruta.namaKrt} berhasil dihapus", Toast.LENGTH_SHORT).show()
+//                            viewModel.deleteRuta(
+//                                kodeRuta = ruta.kodeRuta
+//                            )
+//                            openPasswordMasterDialog = false
+//                            openActionDialog = false
+//                            navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${ruta.noBS}"){
+//                                popUpTo(CapiScreen.Listing.LIST_RUTA + "/${ruta.noBS}"){
+//                                    inclusive = true
+//                                }
+//                            }
+//                            Toast.makeText(context, "Ruta ${ruta.namaKrt} berhasil dihapus", Toast.LENGTH_SHORT).show()
                         },
                         colors = ButtonDefaults.buttonColors(PklPrimary900)) {
                         Text(text = stringResource(id = R.string.hapus_pass_master))

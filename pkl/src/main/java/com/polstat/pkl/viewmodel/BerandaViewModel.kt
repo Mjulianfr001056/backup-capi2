@@ -72,7 +72,8 @@ class BerandaViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val getDataTimWithAllJob = async { getDataTimWithAll(_session?.idTim.toString()) }
+//            val getDataTimWithAllJob = async { getDataTimWithAll(_session?.idTim.toString()) }
+            val getDataTimWithAllJob = async { getDataTimWithAll(_session?.nim.toString()) }
             getDataTimWithAllJob.await()
             val getMahasiswaWithWilayahJob = async { getMahasiswaWithWilayah(_session?.nim.toString()) }
             getMahasiswaWithWilayahJob.await()

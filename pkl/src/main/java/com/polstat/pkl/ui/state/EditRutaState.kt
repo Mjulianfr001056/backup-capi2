@@ -1,6 +1,6 @@
 package com.polstat.pkl.ui.state
 
-data class EditRutaState (
+data class EditRutaState(
     val SLS: String = "",
     val SLSError: String? = null,
     val noSegmen: String = "S000",
@@ -9,7 +9,7 @@ data class EditRutaState (
     val noBgFisikError: String? = null,
     val noBgSensus: String = "",
     val noBgSensusError: String? = null,
-    val noUrutKlg: Int = 0,
+    val noUrutKlg: String = "",
     val noUrutKlgError: String? = null,
     val namaKK: String = "",
     val namaKKError: String? = null,
@@ -23,7 +23,7 @@ data class EditRutaState (
     val penglMknError: String? = null,
     val noUrutRuta: Int = 0,
     val noUrutRutaError: String? = null,
-    val kkOrKrt : String = "",
+    val kkOrKrt: String = "",
     val kkOrKrtError: String? = null,
     val namaKrt: String = "",
     val namaKrtError: String? = null,
@@ -34,7 +34,7 @@ data class EditRutaState (
     val kodeRuta: String = "",
     val kodeRutaError: String? = null,
     val long: Double = 0.0,
-    val longError : String? = null,
+    val longError: String? = null,
     val lat: Double = 0.0,
     val latError: String? = null,
 )

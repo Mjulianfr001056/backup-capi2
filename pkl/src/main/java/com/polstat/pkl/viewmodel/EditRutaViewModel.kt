@@ -255,8 +255,9 @@ class EditRutaViewModel @Inject constructor(
                     isGenzOrtu = state.value.isGenzOrtu,
                     noUrutKlgEgb = state.value.noUrutKlgEgb,
                     penglMkn = state.value.penglMkn,
-                    noBS = noBS,
-                    kodeKlg = "K"+ noBS + UtilFunctions.convertTo3DigitsString(state.value.noUrutKlg!!),
+//                    noBS = noBS,
+//                    kodeKlg = "K"+ noBS + UtilFunctions.convertTo3DigitsString(state.value.noUrutKlg!!),
+                    kodeKlg = "K"+ noBS + state.value.noUrutKlg,
                     status = "update"
                 )
 
@@ -272,7 +273,7 @@ class EditRutaViewModel @Inject constructor(
                     katGenz = if (state.value.genzOrtu!! >= 1 && state.value.genzOrtu!! <= 2) 1 else if (state.value.genzOrtu!! >= 3 && state.value.genzOrtu!! <= 4) 2 else if (state.value.genzOrtu!! > 4) 3 else 0,
                     long = state.value.long,
                     lat = state.value.lat,
-                    noBS = noBS,
+//                    noBS = noBS,
                     status = "update"
                 )
 

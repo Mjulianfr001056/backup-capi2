@@ -1,6 +1,5 @@
 package com.polstat.pkl.repository
 
-import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.database.relation.WilayahWithKeluarga
 import com.polstat.pkl.database.relation.WilayahWithRuta
@@ -18,7 +17,7 @@ interface WilayahRepository {
 
     suspend fun getWilayahWithRuta(noBS: String) : Flow<Result<WilayahWithRuta>>
 
-    suspend fun getWilayahByNIM(nim: String) : Flow<Result<List<WilayahEntity>>>
+//    suspend fun getWilayahByNIM(nim: String) : Flow<Result<List<WilayahEntity>>>
 
     suspend fun getWilayahWithAll(noBS: String) : Flow<Result<WilayahWithAll>>
 

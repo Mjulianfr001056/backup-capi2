@@ -1,6 +1,5 @@
 package com.polstat.pkl.database.relation
 
-import androidx.room.DatabaseView
 import androidx.room.Embedded
 import androidx.room.Relation
 import com.polstat.pkl.database.entity.MahasiswaEntity
@@ -11,7 +10,7 @@ data class MahasiswaWithWilayah (
     val mahasiswa: MahasiswaEntity? = MahasiswaEntity(),
     @Relation(
         parentColumn = "nim",
-        entityColumn = "nim"
+        entityColumn = "idBS"
     )
     val listWilayah: List<WilayahEntity>? = emptyList()
 )

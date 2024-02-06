@@ -291,7 +291,7 @@ fun EditRutaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 EditRutaEvent.NoUrutKlgChanged(
-                                    it.toInt()
+                                    it.toInt().toString()
                                 )
                             )
                         }

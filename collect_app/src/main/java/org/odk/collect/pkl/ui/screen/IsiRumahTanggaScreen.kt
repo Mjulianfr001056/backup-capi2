@@ -138,7 +138,7 @@ fun IsiRumahTanggaScreen(
                     .padding(15.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                if (lastKeluarga.value.noUrutKlg != 0) {
+                if (lastKeluarga.value.noUrutKlg != "") {
                     Card(
                         border = BorderStroke(1.dp, PklSecondary),
                         colors = CardDefaults.cardColors(
@@ -173,7 +173,8 @@ fun IsiRumahTanggaScreen(
                                 )
                                 TableCellForm(
                                     label = "No. Klg",
-                                    value = ": ${UtilFunctions.convertTo3DigitsString(lastKeluarga.value.noUrutKlg)}",
+//                                    value = ": ${UtilFunctions.convertTo3DigitsString(lastKeluarga.value.noUrutKlg)}",
+                                    value = ": ${lastKeluarga.value.noUrutKlg}",
                                     fontSize = 10.sp,
                                     weight = weight
                                 )

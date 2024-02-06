@@ -1,8 +1,6 @@
 package com.polstat.pkl.repository
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import com.polstat.pkl.model.domain.Session
 import com.polstat.pkl.model.response.AuthResponse
 import com.polstat.pkl.network.AuthApi
@@ -11,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import okio.IOException
 import retrofit2.HttpException
-import java.time.Instant
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -20,7 +17,7 @@ class AuthRepositoryImpl @Inject constructor(
 ) : AuthRepository {
 
     companion object {
-        private const val TAG = "AuthRepositoryImpl"
+        private const val TAG = "CAPI_AuthRepo"
     }
 
     val session = sessionRepository.getActiveSession()
@@ -30,25 +27,28 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun login(nim: String, password: String): Flow<Result<AuthResponse>> {
         return flow {
             emit(Result.Loading(true))
             val authResponse = try {
                 val response = authApi.login(nim, password)
+
                 val newSession = Session(
                     nama = response.nama,
                     nim = response.nim,
-                    password = password,
+                    //password = password,
                     avatar = response.avatar,
                     isKoor = response.isKoor,
-                    id_kuesioner = response.idKuesioner,
+                    //id_kuesioner = response.idKuesioner,
                     idTim = response.dataTim.idTim,
+                    namaTim = response.dataTim.namaTim,
                     token = response.token
                 )
+
                 saveSession(newSession)
                 sessionRepository.logIn()
-                Log.d(TAG, "Session was saved: $session")
+
+                Log.d(TAG, "Session was saved: ${session?.nim}")
                 response
             } catch (e: IOException) {
                 e.printStackTrace()

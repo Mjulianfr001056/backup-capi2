@@ -28,7 +28,6 @@ class SessionRepositoryImpl @Inject constructor(
 
     private val gson = Gson()
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun logIn() {
         sharedPreferences.edit().putLong(KEY_LAST_ACTIVE_TIME, Instant.now().toEpochMilli()).apply()
     }

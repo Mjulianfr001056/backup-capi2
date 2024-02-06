@@ -66,10 +66,8 @@ import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.viewmodel.AuthViewModel
 import com.polstat.pkl.viewmodel.ListBSViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
 import java.util.Date
 
@@ -150,16 +148,16 @@ fun ListBSScreen(
                     ) {
                         IconButton(
                             onClick = {
-                                coroutineScope.launch {
-                                    val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
-                                    lastJob.await()
-                                    delay(2000)
-                                    navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring"){
-                                        popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring"){
-                                            inclusive = true
-                                        }
-                                    }
-                                }
+//                                coroutineScope.launch {
+//                                    val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
+//                                    lastJob.await()
+//                                    delay(2000)
+//                                    navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring"){
+//                                        popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring"){
+//                                            inclusive = true
+//                                        }
+//                                    }
+//                                }
 
                             }
                         ) {
@@ -496,7 +494,7 @@ fun BS() {
             status = "telah-disampel",
             tglListing = Date(),
             tglPeriksa = Date(),
-            nim = ""
+//            nim = ""
         )
     )
 }

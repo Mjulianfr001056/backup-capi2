@@ -116,9 +116,9 @@ interface Capi63Dao {
     @Query("SELECT * FROM wilayah WHERE noBS = :noBS")
     suspend fun getWilayahWithRuta(noBS: String) : WilayahWithRuta
 
-    @Transaction
-    @Query("SELECT * FROM wilayah WHERE nim = :nim")
-    suspend fun getWilayahByNIM(nim: String) : List<WilayahEntity>
+//    @Transaction
+//    @Query("SELECT * FROM wilayah")
+//    suspend fun getWilayahByNIM(nim: String) : List<WilayahEntity>
 
     @Transaction
     @Query("SELECT * FROM sampel_ruta WHERE noBS = :noBS")

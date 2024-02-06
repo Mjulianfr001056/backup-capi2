@@ -17,7 +17,7 @@ data class IsiRutaScreenState(
     /**
      * Ini adalah state untuk menyimpan data beberapa keluarga
      */
-    val listNoUrutKlg: List<Int> = emptyList(),
+    val listNoUrutKlg: List<String> = emptyList(),
     val listNoUrutKlgError: List<String> = emptyList(),
     val listNamaKK: List<String> = emptyList(),
     val listNamaKKError: List<String> = emptyList(),
@@ -35,7 +35,7 @@ data class IsiRutaScreenState(
      */
     val listNoUrutRuta: List<List<Int>> = emptyList(),
     val listNoUrutRutaError: List<List<String>> = emptyList(),
-    val listKkOrKrt : List<List<String>> = emptyList(),
+    val listKkOrKrt: List<List<String>> = emptyList(),
     val listKkOrKrtError: List<List<String>> = emptyList(),
     val listNamaKrt: List<List<String>> = emptyList(),
     val listNamaKrtError: List<List<String>> = emptyList(),

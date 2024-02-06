@@ -55,36 +55,36 @@ class ListBSViewModel @Inject constructor(
 
     init {
         getMahasiswaWithWilayah(_session?.nim.toString())
-        getWilayahByNIM(_session?.nim.toString())
+//        getWilayahByNIM(_session?.nim.toString())
         Log.d(TAG, "isMonitoring: $isMonitoring")
     }
 
-    private fun getWilayahByNIM(
-        nim: String
-    ) {
-        viewModelScope.launch {
-            wilayahRepository.getWilayahByNIM(nim).collectLatest { result ->
-                when(result) {
-                    is Result.Success -> {
-                        result.data?.let { response ->
-                            _listWilayahByNIM.value = response
-                            Log.d(TAG, "getDataWilayahByNIM success: $response")
-                        }
-                    }
-                    is Result.Loading -> {
-                        Log.d(TAG, "getDataWilayahByNIM: Loading...")
-                    }
-                    is Result.Error -> {
-                        result.message?.let { error ->
-                            _errorMessage.value = error
-                        }
-                        _showErrorToastChannel.send(true)
-                        Log.e(TAG, "getDataWilayahByNIM: Error in getDataWilayahByNIM")
-                    }
-                }
-            }
-        }
-    }
+//    private fun getWilayahByNIM(
+//        nim: String
+//    ) {
+//        viewModelScope.launch {
+//            wilayahRepository.getWilayahByNIM(nim).collectLatest { result ->
+//                when(result) {
+//                    is Result.Success -> {
+//                        result.data?.let { response ->
+//                            _listWilayahByNIM.value = response
+//                            Log.d(TAG, "getDataWilayahByNIM success: $response")
+//                        }
+//                    }
+//                    is Result.Loading -> {
+//                        Log.d(TAG, "getDataWilayahByNIM: Loading...")
+//                    }
+//                    is Result.Error -> {
+//                        result.message?.let { error ->
+//                            _errorMessage.value = error
+//                        }
+//                        _showErrorToastChannel.send(true)
+//                        Log.e(TAG, "getDataWilayahByNIM: Error in getDataWilayahByNIM")
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     private fun getMahasiswaWithWilayah(
         nim: String

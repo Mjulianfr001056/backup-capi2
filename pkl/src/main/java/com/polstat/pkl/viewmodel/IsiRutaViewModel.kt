@@ -152,13 +152,13 @@ class IsiRutaViewModel @Inject constructor(
             noBgFisik = "",
             noBgSensus = "",
             noSegmen = "",
-            noUrutKlg = 0,
+            noUrutKlg = "",
             noUrutKlgEgb = 0,
             namaKK = "",
             alamat = "",
             isGenzOrtu = 0,
             penglMkn = 0,
-            noBS = "",
+//            noBS = "",
             status = ""
         )
 
@@ -188,13 +188,13 @@ class IsiRutaViewModel @Inject constructor(
             noBgFisik = "",
             noBgSensus = "",
             noSegmen = "",
-            noUrutKlg = 0,
+            noUrutKlg = "",
             noUrutKlgEgb = 0,
             namaKK = "",
             alamat = "",
             isGenzOrtu = 0,
             penglMkn = 0,
-            noBS = "",
+//            noBS = "",
             status = ""
         )
 
@@ -229,7 +229,7 @@ class IsiRutaViewModel @Inject constructor(
             long = 0.0,
             lat = 0.0,
             catatan = "",
-            noBS = "",
+//            noBS = "",
             status = ""
         )
 
@@ -358,7 +358,8 @@ class IsiRutaViewModel @Inject constructor(
             }
             is IsiRutaScreenEvent.NoUrutKlgChanged -> {
                 val newListNoUrutKlg = state.value.listNoUrutKlg.toMutableList()
-                newListNoUrutKlg[index] = event.noUrutKlg
+//                newListNoUrutKlg[index] = event.noUrutKlg
+                newListNoUrutKlg[index] = event.noUrutKlg.toString()
                 _state.emit(state.value.copy(listNoUrutKlg = newListNoUrutKlg))
             }
             is IsiRutaScreenEvent.NamaKKChanged -> {
@@ -567,8 +568,9 @@ class IsiRutaViewModel @Inject constructor(
                             isGenzOrtu = state.value.listIsGenzOrtu[indexKlg],
                             noUrutKlgEgb = state.value.listNoUrutKlgEgb[indexKlg],
                             penglMkn = state.value.listPenglMkn[indexKlg],
-                            noBS = noBS,
-                            kodeKlg = "K"+ noBS + UtilFunctions.convertTo3DigitsString(state.value.listNoUrutKlg[indexKlg]),
+//                            noBS = noBS,
+//                            kodeKlg = "K"+ noBS + UtilFunctions.convertTo3DigitsString(state.value.listNoUrutKlg[indexKlg]),
+                            kodeKlg = "K"+ noBS + state.value.listNoUrutKlg[indexKlg],
                             status = "insert"
                         )
 
@@ -598,7 +600,7 @@ class IsiRutaViewModel @Inject constructor(
                                     long = lokasi.value.longitude,
                                     lat = lokasi.value.latitude,
                                     catatan = "",
-                                    noBS = noBS,
+//                                    noBS = noBS,
                                     status = "insert"
                                 )
 

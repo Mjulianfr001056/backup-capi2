@@ -193,7 +193,10 @@ class SalinRutaViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-            wilayahRepository.updateWilayah(updatedWilayah, nim).collectLatest { message ->
+//            wilayahRepository.updateWilayah(updatedWilayah, nim).collectLatest { message ->
+//                Log.d(TAG, message)
+//            }
+            wilayahRepository.updateWilayah(updatedWilayah).collectLatest { message ->
                 Log.d(TAG, message)
             }
         }
@@ -257,13 +260,13 @@ class SalinRutaViewModel @Inject constructor(
                     noSegmen = state.value.noSegmen,
                     noBgFisik = state.value.noBgFisik,
                     noBgSensus = state.value.noBgSensus,
-                    noUrutKlg = state.value.noUrutKlg,
+                    noUrutKlg = state.value.noUrutKlg.toString(),
                     namaKK = state.value.namaKK,
                     alamat = state.value.alamat,
                     isGenzOrtu = state.value.isGenzOrtu,
                     noUrutKlgEgb = state.value.noUrutKlgEgb,
                     penglMkn = state.value.penglMkn,
-                    noBS = noBS,
+//                    noBS = noBS,
                     kodeKlg = "K"+ noBS + UtilFunctions.convertTo3DigitsString(state.value.noUrutKlg!!),
                     status = "insert"
                 )

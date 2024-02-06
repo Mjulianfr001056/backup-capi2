@@ -107,23 +107,23 @@ class WilayahRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getWilayahByNIM(
-        nim: String
-    ): Flow<Result<List<WilayahEntity>>> {
-        return flow {
-            try {
-                emit(Result.Loading(true))
-                val wilayahList = capi63Database.capi63Dao.getWilayahByNIM(nim)
-                Log.d(TAG, "Berhasil getWilayahByNIM: $wilayahList")
-                emit(Result.Success(wilayahList))
-            } catch (e: Exception) {
-                Log.d(TAG, "Gagal getWilayahByNIM: ${e.message}")
-                emit(Result.Error(null, "Error fetching WilayahByNIM: ${e.message}"))
-            } finally {
-                emit(Result.Loading(false))
-            }
-        }
-    }
+//    override suspend fun getWilayahByNIM(
+//        nim: String
+//    ): Flow<Result<List<WilayahEntity>>> {
+//        return flow {
+//            try {
+//                emit(Result.Loading(true))
+//                val wilayahList = capi63Database.capi63Dao.getWilayahByNIM(nim)
+//                Log.d(TAG, "Berhasil getWilayahByNIM: $wilayahList")
+//                emit(Result.Success(wilayahList))
+//            } catch (e: Exception) {
+//                Log.d(TAG, "Gagal getWilayahByNIM: ${e.message}")
+//                emit(Result.Error(null, "Error fetching WilayahByNIM: ${e.message}"))
+//            } finally {
+//                emit(Result.Loading(false))
+//            }
+//        }
+//    }
 
     override suspend fun getWilayahWithAll(
         noBS: String

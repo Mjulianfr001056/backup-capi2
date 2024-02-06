@@ -10,7 +10,7 @@ data class WilayahWithKeluarga (
     val wilayah: WilayahEntity? = WilayahEntity(),
     @Relation(
         parentColumn = "noBS",
-        entityColumn = "noBS"
+        entityColumn = "SLS"
     )
     val listKeluarga: List<KeluargaEntity>? = emptyList()
 )
