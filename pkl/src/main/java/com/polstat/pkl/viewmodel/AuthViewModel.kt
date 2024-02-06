@@ -156,7 +156,14 @@ class AuthViewModel @Inject constructor(
                 }
             }
 
-//            saveDataTim()
+            saveDataTim()
+
+            Log.d(
+                TAG,
+                "${dataTimRepository.getDataTim(
+                    authResponse.value.dataTim.idTim
+                )}"
+            )
 
             if (authResponse.value.wilayah.isEmpty()) {
                 return@launch
@@ -267,6 +274,17 @@ class AuthViewModel @Inject constructor(
 //    }
 
     private suspend fun saveDataTim(){
+        if (!authResponse.value.isKoor || authResponse.value.dataTim.idTim.isEmpty()) {
+            return
+        }
+
+        authResponse.value.dataTim.anggota.forEach {
+            dataTimRepository.insertAnggotaTim(it.nim to it.nama)
+                .collectLatest { message ->
+                    Log.d(TAG, message)
+                }
+        }
+
 //        val dataTim = if (authResponse.value.isKoor) Tim.Pml(
 //            idTim = authResponse.value.dataTim.idTim,
 //            namaTim = authResponse.value.dataTim.namaTim,

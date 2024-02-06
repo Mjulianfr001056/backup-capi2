@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "data_tim")
+@Deprecated("OTW dihapus")
 data class DataTimEntity (
     @PrimaryKey(autoGenerate = false)
     val idTim: String = "",

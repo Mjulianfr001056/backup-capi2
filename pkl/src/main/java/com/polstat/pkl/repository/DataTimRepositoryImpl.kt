@@ -2,6 +2,7 @@ package com.polstat.pkl.repository
 
 import android.util.Log
 import com.polstat.pkl.database.dao.Capi63Dao
+import com.polstat.pkl.database.entity.AnggotaTimEntity
 import com.polstat.pkl.database.entity.DataTimEntity
 import com.polstat.pkl.database.relation.DataTimWithAll
 import com.polstat.pkl.database.relation.DataTimWithMahasiswa
@@ -56,6 +57,24 @@ class DataTimRepositoryImpl @Inject constructor (
             }catch (e: Exception){
                 val message = "Gagal menambahkan data tim!"
                 Log.d(TAG, "insertTim: $message (${e.message})")
+                emit(message)
+                return@flow
+            }
+        }
+    }
+
+    //TODO(Pertimbangkan pakai model daripada pair)
+    override suspend fun insertAnggotaTim(anggota: Pair<String, String>): Flow<String> {
+        return flow {
+            try {
+                val anggotaTim = AnggotaTimEntity(anggota.first, anggota.second)
+                dao.insertAnggotaTim(anggotaTim)
+
+                val message = "Berhasil menambahkan data tim!"
+                emit(message)
+            }catch (e: Exception){
+                val message = "Gagal menambahkan data tim!"
+                Log.d(TAG, "insertAnggota: $message (${e.message})")
                 emit(message)
                 return@flow
             }
