@@ -79,7 +79,12 @@ class AuthViewModel @Inject constructor(
             getLocationUseCase.invoke().collect { location ->
                 if (location != null && _session?.nim != null) {
                     Log.d(TAG, "getLocationUseCase: Nim = ${_session.nim}")
-                    locationRepository.updateLocation(_session.nim,location.longitude,location.latitude,location.accuracy)
+                    locationRepository.updateLocation(
+                        _session.nim,
+                        location.longitude,
+                        location.latitude,
+                        location.accuracy
+                    )
                 }
                 Log.d(TAG, "getCurrentLocation: ${location?.latitude}, ${location?.longitude}, ${location?.accuracy}")
             }
@@ -124,7 +129,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-//    @Suppress("NAME_SHADOWING")
+    //    @Suppress("NAME_SHADOWING")
     fun login(
         nim: String,
         password: String
@@ -263,8 +268,8 @@ class AuthViewModel @Inject constructor(
     fun onPermissionResult(
         permission: String,
         isGranted: Boolean,
-    ){
-        if (!isGranted && !visiblePermissionDialogQueue.contains(permission)){
+    ) {
+        if (!isGranted && !visiblePermissionDialogQueue.contains(permission)) {
             visiblePermissionDialogQueue.add(permission)
         }
     }

@@ -37,6 +37,10 @@ class ListBSViewModel @Inject constructor(
 
     val isMonitoring = savedStateHandle.get<Boolean>("isMonitoring")
 
+    private val _listWilayah = MutableStateFlow<List<WilayahEntity>>(emptyList())
+
+    val listWilayah = _listWilayah.asStateFlow()
+
     private val _listWilayahByNIM = MutableStateFlow<List<WilayahEntity>>(emptyList())
 
     val listWilayahByNIM = _listWilayahByNIM.asStateFlow()
@@ -54,37 +58,32 @@ class ListBSViewModel @Inject constructor(
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
     init {
-        getMahasiswaWithWilayah(_session?.nim.toString())
-//        getWilayahByNIM(_session?.nim.toString())
+        getAllWilayah()
         Log.d(TAG, "isMonitoring: $isMonitoring")
     }
 
-//    private fun getWilayahByNIM(
-//        nim: String
-//    ) {
-//        viewModelScope.launch {
-//            wilayahRepository.getWilayahByNIM(nim).collectLatest { result ->
-//                when(result) {
-//                    is Result.Success -> {
-//                        result.data?.let { response ->
-//                            _listWilayahByNIM.value = response
-//                            Log.d(TAG, "getDataWilayahByNIM success: $response")
-//                        }
-//                    }
-//                    is Result.Loading -> {
-//                        Log.d(TAG, "getDataWilayahByNIM: Loading...")
-//                    }
-//                    is Result.Error -> {
-//                        result.message?.let { error ->
-//                            _errorMessage.value = error
-//                        }
-//                        _showErrorToastChannel.send(true)
-//                        Log.e(TAG, "getDataWilayahByNIM: Error in getDataWilayahByNIM")
-//                    }
-//                }
-//            }
-//        }
-//    }
+    private fun getAllWilayah() {
+        viewModelScope.launch {
+            wilayahRepository.getAllWilayah().collectLatest { result ->
+                when(result) {
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            _errorMessage.value = error
+                            Log.e(TAG, "getAllWilayah: Error in getAllWilayah ($errorMessage)")
+                        }
+                        _showErrorToastChannel.send(true)
+                    }
+                    is Result.Loading -> Log.d(TAG, "getAllWilayah: Loading...")
+                    is Result.Success -> {
+                        result.data?.let {
+                            _listWilayah.value = it
+                            Log.d(TAG, "getAllWilayah: $listWilayah")
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     private fun getMahasiswaWithWilayah(
         nim: String

@@ -19,55 +19,47 @@ fun Wilayah.toWilayahEntity(): WilayahEntity {
         status = status,
         tglListing = tglListing,
         tglPeriksa = tglPeriksa
-//        idKab = idKab,
-//        idKec = idKec,
-//        idKel = idKel,
-//        catatan = catatan,
     )
 }
 
-fun WilayahEntity.toWilayah(
-    keluarga: List<Keluarga>
-): Wilayah {
-    return Wilayah(
-        idBS = idBS,
-        noBS = noBS,
-        namaKab = namaKab,
-        namaKec = namaKec,
-        namaKel = namaKel,
-        jmlKlg = jmlKlg,
-        jmlKlgEgb = jmlKlgEgb,
-        jmlRuta = jmlRuta,
-        jmlRutaEgb = jmlRutaEgb,
-        status = status,
-        tglListing = tglListing,
-        tglPeriksa = tglPeriksa,
-        keluarga = keluarga
-//        idKab = idKab,
-//        idKec = idKec,
-//        idKel = idKel,
-//        catatan = catatan,
-    )
-}
+//fun WilayahEntity.toWilayah(
+//    keluarga: List<Keluarga>
+//): Wilayah {
+//    return Wilayah(
+//        idBS = idBS,
+//        noBS = noBS,
+//        namaKab = namaKab,
+//        namaKec = namaKec,
+//        namaKel = namaKel,
+//        jmlKlg = jmlKlg,
+//        jmlKlgEgb = jmlKlgEgb,
+//        jmlRuta = jmlRuta,
+//        jmlRutaEgb = jmlRutaEgb,
+//        status = status,
+//        tglListing = tglListing,
+//        tglPeriksa = tglPeriksa,
+//        keluarga = keluarga
+//    )
+//}
 
-fun SyncRutaResponse.toWilayah(): Wilayah {
-    return Wilayah(
-        idBS = idBS,
-        noBS = noBS,
-        idKab = idKab,
-        namaKab = namaKab,
-        idKec = idKec,
-        namaKec = namaKec,
-        idKel = idKel,
-        namaKel = namaKel,
-        jmlKlg = jmlKlg,
-        jmlKlgEgb = jmlKlgEgb,
-        jmlRuta = jmlRuta,
-        jmlRutaEgb = jmlRutaEgb,
-        tglListing = tglListing,
-        tglPeriksa = tglPeriksa,
-        catatan = catatan,
-        status = status,
-        keluarga = keluarga
-    )
-}
+//fun SyncRutaResponse.toWilayah(): Wilayah {
+//    return Wilayah(
+//        idBS = idBS,
+//        noBS = noBS,
+//        idKab = idKab,
+//        namaKab = namaKab,
+//        idKec = idKec,
+//        namaKec = namaKec,
+//        idKel = idKel,
+//        namaKel = namaKel,
+//        jmlKlg = jmlKlg,
+//        jmlKlgEgb = jmlKlgEgb,
+//        jmlRuta = jmlRuta,
+//        jmlRutaEgb = jmlRutaEgb,
+//        tglListing = tglListing,
+//        tglPeriksa = tglPeriksa,
+//        catatan = catatan,
+//        status = status,
+//        keluarga = keluarga
+//    )
+//}

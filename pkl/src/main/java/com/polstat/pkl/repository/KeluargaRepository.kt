@@ -14,6 +14,10 @@ interface KeluargaRepository {
 
     suspend fun getKeluarga(kodeKlg: String) : Flow<Result<KeluargaEntity>>
 
+    suspend fun getAllKeluargaByWilayah(idBS: String) : Flow<Result<List<KeluargaEntity>>>
+
+    suspend fun getAllKeluargaByRuta(kodeRuta: String) : Flow<Result<List<KeluargaEntity>>>
+
     suspend fun getLastKeluarga() : Flow<Result<KeluargaEntity>>
 
     suspend fun getLastKeluargaEgb() : Flow<Result<KeluargaEntity>>

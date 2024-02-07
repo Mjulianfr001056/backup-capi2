@@ -7,14 +7,14 @@ import androidx.room.PrimaryKey
 data class MahasiswaEntity (
     @PrimaryKey(autoGenerate = false)
     val nim: String = "",
-    val alamat: String = "[Not set]",// tdk dipake
-    val email: String = "[Not set]", //
-    val foto: String = "[Not set]",
-    val id_tim: String = "[Not set]",
-    val isKoor: Boolean = false, // akan dibuah jdi isPML
+//    val alamat: String = "[Not set]",// tdk dipake
+//    val email: String = "[Not set]", //
+//    val foto: String = "[Not set]",
+//    val id_tim: String = "[Not set]",
+//    val isPML: Boolean = false, // akan dibuah jdi isPML
     val nama: String = "[Not set]",
     val no_hp: String = "[Not set]",
-    val password: String = "[Not set]"//
+//    val password: String = "[Not set]"//
 )
 
 /** QC 23/Jan/2024

@@ -35,7 +35,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,7 +63,6 @@ import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
-import com.polstat.pkl.viewmodel.AuthViewModel
 import com.polstat.pkl.viewmodel.ListBSViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -76,17 +74,14 @@ import java.util.Date
 @Composable
 fun ListBSScreen(
     navController: NavHostController,
-    viewModel: ListBSViewModel,
-    authViewModel: AuthViewModel
+    viewModel: ListBSViewModel
 ) {
 
-    val listWilayah = viewModel.listWilayahByNIM
+    val session = viewModel.session
 
-    val mahasiswaWithWilayah = viewModel.mahasiswaWithWilayah.collectAsState()
+    val listWilayah = viewModel.listWilayah
 
     val context = LocalContext.current
-
-    val session = viewModel.session
 
     val isMonitoring = viewModel.isMonitoring
 
@@ -148,17 +143,13 @@ fun ListBSScreen(
                     ) {
                         IconButton(
                             onClick = {
-//                                coroutineScope.launch {
-//                                    val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
-//                                    lastJob.await()
-//                                    delay(2000)
-//                                    navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring"){
-//                                        popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring"){
-//                                            inclusive = true
-//                                        }
-//                                    }
-//                                }
-
+                                coroutineScope.launch {
+                                    navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring"){
+                                        popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring"){
+                                            inclusive = true
+                                        }
+                                    }
+                                }
                             }
                         ) {
                             Icon(
@@ -174,7 +165,7 @@ fun ListBSScreen(
         },
         content = { innerPadding ->
             if (isMonitoring != null) {
-                val listWilayahValue = if (isMonitoring) listWilayah.value else mahasiswaWithWilayah.value.listWilayah
+                val listWilayahValue = listWilayah.value
 
                 ListBS(
                     listWilayah = listWilayahValue,
@@ -183,12 +174,6 @@ fun ListBSScreen(
                     isMonitoring = isMonitoring
                 )
             }
-
-//            ListBS(
-//                listWilayah = mahasiswaWithWilayah.value.listWilayah,
-//                navController = navController,
-//                modifier = Modifier.padding(innerPadding)
-//            )
         },
     )
 }
@@ -465,8 +450,7 @@ fun PreviewListBSScreen() {
             val navController = rememberNavController()
             ListBSScreen(
                 navController = navController,
-                viewModel = hiltViewModel(),
-                authViewModel = hiltViewModel()
+                viewModel = hiltViewModel()
             )
         }
     }
@@ -480,21 +464,16 @@ fun BS() {
         onLihatSampleClicked = { /*TODO*/ },
         wilayah = WilayahEntity(
             noBS = "444C",
-//            idKab = "001",
-//            idKec = "001",
-//            idKel = "002",
             namaKab = "Buleleng",
             namaKec = "Kecamatan A",
             namaKel = "Kelurahan B",
-//            catatan = "",
             jmlKlg = 0,
             jmlKlgEgb = 0,
             jmlRuta = 0,
             jmlRutaEgb = 0,
             status = "telah-disampel",
             tglListing = Date(),
-            tglPeriksa = Date(),
-//            nim = ""
+            tglPeriksa = Date()
         )
     )
 }

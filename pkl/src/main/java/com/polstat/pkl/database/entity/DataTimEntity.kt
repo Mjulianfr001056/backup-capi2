@@ -12,7 +12,7 @@ data class DataTimEntity (
     val passPML: String = "[Not set]",
     val namaPML: String = "[Not set]",
     val nimPML: String = "[Not set]",
-    val teleponPML: String = "[Not set]",
+    val teleponPML: String = "[Not set]"
 )
 
 /** QC 23/Jan/2024
