@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 data class AnggotaTimEntity (
     @PrimaryKey(autoGenerate = false)
     val nim: String = "",
-    val nama: String = ""
+    val nama: String = "",
+    val noTlp: String = ""
     //Tambahkan atribut lain seperlunya
 )

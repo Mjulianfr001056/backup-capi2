@@ -89,8 +89,10 @@ import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.utils.UtilFunctions
 import com.polstat.pkl.viewmodel.AuthViewModel
 import com.polstat.pkl.viewmodel.ListRutaViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
 
 //@Preview
@@ -120,10 +122,9 @@ fun ListRutaScreen(
     var openFinalisasiBSDialog by remember { mutableStateOf(false) }
     var enableFinalisasiBSButton by remember { mutableStateOf(false) }
     var checkedCheckbox by remember { mutableStateOf(false) }
-    val noBS = viewModel.noBS
+    val noBS = viewModel.idBS
     val isMonitoring = viewModel.isMonitoring
     val session = viewModel.session
-    val wilayahWithAll = viewModel.wilayahWithAll.collectAsState()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -195,24 +196,24 @@ fun ListRutaScreen(
                         )
                     }
                     IconButton(onClick = {
-                        coroutineScope.launch {
-                            val synchronizeRutaJob = async {
-                                viewModel.synchronizeRuta(
-                                    nim = session?.nim.toString(),
-                                    idBS = noBS.toString(),
-                                    wilayahWithAll = wilayahWithAll.value
-                                )
-                            }
-                            synchronizeRutaJob.await()
-                            val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
-                            lastJob.await()
-                            delay(1000L)
-                            navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${noBS}"){
-                                popUpTo(CapiScreen.Listing.LIST_BS + "/${noBS}"){
-                                    inclusive = true
-                                }
-                            }
-                        }
+//                        coroutineScope.launch {
+//                            val synchronizeRutaJob = async {
+//                                viewModel.synchronizeRuta(
+//                                    nim = session?.nim.toString(),
+//                                    idBS = noBS.toString(),
+//                                    wilayahWithAll = wilayahWithAll.value
+//                                )
+//                            }
+//                            synchronizeRutaJob.await()
+//                            val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
+//                            lastJob.await()
+//                            delay(1000L)
+//                            navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${noBS}"){
+//                                popUpTo(CapiScreen.Listing.LIST_BS + "/${noBS}"){
+//                                    inclusive = true
+//                                }
+//                            }
+//                        }
 
                     }) {
                         Icon(
@@ -248,21 +249,21 @@ fun ListRutaScreen(
                             DropdownMenuItem(
                                 text = { Text(text = stringResource(id = R.string.ambil_sampel)) },
                                 onClick = {
-                                    showMenu = false
-                                    if (noBS != null) {
-
-                                        coroutineScope.launch {
-                                            val generateRutaJob = async { viewModel.generateRuta(noBS) }
-                                            generateRutaJob.await()
-                                            val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
-                                            lastJob.await()
-                                            navController.navigate(CapiScreen.Listing.LIST_BS){
-                                                popUpTo(CapiScreen.Listing.LIST_BS){
-                                                    inclusive = true
-                                                }
-                                            }
-                                        }
-                                    }
+//                                    showMenu = false
+//                                    if (noBS != null) {
+//
+//                                        coroutineScope.launch {
+//                                            val generateRutaJob = async { viewModel.generateRuta(noBS) }
+//                                            generateRutaJob.await()
+//                                            val lastJob = async { authViewModel.login(session?.nim.toString(), session?.password.toString()) }
+//                                            lastJob.await()
+//                                            navController.navigate(CapiScreen.Listing.LIST_BS){
+//                                                popUpTo(CapiScreen.Listing.LIST_BS){
+//                                                    inclusive = true
+//                                                }
+//                                            }
+//                                        }
+//                                    }
                                 }
                             )
                         }
@@ -344,20 +345,20 @@ fun ListRutaScreen(
                             Button(
                                 modifier = Modifier.fillMaxWidth(),
                                 onClick = {
-                                    openFinalisasiBSDialog = false
-                                    coroutineScope.launch {
-                                        val finalisasiBSJob = async { viewModel.finalisasiBS(noBS.toString()) }
-                                        finalisasiBSJob.await()
-                                        delay(1000)
-                                        val lastJob = async { authViewModel.login(session.nim.toString(), session?.password.toString()) }
-                                        lastJob.await()
-                                        delay(2000)
-                                        navController.navigate(CapiScreen.Listing.LIST_BS){
-                                            popUpTo(CapiScreen.Listing.LIST_BS){
-                                                inclusive = true
-                                            }
-                                        }
-                                    }
+//                                    openFinalisasiBSDialog = false
+//                                    coroutineScope.launch {
+//                                        val finalisasiBSJob = async { viewModel.finalisasiBS(noBS.toString()) }
+//                                        finalisasiBSJob.await()
+//                                        delay(1000)
+//                                        val lastJob = async { authViewModel.login(session.nim.toString(), session?.password.toString()) }
+//                                        lastJob.await()
+//                                        delay(2000)
+//                                        navController.navigate(CapiScreen.Listing.LIST_BS){
+//                                            popUpTo(CapiScreen.Listing.LIST_BS){
+//                                                inclusive = true
+//                                            }
+//                                        }
+//                                    }
                                 },
                                 enabled = enableFinalisasiBSButton,
                                 content = {
