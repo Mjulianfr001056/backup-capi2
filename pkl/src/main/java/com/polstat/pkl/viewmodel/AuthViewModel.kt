@@ -84,14 +84,22 @@ class AuthViewModel @Inject constructor(
             getLocationUseCase.invoke().collect { location ->
                 if (location != null && _session?.nim != null) {
                     Log.d(TAG, "getLocationUseCase: Nim = ${_session.nim}")
-                    locationRepository.updateLocation(_session.nim,location.longitude,location.latitude,location.accuracy)
+                    locationRepository.updateLocation(
+                        _session.nim,
+                        location.longitude,
+                        location.latitude,
+                        location.accuracy
+                    )
                 }
-                Log.d(TAG, "getCurrentLocation: ${location?.latitude}, ${location?.longitude}, ${location?.accuracy}")
+                Log.d(
+                    TAG,
+                    "getCurrentLocation: ${location?.latitude}, ${location?.longitude}, ${location?.accuracy}"
+                )
             }
         }
     }
 
-    fun isLoggedIn() : Boolean {
+    fun isLoggedIn(): Boolean {
         return sessionRepository.isLoggedIn()
     }
 
@@ -129,7 +137,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-//    @Suppress("NAME_SHADOWING")
+    //    @Suppress("NAME_SHADOWING")
     fun login(
         nim: String,
         password: String
@@ -160,14 +168,13 @@ class AuthViewModel @Inject constructor(
                     }
                 }
             }
-
-            saveMahasiswa(authResponse.value.dataTim)
             /**
              * TODO(Data team langsung ganti ke format PPL atau PML)
              */
             saveDataTim()
 
             if (authResponse.value.wilayah.isEmpty()) {
+                return@launch
             }
 
             authResponse.value.wilayah.forEach { wilayah ->
@@ -176,28 +183,33 @@ class AuthViewModel @Inject constructor(
                         Log.d(TAG, message)
                     }
 
-                if(wilayah.keluarga!!.isNotEmpty()) {
-                    wilayah.keluarga.forEach { keluarga ->
-                        keluargaRepository.fetchKeluargaFromServer(keluarga)
+                if (wilayah.keluarga.isEmpty()) {
+                    return@launch
+                }
+                wilayah.keluarga.forEach { keluarga ->
+                    keluargaRepository.fetchKeluargaFromServer(keluarga)
+                        .collectLatest { message ->
+                            Log.d(TAG, message)
+                        }
+
+                    if (keluarga.ruta.isEmpty()) {
+                        return@launch
+                    }
+                    keluarga.ruta.forEach { ruta ->
+                        localRutaRepository.fetchRutaFromServer(ruta)
                             .collectLatest { message ->
                                 Log.d(TAG, message)
                             }
-
-                            if (keluarga.ruta!!.isNotEmpty()) {
-                                keluarga.ruta.forEach { ruta ->
-                                    localRutaRepository.fetchRutaFromServer(ruta)
-                                        .collectLatest { message ->
-                                            Log.d(TAG, message)
-                                        }
-                                    localRutaRepository.insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
-                                        .collectLatest { message ->
-                                            Log.d(TAG, message)
-                                        }
-                                }
+                        localRutaRepository.insertKeluargaAndRuta(
+                            keluarga.kodeKlg,
+                            ruta.kodeRuta
+                        )
+                            .collectLatest { message ->
+                                Log.d(TAG, message)
                             }
-                        }
                     }
                 }
+            }
 
             Log.d(TAG, "Token: ${_session?.token} ")
             delay(2000)
@@ -249,32 +261,7 @@ class AuthViewModel @Inject constructor(
         _showLoadingChannel.trySend(false)
     }
 
-    private suspend fun saveMahasiswa(dataTim: DataTim){
-        val mahasiswa = Mahasiswa(
-            foto = authResponse.value.avatar,
-            id_tim = dataTim.idTim,
-            isKoor = authResponse.value.isKoor,
-            nama = authResponse.value.nama,
-            nim = authResponse.value.nim,
-        )
-
-        /**
-         * TODO(Perpendek authResponse.value.xxx telescoping-nya)
-         */
-
-        mahasiswaRepository.insertMahasiswa(mahasiswa)
-            .collectLatest { message ->
-                Log.d(TAG, "${message}: ${mahasiswa.toMahasiswaEntity()}")
-            }
-
-        /**
-         * TODO(Cek lagi, apa mau disimpan semua property-nya?)
-         * TODO(Cek juga log nya mau sebanyak itu?)
-         */
-
-    }
-
-    private suspend fun saveDataTim(){
+    private suspend fun saveDataTim() {
         val dataTim = if (authResponse.value.isKoor) Tim.Pml(
             idTim = authResponse.value.dataTim.idTim,
             namaTim = authResponse.value.dataTim.namaTim,
@@ -300,93 +287,63 @@ class AuthViewModel @Inject constructor(
             Log.d(TAG, message)
         }
 
-        if (authResponse.value.dataTim.anggota!!.isNotEmpty()) {
-            authResponse.value.dataTim.anggota!!.forEach { mahasiswa ->
-                mahasiswaRepository.insertMahasiswa(mahasiswa)
-                    .collectLatest { message ->
-                        Log.d(TAG, message)
-                    }
-
-                if (mahasiswa.wilayah_kerja?.isNotEmpty() == true) {
-                    mahasiswa.wilayah_kerja.forEach { wilayah ->
-                        wilayahRepository.insertWilayah(
-                            wilayah,
-                            mahasiswa.nim
-                        ).collectLatest { message ->
-                            Log.d(TAG, message)
-                        }
-
-                        if(wilayah.keluarga!!.isNotEmpty()) {
-                            wilayah.keluarga.forEach { keluarga ->
-                                keluargaRepository.fetchKeluargaFromServer(keluarga)
-                                    .collectLatest { message ->
-                                        Log.d(TAG, message)
-                                    }
-
-                                if (keluarga.ruta!!.isNotEmpty()) {
-                                    keluarga.ruta.forEach { ruta ->
-                                        localRutaRepository.fetchRutaFromServer(ruta)
-                                            .collectLatest { message ->
-                                                Log.d(TAG, message)
-                                            }
-                                        localRutaRepository.insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
-                                            .collectLatest { message ->
-                                                Log.d(TAG, message)
-                                            }
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                }
-            }
+        if (authResponse.value.dataTim.anggota.isEmpty()) {
+            return
         }
-
-        when (dataTim) {
-            is Tim.Pml -> {
-                dataTim.anggota.forEach { mahasiswa ->
-                    mahasiswaRepository.insertMahasiswa(mahasiswa)
-                        .collectLatest { message ->
-                            Log.d(TAG, message)
-                        }
-
-                    mahasiswa.wilayah_kerja.forEach {wilayah ->
-                        wilayahRepository.insertWilayah(
-                            wilayah,
-                            mahasiswa.nim
-                        ).collectLatest { message ->
-                            Log.d(TAG, message)
-                        }
-
-                        wilayah.keluarga.forEach { keluarga ->
-                            keluargaRepository.insertKeluarga(keluarga)
-                                .collectLatest { message ->
-                                    Log.d(TAG, message)
-                                }
-
-                            keluarga.ruta.forEach { ruta ->
-                                localRutaRepository.insertRuta(ruta)
-                                    .collectLatest { message ->
-                                        Log.d(TAG, message)
-                                    }
-                                localRutaRepository.insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
-                                    .collectLatest { message ->
-                                        Log.d(TAG, message)
-                                    }
-                            }
-
-                        }
-                    }
-
-
+        authResponse.value.dataTim.anggota.forEach { mahasiswa ->
+            mahasiswaRepository.insertMahasiswa(mahasiswa)
+                .collectLatest { message ->
+                    Log.d(TAG, message)
                 }
-
-            }
-            else -> {
-                return
-            }
         }
+//        when (dataTim) {
+//            is Tim.Pml -> {
+//                dataTim.anggota.forEach { mahasiswa ->
+//                    mahasiswaRepository.insertMahasiswa(mahasiswa)
+//                        .collectLatest { message ->
+//                            Log.d(TAG, message)
+//                        }
+//
+//                    mahasiswa.wilayah_kerja.forEach { wilayah ->
+//                        wilayahRepository.insertWilayah(
+//                            wilayah,
+//                            mahasiswa.nim
+//                        ).collectLatest { message ->
+//                            Log.d(TAG, message)
+//                        }
+//
+//                        wilayah.keluarga.forEach { keluarga ->
+//                            keluargaRepository.insertKeluarga(keluarga)
+//                                .collectLatest { message ->
+//                                    Log.d(TAG, message)
+//                                }
+//
+//                            keluarga.ruta.forEach { ruta ->
+//                                localRutaRepository.insertRuta(ruta)
+//                                    .collectLatest { message ->
+//                                        Log.d(TAG, message)
+//                                    }
+//                                localRutaRepository.insertKeluargaAndRuta(
+//                                    keluarga.kodeKlg,
+//                                    ruta.kodeRuta
+//                                )
+//                                    .collectLatest { message ->
+//                                        Log.d(TAG, message)
+//                                    }
+//                            }
+//
+//                        }
+//                    }
+//
+//
+//                }
+//
+//            }
+//
+//            else -> {
+//                return
+//            }
+//        }
     }
 
     fun dismissPermissionDialog() {
@@ -396,8 +353,8 @@ class AuthViewModel @Inject constructor(
     fun onPermissionResult(
         permission: String,
         isGranted: Boolean,
-    ){
-        if (!isGranted && !visiblePermissionDialogQueue.contains(permission)){
+    ) {
+        if (!isGranted && !visiblePermissionDialogQueue.contains(permission)) {
             visiblePermissionDialogQueue.add(permission)
         }
     }

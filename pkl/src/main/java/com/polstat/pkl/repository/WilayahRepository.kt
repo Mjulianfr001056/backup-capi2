@@ -14,11 +14,12 @@ interface WilayahRepository {
 
     suspend fun updateWilayah(wilayah: Wilayah) : Flow<String>
 
+    suspend fun getAllWilayah(): Flow<Result<List<WilayahEntity>>>
+
     suspend fun deleteAllWilayah() : Flow<String>
 
     suspend fun getWilayahWithRuta(noBS: String) : Flow<Result<WilayahWithRuta>>
 
-    suspend fun getWilayahByNIM(nim: String) : Flow<Result<List<WilayahEntity>>>
 
     suspend fun getWilayahWithAll(noBS: String) : Flow<Result<WilayahWithAll>>
 

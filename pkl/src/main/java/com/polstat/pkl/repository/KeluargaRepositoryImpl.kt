@@ -144,6 +144,38 @@ class KeluargaRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getAllKeluargaByWilayah(idBS: String): Flow<Result<List<KeluargaEntity>>> {
+        return flow {
+            try {
+                emit(Result.Loading(true))
+                val listAllKeluargaByWilayah = capi63Database.capi63Dao.getAllKeluargaByWilayah(idBS)
+                Log.d(TAG, "Berhasil getAllKeluargaByWilayah: $listAllKeluargaByWilayah")
+                emit(Result.Success(listAllKeluargaByWilayah))
+            } catch (e: Exception) {
+                Log.d(TAG, "Gagal getAllKeluargaByWilayah: ${e.message}")
+                emit(Result.Error(null, "Error Get All Keluarga By Wilayah: ${e.message}"))
+            } finally {
+                emit(Result.Loading(false))
+            }
+        }
+    }
+
+    override suspend fun getAllKeluargaByRuta(kodeRuta: String): Flow<Result<List<KeluargaEntity>>> {
+        return flow {
+            try {
+                emit(Result.Loading(true))
+                val listAllKeluargaByRuta = capi63Database.capi63Dao.getAllKeluargaByRuta(kodeRuta)
+                Log.d(TAG, "Berhasil getAllKeluargaByRuta: $listAllKeluargaByRuta")
+                emit(Result.Success(listAllKeluargaByRuta))
+            } catch (e: Exception) {
+                Log.d(TAG, "Gagal getAllKeluargaByRuta: ${e.message}")
+                emit(Result.Error(null, "Error Get All Keluarga By Ruta: ${e.message}"))
+            } finally {
+                emit(Result.Loading(false))
+            }
+        }
+    }
+
     override suspend fun deleteAllKeluarga(): Flow<String> {
         return  flow {
             try {

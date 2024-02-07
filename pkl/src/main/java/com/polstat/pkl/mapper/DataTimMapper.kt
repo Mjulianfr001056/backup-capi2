@@ -14,17 +14,3 @@ fun DataTim.toDataTimEntity() : DataTimEntity {
         teleponPML = teleponPML
     )
 }
-
-fun DataTimEntity.toDataTim(
-    anggota: List<Mahasiswa>
-) : DataTim {
-    return DataTim(
-        anggota = anggota,
-        idTim = idTim,
-        namaTim = namaTim,
-        passPML = passPML,
-        namaPML = namaPML,
-        nimPML = nimPML,
-        teleponPML = teleponPML
-    )
-}

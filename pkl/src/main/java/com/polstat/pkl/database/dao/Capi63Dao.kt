@@ -48,6 +48,9 @@ interface Capi63Dao {
     @Update
     suspend fun updateWilayah(wilayahEntity: WilayahEntity)
 
+    @Query("SELECT * FROM wilayah")
+    suspend fun getAllWilayah(): List<WilayahEntity>
+
     @Query("DELETE FROM wilayah")
     suspend fun deleteAllWilayah()
 
@@ -61,6 +64,13 @@ interface Capi63Dao {
 
     @Query("SELECT * FROM keluarga WHERE kodeKlg = :kodeKlg")
     suspend fun getKeluarga(kodeKlg: String) : KeluargaEntity
+
+    @Query("SELECT * FROM keluarga WHERE idBS = :idBS")
+    suspend fun getAllKeluargaByWilayah(idBS: String) : List<KeluargaEntity>
+
+    @Transaction
+    @Query("SELECT * FROM keluarga INNER JOIN KeluargaAndRutaEntity ON keluarga.kodeKlg = KeluargaAndRutaEntity.kodeKlg WHERE KeluargaAndRutaEntity.kodeRuta = :kodeRuta")
+    suspend fun getAllKeluargaByRuta(kodeRuta: String): List<KeluargaEntity>
 
     @Query("SELECT * FROM keluarga WHERE status != 'delete' ORDER BY noUrutKlg DESC LIMIT 1")
     suspend fun getLastKeluarga(): KeluargaEntity
@@ -85,11 +95,19 @@ interface Capi63Dao {
     @Query("SELECT * FROM ruta WHERE kodeRuta = :kodeRuta")
     suspend fun getRuta(kodeRuta: String) : RutaEntity
 
+    @Query("SELECT * FROM ruta WHERE idBS = :idBS")
+    suspend fun getAllRutaByWilayah(idBS: String) : List<RutaEntity>
+
     @Query("SELECT * FROM ruta WHERE status != 'delete' ORDER BY noUrutRuta DESC LIMIT 1")
     suspend fun getLastRuta(): RutaEntity
 
     @Query("DELETE FROM ruta")
     suspend fun deleteAllRuta()
+
+    @Transaction
+    @Query("SELECT * FROM ruta INNER JOIN KeluargaAndRutaEntity ON ruta.kodeRuta = KeluargaAndRutaEntity.kodeRuta WHERE KeluargaAndRutaEntity.kodeKlg = :kodeKlg")
+    suspend fun getAllRutaByKeluarga(kodeKlg: String): List<RutaEntity>
+
 
 
     // Operasi database untuk entitas berelasi
@@ -116,9 +134,6 @@ interface Capi63Dao {
     @Query("SELECT * FROM wilayah WHERE noBS = :noBS")
     suspend fun getWilayahWithRuta(noBS: String) : WilayahWithRuta
 
-    @Transaction
-    @Query("SELECT * FROM wilayah WHERE nim = :nim")
-    suspend fun getWilayahByNIM(nim: String) : List<WilayahEntity>
 
     @Transaction
     @Query("SELECT * FROM sampel_ruta WHERE noBS = :noBS")

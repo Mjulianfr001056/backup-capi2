@@ -119,7 +119,6 @@ fun ListRutaScreen(
     var showSearchBar by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
     var isListRuta by remember { mutableStateOf(true) }
-    var isListKeluarga by remember { mutableStateOf(false) }
     var openFinalisasiBSDialog by remember { mutableStateOf(false) }
     var enableFinalisasiBSButton by remember { mutableStateOf(false) }
     var checkedCheckbox by remember { mutableStateOf(false) }
@@ -202,7 +201,7 @@ fun ListRutaScreen(
                             val synchronizeRutaJob = async {
                                 viewModel.synchronizeRuta(
                                     nim = session?.nim.toString(),
-                                    noBS = noBS.toString(),
+                                    idBS = noBS.toString(),
                                     wilayahWithAll = wilayahWithAll.value
                                 )
                             }
@@ -275,7 +274,6 @@ fun ListRutaScreen(
                                 onClick = {
                                     showMenu = false
                                     isListRuta = false
-                                    isListKeluarga = true
                                 }
                             )
                         }
@@ -284,7 +282,6 @@ fun ListRutaScreen(
                                 text = { Text(text = stringResource(id = R.string.tampilkan_list_ruta)) },
                                 onClick = {
                                     showMenu = false
-                                    isListKeluarga = false
                                     isListRuta = true
                                 }
                             )
@@ -855,7 +852,7 @@ fun RutaRow(
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_urut_keluarga,
-                                                value = UtilFunctions.convertTo3DigitsString(keluarga.noUrutKlg!!)
+                                                value = UtilFunctions.padWithZeros(keluarga.noUrutKlg, 3)
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nama_kepala_keluarga,
@@ -1031,7 +1028,7 @@ fun RutaRow(
                             Text(modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    navController.navigate(CapiScreen.Listing.EDIT_RUTA + "/${ruta.noBS}/${keluarga.kodeKlg}/${ruta.kodeRuta}")
+                                    navController.navigate(CapiScreen.Listing.EDIT_RUTA + "/${ruta.idBS}/${keluarga.kodeKlg}/${ruta.kodeRuta}")
                                 }
                                 .padding(
                                     top = 10.dp,
@@ -1046,7 +1043,7 @@ fun RutaRow(
                             Text(modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    navController.navigate(CapiScreen.Listing.SALIN_RUTA + "/${ruta.noBS}/${ruta.kodeRuta}")
+                                    navController.navigate(CapiScreen.Listing.SALIN_RUTA + "/${ruta.idBS}/${ruta.kodeRuta}")
                                 }
                                 .padding(
                                     top = 10.dp,
@@ -1095,8 +1092,8 @@ fun RutaRow(
                             )
                             openPasswordMasterDialog = false
                             openActionDialog = false
-                            navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${ruta.noBS}"){
-                                popUpTo(CapiScreen.Listing.LIST_RUTA + "/${ruta.noBS}"){
+                            navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${ruta.idBS}"){
+                                popUpTo(CapiScreen.Listing.LIST_RUTA + "/${ruta.idBS}"){
                                     inclusive = true
                                 }
                             }
