@@ -1,5 +1,6 @@
 package com.polstat.pkl.repository
 
+import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.database.relation.WilayahWithKeluarga
 import com.polstat.pkl.database.relation.WilayahWithRuta

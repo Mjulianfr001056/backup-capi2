@@ -3,6 +3,7 @@ package com.polstat.pkl.repository
 import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
 import com.polstat.pkl.database.dao.Capi63Dao
+import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.database.relation.KeluargaWithRuta
 import com.polstat.pkl.database.relation.RutaWithKeluarga
 import com.polstat.pkl.database.relation.WilayahWithAll

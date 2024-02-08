@@ -30,7 +30,6 @@ import org.odk.collect.pkl.ui.screen.ListRutaScreen
 import org.odk.collect.pkl.ui.screen.ListSampleScreen
 import org.odk.collect.pkl.ui.screen.LoginScreen
 import org.odk.collect.pkl.ui.screen.OnBoardingScreen
-import org.odk.collect.pkl.ui.screen.PasswordMasterScreen
 import org.odk.collect.pkl.ui.screen.SalinRutaScreen
 import org.odk.collect.pkl.ui.screen.SamplingScreen
 
@@ -114,7 +113,7 @@ fun SamplingNavHost(
                 ListBSScreen(
                     navController = samplingNavController,
                     viewModel = hiltViewModel(),
-                    authViewModel = hiltViewModel()
+//                    authViewModel = hiltViewModel()
                 )
             }
             composable(

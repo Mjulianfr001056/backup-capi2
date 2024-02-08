@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.mapper.toRuta
-import com.polstat.pkl.mapper.toWilayah
+//import com.polstat.pkl.mapper.toWilayah
 import com.polstat.pkl.model.domain.Keluarga
 import com.polstat.pkl.model.domain.Ruta
 import com.polstat.pkl.repository.KeluargaRepository
@@ -185,22 +185,22 @@ class SalinRutaViewModel @Inject constructor(
             }
         }
 
-        val wilayah = wilayahWithAll.value.wilayahWithKeluarga!!.wilayah!!.toWilayah(emptyList())
-        val updatedWilayah = wilayah.copy(
-            jmlKlg = wilayahWithAll.value.listKeluargaWithRuta!!.filter { it.keluarga.status != "delete" }.size,
-            jmlKlgEgb = wilayahWithAll.value.listKeluargaWithRuta!!.filter { it.keluarga.status != "delete" && it.keluarga.noUrutKlgEgb != 0 }.size,
-            jmlRuta = wilayahWithAll.value.listKeluargaWithRuta!!.flatMap { it.listRuta.filter { it.status != "delete" } }.size,
-            jmlRutaEgb = wilayahWithAll.value.listKeluargaWithRuta!!.flatMap { it.listRuta.filter { it.status != "delete" && it.noUrutEgb != 0 }}.size
-        )
-
-        viewModelScope.launch {
-//            wilayahRepository.updateWilayah(updatedWilayah, nim).collectLatest { message ->
+//        val wilayah = wilayahWithAll.value.wilayahWithKeluarga!!.wilayah!!.toWilayah(emptyList())
+//        val updatedWilayah = wilayah.copy(
+//            jmlKlg = wilayahWithAll.value.listKeluargaWithRuta!!.filter { it.keluarga.status != "delete" }.size,
+//            jmlKlgEgb = wilayahWithAll.value.listKeluargaWithRuta!!.filter { it.keluarga.status != "delete" && it.keluarga.noUrutKlgEgb != 0 }.size,
+//            jmlRuta = wilayahWithAll.value.listKeluargaWithRuta!!.flatMap { it.listRuta.filter { it.status != "delete" } }.size,
+//            jmlRutaEgb = wilayahWithAll.value.listKeluargaWithRuta!!.flatMap { it.listRuta.filter { it.status != "delete" && it.noUrutEgb != 0 }}.size
+//        )
+//
+//        viewModelScope.launch {
+////            wilayahRepository.updateWilayah(updatedWilayah, nim).collectLatest { message ->
+////                Log.d(TAG, message)
+////            }
+//            wilayahRepository.updateWilayah(updatedWilayah).collectLatest { message ->
 //                Log.d(TAG, message)
 //            }
-            wilayahRepository.updateWilayah(updatedWilayah).collectLatest { message ->
-                Log.d(TAG, message)
-            }
-        }
+//        }
 
     }
 

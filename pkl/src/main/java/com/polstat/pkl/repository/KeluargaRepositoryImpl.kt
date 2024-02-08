@@ -126,7 +126,7 @@ class KeluargaRepositoryImpl @Inject constructor(
         return flow {
             try {
                 emit(Result.Loading(true))
-                val listAllKeluargaByWilayah = capi63Database.capi63Dao.getAllKeluargaByWilayah(idBS)
+                val listAllKeluargaByWilayah = capi63Dao.getAllKeluargaByWilayah(idBS)
                 Log.d(TAG, "Berhasil getAllKeluargaByWilayah: $listAllKeluargaByWilayah")
                 emit(Result.Success(listAllKeluargaByWilayah))
             } catch (e: Exception) {
@@ -142,7 +142,7 @@ class KeluargaRepositoryImpl @Inject constructor(
         return flow {
             try {
                 emit(Result.Loading(true))
-                val listAllKeluargaByRuta = capi63Database.capi63Dao.getAllKeluargaByRuta(kodeRuta)
+                val listAllKeluargaByRuta = capi63Dao.getAllKeluargaByRuta(kodeRuta)
                 Log.d(TAG, "Berhasil getAllKeluargaByRuta: $listAllKeluargaByRuta")
                 emit(Result.Success(listAllKeluargaByRuta))
             } catch (e: Exception) {
