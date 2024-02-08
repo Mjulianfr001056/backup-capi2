@@ -5,7 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.database.entity.WilayahEntity
-import com.polstat.pkl.database.relation.MahasiswaWithWilayah
 import com.polstat.pkl.repository.MahasiswaRepository
 import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.WilayahRepository
@@ -27,27 +26,17 @@ class ListBSViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    companion object{
-        private  const val TAG = "CAPI63_LISTBS_VM"
+    companion object {
+        private const val TAG = "CAPI63_LISTBS_VM"
     }
 
-    private val _session = sessionRepository.getActiveSession()
-
-    val session = _session
+    private val session = sessionRepository.getActiveSession()
 
     val isMonitoring = savedStateHandle.get<Boolean>("isMonitoring")
 
     private val _listWilayah = MutableStateFlow<List<WilayahEntity>>(emptyList())
 
     val listWilayah = _listWilayah.asStateFlow()
-
-    private val _listWilayahByNIM = MutableStateFlow<List<WilayahEntity>>(emptyList())
-
-    val listWilayahByNIM = _listWilayahByNIM.asStateFlow()
-
-    private val _mahasiswaWithWilayah = MutableStateFlow(MahasiswaWithWilayah())
-
-    val mahasiswaWithWilayah = _mahasiswaWithWilayah.asStateFlow()
 
     private val _errorMessage = MutableStateFlow("")
 
@@ -65,7 +54,7 @@ class ListBSViewModel @Inject constructor(
     private fun getAllWilayah() {
         viewModelScope.launch {
             wilayahRepository.getAllWilayah().collectLatest { result ->
-                when(result) {
+                when (result) {
                     is Result.Error -> {
                         result.message?.let { error ->
                             _errorMessage.value = error
@@ -73,39 +62,13 @@ class ListBSViewModel @Inject constructor(
                         }
                         _showErrorToastChannel.send(true)
                     }
+
                     is Result.Loading -> Log.d(TAG, "getAllWilayah: Loading...")
                     is Result.Success -> {
                         result.data?.let {
                             _listWilayah.value = it
                             Log.d(TAG, "getAllWilayah: $listWilayah")
                         }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun getMahasiswaWithWilayah(
-        nim: String
-    ) {
-        viewModelScope.launch {
-            mahasiswaRepository.getMahasiswaWithWilayah(nim).collectLatest { result ->
-                when(result) {
-                    is Result.Success -> {
-                        result.data?.let { response ->
-                            _mahasiswaWithWilayah.value = response
-                            Log.d(TAG, "getMahasiswaWithWilayah success: $response")
-                        }
-                    }
-                    is Result.Loading -> {
-                        Log.d(TAG, "getMahasiswaWithWilayah: Loading...")
-                    }
-                    is Result.Error -> {
-                        result.message?.let { error ->
-                            _errorMessage.value = error
-                        }
-                        _showErrorToastChannel.send(true)
-                        Log.e(TAG, "getMahasiswaWithWilayah: Error in getMahasiswaWithWilayah")
                     }
                 }
             }

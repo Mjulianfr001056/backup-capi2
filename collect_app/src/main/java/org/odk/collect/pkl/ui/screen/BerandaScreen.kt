@@ -41,7 +41,6 @@ import org.odk.collect.pkl.ui.screen.components.BottomNavBar
 import org.odk.collect.pkl.ui.screen.components.ListPplCard
 import org.odk.collect.pkl.ui.screen.components.PmlCard
 import org.odk.collect.pkl.ui.screen.components.ProfileCard
-import org.odk.collect.pkl.ui.screen.components.ProgresListingCard
 import org.odk.collect.pkl.ui.screen.components.StatusListingCard
 import org.odk.collect.pkl.ui.screen.components.WilayahKerjaCard
 import com.polstat.pkl.ui.theme.Capi63Theme
@@ -53,6 +52,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
+import org.odk.collect.pkl.ui.screen.components.ProgresCacahCard
 import timber.log.Timber
 
 @Preview
@@ -87,9 +87,11 @@ fun BerandaScreen(
 
     val session = viewModel.session
 
-    val dataTimWithAll = viewModel.dataTimWithAll.collectAsState()
+    val listWilayah = viewModel.listWilayah
     
-    val listSampelRuta = viewModel.listSampelRuta.collectAsState()
+    val listAllSampelRuta = viewModel.listAllSampelRuta.collectAsState()
+
+    val listAnggotaTim = viewModel.listAnggotaTim
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -188,35 +190,23 @@ fun BerandaScreen(
                 .verticalScroll(rememberScrollState())
         ) {
 
-            ProfileCard(
-                session = session!!,
-                dataTim = dataTimWithAll.value.dataTimWithMahasiswa!!.dataTim
-            )
-
-            if (dataTimWithAll.value.listMahasiswaWithAll!!.isNotEmpty()) {
-                dataTimWithAll.value.listMahasiswaWithAll!!.forEach { mahasiswaWithAll ->
-                    if (mahasiswaWithAll.mahasiswaWithWilayah!!.mahasiswa!!.nim == session.nim) {
-                        WilayahKerjaCard(
-                            listWilayah = mahasiswaWithAll.mahasiswaWithWilayah!!.listWilayah!!,
-                            listSampelRutaEntity = listSampelRuta.value
-                        )
-                    }
-                }
+            session?.let {
+                ProfileCard(
+                    session = it
+                )
             }
 
-            if (session.isKoor!!) {
-                ListPplCard(dataTimWithAll = dataTimWithAll.value)
-                StatusListingCard(dataTimWithAll = dataTimWithAll.value)
-            } else {
-                PmlCard(dataTim = dataTimWithAll.value.dataTimWithMahasiswa!!.dataTim)
+            WilayahKerjaCard(
+                listWilayah = listWilayah.value,
+                listAllSampelRuta = listAllSampelRuta.value
+            )
 
-                if (dataTimWithAll.value.listMahasiswaWithAll!!.isNotEmpty()) {
-                    dataTimWithAll.value.listMahasiswaWithAll!!.forEach { mahasiswaWithAll ->
-                        if (mahasiswaWithAll.mahasiswaWithWilayah!!.mahasiswa!!.nim == session.nim) {
-                            ProgresListingCard(mahasiswaWithAll = mahasiswaWithAll)
-                        }
-                    }
-                }
+            if (session?.isKoor == true) {
+                ListPplCard(listAnggotaTim = listAnggotaTim.value)
+                StatusListingCard(listWilayah = listWilayah.value)
+            } else {
+                session?.let { PmlCard(session = it) }
+                ProgresCacahCard(listWilayah = listWilayah.value, listAllSampelRuta = listAllSampelRuta.value)
             }
         }
     }

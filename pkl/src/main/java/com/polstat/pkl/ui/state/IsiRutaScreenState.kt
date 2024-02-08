@@ -33,7 +33,7 @@ data class IsiRutaScreenState(
     /**
      * Ini adalah state untuk menyimpan data beberapa ruta dalam list dua dimensi
      */
-    val listNoUrutRuta: List<List<Int>> = emptyList(),
+    val listNoUrutRuta: List<List<String>> = emptyList(),
     val listNoUrutRutaError: List<List<String>> = emptyList(),
     val listKkOrKrt: List<List<String>> = emptyList(),
     val listKkOrKrtError: List<List<String>> = emptyList(),

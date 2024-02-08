@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class RutaEntity (
     @PrimaryKey(autoGenerate = false)
     var kodeRuta: String = "[not set]",
-    var noUrutRuta: Int = -1,
+    var noUrutRuta: String = "[not set]",
     var noUrutEgb: Int? = -1,
     var kkOrKrt: String = "[not set]",
     var namaKrt: String = "[not set]",

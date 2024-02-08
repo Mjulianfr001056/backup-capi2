@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.database.entity.KeluargaEntity
 import com.polstat.pkl.database.entity.RutaEntity
-import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.mapper.toKeluargaDto
 import com.polstat.pkl.mapper.toRuta
 import com.polstat.pkl.mapper.toRutaDtoList
@@ -50,21 +49,21 @@ class ListRutaViewModel @Inject constructor(
 
     val idBS = savedStateHandle.get<String>("idBS")
 
-    val _listKeluargaByWilayah = MutableStateFlow<List<KeluargaEntity>>(emptyList())
+    private val _listKeluargaByWilayah = MutableStateFlow<List<KeluargaEntity>>(emptyList())
 
-    private val listKeluargaByWilayah = _listKeluargaByWilayah.asStateFlow()
+    val listKeluargaByWilayah = _listKeluargaByWilayah.asStateFlow()
 
-    val _listRutaByWilayah = MutableStateFlow<List<RutaEntity>>(emptyList())
+    private val _listRutaByWilayah = MutableStateFlow<List<RutaEntity>>(emptyList())
 
-    private val listRutaByWilayah = _listRutaByWilayah.asStateFlow()
+    val listRutaByWilayah = _listRutaByWilayah.asStateFlow()
 
-    val _listKeluargaByRuta = MutableStateFlow<List<KeluargaEntity>>(emptyList())
+    private val _listKeluargaByRuta = MutableStateFlow<List<KeluargaEntity>>(emptyList())
 
-    private val listKeluargaByRuta = _listKeluargaByRuta.asStateFlow()
+    val listKeluargaByRuta = _listKeluargaByRuta.asStateFlow()
 
-    val _listRutaByKeluarga = MutableStateFlow<List<RutaEntity>>(emptyList())
+    private val _listRutaByKeluarga = MutableStateFlow<List<RutaEntity>>(emptyList())
 
-    private val listRutaByKeluarga = _listRutaByKeluarga.asStateFlow()
+    val listRutaByKeluarga = _listRutaByKeluarga.asStateFlow()
 
     private val _synchronizeRuta = MutableStateFlow(SyncRutaResponse())
 
@@ -91,6 +90,10 @@ class ListRutaViewModel @Inject constructor(
     private val _successMessage = MutableStateFlow("")
 
     val successMessage = _successMessage.asStateFlow()
+
+    init {
+        idBS?.let { getAllRutaByWilayah(it) }
+    }
 
     fun getAllRutaByWilayah(idBS: String) {
         viewModelScope.launch {
@@ -189,18 +192,16 @@ class ListRutaViewModel @Inject constructor(
     }
 
     fun synchronizeRuta(
-        wilayahWithAll: WilayahWithAll,
+        listKeluargaByWilayah: List<KeluargaEntity>,
         nim: String,
         idBS: String
     ) {
         val jsonKlgInstance = JsonKlg()
 
-        if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
-            wilayahWithAll.listKeluargaWithRuta.forEach { keluargaWithRuta ->
-                if (keluargaWithRuta.keluarga.status != "fetch") {
-                    jsonKlgInstance.add(keluargaWithRuta.keluarga.toKeluargaDto(keluargaWithRuta.listRuta.toRutaDtoList()))
-                }
-            }
+        listKeluargaByWilayah.forEach { keluargaEntity ->
+            getAllRutaByKeluarga(keluargaEntity.kodeKlg)
+            val listFilteredRuta = listRutaByKeluarga.value.filter { it.status != "fetch" }
+            jsonKlgInstance.add(keluargaEntity.toKeluargaDto(listFilteredRuta.toRutaDtoList()))
         }
 
         val syncRutaRequest = SyncRutaRequest(
@@ -297,10 +298,10 @@ class ListRutaViewModel @Inject constructor(
     }
 
     fun finalisasiBS(
-        noBS: String
+        idBS: String
     ) {
         viewModelScope.launch {
-            remoteRutaRepository.finalisasiBS(noBS).collectLatest { result ->
+            remoteRutaRepository.finalisasiBS(idBS).collectLatest { result ->
                 when (result) {
                     is Result.Success -> {
                         result.data?.let { response ->
