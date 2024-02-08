@@ -523,7 +523,7 @@ fun KeteranganKeluarga(
             coroutineScope.launch {
                 viewModel.onEvent(
                     event = IsiRutaScreenEvent.NoUrutKlgChanged(
-                        it.toIntOrNull() ?: 0
+                        it
                     ),
                     index = index
                 )
@@ -540,7 +540,7 @@ fun KeteranganKeluarga(
             coroutineScope.launch {
                 viewModel.onEvent(
                     event = IsiRutaScreenEvent.NoUrutKlgChanged(
-                        increment(state.value.listNoUrutKlg[index].toString()).toInt()
+                        increment(state.value.listNoUrutKlg[index])
                     ),
                     index = index
                 )
@@ -550,7 +550,7 @@ fun KeteranganKeluarga(
             coroutineScope.launch {
                 viewModel.onEvent(
                     event = IsiRutaScreenEvent.NoUrutKlgChanged(
-                        decrement(state.value.listNoUrutKlg[index].toString()).toInt()
+                        decrement(state.value.listNoUrutKlg[index])
                     ),
                     index = index
                 )

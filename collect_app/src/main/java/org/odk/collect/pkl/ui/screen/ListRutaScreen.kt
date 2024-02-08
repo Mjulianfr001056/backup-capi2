@@ -622,10 +622,10 @@ fun RutaOrKlgRow(
                                                 label = R.string.nama_krt_ruta,
                                                 value = ruta.namaKrt
                                             )
-                                            DetailRutaTextField(
-                                                label = R.string.keberadaan_genz_ortu_ruta,
-                                                value = "${ruta.genzOrtu}"
-                                            )
+//                                            DetailRutaTextField(
+//                                                label = R.string.keberadaan_genz_ortu_ruta,
+//                                                value = "${ruta.genzOrtu}"
+//                                            )
                                             DetailRutaTextField(
                                                 label = R.string.kategori_jml_genz,
                                                 value = "${ruta.katGenz}"
@@ -1276,7 +1276,7 @@ fun DetailCard(
             R.string.nomor_urut_ruta_egb to ruta.noUrutEgb,
             R.string.identifikasi_kk_krt to ruta.kkOrKrt,
             R.string.nama_krt_list_ruta to ruta.namaKrt,
-            R.string.keberadaan_genz_ortu_ruta to ruta.genzOrtu,
+//            R.string.keberadaan_genz_ortu_ruta to ruta.genzOrtu,
             R.string.kategori_jml_genz to ruta.katGenz,
             R.string.catatan to ruta.catatan
         )

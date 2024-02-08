@@ -26,7 +26,7 @@ import org.odk.collect.pkl.ui.screen.ListRutaScreen
 import org.odk.collect.pkl.ui.screen.ListSampleScreen
 import org.odk.collect.pkl.ui.screen.LoginScreen
 import org.odk.collect.pkl.ui.screen.OnBoardingScreen
-import org.odk.collect.pkl.ui.screen.SalinRutaScreen
+//import org.odk.collect.pkl.ui.screen.SalinRutaScreen
 import org.odk.collect.pkl.ui.screen.SamplingScreen
 
 @Composable
@@ -185,10 +185,10 @@ fun SamplingNavHost(
                     }
                 )
             ) {
-                SalinRutaScreen(
-                    navController = samplingNavController,
-                    viewModel = hiltViewModel()
-                )
+//                SalinRutaScreen(
+//                    navController = samplingNavController,
+//                    viewModel = hiltViewModel()
+//                )
             }
 
         }

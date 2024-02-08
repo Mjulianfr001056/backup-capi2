@@ -220,7 +220,8 @@ class IsiRutaViewModel @Inject constructor(
             noUrutEgb = 0,
             kkOrKrt = "",
             namaKrt = "",
-            genzOrtu = 0,
+            jmlGenzAnak = 0,
+            jmlGenzDewasa = 0,
             katGenz = 0,
             long = 0.0,
             lat = 0.0,
@@ -370,11 +371,11 @@ class IsiRutaViewModel @Inject constructor(
             is IsiRutaScreenEvent.IsGenzOrtuChanged -> {
                 val newListIsGenzOrtu = state.value.listIsGenzOrtu.toMutableList()
                 newListIsGenzOrtu[index] = event.isGenzOrtu
-                
+
                 _state.emit(state.value.copy(listIsGenzOrtu = newListIsGenzOrtu))
-                
+
                 val newListNoUrutKlgEgb = state.value.listNoUrutKlgEgb.toMutableList()
-                
+
                 if (newListIsGenzOrtu[index] > 0) {
                     val maxElement = newListNoUrutKlgEgb.maxOrNull()
                     if (maxElement == 0) {
@@ -552,13 +553,13 @@ class IsiRutaViewModel @Inject constructor(
                                         else -> "3"
                                     },
                                     namaKrt = state.value.listNamaKrt[indexKlg][indexRuta],
-                                    isGenzOrtu = genzOrtuRuta,
-                                    katGenz = when {
-                                        genzOrtuRuta in 1..2 -> 1
-                                        genzOrtuRuta in 3..4 -> 2
-                                        genzOrtuRuta > 4 -> 3
-                                        else -> 0
-                                    },
+//                                    isGenzOrtu = genzOrtuRuta,
+//                                    katGenz = when {
+//                                        genzOrtuRuta in 1..2 -> 1
+//                                        genzOrtuRuta in 3..4 -> 2
+//                                        genzOrtuRuta > 4 -> 3
+//                                        else -> 0
+//                                    },
                                     long = lokasi.value.longitude,
                                     lat = lokasi.value.latitude,
                                     catatan = "",
