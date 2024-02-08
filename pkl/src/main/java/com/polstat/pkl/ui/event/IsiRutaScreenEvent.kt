@@ -6,7 +6,7 @@ sealed class IsiRutaScreenEvent {
     data class NoBgFisikChanged(val noBgFisik: String) : IsiRutaScreenEvent()
     data class NoBgSensusChanged(val noBgSensus: String) : IsiRutaScreenEvent()
     data class JmlKlgChanged(val jmlKlg: Int) : IsiRutaScreenEvent()
-    data class NoUrutKlgChanged(val noUrutKlg: Int) : IsiRutaScreenEvent()
+    data class NoUrutKlgChanged(val noUrutKlg: String) : IsiRutaScreenEvent()
     data class NamaKKChanged(val namaKK: String) : IsiRutaScreenEvent()
     data class AlamatChanged(val alamat: String) : IsiRutaScreenEvent()
     data class IsGenzOrtuChanged(val isGenzOrtu: Int) : IsiRutaScreenEvent()

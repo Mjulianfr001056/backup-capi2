@@ -5,7 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.database.entity.SampelRutaEntity
-import com.polstat.pkl.mapper.toWilayah
 import com.polstat.pkl.model.response.SampelRutaResponse
 import com.polstat.pkl.repository.SampelRutaRepository
 import com.polstat.pkl.utils.Result

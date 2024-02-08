@@ -354,8 +354,7 @@ class IsiRutaViewModel @Inject constructor(
             }
             is IsiRutaScreenEvent.NoUrutKlgChanged -> {
                 val newListNoUrutKlg = state.value.listNoUrutKlg.toMutableList()
-//                newListNoUrutKlg[index] = event.noUrutKlg
-                newListNoUrutKlg[index] = event.noUrutKlg.toString()
+                newListNoUrutKlg[index] = event.noUrutKlg
                 _state.emit(state.value.copy(listNoUrutKlg = newListNoUrutKlg))
             }
             is IsiRutaScreenEvent.NamaKKChanged -> {
@@ -404,12 +403,14 @@ class IsiRutaViewModel @Inject constructor(
                 val updatedState = when {
                     state.value.listNoUrutRuta[index].isEmpty() || diff > 0 -> {
                         val newListNoUrutRuta = state.value.listNoUrutRuta.toMutableList()
-//                        newListNoUrutRuta[index] = if (index == 0) {
-//                            (lastRuta.value.noUrutRuta.toInt() + 1..lastRuta.value.noUrutRuta.toInt()  + newSize).toList().map { it.toString() }
-//
-//                        } else {
-//                            ((newListNoUrutRuta[index - 1].maxOrNull()?.plus(1) ?: 0)..(newListNoUrutRuta[index - 1].maxOrNull()?.plus(newSize) ?: 0)).toList()
-//                        }
+                        val lastRutaInt = lastRuta.value.noUrutRuta.toInt()
+                        val previousListMax = newListNoUrutRuta[index - 1].map { it.toIntOrNull() ?: 0 }.maxOrNull() ?: 0
+
+                        newListNoUrutRuta[index] = if (index == 0) {
+                            (lastRutaInt + 1..lastRutaInt + newSize).map { it.toString() }
+                        } else {
+                            (previousListMax + 1..previousListMax + newSize).map { it.toString() }
+                        }
 
                         val newListKkOrKrt = state.value.listKkOrKrt.toMutableList()
                         newListKkOrKrt[index] = state.value.listKkOrKrt[index] + List(diff) { "" }
@@ -429,13 +430,6 @@ class IsiRutaViewModel @Inject constructor(
                         val newListLat = state.value.listLat.toMutableList()
                         newListLat[index] = state.value.listLat[index] + List(diff) { 0.0 }
 
-//                        val newListKkOrKrt = updateList(state.value.listKkOrKrt, index, diff, "")
-//                        val newListNamaKrt = updateList(state.value.listNamaKrt, index, diff, "")
-//                        val newListGenzOrtu = updateList(state.value.listGenzOrtu, index, diff, 0)
-//                        val newListKatGenz = updateList(state.value.listKatGenz, index, diff, 0)
-//                        val newListLong = updateList(state.value.listLong, index, diff, 0.0)
-//                        val newListLat = updateList(state.value.listLat, index, diff, 0.0)
-
                         state.value.copy(
                             listNoUrutRuta = newListNoUrutRuta,
                             listKkOrKrt = newListKkOrKrt,
@@ -448,35 +442,6 @@ class IsiRutaViewModel @Inject constructor(
                     }
 
                     diff < 0 -> {
-
-//                        val newListNoUrutRuta = state.value.listNoUrutRuta.mapIndexed { i, list ->
-//                            if (i == index) list.take(newSize).toMutableList() else list.toMutableList()
-//                        }.toMutableList()
-//
-//                        val newListKkOrKrt = state.value.listKkOrKrt.mapIndexed { i, list ->
-//                            if (i == index) list.take(newSize).toMutableList() else list.toMutableList()
-//                        }.toMutableList()
-//
-//                        val newListNamaKrt = state.value.listNamaKrt.mapIndexed { i, list ->
-//                            if (i == index) list.take(newSize).toMutableList() else list.toMutableList()
-//                        }.toMutableList()
-//
-//                        val newListGenzOrtu = state.value.listGenzOrtu.mapIndexed { i, list ->
-//                            if (i == index) list.take(newSize).toMutableList() else list.toMutableList()
-//                        }.toMutableList()
-//
-//                        val newListKatGenz = state.value.listKatGenz.mapIndexed { i, list ->
-//                            if (i == index) list.take(newSize).toMutableList() else list.toMutableList()
-//                        }.toMutableList()
-//
-//                        val newListLong = state.value.listLong.mapIndexed { i, list ->
-//                            if (i == index) list.take(newSize).toMutableList() else list.toMutableList()
-//                        }.toMutableList()
-//
-//                        val newListLat = state.value.listLat.mapIndexed { i, list ->
-//                            if (i == index) list.take(newSize).toMutableList() else list.toMutableList()
-//                        }.toMutableList()
-
                         val newListNoUrutRuta = updateListAtIndex(state.value.listNoUrutRuta, index, newSize)
                         val newListKkOrKrt = updateListAtIndex(state.value.listKkOrKrt, index, newSize)
                         val newListNamaKrt = updateListAtIndex(state.value.listNamaKrt, index, newSize)
