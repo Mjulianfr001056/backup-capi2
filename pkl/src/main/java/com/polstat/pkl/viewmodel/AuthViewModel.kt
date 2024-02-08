@@ -161,7 +161,7 @@ class AuthViewModel @Inject constructor(
                 }
             }
 
-            saveDataTim()
+            saveDataTim(authResponse.value)
 
             //Redundant but preferred
             if (authResponse.value.wilayah.isEmpty()) {
@@ -243,22 +243,18 @@ class AuthViewModel @Inject constructor(
         _showLoadingChannel.trySend(false)
     }
 
-    private suspend fun saveDataTim(){
+    private suspend fun saveDataTim(user: AuthResponse){
         //Cek apakah user adalah koor atau tidak dan apakah memiliki anggota tim atau tidak
-        if (!authResponse.value.isKoor || authResponse.value.dataTim.anggota.isEmpty()) {
+        if (!user.isKoor || user.dataTim.anggota.isEmpty()) {
             return
         }
 
-        authResponse.value.dataTim.anggota.forEach {
+        user.dataTim.anggota.forEach {
             dataTimRepository.insertAnggotaTim(it.nim to it.nama)
                 .collectLatest { message ->
                     Log.d(TAG, message)
                 }
         }
-
-        /**
-         * TODO(Perpendek authResponse.value.xxx telescoping-nya)
-         */
     }
 
     fun dismissPermissionDialog() {

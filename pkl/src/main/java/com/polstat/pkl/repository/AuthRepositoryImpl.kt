@@ -36,13 +36,14 @@ class AuthRepositoryImpl @Inject constructor(
                 val newSession = Session(
                     nama = response.nama,
                     nim = response.nim,
-                    //password = password,
                     avatar = response.avatar,
                     isKoor = response.isKoor,
-                    //id_kuesioner = response.idKuesioner,
+                    token = response.token,
+
                     idTim = response.dataTim.idTim,
                     namaTim = response.dataTim.namaTim,
-                    token = response.token
+                    nimPml = response.dataTim.nimPML,
+                    noTlpPml = response.dataTim.teleponPML
                 )
 
                 saveSession(newSession)

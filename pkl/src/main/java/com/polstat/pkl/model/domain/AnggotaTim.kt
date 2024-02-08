@@ -5,4 +5,6 @@ data class AnggotaTim(
     val nama: String,
     val noTlp: String
     //Tambahkan atribut lain seperlunya
-)
+){
+
+}
