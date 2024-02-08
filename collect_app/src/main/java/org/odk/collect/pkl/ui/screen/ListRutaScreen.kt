@@ -1,22 +1,27 @@
 package org.odk.collect.pkl.ui.screen
 
+import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.MoreVert
@@ -33,11 +38,22 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,13 +62,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import com.polstat.pkl.R
 import com.polstat.pkl.database.entity.KeluargaEntity
@@ -60,13 +81,18 @@ import com.polstat.pkl.database.entity.RutaEntity
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary300
 import com.polstat.pkl.ui.theme.PklPrimary900
+import com.polstat.pkl.ui.theme.PklTertiary100
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.utils.UtilFunctions
 import com.polstat.pkl.viewmodel.ListRutaViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import org.odk.collect.pkl.navigation.CapiScreen
 
-
-@Suppress("UNUSED_EXPRESSION")
 @OptIn(ExperimentalMaterial3Api::class)
+@Suppress("UNUSED_EXPRESSION")
 @Composable
 fun ListRutaScreen(
     navController: NavHostController,
@@ -80,10 +106,10 @@ fun ListRutaScreen(
     var enableFinalisasiBSButton by remember { mutableStateOf(false) }
     var checkedCheckbox by remember { mutableStateOf(false) }
     val session = viewModel.session
-    val listRutaByWilayah = viewModel.listRutaByWilayah
-    val listRutaByKeluarga = viewModel.listRutaByKeluarga
-    val listKeluargaByWilayah = viewModel.listKeluargaByWilayah
-    val listKeluargaByRuta = viewModel.listKeluargaByRuta
+    val listRutaByWilayah = viewModel.listRutaByWilayah.collectAsState()
+    val listRutaByKeluarga = viewModel.listRutaByKeluarga.collectAsState()
+    val listKeluargaByWilayah = viewModel.listKeluargaByWilayah.collectAsState()
+    val listKeluargaByRuta = viewModel.listKeluargaByRuta.collectAsState()
     val idBS = viewModel.idBS
     val isMonitoring = viewModel.isMonitoring
     val context = LocalContext.current
@@ -142,7 +168,7 @@ fun ListRutaScreen(
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Back Button",
                             tint = Color.White
                         )
@@ -286,7 +312,7 @@ fun ListRutaScreen(
                         leadingIcon = {
                             IconButton(onClick = { showSearchBar = false }) {
                                 Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    imageVector = Icons.Filled.ArrowBack,
                                     contentDescription = stringResource(id = R.string.back_icon),
                                     tint = Color.White
                                 )
@@ -1284,7 +1310,10 @@ fun RowScope.TableCell(
 ) {
     Text(
         modifier = Modifier
-            .padding(start = 10.dp, end = 10.dp)
+            .padding(
+                start = 10.dp,
+                end = 10.dp
+            )
             .weight(weight),
         text = text,
         color = color,
