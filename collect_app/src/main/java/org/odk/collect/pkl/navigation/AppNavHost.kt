@@ -1,6 +1,6 @@
 package org.odk.collect.pkl.navigation
 
-import EditRutaScreen
+//import EditRutaScreen
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -168,10 +168,10 @@ fun SamplingNavHost(
                     }
                 )
             ) {
-                EditRutaScreen(
-                    navController = samplingNavController,
-                    viewModel = hiltViewModel()
-                )
+//                EditRutaScreen(
+//                    navController = samplingNavController,
+//                    viewModel = hiltViewModel()
+//                )
             }
 
             composable(

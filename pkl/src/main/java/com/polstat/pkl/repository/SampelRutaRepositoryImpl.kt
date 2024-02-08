@@ -89,7 +89,7 @@ class SampelRutaRepositoryImpl @Inject constructor(
             try {
                 emit(Result.Loading(true))
 
-                val sampelRuta = capi63Dao.getSampelRutaByNoBS(noBS)
+                val sampelRuta = capi63Dao.getSampelRutaByNoBS(idBS)
 
                 Log.d(TAG, "Berhasil getSampelRuta: $sampelRuta")
 

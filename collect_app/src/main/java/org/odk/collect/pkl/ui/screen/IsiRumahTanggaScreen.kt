@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
@@ -203,7 +204,7 @@ fun IsiRumahTanggaScreen(
                                 )
                                 TableCellForm(
                                     label = "No. Ruta",
-                                    value = ": ${UtilFunctions.convertTo3DigitsString(lastRuta.value.noUrutRuta)}",
+                                    value = ": ${UtilFunctions.padWithZeros(lastRuta.value.noUrutRuta,3)}",
                                     fontSize = 10.sp,
                                     weight = weight
                                 )
@@ -816,7 +817,7 @@ fun KeteranganRuta(
             coroutineScope.launch {
                 viewModel.onEvent(
                     IsiRutaScreenEvent.NoUrutRutaChanged(
-                        it.toIntOrNull() ?: 0
+                        it
                     ),
                     indexKlg,
                     indexRuta
@@ -834,7 +835,7 @@ fun KeteranganRuta(
             coroutineScope.launch {
                 viewModel.onEvent(
                     IsiRutaScreenEvent.NoUrutRutaChanged(
-                        increment(state.value.listNoUrutRuta[indexKlg][indexRuta].toString()).toInt()
+                        increment(state.value.listNoUrutRuta[indexKlg][indexRuta])
                     ),
                     indexKlg,
                     indexRuta
@@ -845,7 +846,7 @@ fun KeteranganRuta(
             coroutineScope.launch {
                 viewModel.onEvent(
                     IsiRutaScreenEvent.NoUrutRutaChanged(
-                        decrement(state.value.listNoUrutRuta[indexKlg][indexRuta].toString()).toInt()
+                        decrement(state.value.listNoUrutRuta[indexKlg][indexRuta])
                     ),
                     indexKlg,
                     indexRuta
@@ -936,6 +937,12 @@ fun KeteranganRuta(
 
     Spacer(modifier = Modifier.padding(10.dp))
 
+    Text(
+        text = "15. Keberadaan Gen Z dan Orang Tua dalam Rumah Tangga",
+        fontFamily = PoppinsFontFamily,
+        fontWeight = FontWeight.SemiBold
+    )
+
     InputNomor(
         value = state.value.listGenzOrtu[indexKlg][indexRuta].toString(),
         onValueChange = {
@@ -949,7 +956,49 @@ fun KeteranganRuta(
         },
         label = {
             Text(
-                text = "15. Keberadaan Gen Z dan Orang Tua dalam Rumah Tangga",
+                text = "15a. Jumlah Gen Z anak e/ligible (kelahiran 2007-2012)",
+                fontFamily = PoppinsFontFamily,
+                fontWeight = FontWeight.SemiBold
+            )
+        },
+        onIncrement = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    IsiRutaScreenEvent.GenzOrtuChanged(
+                        increment(state.value.listGenzOrtu[indexKlg][indexRuta].toString()).toInt()
+                    ),
+                    indexKlg,
+                    indexRuta
+                )
+            }
+        },
+        onDecrement = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    IsiRutaScreenEvent.GenzOrtuChanged(
+                        decrement(state.value.listGenzOrtu[indexKlg][indexRuta].toString()).toInt()
+                    ),
+                    indexKlg,
+                    indexRuta
+                )
+            }
+        },
+    )
+
+    InputNomor(
+        value = state.value.listGenzOrtu[indexKlg][indexRuta].toString(),
+        onValueChange = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    IsiRutaScreenEvent.GenzOrtuChanged(it.toIntOrNull() ?: 0),
+                    indexKlg,
+                    indexRuta
+                )
+            }
+        },
+        label = {
+            Text(
+                text = "15b. Jumlah Gen Z dewasa eligible (kelahiran 1997-2006)",
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.SemiBold
             )
@@ -1254,7 +1303,7 @@ fun IsiRumahTanggaTopBar(
                 }
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "kembali",
                     tint = Color.White,
                     modifier = Modifier.size(25.dp)
