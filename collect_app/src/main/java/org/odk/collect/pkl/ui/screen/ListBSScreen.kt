@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Sync
@@ -77,8 +78,6 @@ fun ListBSScreen(
     viewModel: ListBSViewModel
 ) {
 
-    val session = viewModel.session
-
     val listWilayah = viewModel.listWilayah
 
     val context = LocalContext.current
@@ -128,7 +127,7 @@ fun ListBSScreen(
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            imageVector = Icons.Filled.ArrowBack,
                             tint = Color.White,
                             contentDescription = stringResource(R.string.back_icon),
                             modifier = Modifier.size(25.dp)
