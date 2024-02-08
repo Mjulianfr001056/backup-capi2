@@ -15,4 +15,6 @@ interface SampelRutaRepository {
     suspend fun deleteAllSampelRuta() : Flow<String>
 
     suspend fun getSampelRuta(noBS: String) : Flow<Result<List<SampelRutaEntity>>>
+
+    suspend fun getAllSampelRuta() : Flow<Result<List<SampelRutaEntity>>>
 }

@@ -3,14 +3,8 @@ package com.polstat.pkl.repository
 import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
 import com.polstat.pkl.database.Capi63Database
-import com.polstat.pkl.database.relation.KeluargaWithRuta
-import com.polstat.pkl.database.relation.MahasiswaWithAll
-import com.polstat.pkl.database.relation.MahasiswaWithWilayah
-import com.polstat.pkl.database.relation.RutaWithKeluarga
-import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.mapper.toMahasiswaEntity
 import com.polstat.pkl.model.domain.Mahasiswa
-import com.polstat.pkl.utils.Result
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -57,87 +51,4 @@ class MahasiswaRepositoryImpl @Inject constructor (
             }
         }
     }
-
-
-    override suspend fun getMahasiswaWithWilayah(
-        nim: String
-    ): Flow<Result<MahasiswaWithWilayah>> {
-        return flow {
-            try {
-                emit(Result.Loading(true))
-
-                val mahasiswaWithWilayah = capi63Database.capi63Dao.getMahasiswaWithWilayah(nim)
-
-                Log.d(TAG, "Berhasil getMahasiswaWithWilayah: $mahasiswaWithWilayah")
-
-                emit(Result.Success(mahasiswaWithWilayah))
-            } catch (e: Exception) {
-                Log.d(TAG, "Gagal getMahasiswaWithWilayah: ${e.message}")
-                emit(Result.Error(null, "Error fetching MahasiswaWithWilayah: ${e.message}"))
-            } finally {
-                emit(Result.Loading(false))
-            }
-        }
-    }
-
-    override suspend fun getMahasiswaWithAll(
-        nim: String
-    ): Flow<Result<MahasiswaWithAll>> {
-
-        return flow {
-
-            try {
-                emit(Result.Loading(true))
-
-                val mahasiswaWithWilayah = capi63Database.capi63Dao.getMahasiswaWithWilayah(nim)
-
-                val listWilayahWithAll = mahasiswaWithWilayah.listWilayah?.map { wilayah ->
-
-                    val wilayahWithKeluarga = capi63Database.capi63Dao.getWilayahWithKeluarga(wilayah.noBS)
-
-                    val wilayahWithRuta = capi63Database.capi63Dao.getWilayahWithRuta(wilayah.noBS)
-
-                    val listKeluargaWithRuta = wilayahWithKeluarga.listKeluarga?.map { keluarga ->
-
-                        val ruta = capi63Database.capi63Dao.getKeluargaWithRuta(keluarga.kodeKlg)
-
-                        KeluargaWithRuta(keluarga, ruta.listRuta)
-
-                    }
-
-                    val listRutaWithKeluarga = wilayahWithRuta.listRuta?.map {ruta ->
-
-                        val keluarga = capi63Database.capi63Dao.getRutaWithKeluarga(ruta.kodeRuta)
-
-                        RutaWithKeluarga(ruta, keluarga.listKeluarga)
-
-                    }
-
-                    WilayahWithAll(wilayahWithKeluarga, wilayahWithRuta, listKeluargaWithRuta, listRutaWithKeluarga)
-
-                }
-
-                val mahasiswaWithAll = MahasiswaWithAll(
-                    mahasiswaWithWilayah = mahasiswaWithWilayah,
-                    listWilayahWithAll = listWilayahWithAll
-                )
-
-                Log.d(TAG, "Berhasil getMahasiswaWithAll: $mahasiswaWithAll")
-
-                emit(Result.Success(mahasiswaWithAll))
-
-            } catch (e: Exception) {
-
-                Log.d(TAG, "Gagal getMahasiswaWithAll: ${e.message}")
-
-                emit(Result.Error(null, "Error fetching MahasiswaWithAll: ${e.message}"))
-
-            } finally {
-
-                emit(Result.Loading(false))
-
-            }
-        }
-    }
-
 }

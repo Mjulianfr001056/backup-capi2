@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
 data class SampelRutaEntity (
     @PrimaryKey(autoGenerate = false)
     var kodeRuta: String = "",
-    var noBS: String = "[Not set]",//
+    var idBS: String = "[Not set]",//
     var SLS: String = "[Not set]", //ganti nama var banjar
     var noSegmen: String = "[Not set]",
     var noBgFisik: String = "[Not set]",

@@ -4,10 +4,9 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.polstat.pkl.database.entity.AnggotaTimEntity
 import com.polstat.pkl.database.entity.SampelRutaEntity
-import com.polstat.pkl.database.relation.DataTimWithAll
-import com.polstat.pkl.database.relation.MahasiswaWithWilayah
-import com.polstat.pkl.database.relation.WilayahWithRuta
+import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.repository.DataTimRepository
 import com.polstat.pkl.repository.KeluargaRepository
 import com.polstat.pkl.repository.LocalRutaRepository
@@ -42,25 +41,19 @@ class BerandaViewModel @Inject constructor(
         private const val TAG = "CAPI63_BERANDA_VM"
     }
 
-    private val _session = sessionRepository.getActiveSession()
+    val session = sessionRepository.getActiveSession()
 
-    val session = _session
+    private val _listWilayah = MutableStateFlow<List<WilayahEntity>>(emptyList())
 
-    private val _dataTimWithAll = MutableStateFlow(DataTimWithAll())
+    val listWilayah = _listWilayah.asStateFlow()
 
-    val dataTimWithAll = _dataTimWithAll.asStateFlow()
+    private val _listAllSampelRuta = MutableStateFlow<List<SampelRutaEntity>>(emptyList())
 
-    private val _wilayahWithRuta = MutableStateFlow(WilayahWithRuta())
+    val listAllSampelRuta = _listAllSampelRuta.asStateFlow()
 
-    val wilayahWithRuta = _wilayahWithRuta.asStateFlow()
+    private val _listAnggotaTim = MutableStateFlow<List<AnggotaTimEntity>>(emptyList())
 
-    private val _mahasiswaWithWilayah = MutableStateFlow(MahasiswaWithWilayah())
-
-    val mahasiswaWithWilayah = _mahasiswaWithWilayah.asStateFlow()
-
-    private val _listSampelRuta = MutableStateFlow<List<SampelRutaEntity>>(listOf())
-
-    val listSampelRuta = _listSampelRuta.asStateFlow()
+    val listAnggotaTim = _listAnggotaTim.asStateFlow()
 
     private val _errorMessage = MutableStateFlow("")
 
@@ -72,16 +65,7 @@ class BerandaViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-//            val getDataTimWithAllJob = async { getDataTimWithAll(_session?.idTim.toString()) }
-            val getDataTimWithAllJob = async { getDataTimWithAll(_session?.nim.toString()) }
-            getDataTimWithAllJob.await()
-            val getMahasiswaWithWilayahJob = async { getMahasiswaWithWilayah(_session?.nim.toString()) }
-            getMahasiswaWithWilayahJob.await()
-            _mahasiswaWithWilayah.value.listWilayah?.let {
-                if (it.isNotEmpty()) {
-                    getAllSampelRutaByNoBS(it[0].noBS)
-                }
-            }
+
         }
     }
 
@@ -121,98 +105,14 @@ class BerandaViewModel @Inject constructor(
         Log.d(TAG, "logout: Berhasil logout!")
     }
 
-    private fun getDataTimWithAll(
-        idTim: String
-    ) {
+    fun getAllSampelRuta() {
         viewModelScope.launch {
-            dataTimRepository.getDataTimWithAll(idTim).collectLatest { result ->
+            sampelRutaRepository.getAllSampelRuta().collectLatest { result ->
                 when(result) {
                     is Result.Success -> {
                         result.data?.let { response ->
-                            _dataTimWithAll.value = response
-                            Log.d(TAG, "getDataTimWithAll succeed: $response")
-                        }
-                    }
-                    is Result.Loading -> {
-                        Log.d(TAG, "getDataTimWithAll: Loading...")
-                    }
-                    is Result.Error -> {
-                        result.message?.let { error ->
-                            _errorMessage.value = error
-                        }
-                        _showErrorToastChannel.send(true)
-                        Log.e(TAG, "getDataTimWithAll: Error in getDataTimWithAll")
-                    }
-
-                }
-            }
-        }
-    }
-
-    private fun getMahasiswaWithWilayah(
-        nim: String
-    ) {
-        viewModelScope.launch {
-            mahasiswaRepository.getMahasiswaWithWilayah(nim).collectLatest { result ->
-                when(result) {
-                    is Result.Success -> {
-                        result.data?.let { response ->
-                            _mahasiswaWithWilayah.value = response
-                            Log.d(TAG, "getMahasiswaWithWilayah success: $response")
-                        }
-                    }
-                    is Result.Loading -> {
-                        Log.d(TAG, "getMahasiswaWithWilayah: Loading...")
-                    }
-                    is Result.Error -> {
-                        result.message?.let { error ->
-                            _errorMessage.value = error
-                        }
-                        _showErrorToastChannel.send(true)
-                        Log.e(TAG, "getMahasiswaWithWilayah: Error in getMahasiswaWithWilayah")
-                    }
-                }
-            }
-        }
-    }
-
-    fun getWilayahWithRuta(
-        noBS: String
-    ) {
-        viewModelScope.launch {
-            wilayahRepository.getWilayahWithRuta(noBS).collectLatest { result ->
-                when(result) {
-                    is Result.Success -> {
-                        result.data?.let { response ->
-                            _wilayahWithRuta.value = response
-                            Log.d(TAG, "getWilayahWithRuta succeed: $response")
-                        }
-                    }
-                    is Result.Loading -> {
-                        Log.d(TAG, "getWilayahWithRuta: Loading...")
-                    }
-                    is Result.Error -> {
-                        result.message?.let { error ->
-                            _errorMessage.value = error
-                        }
-                        _showErrorToastChannel.send(true)
-                        Log.e(TAG, "getWilayahWithRuta: Error in getWilayahWithRuta")
-                    }
-                }
-            }
-        }
-    }
-
-    fun getAllSampelRutaByNoBS(
-        noBS: String
-    ) {
-        viewModelScope.launch {
-            sampelRutaRepository.getSampelRuta(noBS).collectLatest { result ->
-                when(result) {
-                    is Result.Success -> {
-                        result.data?.let { response ->
-                            _listSampelRuta.value = response
-                            Log.d(TAG, "getAllSampelRutaByNoBS succeed: $response")
+                            _listAllSampelRuta.value = response
+                            Log.d(TAG, "getAllSampelRuta succeed: $listAllSampelRuta")
                         }
                     }
                     is Result.Loading -> {
@@ -221,13 +121,12 @@ class BerandaViewModel @Inject constructor(
                     is Result.Error -> {
                         result.message?.let { error ->
                             _errorMessage.value = error
+                            Log.e(TAG, "getAllSampelRuta: Error in getAllSampelRuta ($errorMessage)")
                         }
                         _showErrorToastChannel.send(true)
-                        Log.e(TAG, "getAllSampelRutaByNoBS: Error in getAllSampelRutaByNoBS")
                     }
                 }
             }
         }
     }
-
 }

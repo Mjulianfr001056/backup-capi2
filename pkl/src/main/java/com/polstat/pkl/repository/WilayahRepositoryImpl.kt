@@ -3,11 +3,7 @@ package com.polstat.pkl.repository
 import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
 import com.polstat.pkl.database.dao.Capi63Dao
-import com.polstat.pkl.database.relation.KeluargaWithRuta
-import com.polstat.pkl.database.relation.RutaWithKeluarga
-import com.polstat.pkl.database.relation.WilayahWithAll
-import com.polstat.pkl.database.relation.WilayahWithKeluarga
-import com.polstat.pkl.database.relation.WilayahWithRuta
+import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.mapper.toWilayahEntity
 import com.polstat.pkl.model.domain.Wilayah
 import com.polstat.pkl.utils.Result
@@ -73,7 +69,6 @@ class WilayahRepositoryImpl @Inject constructor(
         }
     }
 
-
     override suspend fun deleteAllWilayah(): Flow<String> {
         return  flow {
             try {
@@ -86,74 +81,4 @@ class WilayahRepositoryImpl @Inject constructor(
             }
         }
     }
-
-    override suspend fun getWilayahWithRuta(
-        noBS: String
-    ): Flow<Result<WilayahWithRuta>> {
-        return flow {
-            try {
-                emit(Result.Loading(true))
-                val wilayahWithRuta = capi63Dao.getWilayahWithRuta(noBS)
-                Log.d(TAG, "Berhasil getWilayahWithRuta: $wilayahWithRuta")
-                emit(Result.Success(wilayahWithRuta))
-            } catch (e: Exception) {
-                Log.d(TAG, "Gagal getWilayahWithRuta: ${e.message}")
-                emit(Result.Error(null, "Error fetching WilayahWithRuta: ${e.message}"))
-            } finally {
-                emit(Result.Loading(false))
-            }
-        }
-    }
-
-    override suspend fun getWilayahWithKeluarga(
-        noBS: String
-    ): Flow<Result<WilayahWithKeluarga>> {
-        return flow {
-            try {
-                emit(Result.Loading(true))
-                val wilayahWithKeluarga = capi63Dao.getWilayahWithKeluarga(noBS)
-                Log.d(TAG, "Berhasil getWilayahWithKeluarga: $wilayahWithKeluarga")
-                emit(Result.Success(wilayahWithKeluarga))
-            } catch (e: Exception) {
-                Log.d(TAG, "Gagal getWilayahWithKeluarga: ${e.message}")
-                emit(Result.Error(null, "Error fetching getWilayahWithKeluarga: ${e.message}"))
-            } finally {
-                emit(Result.Loading(false))
-            }
-        }
-    }
-
-    override suspend fun getWilayahWithAll(
-        noBS: String
-    ): Flow<Result<WilayahWithAll>> {
-        return flow {
-            try {
-                emit(Result.Loading(true))
-                val wilayahWithKeluarga = capi63Dao.getWilayahWithKeluarga(noBS)
-                val listKeluargaWithRuta = wilayahWithKeluarga.listKeluarga?.map { keluarga ->
-                    val ruta = capi63Dao.getKeluargaWithRuta(keluarga.kodeKlg)
-                    KeluargaWithRuta(keluarga, ruta.listRuta)
-                }
-                val wilayahWithRuta = capi63Dao.getWilayahWithRuta(noBS)
-                val listRutaWithKeluarga = wilayahWithRuta.listRuta?.map { ruta ->
-                    val keluarga = capi63Dao.getRutaWithKeluarga(ruta.kodeRuta)
-                    RutaWithKeluarga(ruta, keluarga.listKeluarga)
-                }
-                val wilayahWithAll = WilayahWithAll(
-                    wilayahWithKeluarga = wilayahWithKeluarga,
-                    wilayahWithRuta = wilayahWithRuta,
-                    listKeluargaWithRuta = listKeluargaWithRuta,
-                    listRutaWithKeluarga = listRutaWithKeluarga
-                )
-                Log.d(TAG, "Berhasil getWilayahWithAll: $wilayahWithAll")
-                emit(Result.Success(wilayahWithAll))
-            } catch (e: Exception) {
-                Log.d(TAG, "Gagal getWilayahWithAll: ${e.message}")
-                emit(Result.Error(null, "Error fetching WilayahWithAll: ${e.message}"))
-            } finally {
-                emit(Result.Loading(false))
-            }
-        }
-    }
-
 }

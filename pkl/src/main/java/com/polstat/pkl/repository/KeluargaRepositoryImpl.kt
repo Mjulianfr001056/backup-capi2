@@ -4,7 +4,6 @@ import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
 import com.polstat.pkl.database.dao.Capi63Dao
 import com.polstat.pkl.database.entity.KeluargaEntity
-import com.polstat.pkl.database.relation.KeluargaWithRuta
 import com.polstat.pkl.mapper.toKeluargaEntity
 import com.polstat.pkl.model.domain.Keluarga
 import com.polstat.pkl.utils.Result
@@ -126,7 +125,7 @@ class KeluargaRepositoryImpl @Inject constructor(
         return flow {
             try {
                 emit(Result.Loading(true))
-                val listAllKeluargaByWilayah = capi63Database.capi63Dao.getAllKeluargaByWilayah(idBS)
+                val listAllKeluargaByWilayah = capi63Dao.getAllKeluargaByWilayah(idBS)
                 Log.d(TAG, "Berhasil getAllKeluargaByWilayah: $listAllKeluargaByWilayah")
                 emit(Result.Success(listAllKeluargaByWilayah))
             } catch (e: Exception) {
@@ -142,7 +141,7 @@ class KeluargaRepositoryImpl @Inject constructor(
         return flow {
             try {
                 emit(Result.Loading(true))
-                val listAllKeluargaByRuta = capi63Database.capi63Dao.getAllKeluargaByRuta(kodeRuta)
+                val listAllKeluargaByRuta = capi63Dao.getAllKeluargaByRuta(kodeRuta)
                 Log.d(TAG, "Berhasil getAllKeluargaByRuta: $listAllKeluargaByRuta")
                 emit(Result.Success(listAllKeluargaByRuta))
             } catch (e: Exception) {
@@ -153,6 +152,7 @@ class KeluargaRepositoryImpl @Inject constructor(
             }
         }
     }
+
 
     override suspend fun deleteAllKeluarga(): Flow<String> {
         return  flow {
@@ -166,26 +166,4 @@ class KeluargaRepositoryImpl @Inject constructor(
             }
         }
     }
-
-    override suspend fun getKeluargaWithRuta(
-        kodeKlg: String
-    ): Flow<Result<KeluargaWithRuta>> {
-        return flow {
-            try {
-                emit(Result.Loading(true))
-
-                val keluargaWithRuta = capi63Dao.getKeluargaWithRuta(kodeKlg)
-
-                Log.d(TAG, "Berhasil getKeluargaWithRuta: $keluargaWithRuta")
-
-                emit(Result.Success(keluargaWithRuta))
-            } catch (e: Exception) {
-                Log.d(TAG, "Gagal getKeluargaWithRuta: ${e.message}")
-                emit(Result.Error(null, "Error fetching KeluargaWithRuta: ${e.message}"))
-            } finally {
-                emit(Result.Loading(false))
-            }
-        }
-    }
-
 }

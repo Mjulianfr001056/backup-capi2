@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.database.entity.KeluargaEntity
 import com.polstat.pkl.database.entity.RutaEntity
-import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.model.domain.Keluarga
 import com.polstat.pkl.model.domain.Lokasi
 import com.polstat.pkl.model.domain.Ruta
@@ -68,10 +67,6 @@ class IsiRutaViewModel @Inject constructor(
     private val _lokasi = MutableStateFlow(Lokasi())
 
     val lokasi = _lokasi.asStateFlow()
-
-    private val _wilayahWithAll = MutableStateFlow(WilayahWithAll())
-
-    val wilayahWithAll = _wilayahWithAll.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -221,7 +216,7 @@ class IsiRutaViewModel @Inject constructor(
     suspend fun getLastRuta(): RutaEntity {
         var rutaEntity = RutaEntity(
             kodeRuta = "",
-            noUrutRuta = 0,
+            noUrutRuta = "",
             noUrutEgb = 0,
             kkOrKrt = "",
             namaKrt = "",
@@ -409,11 +404,12 @@ class IsiRutaViewModel @Inject constructor(
                 val updatedState = when {
                     state.value.listNoUrutRuta[index].isEmpty() || diff > 0 -> {
                         val newListNoUrutRuta = state.value.listNoUrutRuta.toMutableList()
-                        newListNoUrutRuta[index] = if (index == 0) {
-                            (lastRuta.value.noUrutRuta + 1..lastRuta.value.noUrutRuta  + newSize).toList()
-                        } else {
-                            ((newListNoUrutRuta[index - 1].maxOrNull()?.plus(1) ?: 0)..(newListNoUrutRuta[index - 1].maxOrNull()?.plus(newSize) ?: 0)).toList()
-                        }
+//                        newListNoUrutRuta[index] = if (index == 0) {
+//                            (lastRuta.value.noUrutRuta.toInt() + 1..lastRuta.value.noUrutRuta.toInt()  + newSize).toList().map { it.toString() }
+//
+//                        } else {
+//                            ((newListNoUrutRuta[index - 1].maxOrNull()?.plus(1) ?: 0)..(newListNoUrutRuta[index - 1].maxOrNull()?.plus(newSize) ?: 0)).toList()
+//                        }
 
                         val newListKkOrKrt = state.value.listKkOrKrt.toMutableList()
                         newListKkOrKrt[index] = state.value.listKkOrKrt[index] + List(diff) { "" }
@@ -582,7 +578,7 @@ class IsiRutaViewModel @Inject constructor(
                                 val genzOrtuRuta = state.value.listGenzOrtu[indexKlg][indexRuta]
 
                                 val ruta = Ruta(
-                                    kodeRuta = "R$noBS${UtilFunctions.convertTo3DigitsString(state.value.listNoUrutRuta[indexKlg][indexRuta])}",
+                                    kodeRuta = "R$noBS${UtilFunctions.padWithZeros(state.value.listNoUrutRuta[indexKlg][indexRuta], 3)}",
                                     noUrutRuta = state.value.listNoUrutRuta[indexKlg][indexRuta],
                                     noUrutEgb = 0,
                                     kkOrKrt = when (state.value.listKkOrKrt[indexKlg][indexRuta]) {

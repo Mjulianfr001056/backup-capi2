@@ -12,7 +12,7 @@ sealed class IsiRutaScreenEvent {
     data class IsGenzOrtuChanged(val isGenzOrtu: Int) : IsiRutaScreenEvent()
     data class NoUrutKlgEgbChanged(val noUrutKlgEgb: Int) : IsiRutaScreenEvent()
     data class PenglMknChanged(val penglMkn: Int) : IsiRutaScreenEvent()
-    data class NoUrutRutaChanged(val noUrutRuta: Int) : IsiRutaScreenEvent()
+    data class NoUrutRutaChanged(val noUrutRuta: String) : IsiRutaScreenEvent()
     data class KKOrKRTChanged(val kkOrKRT: String) : IsiRutaScreenEvent()
     data class NamaKRTChanged(val namaKRT: String) : IsiRutaScreenEvent()
     data class GenzOrtuChanged(val genzOrtu: Int) : IsiRutaScreenEvent()

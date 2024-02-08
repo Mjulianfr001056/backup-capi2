@@ -38,7 +38,6 @@ import org.odk.collect.pkl.ui.screen.components.NimTextField
 import org.odk.collect.pkl.ui.screen.components.PasswordTextField
 
 //@Preview(showBackground = true, apiLevel = 28)
-@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun LoginScreen(
     navController: NavController,

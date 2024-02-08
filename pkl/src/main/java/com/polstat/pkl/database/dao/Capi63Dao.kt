@@ -14,13 +14,6 @@ import com.polstat.pkl.database.entity.MahasiswaEntity
 import com.polstat.pkl.database.entity.RutaEntity
 import com.polstat.pkl.database.entity.SampelRutaEntity
 import com.polstat.pkl.database.entity.WilayahEntity
-import com.polstat.pkl.database.relation.DataTimWithMahasiswa
-import com.polstat.pkl.database.relation.KeluargaWithRuta
-import com.polstat.pkl.database.relation.MahasiswaWithWilayah
-import com.polstat.pkl.database.relation.RutaWithKeluarga
-import com.polstat.pkl.database.relation.WilayahWithKeluarga
-import com.polstat.pkl.database.relation.WilayahWithRuta
-
 @Dao
 interface Capi63Dao {
 
@@ -69,11 +62,11 @@ interface Capi63Dao {
     @Query("SELECT * FROM keluarga WHERE kodeKlg = :kodeKlg")
     suspend fun getKeluarga(kodeKlg: String) : KeluargaEntity
 
-    @Query("SELECT * FROM keluarga WHERE idBS = :idBS")
+    @Query("SELECT * FROM keluarga WHERE idBS = :idBS ORDER BY noUrutKlg ASC")
     suspend fun getAllKeluargaByWilayah(idBS: String) : List<KeluargaEntity>
 
     @Transaction
-    @Query("SELECT * FROM keluarga INNER JOIN KeluargaAndRutaEntity ON keluarga.kodeKlg = KeluargaAndRutaEntity.kodeKlg WHERE KeluargaAndRutaEntity.kodeRuta = :kodeRuta")
+    @Query("SELECT * FROM keluarga INNER JOIN KeluargaAndRutaEntity ON keluarga.kodeKlg = KeluargaAndRutaEntity.kodeKlg WHERE KeluargaAndRutaEntity.kodeRuta = :kodeRuta ORDER BY keluarga.noUrutKlg ASC")
     suspend fun getAllKeluargaByRuta(kodeRuta: String): List<KeluargaEntity>
 
     @Query("SELECT * FROM keluarga WHERE status != 'delete' ORDER BY noUrutKlg DESC LIMIT 1")
@@ -99,7 +92,7 @@ interface Capi63Dao {
     @Query("SELECT * FROM ruta WHERE kodeRuta = :kodeRuta")
     suspend fun getRuta(kodeRuta: String) : RutaEntity
 
-    @Query("SELECT * FROM ruta WHERE idBS = :idBS")
+    @Query("SELECT * FROM ruta WHERE idBS = :idBS ORDER BY noUrutRuta ASC")
     suspend fun getAllRutaByWilayah(idBS: String) : List<RutaEntity>
 
     @Query("SELECT * FROM ruta WHERE status != 'delete' ORDER BY noUrutRuta DESC LIMIT 1")
@@ -109,9 +102,8 @@ interface Capi63Dao {
     suspend fun deleteAllRuta()
 
     @Transaction
-    @Query("SELECT * FROM ruta INNER JOIN KeluargaAndRutaEntity ON ruta.kodeRuta = KeluargaAndRutaEntity.kodeRuta WHERE KeluargaAndRutaEntity.kodeKlg = :kodeKlg")
+    @Query("SELECT * FROM ruta INNER JOIN KeluargaAndRutaEntity ON ruta.kodeRuta = KeluargaAndRutaEntity.kodeRuta WHERE KeluargaAndRutaEntity.kodeKlg = :kodeKlg ORDER BY ruta.noUrutRuta ASC")
     suspend fun getAllRutaByKeluarga(kodeKlg: String): List<RutaEntity>
-
 
 
     // Operasi database untuk entitas berelasi
@@ -123,34 +115,12 @@ interface Capi63Dao {
     suspend fun deleteAllKeluargaAndRuta()
 
     @Transaction
-    @Query("SELECT * FROM data_tim WHERE idTim = :idTim")
-    suspend fun getDataTimWithMahasiswa(idTim: String) : DataTimWithMahasiswa
+    @Query("SELECT * FROM sampel_ruta WHERE idBS = :idBS")
+    suspend fun getSampelRutaByNoBS(idBS: String) : List<SampelRutaEntity>
 
-    @Transaction
-    @Query("SELECT * FROM mahasiswa WHERE nim = :nim")
-    suspend fun getMahasiswaWithWilayah(nim: String) : MahasiswaWithWilayah
-
-    @Transaction
-    @Query("SELECT * FROM wilayah WHERE noBS = :noBS")
-    suspend fun getWilayahWithKeluarga(noBS: String) : WilayahWithKeluarga
-
-    @Transaction
-    @Query("SELECT * FROM wilayah WHERE noBS = :noBS")
-    suspend fun getWilayahWithRuta(noBS: String) : WilayahWithRuta
-
-
-    @Transaction
-    @Query("SELECT * FROM sampel_ruta WHERE noBS = :noBS")
-    suspend fun getSampelRutaByNoBS(noBS: String) : List<SampelRutaEntity>
+    @Query("SELECT * FROM sampel_ruta")
+    suspend fun getAllSampelRuta() : List<SampelRutaEntity>
 
     @Query("DELETE FROM sampel_ruta")
     suspend fun deleteAllSampelRuta()
-
-    @Transaction
-    @Query("SELECT * FROM keluarga WHERE kodeKlg = :kodeKlg")
-    suspend fun getKeluargaWithRuta(kodeKlg: String) : KeluargaWithRuta
-
-    @Transaction
-    @Query("SELECT * FROM ruta WHERE kodeRuta = :kodeRuta")
-    suspend fun getRutaWithKeluarga(kodeRuta: String) : RutaWithKeluarga
 }

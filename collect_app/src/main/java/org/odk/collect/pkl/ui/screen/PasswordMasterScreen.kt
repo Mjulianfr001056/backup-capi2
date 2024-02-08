@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -97,7 +96,7 @@ fun PasswordMasterScreen(
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             tint = PklBase,
                             contentDescription = "Back Icon",
                             modifier = Modifier.size(25.dp)
