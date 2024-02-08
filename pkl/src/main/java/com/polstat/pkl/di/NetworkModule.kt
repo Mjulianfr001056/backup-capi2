@@ -1,16 +1,16 @@
 package com.polstat.pkl.di
 
-import com.polstat.pkl.repository.LocationRepository
-import com.polstat.pkl.repository.LocationRepositoryImpl
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.polstat.pkl.database.Capi63Database
+import com.polstat.pkl.database.dao.Capi63Dao
 import com.polstat.pkl.network.AuthApi
 import com.polstat.pkl.network.LocationApi
 import com.polstat.pkl.network.RutaApi
 import com.polstat.pkl.network.SampelRutaApi
 import com.polstat.pkl.repository.AuthRepository
 import com.polstat.pkl.repository.AuthRepositoryImpl
+import com.polstat.pkl.repository.LocationRepository
+import com.polstat.pkl.repository.LocationRepositoryImpl
 import com.polstat.pkl.repository.RemoteRutaRepository
 import com.polstat.pkl.repository.RemoteRutaRepositoryImpl
 import com.polstat.pkl.repository.SampelRutaRepository
@@ -98,8 +98,8 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideSampelRutaRepository(sampelRutaApi: SampelRutaApi, capi63Database: Capi63Database) : SampelRutaRepository {
-        return SampelRutaRepositoryImpl(sampelRutaApi, capi63Database)
+    fun provideSampelRutaRepository(sampelRutaApi: SampelRutaApi, capi63Dao: Capi63Dao) : SampelRutaRepository {
+        return SampelRutaRepositoryImpl(sampelRutaApi, capi63Dao)
     }
 
     @Provides
