@@ -118,9 +118,9 @@ interface Capi63Dao {
     @Query("SELECT * FROM sampel_ruta WHERE idBS = :idBS")
     suspend fun getSampelRutaByNoBS(idBS: String) : List<SampelRutaEntity>
 
+
     @Query("SELECT * FROM sampel_ruta")
     suspend fun getAllSampelRuta() : List<SampelRutaEntity>
-
     @Query("DELETE FROM sampel_ruta")
     suspend fun deleteAllSampelRuta()
 }

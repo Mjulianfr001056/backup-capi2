@@ -17,4 +17,6 @@ interface SampelRutaRepository {
     suspend fun getSampelRuta(noBS: String) : Flow<Result<List<SampelRutaEntity>>>
 
     suspend fun getAllSampelRuta() : Flow<Result<List<SampelRutaEntity>>>
+
+    suspend fun confirmSampel(kodeRuta: String) : Flow<String>
 }

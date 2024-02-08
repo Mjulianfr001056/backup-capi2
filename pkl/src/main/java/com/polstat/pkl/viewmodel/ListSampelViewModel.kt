@@ -5,11 +5,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.database.entity.SampelRutaEntity
+import com.polstat.pkl.mapper.toWilayah
 import com.polstat.pkl.model.response.SampelRutaResponse
 import com.polstat.pkl.repository.SampelRutaRepository
 import com.polstat.pkl.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -52,6 +54,14 @@ class ListSampelViewModel @Inject constructor(
 
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
+    private val _showSuccessToastChannel = Channel<Boolean>()
+
+    val showSuccessToastChannel = _showSuccessToastChannel.receiveAsFlow()
+
+    private val _successMessage = MutableStateFlow("")
+
+    val successMessage = _successMessage.asStateFlow()
+
     private val _isSyncing = MutableStateFlow(false)
 
     val isSyncing: StateFlow<Boolean> get() = _isSyncing
@@ -61,16 +71,17 @@ class ListSampelViewModel @Inject constructor(
     val isDataInserted = _isDataInserted.asStateFlow()
 
     init {
-        getSampelRutaFromWSAndInsertThem(noBS!!)
+//        getSampelRutaFromWSAndInsertThem(noBS!!)
+        getSampelRutaFromWSAndInsertThem("5104030014007B")
     }
 
 
     private fun getSampelRutaFromWSAndInsertThem(
-        noBS: String
+        idBS: String
     ) {
         viewModelScope.launch {
 //            openLoadingDialog()
-            sampelRutaRepository.getSampelRutaFromWS(noBS).collectLatest { result ->
+            sampelRutaRepository.getSampelRutaFromWS(idBS).collectLatest { result ->
                 when (result) {
                     is Result.Success -> {
                         result.data?.let { response ->
@@ -108,10 +119,10 @@ class ListSampelViewModel @Inject constructor(
     }
 
     fun getSampelByBSFromDB(
-        noBS: String
+        idBS: String
     ) {
         viewModelScope.launch {
-            sampelRutaRepository.getSampelRuta(noBS).collectLatest { result ->
+            sampelRutaRepository.getSampelRuta(idBS).collectLatest { result ->
                 when(result) {
                     is Result.Success -> {
                         result.data?.let { response ->
@@ -130,6 +141,21 @@ class ListSampelViewModel @Inject constructor(
                         Log.e(TAG, "getSampelByBS: Error in getSampelByBS")
                     }
                 }
+            }
+        }
+    }
+
+    fun confirmSampel(kodeRuta: String) {
+        viewModelScope.launch {
+            try {
+                sampelRutaRepository.confirmSampel(kodeRuta).collectLatest { message ->
+                    _successMessage.value = message
+                    _showSuccessToastChannel.send(true)
+                    Log.d(TAG, message)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error: ${e.message}", e)
+                _showErrorToastChannel.send(true)
             }
         }
     }
