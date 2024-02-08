@@ -296,7 +296,7 @@ class IsiRutaViewModel @Inject constructor(
 
                 val updatedState = when {
                     state.value.listNoUrutKlg.isEmpty() || diff > 0 -> {
-                        val newElements = List(event.jmlKlg) { lastKeluarga.value.noUrutKlg + it + 1 }
+                        val newElements = List(event.jmlKlg) { lastKeluarga.value.noUrutKlg.toInt() + it + 1 }.map { it.toString() }
                         state.value.copy(
                             listNoUrutKlg = newElements,
                             listNamaKK = state.value.listNamaKK + List(diff) { "" },
@@ -404,13 +404,11 @@ class IsiRutaViewModel @Inject constructor(
                 val updatedState = when {
                     state.value.listNoUrutRuta[index].isEmpty() || diff > 0 -> {
                         val newListNoUrutRuta = state.value.listNoUrutRuta.toMutableList()
-                        val lastRutaInt = lastRuta.value.noUrutRuta.toInt()
-                        val previousListMax = newListNoUrutRuta[index - 1].map { it.toIntOrNull() ?: 0 }.maxOrNull() ?: 0
-
                         newListNoUrutRuta[index] = if (index == 0) {
-                            (lastRutaInt + 1..lastRutaInt + newSize).map { it.toString() }
+                            (lastRuta.value.noUrutRuta.toInt() + 1..lastRuta.value.noUrutRuta.toInt() + newSize).toList().map { it.toString() }
+
                         } else {
-                            (previousListMax + 1..previousListMax + newSize).map { it.toString() }
+                            ((newListNoUrutRuta[index - 1].map { it.toIntOrNull() ?: 0 }.max().plus(1))..(newListNoUrutRuta[index - 1].map { it.toIntOrNull() ?: 0 }.max().plus(newSize))).toList().map { it.toString() }
                         }
 
                         val newListKkOrKrt = state.value.listKkOrKrt.toMutableList()
