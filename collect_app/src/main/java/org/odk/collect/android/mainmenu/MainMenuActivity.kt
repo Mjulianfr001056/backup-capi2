@@ -15,7 +15,6 @@ import org.odk.collect.android.utilities.ThemeUtils
 import org.odk.collect.androidshared.ui.FragmentFactoryBuilder
 import org.odk.collect.crashhandler.CrashHandler
 import org.odk.collect.permissions.PermissionsProvider
-import org.odk.collect.pkl.CapiFirstActivity
 import org.odk.collect.settings.SettingsProvider
 import org.odk.collect.strings.localization.LocalizedActivity
 import timber.log.Timber
@@ -113,7 +112,7 @@ class MainMenuActivity : LocalizedActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        ActivityUtils.startActivityAndCloseAllOthers(this, CapiFirstActivity::class.java)
+//        ActivityUtils.startActivityAndCloseAllOthers(this, CapiFirstActivity::class.java)
     }
 
     private fun initSplashScreen() {

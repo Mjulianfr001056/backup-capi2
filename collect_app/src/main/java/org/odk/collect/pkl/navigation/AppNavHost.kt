@@ -58,7 +58,7 @@ fun AppNavHost(
         }
 
         navigation(
-            startDestination = CapiScreen.Main.BERANDA,
+            startDestination = CapiScreen.Main.KUESIONER,
             route = CapiScreen.Top.MAIN
         ){
             composable(CapiScreen.Main.BERANDA) {
