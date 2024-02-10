@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
@@ -47,7 +46,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -78,6 +76,8 @@ import androidx.navigation.NavHostController
 import com.polstat.pkl.R
 import com.polstat.pkl.database.entity.KeluargaEntity
 import com.polstat.pkl.database.entity.RutaEntity
+import com.polstat.pkl.database.relation.KeluargaWithRuta
+import com.polstat.pkl.database.relation.RutaWithKeluarga
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary300
 import com.polstat.pkl.ui.theme.PklPrimary900
@@ -87,6 +87,7 @@ import com.polstat.pkl.utils.UtilFunctions
 import com.polstat.pkl.viewmodel.ListRutaViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
@@ -101,23 +102,22 @@ fun ListRutaScreen(
     var showMenu by remember { mutableStateOf(false) }
     var showSearchBar by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
-    var isListRuta by remember { mutableStateOf(true) }
+    var isListRuta = viewModel.isListRuta?: true
     var openFinalisasiBSDialog by remember { mutableStateOf(false) }
     var enableFinalisasiBSButton by remember { mutableStateOf(false) }
     var checkedCheckbox by remember { mutableStateOf(false) }
     val session = viewModel.session
-    val listRutaByWilayah = viewModel.listRutaByWilayah.collectAsState()
-    val listRutaByKeluarga = viewModel.listRutaByKeluarga.collectAsState()
-    val listKeluargaByWilayah = viewModel.listKeluargaByWilayah.collectAsState()
-    val listKeluargaByRuta = viewModel.listKeluargaByRuta.collectAsState()
+    val listRutaWithKeluarga = viewModel.listRutaWithKeluarga.collectAsState()
+    val listKeluargaWithRuta = viewModel.listKeluargaWithRuta.collectAsState()
     val idBS = viewModel.idBS
-    val isMonitoring = viewModel.isMonitoring
+    val statusBS = viewModel.wilayah.collectAsState().value.status
+    val isMonitoring = viewModel.isMonitoring?: false
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = viewModel.showSuccessToastChannel) {
-        viewModel.showSuccessToastChannel.collectLatest { show ->
-            if (show) {
+        viewModel.showSuccessToastChannel.collectLatest { isSuccess ->
+            if (isSuccess) {
                 delay(1500)
                 Toast.makeText(context, viewModel.successMessage.value, Toast.LENGTH_SHORT).show()
             }
@@ -125,8 +125,8 @@ fun ListRutaScreen(
     }
 
     LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
-        viewModel.showErrorToastChannel.collectLatest { show ->
-            if (show) {
+        viewModel.showErrorToastChannel.collectLatest { isError ->
+            if (isError) {
                 delay(1500)
                 Toast.makeText(context, viewModel.errorMessage.value, Toast.LENGTH_SHORT).show()
             }
@@ -184,24 +184,21 @@ fun ListRutaScreen(
                     }
                     IconButton(
                         onClick = {
+
                             coroutineScope.launch {
-                                val getListKeluargaJob = async {
-                                    idBS?.let { viewModel.getAllKeluargaByWilayah(it) }
-                                }
-                                getListKeluargaJob.await()
                                 val synchronizeRutaJob = async {
                                     idBS?.let {
                                         viewModel.synchronizeRuta(
                                             nim = session?.nim.toString(),
                                             idBS = it,
-                                            listKeluargaByWilayah = listKeluargaByWilayah.value
+                                            listKeluargaWithRuta = listKeluargaWithRuta.value
                                         )
                                     }
                                 }
                                 synchronizeRutaJob.await()
                                 delay(1000L)
-                                navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${idBS}") {
-                                    popUpTo(CapiScreen.Listing.LIST_BS + "/${idBS}") {
+                                navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
+                                    popUpTo(CapiScreen.Listing.LIST_BS + "/$idBS/$isMonitoring/$isListRuta") {
                                         inclusive = true
                                     }
                                 }
@@ -230,7 +227,7 @@ fun ListRutaScreen(
                             y = (-3).dp
                         )
                     ) {
-                        if (session?.isKoor == true) {
+                        if (session?.isKoor == true && isMonitoring) {
                             DropdownMenuItem(
                                 text = { Text(text = stringResource(id = R.string.finalisasi_bs)) },
                                 onClick = {
@@ -244,12 +241,23 @@ fun ListRutaScreen(
                                     showMenu = false
                                     if (idBS != null) {
                                         coroutineScope.launch {
-                                            val generateRutaJob = async { viewModel.generateRuta(idBS) }
-                                            generateRutaJob.await()
-                                            navController.navigate(CapiScreen.Listing.LIST_BS){
-                                                popUpTo(CapiScreen.Listing.LIST_BS){
-                                                    inclusive = true
+                                            if (statusBS == "listing-selesai") {
+                                                val generateRutaJob = async { viewModel.generateSampel(idBS) }
+                                                generateRutaJob.await()
+                                                delay(2000L)
+
+                                                if (viewModel.successMessage.value == "Berhasil Ambil Sampel!"){
+                                                    navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+                                                        popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+                                                            inclusive = true
+                                                        }
+                                                    }
                                                 }
+
+                                            } else if (statusBS == "listing") {
+                                                Toast.makeText(context, "Gagal ambil sampel: Blok sensus belum dilakukan finalisasi!", Toast.LENGTH_SHORT).show()
+                                            } else {
+                                                Toast.makeText(context, "Gagal ambil sampel: Blok sensus sudah pernah diambil sampel!", Toast.LENGTH_SHORT).show()
                                             }
                                         }
                                     }
@@ -262,15 +270,13 @@ fun ListRutaScreen(
                                 Text(text = stringResource(id = resourceId))
                             },
                             onClick = {
-                                coroutineScope.launch {
-                                    if (isListRuta) {
-                                        idBS?.let { viewModel.getAllRutaByWilayah(it) }
-                                    } else {
-                                        idBS?.let { viewModel.getAllKeluargaByWilayah(it) }
-                                    }
-                                }
                                 showMenu = false
                                 isListRuta = !isListRuta
+                                navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
+                                    popUpTo(CapiScreen.Listing.LIST_BS + "/$idBS/$isMonitoring/$isListRuta") {
+                                        inclusive = true
+                                    }
+                                }
                             }
                         )
                     }
@@ -323,79 +329,85 @@ fun ListRutaScreen(
                     )
                 }
             }
-            if(session?.isKoor == true && isMonitoring == true){
-                if ( openFinalisasiBSDialog ) {
-                    AlertDialog(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        onDismissRequest = { openFinalisasiBSDialog = false },
-                        confirmButton = {
-                            Button(
-                                modifier = Modifier.fillMaxWidth(),
-                                onClick = {
-                                    openFinalisasiBSDialog = false
-                                    coroutineScope.launch {
+            if (openFinalisasiBSDialog) {
+                AlertDialog(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    onDismissRequest = { openFinalisasiBSDialog = false },
+                    confirmButton = {
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                openFinalisasiBSDialog = false
+                                coroutineScope.launch {
+                                    if (statusBS == "listing") {
                                         val finalisasiBSJob = async {
                                             idBS?.let { viewModel.finalisasiBS(it) }
                                         }
                                         finalisasiBSJob.await()
-                                        navController.navigate(CapiScreen.Listing.LIST_BS){
-                                            popUpTo(CapiScreen.Listing.LIST_BS){
-                                                inclusive = true
+                                        delay(2000L)
+
+                                        if (viewModel.successMessage.value == "Berhasil melakukan finalisasi blok sensus!") {
+                                            navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+                                                popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+                                                    inclusive = true
+                                                }
                                             }
                                         }
+                                    } else {
+                                        Toast.makeText(context, "Gagal Finalisasi: Blok sensus sudah pernah dilakukan finalisasi!", Toast.LENGTH_SHORT).show()
                                     }
-                                },
-                                enabled = enableFinalisasiBSButton,
-                                content = {
-                                    Text(
-                                        text = stringResource(id = R.string.kirim_hasil_listing).uppercase(),
-                                        fontFamily = PoppinsFontFamily,
-                                        fontWeight = FontWeight.Medium,
-                                        fontSize = 16.sp,
-                                        color = PklBase
-                                    )
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = PklPrimary900)
-                            )
-                        },
-                        title = {
-                            Text(
-                                text = stringResource(id = R.string.konfirmasi_finalisasi_bs),
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 18.sp,
-                                color = PklPrimary900,
-                                textAlign = TextAlign.Center
-                            )
-                        },
-                        text = {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                Arrangement.Start,
-                                Alignment.CenterVertically
-                            ) {
-                                Checkbox(
-                                    checked = checkedCheckbox,
-                                    onCheckedChange = { checkedCheckbox = it },
-                                    colors = CheckboxDefaults.colors(
-                                        checkedColor = PklPrimary900,
-                                        checkmarkColor = PklBase,
-                                    )
-                                )
+                                }
+                            },
+                            enabled = enableFinalisasiBSButton,
+                            content = {
                                 Text(
-                                    text = stringResource(id = R.string.pernyataan_konfirmasi_finalisasi_bs),
+                                    text = stringResource(id = R.string.kirim_hasil_listing).uppercase(),
                                     fontFamily = PoppinsFontFamily,
                                     fontWeight = FontWeight.Medium,
-                                    fontSize = 14.sp,
-                                    color = Color.Black
+                                    fontSize = 16.sp,
+                                    color = PklBase
                                 )
-                            }
-                        },
-                        shape = RoundedCornerShape(15.dp),
-                        containerColor = PklBase
-                    )
-                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = PklPrimary900)
+                        )
+                    },
+                    title = {
+                        Text(
+                            text = stringResource(id = R.string.konfirmasi_finalisasi_bs),
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 18.sp,
+                            color = PklPrimary900,
+                            textAlign = TextAlign.Center
+                        )
+                    },
+                    text = {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            Arrangement.Start,
+                            Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = checkedCheckbox,
+                                onCheckedChange = { checkedCheckbox = it },
+                                colors = CheckboxDefaults.colors(
+                                    checkedColor = PklPrimary900,
+                                    checkmarkColor = PklBase,
+                                )
+                            )
+                            Text(
+                                text = stringResource(id = R.string.pernyataan_konfirmasi_finalisasi_bs),
+                                fontFamily = PoppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                color = Color.Black
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(15.dp),
+                    containerColor = PklBase
+                )
             }
             enableFinalisasiBSButton = checkedCheckbox
         },
@@ -404,13 +416,9 @@ fun ListRutaScreen(
             val colWeight1 = .15f
             val colWeight2 = .55f
 
-            val filteredRutaList = listRutaByWilayah.value.filter { ruta ->
-                ruta.kodeRuta.contains(text, ignoreCase = true) || ruta.namaKrt.contains(text, ignoreCase = true)
-            }
+            val filteredRutaList = listRutaWithKeluarga.value.filter { it.ruta.status != "delete" }.filter { it.ruta.kodeRuta.contains(text, ignoreCase = true) || it.ruta.namaKrt.contains(text, ignoreCase = true) }
 
-            val filteredKeluargaList = listKeluargaByWilayah.value.filter { keluarga ->
-                keluarga.kodeKlg.contains(text, ignoreCase = true) || keluarga.namaKK.contains(text, ignoreCase = true)
-            }
+            val filteredKeluargaList = listKeluargaWithRuta.value.filter { it.keluarga.status != "delete" }.filter { it.keluarga.kodeKlg.contains(text, ignoreCase = true) || it.keluarga.namaKK.contains(text, ignoreCase = true) }
 
             LazyColumn(
                 modifier = Modifier
@@ -445,37 +453,35 @@ fun ListRutaScreen(
                     }
                 }
 
-                val itemsList = if (isListRuta) {
-                    filteredRutaList.filter { it.status != "delete" }
-                } else {
-                    filteredKeluargaList.filter { it.status != "delete" }
-                }
+                val itemsList = if (isListRuta) filteredRutaList else filteredKeluargaList
 
                 items(itemsList.size) { index ->
                     if (isListRuta) {
-                        val rutaItem = itemsList[index]
+                        val rutaWithKeluargaItem = itemsList[index] as RutaWithKeluarga
                         RutaOrKlgRow(
-                            ruta = rutaItem as RutaEntity,
-                            listKeluargaByRuta = listKeluargaByRuta.value,
+                            rutaWithKeluarga = rutaWithKeluargaItem,
                             viewModel = viewModel,
                             navController = navController,
-                            isListRuta = isListRuta
+                            userNim = session?.nim ?: "",
+                            isMonitoring = isMonitoring,
+                            isListRuta = true
                         )
                     } else {
-                        val keluargaItem = itemsList[index]
+                        val keluargaWithRutaItem = itemsList[index] as KeluargaWithRuta
                         RutaOrKlgRow(
-                            keluarga = keluargaItem as KeluargaEntity,
-                            listRutaByKeluarga = listRutaByKeluarga.value,
+                            keluargaWithRuta = keluargaWithRutaItem,
                             viewModel = viewModel,
                             navController = navController,
-                            isListRuta = isListRuta
+                            userNim = session?.nim ?: "",
+                            isMonitoring = isMonitoring,
+                            isListRuta = false
                         )
                     }
                 }
             }
         },
         floatingActionButton = {
-            if (isMonitoring == false && session?.isKoor == true){
+            if (isMonitoring == false){
                 FloatingActionButton(
                     modifier = Modifier
                         .padding(all = 16.dp),
@@ -499,18 +505,20 @@ fun ListRutaScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RutaOrKlgRow(
-    ruta: RutaEntity = RutaEntity(),
-    keluarga: KeluargaEntity = KeluargaEntity(),
-    listKeluargaByRuta: List<KeluargaEntity> = emptyList(),
-    listRutaByKeluarga: List<RutaEntity> = emptyList(),
+    keluargaWithRuta: KeluargaWithRuta = KeluargaWithRuta(),
+    rutaWithKeluarga: RutaWithKeluarga = RutaWithKeluarga(),
     viewModel: ListRutaViewModel,
     navController: NavHostController,
+    userNim: String,
+    isMonitoring: Boolean,
     isListRuta: Boolean
 ) {
     var openActionDialog by remember { mutableStateOf(false) }
     var openDetail by remember { mutableStateOf(false) }
-    var openPasswordMasterDialog by remember { mutableStateOf(false) }
+    var openDeleteConfirmDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val idBS = viewModel.idBS
 
     val colWeight1 = .15f
     val colWeight2 = .55f
@@ -526,26 +534,19 @@ fun RutaOrKlgRow(
         Arrangement.SpaceEvenly,
         Alignment.CenterVertically
     ) {
-        val selectedData = if (isListRuta) listKeluargaByRuta[0] else keluarga
-        val noUrut = if (isListRuta) ruta.noUrutRuta else keluarga.noUrutKlg
-        val nama = if (isListRuta) ruta.namaKrt else keluarga.namaKK
+        val selectedData = if (isListRuta) rutaWithKeluarga.listKeluarga.first() else keluargaWithRuta.keluarga
+        val noUrut = if (isListRuta) rutaWithKeluarga.ruta.noUrutRuta else keluargaWithRuta.keluarga.noUrutKlg
+        val nama = if (isListRuta) rutaWithKeluarga.ruta.namaKrt else keluargaWithRuta.keluarga.namaKK
 
-        TableCell(text = selectedData.noBgFisik, weight = colWeight1)
-        TableCell(text = selectedData.noBgSensus, weight = colWeight1)
-        TableCell(text = noUrut, weight = colWeight1)
-        TableCell(text = viewModel.sederhanakanNama(nama), weight = colWeight2)
+        TableCell(text = UtilFunctions.padWithZeros(selectedData.noBgFisik, 3), fontSize = 14.sp, weight = colWeight1)
+        TableCell(text = UtilFunctions.padWithZeros(selectedData.noBgSensus, 3), fontSize = 14.sp, weight = colWeight1)
+        TableCell(text = UtilFunctions.padWithZeros(noUrut, 3), fontSize = 14.sp, weight = colWeight1)
+        TableCell(text = viewModel.sederhanakanNama(nama), fontSize = 14.sp, weight = colWeight2)
 
         IconButton(
             modifier = Modifier.weight(colWeight1),
             onClick = {
                 openDetail = true
-                coroutineScope.launch {
-                    if (isListRuta) {
-                        viewModel.getAllKeluargaByRuta(ruta.kodeRuta)
-                    } else {
-                        viewModel.getAllRutaByKeluarga(keluarga.kodeKlg)
-                    }
-                }
             }
         ) {
             Icon(
@@ -601,38 +602,43 @@ fun RutaOrKlgRow(
                                         item {
                                             DetailRutaTextField(
                                                 label = R.string.kode_ruta,
-                                                value = ruta.kodeRuta
+                                                value = rutaWithKeluarga.ruta.kodeRuta
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_urut_krt_ruta,
-                                                value = UtilFunctions.padWithZeros(
-                                                    ruta.noUrutRuta,
-                                                    3
-                                                )
+                                                value = UtilFunctions.padWithZeros(rutaWithKeluarga.ruta.noUrutRuta)
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_urut_ruta_egb,
-                                                value = UtilFunctions.convertTo3DigitsString(ruta.noUrutEgb)
+                                                value = if (rutaWithKeluarga.ruta.noUrutEgb == null) "N/A" else UtilFunctions.convertTo4DigitsString(rutaWithKeluarga.ruta.noUrutEgb)
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.identifikasi_kk_krt,
-                                                value = if (ruta.kkOrKrt == "1") "Kepala Keluarga (KK) saja" else if (ruta.kkOrKrt == "2") "Kepala Rumah Tangga (KRT) saja" else "KK Sekaligus KRT",
+                                                value = if (rutaWithKeluarga.ruta.kkOrKrt == "1") "Kepala Keluarga (KK) saja" else if (rutaWithKeluarga.ruta.kkOrKrt == "2") "Kepala Rumah Tangga (KRT) saja" else "KK Sekaligus KRT",
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nama_krt_ruta,
-                                                value = ruta.namaKrt
+                                                value = rutaWithKeluarga.ruta.namaKrt
                                             )
-//                                            DetailRutaTextField(
-//                                                label = R.string.keberadaan_genz_ortu_ruta,
-//                                                value = "${ruta.genzOrtu}"
-//                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.jml_genz_anak,
+                                                value = "${rutaWithKeluarga.ruta.jmlGenzAnak}"
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.jml_genz_dewasa,
+                                                value = "${rutaWithKeluarga.ruta.jmlGenzDewasa}"
+                                            )
                                             DetailRutaTextField(
                                                 label = R.string.kategori_jml_genz,
-                                                value = "${ruta.katGenz}"
+                                                value = "${rutaWithKeluarga.ruta.katGenz}"
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.catatan,
-                                                value = ruta.catatan.ifEmpty { "N/A" }
+                                                value = rutaWithKeluarga.ruta.catatan.ifEmpty { "N/A" }
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.nim_pencacah,
+                                                value = rutaWithKeluarga.ruta.nimPencacah.ifEmpty { "N/A" }
                                             )
                                             Spacer(modifier = Modifier.size(5.dp))
                                             Text(
@@ -646,7 +652,7 @@ fun RutaOrKlgRow(
                                             )
                                         }
 
-                                        val daftarKeluargaByRuta = listKeluargaByRuta.filter { it.status != "delete" }
+                                        val daftarKeluargaByRuta = rutaWithKeluarga.listKeluarga.filter { it.status != "delete" }
                                         items(daftarKeluargaByRuta.size) { itemIndex ->
                                             val keluargaByRuta = daftarKeluargaByRuta[itemIndex]
                                             var expanded by remember { mutableStateOf(false) }
@@ -706,7 +712,7 @@ fun RutaOrKlgRow(
                                                             )
                                                             Spacer(modifier = Modifier.height(8.dp))
                                                             DetailCard(
-                                                                keluarga = keluarga,
+                                                                keluarga = keluargaByRuta,
                                                                 isListRuta = isListRuta
                                                             )
                                                         }
@@ -787,58 +793,47 @@ fun RutaOrKlgRow(
                                         item {
                                             DetailRutaTextField(
                                                 label = R.string.kode_klg,
-                                                value = keluarga.kodeKlg
+                                                value = keluargaWithRuta.keluarga.kodeKlg
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.sls,
-                                                value = keluarga.banjar
+                                                value = keluargaWithRuta.keluarga.banjar
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_segmen_ruta,
-                                                value = keluarga.noSegmen
+                                                value = keluargaWithRuta.keluarga.noSegmen
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_urut_bangunan_fisik_ruta,
-                                                value = UtilFunctions.padWithZeros(
-                                                    keluarga.noBgFisik,
-                                                    3
-                                                )
+                                                value = UtilFunctions.padWithZeros(keluargaWithRuta.keluarga.noBgFisik)
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_urut_bangunan_sensus_ruta,
-                                                value = UtilFunctions.padWithZeros(
-                                                    keluarga.noBgSensus,
-                                                    3
-                                                )
+                                                value = UtilFunctions.padWithZeros(keluargaWithRuta.keluarga.noBgSensus)
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_urut_keluarga,
-                                                value = UtilFunctions.padWithZeros(
-                                                    keluarga.noUrutKlg,
-                                                    3
-                                                )
+                                                value = UtilFunctions.padWithZeros(keluargaWithRuta.keluarga.noUrutKlg)
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nama_kepala_keluarga,
-                                                value = keluarga.namaKK
+                                                value = keluargaWithRuta.keluarga.namaKK
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.alamat_ruta,
-                                                value = keluarga.alamat
+                                                value = keluargaWithRuta.keluarga.alamat
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.keberadaan_genz_ortu_keluarga,
-                                                value = "${keluarga.isGenzOrtu}"
+                                                value = "${keluargaWithRuta.keluarga.isGenzOrtu}"
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.no_urut_keluarga_egb,
-                                                value = UtilFunctions.convertTo3DigitsString(
-                                                    keluarga.noUrutKlgEgb
-                                                )
+                                                value = UtilFunctions.convertTo4DigitsString(keluargaWithRuta.keluarga.noUrutKlgEgb)
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.jml_pengelolaan_makan_keluarga,
-                                                value = "${keluarga.penglMkn}"
+                                                value = "${keluargaWithRuta.keluarga.penglMkn}"
                                             )
                                             Text(
                                                 modifier = Modifier.fillMaxWidth(),
@@ -851,8 +846,7 @@ fun RutaOrKlgRow(
                                             )
                                         }
 
-                                        val daftarRutaByKlg =
-                                            listRutaByKeluarga.filter { it.status != "delete" }
+                                        val daftarRutaByKlg = keluargaWithRuta.listRuta.filter { it.status != "delete" }
                                         items(daftarRutaByKlg.size) { itemIndex ->
                                             val rutaByKlg = daftarRutaByKlg[itemIndex]
                                             var expanded by remember { mutableStateOf(false) }
@@ -887,7 +881,7 @@ fun RutaOrKlgRow(
                                                             horizontalArrangement = Arrangement.SpaceBetween
                                                         ) {
                                                             Text(
-                                                                text = ruta.kodeRuta,
+                                                                text = rutaByKlg.kodeRuta,
                                                                 fontFamily = PoppinsFontFamily,
                                                                 fontWeight = FontWeight.Medium,
                                                                 fontSize = 18.sp,
@@ -962,7 +956,7 @@ fun RutaOrKlgRow(
         }
 
 //      menampilkan action dialog
-        if (openActionDialog) {
+        if (openActionDialog && !isMonitoring) {
             Dialog(onDismissRequest = { openActionDialog = false },
                 content = {
                     Column(
@@ -989,7 +983,7 @@ fun RutaOrKlgRow(
                                     top = 10.dp,
                                     bottom = 10.dp
                                 ),
-                            text = stringResource(id = R.string.action_art),
+                            text = stringResource(id = R.string.action),
                             color = PklBase,
                             textAlign = TextAlign.Center,
                             fontFamily = PoppinsFontFamily,
@@ -1006,7 +1000,7 @@ fun RutaOrKlgRow(
                             Text(modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    navController.navigate(CapiScreen.Listing.EDIT_RUTA + "/${ruta.idBS}/${keluarga.kodeKlg}/${ruta.kodeRuta}")
+//                                    navController.navigate(CapiScreen.Listing.EDIT_RUTA + "/${ruta.idBS}/${keluarga.kodeKlg}/${ruta.kodeRuta}")
 //                                    navController.navigate(CapiScreen.Listing.EDIT_RUTA + "/${ruta.noBS}/${keluarga.kodeKlg}/${ruta.kodeRuta}")
                                 }
                                 .padding(
@@ -1035,49 +1029,73 @@ fun RutaOrKlgRow(
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium)
 
-//                          untuk menghapus ruta
-                            Text(modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    openPasswordMasterDialog = true
-                                }
-                                .padding(
-                                    top = 10.dp,
-                                    bottom = 10.dp
-                                ),
-                                textAlign = TextAlign.Center,
-                                text = stringResource(id = R.string.hapus_action_art),
-                                fontSize = 16.sp,
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium)
+//                          untuk menghapus ruta/klg
+                            if (userNim == (if (isListRuta) rutaWithKeluarga.ruta.nimPencacah else keluargaWithRuta.keluarga.nimPencacah)) {
+                                Text(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        openDeleteConfirmDialog = true
+                                    }
+                                    .padding(
+                                        top = 10.dp,
+                                        bottom = 10.dp
+                                    ),
+                                    textAlign = TextAlign.Center,
+                                    text = stringResource(id = R.string.hapus_action_art),
+                                    fontSize = 16.sp,
+                                    fontFamily = PoppinsFontFamily,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
                         }
                     }
-                })
+                }
+            )
         }
 
 //      menampilkan pop up password master jika mengeklik action hapus
-        if (openPasswordMasterDialog) {
-            var inputPasswordMaster by remember { mutableStateOf("") }
+        if (openDeleteConfirmDialog) {
+//            var inputPasswordMaster by remember { mutableStateOf("") }
 
             AlertDialog(
                 modifier = Modifier
                     .fillMaxWidth(),
-                onDismissRequest = { openPasswordMasterDialog = false },
+                onDismissRequest = { openDeleteConfirmDialog = false },
                 confirmButton = {
                     Button(
                         modifier = Modifier.fillMaxWidth(0.45f),
                         onClick = {
-//                            viewModel.deleteRuta(
-//                                kodeRuta = ruta.kodeRuta
-//                            )
-//                            openPasswordMasterDialog = false
-//                            openActionDialog = false
-//                            navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${ruta.noBS}"){
-//                                popUpTo(CapiScreen.Listing.LIST_RUTA + "/${ruta.noBS}"){
-//                                    inclusive = true
-//                                }
-//                            }
-//                            Toast.makeText(context, "Ruta ${ruta.namaKrt} berhasil dihapus", Toast.LENGTH_SHORT).show()
+                            openDeleteConfirmDialog = false
+                            openActionDialog = false
+                            val isMonitoring = false
+
+                            if (isListRuta) {
+                                coroutineScope.launch {
+                                    val deleteRutaJob = async {
+                                        viewModel.deleteRuta(rutaWithKeluarga.ruta.kodeRuta)
+                                    }
+                                    deleteRutaJob.await()
+                                    navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
+                                        popUpTo(CapiScreen.Listing.LIST_BS + "/$idBS/$isMonitoring/$isListRuta") {
+                                            inclusive = true
+                                        }
+                                    }
+                                    Toast.makeText(context, "Ruta dari ${rutaWithKeluarga.ruta.namaKrt} berhasil dihapus!", Toast.LENGTH_SHORT).show()
+                                }
+                            } else {
+                                coroutineScope.launch {
+                                    val deleteKlgJob = async {
+                                        viewModel.deleteKeluarga(keluargaWithRuta.keluarga.kodeKlg)
+                                    }
+                                    deleteKlgJob.await()
+                                    navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
+                                        popUpTo(CapiScreen.Listing.LIST_BS + "/$idBS/$isMonitoring/$isListRuta") {
+                                            inclusive = true
+                                        }
+                                    }
+                                    Toast.makeText(context, "Keluarga dari ${keluargaWithRuta.keluarga.namaKK} berhasil dihapus!", Toast.LENGTH_SHORT).show()
+                                }
+                            }
                         },
                         colors = ButtonDefaults.buttonColors(PklPrimary900)) {
                         Text(text = stringResource(id = R.string.hapus_pass_master))
@@ -1085,7 +1103,10 @@ fun RutaOrKlgRow(
                 dismissButton = {
                     Button(
                         modifier = Modifier.fillMaxWidth(0.45f),
-                        onClick = { openPasswordMasterDialog = false },
+                        onClick = {
+                            openDeleteConfirmDialog = false
+                            openActionDialog = false
+                                  },
                         colors = ButtonDefaults.buttonColors(containerColor = PklTertiary100, contentColor = PklPrimary900)
                     ) {
                         Text(text = stringResource(id = R.string.batal_pass_master))
@@ -1108,39 +1129,39 @@ fun RutaOrKlgRow(
                         Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = stringResource(id = R.string.ket_konfirm_hapus_pass_master),
+                            text = if (isListRuta) stringResource(id = R.string.konfirm_hapus_ruta) else stringResource(id = R.string.konfirm_hapus_klg),
                             textAlign = TextAlign.Center,
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.Medium,
                             fontSize = 14.sp
                         )
-                        Spacer(modifier = Modifier.size(15.dp))
-                        TextField(
-                            singleLine = true,
-                            value = inputPasswordMaster,
-                            onValueChange = { inputPasswordMaster = it},
-                            placeholder = {
-                                Text(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    text = stringResource(id = R.string.input_pass_master),
-                                    textAlign = TextAlign.Center,
-                                    fontFamily = PoppinsFontFamily,
-                                    fontWeight = FontWeight.Medium,
-                                    fontSize = 14.sp
-                                )},
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                focusedTextColor = Color.Black,
-                                unfocusedTextColor = Color.Black,
-                                unfocusedIndicatorColor = Color.Black,
-                                focusedIndicatorColor = PklPrimary900,
-                                selectionColors = TextSelectionColors(handleColor = PklPrimary900, backgroundColor = PklPrimary900.copy(0.5f)),
-                                focusedPlaceholderColor = Color.Black.copy(alpha = 0.7f),
-                                unfocusedPlaceholderColor = Color.Black.copy(alpha = 0.7f)
-                            ),
-                            textStyle = TextStyle(fontSize = 16.sp, fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center)
-                        )
+//                        Spacer(modifier = Modifier.size(15.dp))
+//                        TextField(
+//                            singleLine = true,
+//                            value = inputPasswordMaster,
+//                            onValueChange = { inputPasswordMaster = it},
+//                            placeholder = {
+//                                Text(
+//                                    modifier = Modifier.fillMaxWidth(),
+//                                    text = stringResource(id = R.string.input_pass_master),
+//                                    textAlign = TextAlign.Center,
+//                                    fontFamily = PoppinsFontFamily,
+//                                    fontWeight = FontWeight.Medium,
+//                                    fontSize = 14.sp
+//                                )},
+//                            colors = TextFieldDefaults.colors(
+//                                focusedContainerColor = Color.Transparent,
+//                                unfocusedContainerColor = Color.Transparent,
+//                                focusedTextColor = Color.Black,
+//                                unfocusedTextColor = Color.Black,
+//                                unfocusedIndicatorColor = Color.Black,
+//                                focusedIndicatorColor = PklPrimary900,
+//                                selectionColors = TextSelectionColors(handleColor = PklPrimary900, backgroundColor = PklPrimary900.copy(0.5f)),
+//                                focusedPlaceholderColor = Color.Black.copy(alpha = 0.7f),
+//                                unfocusedPlaceholderColor = Color.Black.copy(alpha = 0.7f)
+//                            ),
+//                            textStyle = TextStyle(fontSize = 16.sp, fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center)
+//                        )
                     }
                 }
             )
@@ -1259,26 +1280,29 @@ fun DetailCard(
         listOf(
             R.string.kode_klg to keluarga.kodeKlg,
             R.string.sls to keluarga.banjar,
-            R.string.no_bf_list_ruta to keluarga.noBgFisik,
-            R.string.no_bs_list_ruta to keluarga.noBgSensus,
+            R.string.no_bf_list_ruta to UtilFunctions.padWithZeros(keluarga.noBgFisik),
+            R.string.no_bs_list_ruta to UtilFunctions.padWithZeros(keluarga.noBgSensus),
             R.string.nomor_segmen_ruta to keluarga.noSegmen,
-            R.string.nomor_urut_keluarga to keluarga.noUrutKlg,
+            R.string.nomor_urut_keluarga to UtilFunctions.padWithZeros(keluarga.noUrutKlg),
             R.string.no_urut_keluarga_egb to keluarga.noUrutKlgEgb,
             R.string.nama_kepala_keluarga to keluarga.namaKK,
             R.string.alamat_ruta to keluarga.alamat,
             R.string.keberadaan_genz_ortu_keluarga to keluarga.isGenzOrtu,
-            R.string.jml_pengelolaan_makan_keluarga to keluarga.penglMkn
+            R.string.jml_pengelolaan_makan_keluarga to keluarga.penglMkn,
+            R.string.nim_pencacah to keluarga.nimPencacah
         )
     } else {
         listOf(
             R.string.kode_ruta to ruta.kodeRuta,
-            R.string.no_list_ruta to ruta.noUrutRuta,
-            R.string.nomor_urut_ruta_egb to ruta.noUrutEgb,
+            R.string.no_list_ruta to UtilFunctions.padWithZeros(ruta.noUrutRuta),
+            R.string.nomor_urut_ruta_egb to if (ruta.noUrutEgb == null) "N/A" else ruta.noUrutEgb,
             R.string.identifikasi_kk_krt to ruta.kkOrKrt,
             R.string.nama_krt_list_ruta to ruta.namaKrt,
-//            R.string.keberadaan_genz_ortu_ruta to ruta.genzOrtu,
+            R.string.jml_genz_anak to ruta.jmlGenzAnak,
+            R.string.jml_genz_dewasa to ruta.jmlGenzDewasa,
             R.string.kategori_jml_genz to ruta.katGenz,
-            R.string.catatan to ruta.catatan
+            R.string.catatan to ruta.catatan.ifEmpty { "N/A" },
+            R.string.nim_pencacah to ruta.nimPencacah
         )
     }
 

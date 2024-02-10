@@ -15,7 +15,8 @@ sealed class IsiRutaScreenEvent {
     data class NoUrutRutaChanged(val noUrutRuta: String) : IsiRutaScreenEvent()
     data class KKOrKRTChanged(val kkOrKRT: String) : IsiRutaScreenEvent()
     data class NamaKRTChanged(val namaKRT: String) : IsiRutaScreenEvent()
-    data class GenzOrtuChanged(val genzOrtu: Int) : IsiRutaScreenEvent()
+    data class JmlGenzAnakChanged(val jmlGenzAnak: Int) : IsiRutaScreenEvent()
+    data class JmlGenzDewasaChanged(val jmlGenzDewasa: Int) : IsiRutaScreenEvent()
     data class KatGenzChanged(val katGenz: Int) : IsiRutaScreenEvent()
     object submit : IsiRutaScreenEvent()
 }

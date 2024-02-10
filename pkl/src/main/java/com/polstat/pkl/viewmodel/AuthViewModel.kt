@@ -6,14 +6,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.polstat.pkl.model.domain.AnggotaTim
 import com.polstat.pkl.model.response.AuthResponse
+import com.polstat.pkl.repository.AnggotaTimRepository
 import com.polstat.pkl.repository.AuthRepository
-import com.polstat.pkl.repository.DataTimRepository
 import com.polstat.pkl.repository.KeluargaRepository
 import com.polstat.pkl.repository.LocalRutaRepository
 import com.polstat.pkl.repository.LocationRepository
-import com.polstat.pkl.repository.MahasiswaRepository
-import com.polstat.pkl.repository.SampelRutaRepository
 import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.ui.event.LoginScreenEvent
@@ -37,12 +36,10 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val sessionRepository: SessionRepository,
-    private val dataTimRepository: DataTimRepository,
-    private val mahasiswaRepository: MahasiswaRepository,
+    private val anggotaTimRepository: AnggotaTimRepository,
     private val wilayahRepository: WilayahRepository,
     private val keluargaRepository: KeluargaRepository,
     private val localRutaRepository: LocalRutaRepository,
-    private val sampelRutaRepository: SampelRutaRepository,
     private val validateNim: ValidateNim,
     private val validatePassword: ValidatePassword,
     private val getLocationUseCase: GetLocationUseCase,
@@ -95,41 +92,6 @@ class AuthViewModel @Inject constructor(
         return sessionRepository.isLoggedIn()
     }
 
-    fun deleteAllLocalData() {
-        viewModelScope.launch {
-
-            dataTimRepository.deleteAllDataTim().collectLatest { message ->
-                Log.d(TAG, "deleteAllLocalData: $message")
-            }
-
-            mahasiswaRepository.deleteAllMahasiswa().collectLatest { message ->
-                Log.d(TAG, "deleteAllLocalData: $message")
-            }
-
-            wilayahRepository.deleteAllWilayah().collectLatest { message ->
-                Log.d(TAG, "deleteAllLocalData: $message")
-            }
-
-            keluargaRepository.deleteAllKeluarga().collectLatest { message ->
-                Log.d(TAG, "deleteAllLocalData: $message")
-            }
-
-            localRutaRepository.deleteAllRuta().collectLatest { message ->
-                Log.d(TAG, "deleteAllLocalData: $message")
-            }
-
-            sampelRutaRepository.deleteAllSampelRuta().collectLatest { message ->
-                Log.d(TAG, "deleteAllLocalData: $message")
-            }
-
-            localRutaRepository.deleteAllKeluargaAndRuta().collectLatest { message ->
-                Log.d(TAG, "deleteAllLocalData: $message")
-            }
-
-        }
-    }
-
-    //    @Suppress("NAME_SHADOWING")
     fun login(
         nim: String,
         password: String
@@ -156,9 +118,18 @@ class AuthViewModel @Inject constructor(
                             _errorMessage.value = error
                         }
                         _showErrorToastChannel.send(true)
-                        Log.e(TAG, "Error in login")
+                        Log.e(TAG, "Error in login: $errorMessage")
+                        Log.d(TAG, "login: ${authResponse.value}")
                     }
                 }
+            }
+
+            if (authResponse.value.nim.isEmpty()) {
+                delay(2000)
+                Log.d(TAG, "login: nim empty")
+                closeLoadingDialog()
+                Log.d(TAG, "login: error $showErrorToastChannel, loading $showLoadingChannel")
+                return@launch
             }
 
             saveDataTim(authResponse.value)
@@ -181,7 +152,7 @@ class AuthViewModel @Inject constructor(
                         }
 
                     keluarga.ruta.forEach { ruta ->
-                        localRutaRepository.fetchRutaFromServer(ruta)
+                        localRutaRepository.insertRuta(ruta, LocalRutaRepository.Method.Fetch)
                             .collectLatest { message ->
                                 Log.d(TAG, message)
                             }
@@ -250,7 +221,12 @@ class AuthViewModel @Inject constructor(
         }
 
         user.dataTim.anggota.forEach {
-            dataTimRepository.insertAnggotaTim(it.nim to it.nama)
+            val anggotaTim = AnggotaTim(
+                nim = it.nim,
+                nama = it.nama,
+                noTlp = it.no_hp
+            )
+            anggotaTimRepository.insertAnggotaTim(anggotaTim)
                 .collectLatest { message ->
                     Log.d(TAG, message)
                 }

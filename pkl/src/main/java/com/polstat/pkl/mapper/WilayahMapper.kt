@@ -42,24 +42,24 @@ fun Wilayah.toWilayahEntity(): WilayahEntity {
 //    )
 //}
 
-//fun SyncRutaResponse.toWilayah(): Wilayah {
-//    return Wilayah(
-//        idBS = idBS,
-//        noBS = noBS,
-//        idKab = idKab,
-//        namaKab = namaKab,
-//        idKec = idKec,
-//        namaKec = namaKec,
-//        idKel = idKel,
-//        namaKel = namaKel,
-//        jmlKlg = jmlKlg,
-//        jmlKlgEgb = jmlKlgEgb,
-//        jmlRuta = jmlRuta,
-//        jmlRutaEgb = jmlRutaEgb,
-//        tglListing = tglListing,
-//        tglPeriksa = tglPeriksa,
-//        catatan = catatan,
-//        status = status,
-//        keluarga = keluarga
-//    )
-//}
+fun SyncRutaResponse.toWilayah(): Wilayah {
+    return Wilayah(
+        idBS = idBS,
+        noBS = noBS,
+        idKab = idKab,
+        namaKab = namaKab,
+        idKec = idKec,
+        namaKec = namaKec,
+        idKel = idKel,
+        namaKel = namaKel,
+        jmlKlg = jmlKlg,
+        jmlKlgEgb = jmlKlgEgb,
+        jmlRuta = jmlRuta,
+        jmlRutaEgb = jmlRutaEgb,
+        tglListing = tglListing,
+        tglPeriksa = tglPeriksa,
+        catatan = catatan,
+        status = status,
+        keluarga = keluarga
+    )
+}

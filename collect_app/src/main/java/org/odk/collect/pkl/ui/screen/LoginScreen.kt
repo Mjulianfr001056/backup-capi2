@@ -49,8 +49,8 @@ fun LoginScreen(
     val showLoading by viewModel.showLoadingChannel.collectAsState(false)
 
     LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
-        viewModel.showErrorToastChannel.collectLatest { show ->
-            if (show) {
+        viewModel.showErrorToastChannel.collectLatest { isError ->
+            if (isError) {
                 isLoginProcess = false
                 delay(1500)
                 Toast.makeText(context, viewModel.errorMessage.value, Toast.LENGTH_SHORT).show()

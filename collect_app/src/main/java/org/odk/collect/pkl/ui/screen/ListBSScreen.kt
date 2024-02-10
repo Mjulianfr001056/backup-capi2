@@ -426,10 +426,11 @@ private fun ListBS(
                 val wilayah = listWilayah[index]
                 BlokSensus(
                     onLihatRutaClicked = {
-                        navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${wilayah.noBS}/$isMonitoring")
+                        val isListRuta = true
+                        navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${wilayah.idBS}/$isMonitoring/$isListRuta")
                     },
                     onLihatSampleClicked = {
-                        navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${wilayah.noBS}/$isMonitoring")
+                        navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${wilayah.idBS}/$isMonitoring")
                     },
                     wilayah = wilayah
                 )
