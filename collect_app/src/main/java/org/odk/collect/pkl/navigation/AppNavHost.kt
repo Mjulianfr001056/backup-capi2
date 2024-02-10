@@ -110,12 +110,15 @@ fun SamplingNavHost(
                 )
             }
             composable(
-                route = CapiScreen.Listing.LIST_RUTA + "/{idBS}/{isMonitoring}",
+                route = CapiScreen.Listing.LIST_RUTA + "/{idBS}/{isMonitoring}/{isListRuta}",
                 arguments = listOf(
                     navArgument("idBS") {
                         type = NavType.StringType
                     },
                     navArgument("isMonitoring") {
+                        type = NavType.BoolType
+                    },
+                    navArgument("isListRuta") {
                         type = NavType.BoolType
                     }
                 )

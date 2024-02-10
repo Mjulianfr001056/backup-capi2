@@ -88,7 +88,7 @@ fun ListSampleScreen(
     viewModel: ListSampelViewModel
 ){
 
-    val noBS = viewModel.noBS
+    val idBS = viewModel.idBS
 
     val isMonitoring = viewModel.isMonitoring
 
@@ -105,6 +105,8 @@ fun ListSampleScreen(
     val isDataInserted = viewModel.isDataInserted.collectAsState()
 
     LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
+        viewModel.updateShowLoading(isDataInserted.value)
+
         viewModel.showErrorToastChannel.collectLatest { show ->
             if (show) {
                 delay(1500)
@@ -118,8 +120,7 @@ fun ListSampleScreen(
 
         viewModel.sampelRutaResponse.collectLatest { response ->
             if (isDataInserted.value) {
-//                viewModel.getSampelByBSFromDB(noBS!!)
-                viewModel.getSampelByBSFromDB("5104030014007B")
+                idBS?.let { viewModel.getSampelByBSFromDB(it) }
             }
         }
     }
@@ -139,7 +140,7 @@ fun ListSampleScreen(
                 modifier = Modifier.shadow(10.dp),
                 title = {
                     Text(
-                        text = "List Sample-${noBS}",
+                        text = "List Sample-${idBS?.takeLast(4)}",
                         style = TextStyle(
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.Medium,
@@ -197,7 +198,7 @@ fun ListSampleScreen(
                         }
                         IconButton(onClick = {
 //                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${noBS}/$isMonitoring")
-                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/5104030014007B/$isMonitoring")
+                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/$idBS/$isMonitoring")
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Sync,

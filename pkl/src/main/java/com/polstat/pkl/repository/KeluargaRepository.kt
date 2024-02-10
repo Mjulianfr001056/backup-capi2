@@ -1,6 +1,7 @@
 package com.polstat.pkl.repository
 
 import com.polstat.pkl.database.entity.KeluargaEntity
+import com.polstat.pkl.database.relation.KeluargaWithRuta
 import com.polstat.pkl.model.domain.Keluarga
 import com.polstat.pkl.utils.Result
 import kotlinx.coroutines.flow.Flow
@@ -13,6 +14,8 @@ interface KeluargaRepository {
 
     suspend fun getKeluarga(kodeKlg: String) : Flow<Result<KeluargaEntity>>
 
+    suspend fun fakeDeleteKeluarga(keluarga: Keluarga) : Flow<String>
+
     suspend fun getAllKeluargaByWilayah(idBS: String) : Flow<Result<List<KeluargaEntity>>>
 
     suspend fun getAllKeluargaByRuta(kodeRuta: String) : Flow<Result<List<KeluargaEntity>>>
@@ -24,6 +27,10 @@ interface KeluargaRepository {
     suspend fun updateKeluarga(keluarga: Keluarga) : Flow<String>
 
     suspend fun deleteAllKeluarga() : Flow<String>
+
+    suspend fun deleteAllKeluargaByWilayah(idBS: String) : Flow<String>
+
+    suspend fun getListKeluargaWithRuta(idBS: String) : Flow<Result<List<KeluargaWithRuta>>>
 
     sealed class Method {
         object Insert : Method()

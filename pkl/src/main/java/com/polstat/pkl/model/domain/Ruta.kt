@@ -8,7 +8,7 @@ data class Ruta(
     val namaKrt: String = "[not set]",
     val jmlGenzAnak: Int = -1,
     val jmlGenzDewasa: Int = -1,
-    val katGenz: Int =-1,
+    val katGenz: Int = -1,
     val long: Double = -1.0,
     val lat: Double = -1.0,
     val catatan: String = "[not set]",

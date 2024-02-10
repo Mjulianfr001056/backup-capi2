@@ -9,6 +9,7 @@ import com.polstat.pkl.model.response.SampelRutaResponse
 import com.polstat.pkl.repository.SampelRutaRepository
 import com.polstat.pkl.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +29,7 @@ class ListSampelViewModel @Inject constructor(
         private const val TAG = "CAPI63_LISTSAMPEL_VM"
     }
 
-    val noBS = savedStateHandle.get<String>("noBS")
+    val idBS = savedStateHandle.get<String>("idBS")
 
     val isMonitoring = savedStateHandle.get<Boolean>("isMonitoring")
 
@@ -69,16 +70,24 @@ class ListSampelViewModel @Inject constructor(
     val isDataInserted = _isDataInserted.asStateFlow()
 
     init {
-//        getSampelRutaFromWSAndInsertThem(noBS!!)
-        getSampelRutaFromWSAndInsertThem("5104030014007B")
+        viewModelScope.launch {
+            idBS?.let {
+                val getSampelByBSFromDbJob = async {
+                    getSampelByBSFromDB(it)
+                }
+                getSampelByBSFromDbJob.await()
+                if (listSampelRuta.value.isEmpty()) {
+                    getSampelRutaFromWSAndInsertThem(it)
+                }
+            }
+        }
     }
 
 
-    private fun getSampelRutaFromWSAndInsertThem(
+    private suspend fun getSampelRutaFromWSAndInsertThem(
         idBS: String
     ) {
         viewModelScope.launch {
-//            openLoadingDialog()
             sampelRutaRepository.getSampelRutaFromWS(idBS).collectLatest { result ->
                 when (result) {
                     is Result.Success -> {
@@ -116,7 +125,7 @@ class ListSampelViewModel @Inject constructor(
         }
     }
 
-    fun getSampelByBSFromDB(
+    suspend fun getSampelByBSFromDB(
         idBS: String
     ) {
         viewModelScope.launch {
