@@ -3,22 +3,16 @@ package com.polstat.pkl.viewmodel
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.polstat.pkl.mapper.toMahasiswaEntity
-import com.polstat.pkl.model.domain.DataTim
-import com.polstat.pkl.model.domain.Mahasiswa
-import com.polstat.pkl.model.domain.Tim
+import com.polstat.pkl.model.domain.AnggotaTim
 import com.polstat.pkl.model.response.AuthResponse
+import com.polstat.pkl.repository.AnggotaTimRepository
 import com.polstat.pkl.repository.AuthRepository
-import com.polstat.pkl.repository.DataTimRepository
 import com.polstat.pkl.repository.KeluargaRepository
 import com.polstat.pkl.repository.LocalRutaRepository
 import com.polstat.pkl.repository.LocationRepository
-import com.polstat.pkl.repository.MahasiswaRepository
-import com.polstat.pkl.repository.SampelRutaRepository
 import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.ui.event.LoginScreenEvent
@@ -42,12 +36,10 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val sessionRepository: SessionRepository,
-    private val dataTimRepository: DataTimRepository,
-    private val mahasiswaRepository: MahasiswaRepository,
+    private val anggotaTimRepository: AnggotaTimRepository,
     private val wilayahRepository: WilayahRepository,
     private val keluargaRepository: KeluargaRepository,
     private val localRutaRepository: LocalRutaRepository,
-    private val sampelRutaRepository: SampelRutaRepository,
     private val validateNim: ValidateNim,
     private val validatePassword: ValidatePassword,
     private val getLocationUseCase: GetLocationUseCase,
@@ -84,7 +76,12 @@ class AuthViewModel @Inject constructor(
             getLocationUseCase.invoke().collect { location ->
                 if (location != null && _session?.nim != null) {
                     Log.d(TAG, "getLocationUseCase: Nim = ${_session.nim}")
-                    locationRepository.updateLocation(_session.nim,location.longitude,location.latitude,location.accuracy)
+                    locationRepository.updateLocation(
+                        _session.nim,
+                        location.longitude,
+                        location.latitude,
+                        location.accuracy
+                    )
                 }
                 Log.d(TAG, "getCurrentLocation: ${location?.latitude}, ${location?.longitude}, ${location?.accuracy}")
             }
@@ -95,41 +92,6 @@ class AuthViewModel @Inject constructor(
         return sessionRepository.isLoggedIn()
     }
 
-    fun deleteAllLocalData() {
-        viewModelScope.launch {
-
-            dataTimRepository.deleteAllDataTim().collectLatest { message ->
-                Log.d(TAG, "deleteAllLocalData: $message")
-            }
-
-            mahasiswaRepository.deleteAllMahasiswa().collectLatest { message ->
-                Log.d(TAG, "deleteAllLocalData: $message")
-            }
-
-            wilayahRepository.deleteAllWilayah().collectLatest { message ->
-                Log.d(TAG, "deleteAllLocalData: $message")
-            }
-
-            keluargaRepository.deleteAllKeluarga().collectLatest { message ->
-                Log.d(TAG, "deleteAllLocalData: $message")
-            }
-
-            localRutaRepository.deleteAllRuta().collectLatest { message ->
-                Log.d(TAG, "deleteAllLocalData: $message")
-            }
-
-            sampelRutaRepository.deleteAllSampelRuta().collectLatest { message ->
-                Log.d(TAG, "deleteAllLocalData: $message")
-            }
-
-            localRutaRepository.deleteAllKeluargaAndRuta().collectLatest { message ->
-                Log.d(TAG, "deleteAllLocalData: $message")
-            }
-
-        }
-    }
-
-//    @Suppress("NAME_SHADOWING")
     fun login(
         nim: String,
         password: String
@@ -156,47 +118,52 @@ class AuthViewModel @Inject constructor(
                             _errorMessage.value = error
                         }
                         _showErrorToastChannel.send(true)
-                        Log.e(TAG, "Error in login")
+                        Log.e(TAG, "Error in login: $errorMessage")
+                        Log.d(TAG, "login: ${authResponse.value}")
                     }
                 }
             }
 
-            saveMahasiswa(authResponse.value.dataTim)
-            /**
-             * TODO(Data team langsung ganti ke format PPL atau PML)
-             */
-            saveDataTim()
+            if (authResponse.value.nim.isEmpty()) {
+                delay(2000)
+                Log.d(TAG, "login: nim empty")
+                closeLoadingDialog()
+                Log.d(TAG, "login: error $showErrorToastChannel, loading $showLoadingChannel")
+                return@launch
+            }
 
-            if (authResponse.value.wilayah.isNotEmpty()) {
-                authResponse.value.wilayah.forEach { wilayah ->
-                    wilayahRepository.insertWilayah(wilayah, authResponse.value.nim)
+            saveDataTim(authResponse.value)
+
+            //Redundant but preferred
+            if (authResponse.value.wilayah.isEmpty()) {
+                return@launch
+            }
+
+            authResponse.value.wilayah.forEach { wilayah ->
+                wilayahRepository.insertWilayah(wilayah)
+                    .collectLatest { message ->
+                        Log.d(TAG, message)
+                    }
+
+                wilayah.keluarga.forEach { keluarga ->
+                    keluargaRepository.insertKeluarga(keluarga, KeluargaRepository.Method.Fetch)
                         .collectLatest { message ->
                             Log.d(TAG, message)
                         }
 
-                    if(wilayah.keluarga!!.isNotEmpty()) {
-                        wilayah.keluarga.forEach { keluarga ->
-                            keluargaRepository.fetchKeluargaFromServer(keluarga)
-                                .collectLatest { message ->
-                                    Log.d(TAG, message)
-                                }
-
-                            if (keluarga.ruta!!.isNotEmpty()) {
-                                keluarga.ruta.forEach { ruta ->
-                                    localRutaRepository.fetchRutaFromServer(ruta)
-                                        .collectLatest { message ->
-                                            Log.d(TAG, message)
-                                        }
-                                    localRutaRepository.insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
-                                        .collectLatest { message ->
-                                            Log.d(TAG, message)
-                                        }
-                                }
+                    keluarga.ruta.forEach { ruta ->
+                        localRutaRepository.insertRuta(ruta, LocalRutaRepository.Method.Fetch)
+                            .collectLatest { message ->
+                                Log.d(TAG, message)
                             }
-                        }
+                        localRutaRepository.insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
+                            .collectLatest { message ->
+                                Log.d(TAG, message)
+                            }
                     }
                 }
             }
+
             Log.d(TAG, "Token: ${_session?.token} ")
             delay(2000)
             closeLoadingDialog()
@@ -247,143 +214,22 @@ class AuthViewModel @Inject constructor(
         _showLoadingChannel.trySend(false)
     }
 
-    private suspend fun saveMahasiswa(dataTim: DataTim){
-        val mahasiswa = Mahasiswa(
-            foto = authResponse.value.avatar,
-            id_tim = dataTim.idTim,
-            isKoor = authResponse.value.isKoor,
-            nama = authResponse.value.nama,
-            nim = authResponse.value.nim,
-        )
-
-        /**
-         * TODO(Perpendek authResponse.value.xxx telescoping-nya)
-         */
-
-        mahasiswaRepository.insertMahasiswa(mahasiswa)
-            .collectLatest { message ->
-                Log.d(TAG, "${message}: ${mahasiswa.toMahasiswaEntity()}")
-            }
-
-        /**
-         * TODO(Cek lagi, apa mau disimpan semua property-nya?)
-         * TODO(Cek juga log nya mau sebanyak itu?)
-         */
-
-    }
-
-    private suspend fun saveDataTim(){
-        val dataTim = if (authResponse.value.isKoor) Tim.Pml(
-            idTim = authResponse.value.dataTim.idTim,
-            namaTim = authResponse.value.dataTim.namaTim,
-            passPML = authResponse.value.dataTim.passPML,
-            namaPML = authResponse.value.nama,
-            nimPML = authResponse.value.nim,
-            teleponPML = "",
-            anggota = authResponse.value.dataTim.anggota
-        ) else Tim.Ppl(
-            idTim = authResponse.value.dataTim.idTim,
-            namaTim = authResponse.value.dataTim.namaTim,
-            namaPML = authResponse.value.dataTim.namaPML,
-            nimPML = authResponse.value.dataTim.nimPML,
-            teleponPML = authResponse.value.dataTim.teleponPML
-        )
-
-        /**
-         * TODO(Perpendek authResponse.value.xxx telescoping-nya)
-         */
-
-
-        dataTimRepository.insertTim(dataTim).collectLatest { message ->
-            Log.d(TAG, message)
+    private suspend fun saveDataTim(user: AuthResponse){
+        //Cek apakah user adalah koor atau tidak dan apakah memiliki anggota tim atau tidak
+        if (!user.isKoor || user.dataTim.anggota.isEmpty()) {
+            return
         }
 
-        if (authResponse.value.dataTim.anggota!!.isNotEmpty()) {
-            authResponse.value.dataTim.anggota!!.forEach { mahasiswa ->
-                mahasiswaRepository.insertMahasiswa(mahasiswa)
-                    .collectLatest { message ->
-                        Log.d(TAG, message)
-                    }
-
-                if (mahasiswa.wilayah_kerja?.isNotEmpty() == true) {
-                    mahasiswa.wilayah_kerja.forEach { wilayah ->
-                        wilayahRepository.insertWilayah(
-                            wilayah,
-                            mahasiswa.nim
-                        ).collectLatest { message ->
-                            Log.d(TAG, message)
-                        }
-
-                        if(wilayah.keluarga!!.isNotEmpty()) {
-                            wilayah.keluarga.forEach { keluarga ->
-                                keluargaRepository.fetchKeluargaFromServer(keluarga)
-                                    .collectLatest { message ->
-                                        Log.d(TAG, message)
-                                    }
-
-                                if (keluarga.ruta!!.isNotEmpty()) {
-                                    keluarga.ruta.forEach { ruta ->
-                                        localRutaRepository.fetchRutaFromServer(ruta)
-                                            .collectLatest { message ->
-                                                Log.d(TAG, message)
-                                            }
-                                        localRutaRepository.insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
-                                            .collectLatest { message ->
-                                                Log.d(TAG, message)
-                                            }
-                                    }
-                                }
-
-                            }
-                        }
-                    }
+        user.dataTim.anggota.forEach {
+            val anggotaTim = AnggotaTim(
+                nim = it.nim,
+                nama = it.nama,
+                noTlp = it.no_hp
+            )
+            anggotaTimRepository.insertAnggotaTim(anggotaTim)
+                .collectLatest { message ->
+                    Log.d(TAG, message)
                 }
-            }
-        }
-
-        when (dataTim) {
-            is Tim.Pml -> {
-                dataTim.anggota.forEach { mahasiswa ->
-                    mahasiswaRepository.insertMahasiswa(mahasiswa)
-                        .collectLatest { message ->
-                            Log.d(TAG, message)
-                        }
-
-                    mahasiswa.wilayah_kerja.forEach {wilayah ->
-                        wilayahRepository.insertWilayah(
-                            wilayah,
-                            mahasiswa.nim
-                        ).collectLatest { message ->
-                            Log.d(TAG, message)
-                        }
-
-                        wilayah.keluarga.forEach { keluarga ->
-                            keluargaRepository.insertKeluarga(keluarga)
-                                .collectLatest { message ->
-                                    Log.d(TAG, message)
-                                }
-
-                            keluarga.ruta.forEach { ruta ->
-                                localRutaRepository.insertRuta(ruta)
-                                    .collectLatest { message ->
-                                        Log.d(TAG, message)
-                                    }
-                                localRutaRepository.insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
-                                    .collectLatest { message ->
-                                        Log.d(TAG, message)
-                                    }
-                            }
-
-                        }
-                    }
-
-
-                }
-
-            }
-            else -> {
-                return
-            }
         }
     }
 
@@ -394,8 +240,8 @@ class AuthViewModel @Inject constructor(
     fun onPermissionResult(
         permission: String,
         isGranted: Boolean,
-    ){
-        if (!isGranted && !visiblePermissionDialogQueue.contains(permission)){
+    ) {
+        if (!isGranted && !visiblePermissionDialogQueue.contains(permission)) {
             visiblePermissionDialogQueue.add(permission)
         }
     }

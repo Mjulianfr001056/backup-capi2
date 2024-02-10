@@ -6,19 +6,20 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "keluarga")
 data class KeluargaEntity (
     @PrimaryKey(autoGenerate = false)
-    val kodeKlg: String = "",
-    val SLS: String = "[Not set]",
+    val kodeKlg: String = "[not set]",
+    val banjar: String = "[not set]",
     val noBgFisik: String = "[not set]",
     val noBgSensus: String = "[not set]",
-    val noSegmen: String = "S000",
-    val noUrutKlg: Int = -1,
+    val noSegmen: String = "[not set]",
+    val noUrutKlg: String = "[not set]",
     val noUrutKlgEgb: Int = -1,
-    val namaKK: String = "[Not set]",
-    val alamat: String = "[Not set]",
+    val namaKK: String = "[not set]",
+    val alamat: String = "[not set]",
     val isGenzOrtu: Int = -1,
     val penglMkn: Int = -1,
-    val noBS: String = "[Not set]",
-    val status: String = "[Not set]"
+    val idBS: String = "[not set]",
+    val nimPencacah: String = "[not set]",
+    val status: String = "[not set]"
 )
 
 /** QC 23/Jan/2024

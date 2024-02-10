@@ -1,15 +1,12 @@
 package org.odk.collect.pkl.navigation
 
-import EditRutaScreen
+//import EditRutaScreen
 import android.content.Intent
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -21,7 +18,6 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.polstat.pkl.viewmodel.AuthViewModel
 import com.polstat.pkl.viewmodel.KuesionerViewModel
-import com.polstat.pkl.viewmodel.PasswordMasterViewModel
 import org.odk.collect.pkl.ProjectConfigurerActivity
 import org.odk.collect.pkl.ui.screen.BerandaScreen
 import org.odk.collect.pkl.ui.screen.IsiRumahTanggaScreen
@@ -30,11 +26,9 @@ import org.odk.collect.pkl.ui.screen.ListRutaScreen
 import org.odk.collect.pkl.ui.screen.ListSampleScreen
 import org.odk.collect.pkl.ui.screen.LoginScreen
 import org.odk.collect.pkl.ui.screen.OnBoardingScreen
-import org.odk.collect.pkl.ui.screen.PasswordMasterScreen
-import org.odk.collect.pkl.ui.screen.SalinRutaScreen
+//import org.odk.collect.pkl.ui.screen.SalinRutaScreen
 import org.odk.collect.pkl.ui.screen.SamplingScreen
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun AppNavHost(
     navController: NavHostController
@@ -86,7 +80,6 @@ fun SamplingNavHost(
     rootController : NavHostController
 ){
     val samplingNavController = rememberNavController()
-    val passwordMasterViewModel: PasswordMasterViewModel = viewModel()
 
     NavHost(
         navController = samplingNavController,
@@ -113,31 +106,32 @@ fun SamplingNavHost(
             ) {
                 ListBSScreen(
                     navController = samplingNavController,
-                    viewModel = hiltViewModel(),
-                    authViewModel = hiltViewModel()
+                    viewModel = hiltViewModel()
                 )
             }
             composable(
-                route = CapiScreen.Listing.LIST_RUTA + "/{noBS}/{isMonitoring}",
+                route = CapiScreen.Listing.LIST_RUTA + "/{idBS}/{isMonitoring}/{isListRuta}",
                 arguments = listOf(
-                    navArgument("noBS") {
+                    navArgument("idBS") {
                         type = NavType.StringType
                     },
                     navArgument("isMonitoring") {
+                        type = NavType.BoolType
+                    },
+                    navArgument("isListRuta") {
                         type = NavType.BoolType
                     }
                 )
             ) {
                 ListRutaScreen(
                     navController = samplingNavController,
-                    viewModel = hiltViewModel(),
-                    authViewModel = hiltViewModel()
+                    viewModel = hiltViewModel()
                 )
             }
             composable(
-                route = CapiScreen.Listing.LIST_SAMPLE + "/{noBS}/{isMonitoring}",
+                route = CapiScreen.Listing.LIST_SAMPLE + "/{idBS}/{isMonitoring}",
                 arguments = listOf(
-                    navArgument("noBS") {
+                    navArgument("idBS") {
                         type = NavType.StringType
                     },
                     navArgument("isMonitoring") {
@@ -151,9 +145,9 @@ fun SamplingNavHost(
                 )
             }
             composable(
-                route = CapiScreen.Listing.ISI_RUTA + "/{noBS}",
+                route = CapiScreen.Listing.ISI_RUTA + "/{idBS}",
                 arguments = listOf(
-                    navArgument("noBS") {
+                    navArgument("idBS") {
                         type = NavType.StringType
                     }
                 )
@@ -164,9 +158,9 @@ fun SamplingNavHost(
                 )
             }
             composable(
-                route = CapiScreen.Listing.EDIT_RUTA + "/{noBS}/{kodeKlg}/{kodeRuta}",
+                route = CapiScreen.Listing.EDIT_RUTA + "/{idBS}/{kodeKlg}/{kodeRuta}",
                 arguments = listOf(
-                    navArgument("noBS") {
+                    navArgument("idBS") {
                         type = NavType.StringType
                     },
                     navArgument("kodeKlg") {
@@ -177,16 +171,16 @@ fun SamplingNavHost(
                     }
                 )
             ) {
-                EditRutaScreen(
-                    navController = samplingNavController,
-                    viewModel = hiltViewModel()
-                )
+//                EditRutaScreen(
+//                    navController = samplingNavController,
+//                    viewModel = hiltViewModel()
+//                )
             }
 
             composable(
-                route = CapiScreen.Listing.SALIN_RUTA + "/{noBS}/{kodeRuta}",
+                route = CapiScreen.Listing.SALIN_RUTA + "/{idBS}/{kodeRuta}",
                 arguments = listOf(
-                    navArgument("noBS") {
+                    navArgument("idBS") {
                         type = NavType.StringType
                     },
                     navArgument("kodeRuta") {
@@ -194,10 +188,10 @@ fun SamplingNavHost(
                     }
                 )
             ) {
-                SalinRutaScreen(
-                    navController = samplingNavController,
-                    viewModel = hiltViewModel()
-                )
+//                SalinRutaScreen(
+//                    navController = samplingNavController,
+//                    viewModel = hiltViewModel()
+//                )
             }
 
         }

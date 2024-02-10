@@ -6,18 +6,20 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "ruta")
 data class RutaEntity (
     @PrimaryKey(autoGenerate = false)
-    var kodeRuta: String = "",
-    var noUrutRuta: Int = -1,
-    var noUrutEgb: Int = -1,
-    var kkOrKrt: String = "[Not set]",
-    var namaKrt: String = "[Not set]",
-    var genzOrtu: Int = -1,
+    var kodeRuta: String = "[not set]",
+    var noUrutRuta: String = "[not set]",
+    var noUrutEgb: Int? = -1,
+    var kkOrKrt: String = "[not set]",
+    var namaKrt: String = "[not set]",
+    var jmlGenzAnak: Int = -1,
+    var jmlGenzDewasa: Int = -1,
     var katGenz: Int = -1,
-    var long: Double = -1.0,
-    var lat: Double = -1.0,
-    var catatan: String = "[Not set]",
-    var noBS: String = "[Not set]",
-    var status: String = "[Not set]"
+    var latitude: Double = -1.0,
+    var longitude: Double = -1.0,
+    var catatan: String = "[not set]",
+    var idBS: String = "[not set]",
+    var nimPencacah: String = "[not set]",
+    var status: String = "[not set]"
 )
 
 /** QC 23/Jan/2024

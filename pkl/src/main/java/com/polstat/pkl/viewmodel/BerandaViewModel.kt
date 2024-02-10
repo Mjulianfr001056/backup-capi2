@@ -1,23 +1,19 @@
 package com.polstat.pkl.viewmodel
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.polstat.pkl.database.entity.AnggotaTimEntity
 import com.polstat.pkl.database.entity.SampelRutaEntity
-import com.polstat.pkl.database.relation.DataTimWithAll
-import com.polstat.pkl.database.relation.MahasiswaWithWilayah
-import com.polstat.pkl.database.relation.WilayahWithRuta
-import com.polstat.pkl.repository.DataTimRepository
+import com.polstat.pkl.database.entity.WilayahEntity
+import com.polstat.pkl.repository.AnggotaTimRepository
 import com.polstat.pkl.repository.KeluargaRepository
 import com.polstat.pkl.repository.LocalRutaRepository
-import com.polstat.pkl.repository.MahasiswaRepository
 import com.polstat.pkl.repository.SampelRutaRepository
 import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,38 +25,30 @@ import javax.inject.Inject
 @HiltViewModel
 class BerandaViewModel @Inject constructor(
     private val sessionRepository: SessionRepository,
-    private val dataTimRepository: DataTimRepository,
     private val wilayahRepository: WilayahRepository,
-    private val keluargaRepository: KeluargaRepository,
-    private val localRutaRepository: LocalRutaRepository,
     private val sampelRutaRepository: SampelRutaRepository,
-    private val mahasiswaRepository: MahasiswaRepository,
-    private val sharedPreferences: SharedPreferences
+    private val anggotaTimRepository: AnggotaTimRepository,
+    private val keluargaRepository: KeluargaRepository,
+    private val localRutaRepository: LocalRutaRepository
 ) : ViewModel() {
 
     companion object {
         private const val TAG = "CAPI63_BERANDA_VM"
     }
 
-    private val _session = sessionRepository.getActiveSession()
+    val session = sessionRepository.getActiveSession()
 
-    val session = _session
+    private val _listWilayah = MutableStateFlow<List<WilayahEntity>>(emptyList())
 
-    private val _dataTimWithAll = MutableStateFlow(DataTimWithAll())
+    val listWilayah = _listWilayah.asStateFlow()
 
-    val dataTimWithAll = _dataTimWithAll.asStateFlow()
+    private val _listAllSampelRuta = MutableStateFlow<List<SampelRutaEntity>>(emptyList())
 
-    private val _wilayahWithRuta = MutableStateFlow(WilayahWithRuta())
+    val listAllSampelRuta = _listAllSampelRuta.asStateFlow()
 
-    val wilayahWithRuta = _wilayahWithRuta.asStateFlow()
+    private val _listAnggotaTim = MutableStateFlow<List<AnggotaTimEntity>>(emptyList())
 
-    private val _mahasiswaWithWilayah = MutableStateFlow(MahasiswaWithWilayah())
-
-    val mahasiswaWithWilayah = _mahasiswaWithWilayah.asStateFlow()
-
-    private val _listSampelRuta = MutableStateFlow<List<SampelRutaEntity>>(listOf())
-
-    val listSampelRuta = _listSampelRuta.asStateFlow()
+    val listAnggotaTim = _listAnggotaTim.asStateFlow()
 
     private val _errorMessage = MutableStateFlow("")
 
@@ -71,14 +59,78 @@ class BerandaViewModel @Inject constructor(
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
     init {
+        getAllWilayah()
+        getAllAnggotaTim()
+        getAllSampelRuta()
+    }
+
+    private fun getAllWilayah() {
         viewModelScope.launch {
-            val getDataTimWithAllJob = async { getDataTimWithAll(_session?.idTim.toString()) }
-            getDataTimWithAllJob.await()
-            val getMahasiswaWithWilayahJob = async { getMahasiswaWithWilayah(_session?.nim.toString()) }
-            getMahasiswaWithWilayahJob.await()
-            _mahasiswaWithWilayah.value.listWilayah?.let {
-                if (it.isNotEmpty()) {
-                    getAllSampelRutaByNoBS(it[0].noBS)
+            wilayahRepository.getAllWilayah().collectLatest { result ->
+                when (result) {
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            _errorMessage.value = error
+                            Log.e(TAG, "getAllWilayah: Error in getAllWilayah ($errorMessage)")
+                        }
+                        _showErrorToastChannel.send(true)
+                    }
+
+                    is Result.Loading -> Log.d(TAG, "getAllWilayah: Loading...")
+                    is Result.Success -> {
+                        result.data?.let {
+                            _listWilayah.value = it
+                            Log.d(TAG, "getAllWilayah: $listWilayah")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getAllAnggotaTim() {
+        viewModelScope.launch {
+            anggotaTimRepository.getAllAnggotaTim().collectLatest { result ->
+                when(result) {
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            _errorMessage.value = error
+                            Log.e(TAG, "getAllAnggotaTim: Error in getAllAnggotaTim ($errorMessage)")
+                        }
+                        _showErrorToastChannel.send(true)
+                    }
+                    is Result.Loading -> Log.d(TAG, "getAllAnggotaTim: Loading...")
+                    is Result.Success -> {
+                        result.data?.let {
+                            _listAnggotaTim.value = it
+                            Log.d(TAG, "getAllAnggotaTim: $listAnggotaTim")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getAllSampelRuta() {
+        viewModelScope.launch {
+            sampelRutaRepository.getAllSampelRuta().collectLatest { result ->
+                when(result) {
+                    is Result.Success -> {
+                        result.data?.let { response ->
+                            _listAllSampelRuta.value = response
+                            Log.d(TAG, "getAllSampelRuta succeed: $listAllSampelRuta")
+                        }
+                    }
+                    is Result.Loading -> {
+                        Log.d(TAG, "getAllSampelRutaByNoBS: Loading...")
+                    }
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            _errorMessage.value = error
+                            Log.e(TAG, "getAllSampelRuta: Error in getAllSampelRuta ($errorMessage)")
+                        }
+                        _showErrorToastChannel.send(true)
+                    }
                 }
             }
         }
@@ -86,12 +138,7 @@ class BerandaViewModel @Inject constructor(
 
     fun deleteAllLocalData() {
         viewModelScope.launch {
-
-            dataTimRepository.deleteAllDataTim().collectLatest { message ->
-                Log.d(TAG, "deleteAllLocalData: $message")
-            }
-
-            mahasiswaRepository.deleteAllMahasiswa().collectLatest { message ->
+            anggotaTimRepository.deleteAllAnggotaTim().collectLatest { message ->
                 Log.d(TAG, "deleteAllLocalData: $message")
             }
 
@@ -119,114 +166,4 @@ class BerandaViewModel @Inject constructor(
         sessionRepository.logOut()
         Log.d(TAG, "logout: Berhasil logout!")
     }
-
-    private fun getDataTimWithAll(
-        idTim: String
-    ) {
-        viewModelScope.launch {
-            dataTimRepository.getDataTimWithAll(idTim).collectLatest { result ->
-                when(result) {
-                    is Result.Success -> {
-                        result.data?.let { response ->
-                            _dataTimWithAll.value = response
-                            Log.d(TAG, "getDataTimWithAll succeed: $response")
-                        }
-                    }
-                    is Result.Loading -> {
-                        Log.d(TAG, "getDataTimWithAll: Loading...")
-                    }
-                    is Result.Error -> {
-                        result.message?.let { error ->
-                            _errorMessage.value = error
-                        }
-                        _showErrorToastChannel.send(true)
-                        Log.e(TAG, "getDataTimWithAll: Error in getDataTimWithAll")
-                    }
-
-                }
-            }
-        }
-    }
-
-    private fun getMahasiswaWithWilayah(
-        nim: String
-    ) {
-        viewModelScope.launch {
-            mahasiswaRepository.getMahasiswaWithWilayah(nim).collectLatest { result ->
-                when(result) {
-                    is Result.Success -> {
-                        result.data?.let { response ->
-                            _mahasiswaWithWilayah.value = response
-                            Log.d(TAG, "getMahasiswaWithWilayah success: $response")
-                        }
-                    }
-                    is Result.Loading -> {
-                        Log.d(TAG, "getMahasiswaWithWilayah: Loading...")
-                    }
-                    is Result.Error -> {
-                        result.message?.let { error ->
-                            _errorMessage.value = error
-                        }
-                        _showErrorToastChannel.send(true)
-                        Log.e(TAG, "getMahasiswaWithWilayah: Error in getMahasiswaWithWilayah")
-                    }
-                }
-            }
-        }
-    }
-
-    fun getWilayahWithRuta(
-        noBS: String
-    ) {
-        viewModelScope.launch {
-            wilayahRepository.getWilayahWithRuta(noBS).collectLatest { result ->
-                when(result) {
-                    is Result.Success -> {
-                        result.data?.let { response ->
-                            _wilayahWithRuta.value = response
-                            Log.d(TAG, "getWilayahWithRuta succeed: $response")
-                        }
-                    }
-                    is Result.Loading -> {
-                        Log.d(TAG, "getWilayahWithRuta: Loading...")
-                    }
-                    is Result.Error -> {
-                        result.message?.let { error ->
-                            _errorMessage.value = error
-                        }
-                        _showErrorToastChannel.send(true)
-                        Log.e(TAG, "getWilayahWithRuta: Error in getWilayahWithRuta")
-                    }
-                }
-            }
-        }
-    }
-
-    fun getAllSampelRutaByNoBS(
-        noBS: String
-    ) {
-        viewModelScope.launch {
-            sampelRutaRepository.getSampelRuta(noBS).collectLatest { result ->
-                when(result) {
-                    is Result.Success -> {
-                        result.data?.let { response ->
-                            _listSampelRuta.value = response
-                            Log.d(TAG, "getAllSampelRutaByNoBS succeed: $response")
-                        }
-                    }
-                    is Result.Loading -> {
-                        Log.d(TAG, "getAllSampelRutaByNoBS: Loading...")
-                    }
-                    is Result.Error -> {
-                        result.message?.let { error ->
-                            _errorMessage.value = error
-                        }
-                        _showErrorToastChannel.send(true)
-                        Log.e(TAG, "getAllSampelRutaByNoBS: Error in getAllSampelRutaByNoBS")
-                    }
-                }
-            }
-        }
-    }
-
 }

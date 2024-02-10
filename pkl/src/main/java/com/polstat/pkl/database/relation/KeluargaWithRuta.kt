@@ -7,18 +7,13 @@ import com.polstat.pkl.database.entity.KeluargaAndRutaEntity
 import com.polstat.pkl.database.entity.KeluargaEntity
 import com.polstat.pkl.database.entity.RutaEntity
 
-data class KeluargaWithRuta (
-    @Embedded
-    val keluarga: KeluargaEntity,
+data class KeluargaWithRuta(
+    @Embedded val keluarga: KeluargaEntity = KeluargaEntity(),
     @Relation(
-        parentColumn = "kodeKlg",
         entity = RutaEntity::class,
+        parentColumn = "kodeKlg",
         entityColumn = "kodeRuta",
-        associateBy = Junction(
-            value = KeluargaAndRutaEntity::class,
-            parentColumn = "kodeKlg",
-            entityColumn = "kodeRuta"
-        )
+        associateBy = Junction(KeluargaAndRutaEntity::class)
     )
-    val listRuta: List<RutaEntity>
+    val listRuta: List<RutaEntity> = emptyList()
 )

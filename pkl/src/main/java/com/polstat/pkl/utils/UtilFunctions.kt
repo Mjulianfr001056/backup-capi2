@@ -14,5 +14,17 @@ class UtilFunctions {
             return input.padStart(length, '0')
         }
 
+        fun convertStringToNumber(str: String): Int {
+            if (str.isBlank() || str.startsWith('0')) return 0
+
+            val num = str.takeWhile { it.isDigit() }.toInt()
+            val letter = str.dropWhile { it.isDigit() }
+
+            return num + when (letter) {
+                "" -> 0
+                else -> letter.first().uppercaseChar() - 'A' + 1
+            }
+        }
+
     }
 }

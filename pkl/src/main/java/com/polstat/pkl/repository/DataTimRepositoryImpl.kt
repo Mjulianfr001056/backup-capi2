@@ -2,13 +2,8 @@ package com.polstat.pkl.repository
 
 import android.util.Log
 import com.polstat.pkl.database.dao.Capi63Dao
+import com.polstat.pkl.database.entity.AnggotaTimEntity
 import com.polstat.pkl.database.entity.DataTimEntity
-import com.polstat.pkl.database.relation.DataTimWithAll
-import com.polstat.pkl.database.relation.DataTimWithMahasiswa
-import com.polstat.pkl.database.relation.KeluargaWithRuta
-import com.polstat.pkl.database.relation.MahasiswaWithAll
-import com.polstat.pkl.database.relation.RutaWithKeluarga
-import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.mapper.toDataTimEntity
 import com.polstat.pkl.model.domain.DataTim
 import com.polstat.pkl.model.domain.Tim
@@ -62,6 +57,24 @@ class DataTimRepositoryImpl @Inject constructor (
         }
     }
 
+    //TODO(Pertimbangkan pakai model daripada pair)
+    override suspend fun insertAnggotaTim(anggota: Pair<String, String>): Flow<String> {
+        return flow {
+            try {
+                val anggotaTim = AnggotaTimEntity(anggota.first, anggota.second)
+                dao.insertAnggotaTim(anggotaTim)
+
+                val message = "Berhasil menambahkan data tim!"
+                emit(message)
+            }catch (e: Exception){
+                val message = "Gagal menambahkan data tim!"
+                Log.d(TAG, "insertAnggota: $message (${e.message})")
+                emit(message)
+                return@flow
+            }
+        }
+    }
+
     override suspend fun getDataTim(
         idTim: String
     ): Flow<Result<DataTimEntity>> {
@@ -95,83 +108,4 @@ class DataTimRepositoryImpl @Inject constructor (
             }
         }
     }
-
-    override suspend fun getDataTimWithMahasiswa(
-        idTim: String
-    ): Flow<Result<DataTimWithMahasiswa>> {
-        return flow {
-            try {
-                emit(Result.Loading(true))
-
-                val dataTimWithMahasiswa = dao.getDataTimWithMahasiswa(idTim)
-
-                Log.d(TAG, "Berhasil getDataTimWithMahasiswa: $dataTimWithMahasiswa")
-
-                emit(Result.Success(dataTimWithMahasiswa))
-            } catch (e: Exception) {
-                Log.d(TAG, "Gagal getDataTimWithMahasiswa: ${e.message}")
-                emit(Result.Error(null, "Error fetching DataTimWithMahasiswa: ${e.message}"))
-            } finally {
-                emit(Result.Loading(false))
-            }
-        }
-    }
-
-    override suspend fun getDataTimWithAll(
-        idTim: String
-    ): Flow<Result<DataTimWithAll>> {
-        return flow {
-            try {
-                emit(Result.Loading(true))
-
-                val dataTimWithMahasiswa = dao.getDataTimWithMahasiswa(idTim)
-
-                val listMahasiswaWithAll = dataTimWithMahasiswa.listMahasiswa?.map { mahasiswa ->
-
-                    val mahasiswaWithWilayah = dao.getMahasiswaWithWilayah(mahasiswa.nim)
-
-                    val listWilayahWithAll = mahasiswaWithWilayah.listWilayah?.map { wilayah ->
-
-                        val wilayahWithKeluarga = dao.getWilayahWithKeluarga(wilayah.noBS)
-
-                        val wilayahWithRuta = dao.getWilayahWithRuta(wilayah.noBS)
-
-                        val listKeluargaWithRuta = wilayahWithKeluarga.listKeluarga?.map { keluarga ->
-
-                            val ruta = dao.getKeluargaWithRuta(keluarga.kodeKlg)
-
-                            KeluargaWithRuta(keluarga, ruta.listRuta)
-
-                        }
-
-                        val listRutaWithKeluarga = wilayahWithRuta.listRuta?.map {ruta ->
-
-                            val keluarga = dao.getRutaWithKeluarga(ruta.kodeRuta)
-
-                            RutaWithKeluarga(ruta, keluarga.listKeluarga)
-
-                        }
-
-                        WilayahWithAll(wilayahWithKeluarga, wilayahWithRuta, listKeluargaWithRuta, listRutaWithKeluarga)
-
-                    }
-
-                    MahasiswaWithAll(mahasiswaWithWilayah, listWilayahWithAll)
-
-                }
-
-                val dataTimWithAll = DataTimWithAll(dataTimWithMahasiswa, listMahasiswaWithAll)
-
-                Log.d(TAG, "Berhasil getDataTimWithAll: $dataTimWithAll")
-
-                emit(Result.Success(dataTimWithAll))
-            } catch (e: Exception) {
-                Log.d(TAG, "Gagal getDataTimWithAll: ${e.message}")
-                emit(Result.Error(null, "Error fetching DataTimWithAll: ${e.message}"))
-            } finally {
-                emit(Result.Loading(false))
-            }
-        }
-    }
-
 }

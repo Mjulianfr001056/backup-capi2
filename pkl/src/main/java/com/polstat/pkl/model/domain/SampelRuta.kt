@@ -1,7 +1,7 @@
 package com.polstat.pkl.model.domain
 
 data class SampelRuta(
-    var noBS: String = "[not set]",
+    var idBS: String = "[not set]",
     var kodeRuta: String = "[not set]",
     var SLS: String = "[not set]",
     var noSegmen: String = "[not set]",

@@ -41,7 +41,7 @@
     <string name="toggle">Toggle</string>
     <string name="lihat_ruta">Lihat Ruta</string>
     <string name="lihat_sampel">Lihat Sampel</string>
-    <string name="action_art">Aksi Untuk ART</string>
+    <string name="action">Aksi</string>
     <string name="ubah_action_art">Ubah</string>
     <string name="hapus_action_art">Hapus</string>
     <string name="detail_ruta">detail ruta</string>
@@ -51,10 +51,12 @@
     <string name="nomor_urut_krt_ruta">Nomor Urut Kepala Rumah Tangga</string>
     <string name="nama_krt_ruta">Nama Kepala Rumah Tangga</string>
     <string name="alamat_ruta">Alamat</string>
-    <string name="keberadaan_genz_ortu_ruta">Keberadaan Gen Z dan Orang Tua</string>
+    <string name="jml_genz_anak">Jumlah Gen Z anak eligible (kelahiran tahun 2007-2012)</string>
+    <string name="jml_genz_dewasa">Jumlah Gen Z dewasa eligible (kelahiran tahun 1997-2006)</string>
     <string name="jml_genz_yang_belum_kawin_dalam_ruta">Jumlah Gen Z yang Belum Kawin dalam Rumah Tangga</string>
     <string name="nomor_urut_ruta_egb">Nomor Urut Rumah Tangga Eligible</string>
     <string name="catatan">Catatan</string>
+    <string name="nim_pencacah">Nim Pencacah</string>
     <string name="close_popup_list_ruta">close</string>
     <string name="search_list_ruta">Masukkan kode ruta atau nama KRT</string>
     <string name="search_list_sampel">Masukkan kata kunci</string>
@@ -78,6 +80,8 @@
     <string name="batal_pass_master">Batal</string>
     <string name="konfirmasi_pass_master">Konfirmasi</string>
     <string name="ket_konfirm_hapus_pass_master">Hapus Rumah Tangga membutuhkan persetujuan PML. Harap hubungi PML untuk memperoleh password master.</string>
+    <string name="konfirm_hapus_ruta">Apakah Anda yakin ingin menghapus ruta?</string>
+    <string name="konfirm_hapus_klg">Apakah Anda yakin ingin menghapus keluarga?</string>
     <string name="input_pass_master">Masukkan password master</string>
     <string name="tampilkan_list_keluarga">Tampilkan List Keluarga</string>
     <string name="tampilkan_list_ruta">Tampilkan List Ruta</string>

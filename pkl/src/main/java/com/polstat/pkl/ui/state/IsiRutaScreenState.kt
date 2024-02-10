@@ -17,7 +17,7 @@ data class IsiRutaScreenState(
     /**
      * Ini adalah state untuk menyimpan data beberapa keluarga
      */
-    val listNoUrutKlg: List<Int> = emptyList(),
+    val listNoUrutKlg: List<String> = emptyList(),
     val listNoUrutKlgError: List<String> = emptyList(),
     val listNamaKK: List<String> = emptyList(),
     val listNamaKKError: List<String> = emptyList(),
@@ -33,13 +33,14 @@ data class IsiRutaScreenState(
     /**
      * Ini adalah state untuk menyimpan data beberapa ruta dalam list dua dimensi
      */
-    val listNoUrutRuta: List<List<Int>> = emptyList(),
+    val listNoUrutRuta: List<List<String>> = emptyList(),
     val listNoUrutRutaError: List<List<String>> = emptyList(),
-    val listKkOrKrt : List<List<String>> = emptyList(),
+    val listKkOrKrt: List<List<String>> = emptyList(),
     val listKkOrKrtError: List<List<String>> = emptyList(),
     val listNamaKrt: List<List<String>> = emptyList(),
     val listNamaKrtError: List<List<String>> = emptyList(),
-    val listGenzOrtu: List<List<Int>> = emptyList(),
+    val listJmlGenzAnak: List<List<Int>> = emptyList(),
+    val listJmlGenzDewasa: List<List<Int>> = emptyList(),
     val listGenzOrtuError: List<List<String>> = emptyList(),
     val listKatGenz: List<List<Int>> = emptyList(),
     val listKatGenzError: List<List<String>> = emptyList(),

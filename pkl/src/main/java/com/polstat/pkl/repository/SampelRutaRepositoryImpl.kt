@@ -3,6 +3,7 @@ package com.polstat.pkl.repository
 import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
 import com.polstat.pkl.database.Capi63Database
+import com.polstat.pkl.database.dao.Capi63Dao
 import com.polstat.pkl.database.entity.SampelRutaEntity
 import com.polstat.pkl.mapper.toSampelRutaEntity
 import com.polstat.pkl.model.domain.SampelRuta
@@ -17,7 +18,7 @@ import javax.inject.Inject
 
 class SampelRutaRepositoryImpl @Inject constructor(
     private val sampelRutaApi: SampelRutaApi,
-    private val capi63Database: Capi63Database
+    private val capi63Dao: Capi63Dao
 ) : SampelRutaRepository {
 
     companion object {
@@ -25,12 +26,12 @@ class SampelRutaRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getSampelRutaFromWS(
-        noBS: String
+        idBS: String
     ): Flow<Result<SampelRutaResponse>> {
         return flow {
             emit(Result.Loading(true))
             val sampelRutaResponse = try {
-                sampelRutaApi.getSampel(noBS)
+                sampelRutaApi.getSampel(idBS)
             }  catch (e: IOException) {
                 e.printStackTrace()
                 emit(Result.Error(message = e.localizedMessage ?: "Fetch Sampel Ruta Error"))
@@ -65,7 +66,7 @@ class SampelRutaRepositoryImpl @Inject constructor(
         return flow {
             try {
                 Log.d(TAG, "Sampel Ruta : ${sampelRuta.toSampelRutaEntity()}")
-                capi63Database.capi63Dao.insertSampelRuta(sampelRuta.toSampelRutaEntity())
+                capi63Dao.insertSampelRuta(sampelRuta.toSampelRutaEntity())
                 val message = "Berhasil menambahkan sampel ruta!"
                 Log.d(TAG, "insertSampelRuta: $message $sampelRuta")
                 emit(message)
@@ -82,13 +83,13 @@ class SampelRutaRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getSampelRuta(
-        noBS: String
+        idBS: String
     ): Flow<Result<List<SampelRutaEntity>>> {
         return flow {
             try {
                 emit(Result.Loading(true))
 
-                val sampelRuta = capi63Database.capi63Dao.getSampelRutaByNoBS(noBS)
+                val sampelRuta = capi63Dao.getSampelRutaByNoBS(idBS)
 
                 Log.d(TAG, "Berhasil getSampelRuta: $sampelRuta")
 
@@ -102,10 +103,52 @@ class SampelRutaRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getAllSampelRuta(): Flow<Result<List<SampelRutaEntity>>> {
+        return flow {
+            try {
+                emit(Result.Loading(true))
+                val listAllSampelRuta = capi63Dao.getAllSampelRuta()
+                Log.d(TAG, "Berhasil getAllSampelRuta: $listAllSampelRuta")
+                emit(Result.Success(listAllSampelRuta))
+            } catch (e: Exception) {
+                Log.d(TAG, "Gagal getAllSampelRuta: ${e.message}")
+                emit(Result.Error(null, "Error Get All Sampel Ruta: ${e.message}"))
+            } finally {
+                emit(Result.Loading(false))
+            }
+        }
+    }
+
+    override suspend fun confirmSampel(kodeRuta: String): Flow<String> {
+        return flow {
+            try {
+                sampelRutaApi.confirmSampel(kodeRuta)
+                val message = "Berhasil Konfirmasi Sampel"
+                Log.d(TAG, "Konfirmasi Sampel berhasil !")
+                emit(message)
+            } catch (e: IOException) {
+                val message = "Konfirmasi Sampel gagal !"
+                Log.d(TAG, "Konfirmasi Sampel gagal !", e)
+                emit(message)
+                e.printStackTrace()
+            } catch (e: HttpException) {
+                val message = "Konfirmasi Sampel gagal !"
+                Log.d(TAG, "Konfirmasi Sampel gagal !", e)
+                emit(message)
+                e.printStackTrace()
+            } catch (e: Exception) {
+                val message = "Konfirmasi Sampel gagal !"
+                Log.d(TAG, "Konfirmasi Sampel gagal !", e)
+                emit(message)
+                e.printStackTrace()
+            }
+        }
+    }
+
     override suspend fun deleteAllSampelRuta(): Flow<String> {
         return  flow {
             try {
-                capi63Database.capi63Dao.deleteAllSampelRuta()
+                capi63Dao.deleteAllSampelRuta()
                 val message = "Berhasil menghapus seluruh sampel ruta!"
                 Log.d(TAG, "deleteAllSampelRuta: $message")
             } catch (e: Exception) {

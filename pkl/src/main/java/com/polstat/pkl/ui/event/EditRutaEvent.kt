@@ -5,7 +5,7 @@ sealed class EditRutaEvent {
     data class NoSegmenChanged(val noSegmen: String) : EditRutaEvent()
     data class NoBgFisikChanged(val noBgFisik: String) : EditRutaEvent()
     data class NoBgSensusChanged(val noBgSensus: String) : EditRutaEvent()
-    data class NoUrutKlgChanged(val noUrutKlg: Int) : EditRutaEvent()
+    data class NoUrutKlgChanged(val noUrutKlg: String) : EditRutaEvent()
     data class NamaKKChanged(val namaKK: String) : EditRutaEvent()
     data class AlamatChanged(val alamat: String) : EditRutaEvent()
     data class IsGenzOrtuChanged(val isGenzOrtu: Int) : EditRutaEvent()

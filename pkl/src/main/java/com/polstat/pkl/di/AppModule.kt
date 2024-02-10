@@ -7,6 +7,8 @@ import androidx.room.Room
 import com.google.android.gms.location.LocationServices
 import com.polstat.pkl.database.Capi63Database
 import com.polstat.pkl.database.dao.Capi63Dao
+import com.polstat.pkl.repository.AnggotaTimRepository
+import com.polstat.pkl.repository.AnggotaTimRepositoryImpl
 import com.polstat.pkl.repository.DataTimRepository
 import com.polstat.pkl.repository.DataTimRepositoryImpl
 import com.polstat.pkl.repository.KeluargaRepository
@@ -76,6 +78,12 @@ class AppModule {
 
     @Provides
     @Singleton
+    fun provideAnggotaTimRepository(capi63Dao: Capi63Dao): AnggotaTimRepository {
+        return AnggotaTimRepositoryImpl(capi63Dao)
+    }
+
+    @Provides
+    @Singleton
     fun provideDataTimRepository(capi63Dao: Capi63Dao) : DataTimRepository {
         return DataTimRepositoryImpl(capi63Dao)
     }
@@ -88,19 +96,19 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideWilayahRepository(capi63Database: Capi63Database) : WilayahRepository {
-        return WilayahRepositoryImpl(capi63Database)
+    fun provideWilayahRepository(capi63Dao: Capi63Dao) : WilayahRepository {
+        return WilayahRepositoryImpl(capi63Dao)
     }
 
     @Provides
     @Singleton
-    fun provideLocalRutaRepository(capi63Database: Capi63Database) : LocalRutaRepository {
-        return LocalRutaRepositoryImpl(capi63Database)
+    fun provideLocalRutaRepository(capi63Dao: Capi63Dao) : LocalRutaRepository {
+        return LocalRutaRepositoryImpl(capi63Dao)
     }
 
     @Provides
     @Singleton
-    fun provideKeluargaRepository(capi63Database: Capi63Database) : KeluargaRepository {
-        return KeluargaRepositoryImpl(capi63Database)
+    fun provideKeluargaRepository(capi63Dao: Capi63Dao) : KeluargaRepository {
+        return KeluargaRepositoryImpl(capi63Dao)
     }
 }

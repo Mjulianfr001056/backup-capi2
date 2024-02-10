@@ -3,6 +3,7 @@ package com.polstat.pkl.model.domain
 import java.util.Date
 
 data class Wilayah(
+    val idBS: String = "[not set]",
     val noBS: String = "[not set]",
     val idKab: String = "[not set]",
     val namaKab: String = "[not set]",

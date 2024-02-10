@@ -11,4 +11,8 @@ interface SampelRutaApi {
         @Path("noBS") noBS: String,
     ): SampelRutaResponse
 
+    @GET("listing/confirm-sampel/{kodeRuta}")
+    suspend fun confirmSampel(
+        @Path("kodeRuta") kodeRuta: String
+    )
 }

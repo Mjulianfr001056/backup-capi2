@@ -33,11 +33,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.polstat.pkl.database.entity.DataTimEntity
+import com.polstat.pkl.database.entity.AnggotaTimEntity
 import com.polstat.pkl.database.entity.SampelRutaEntity
 import com.polstat.pkl.database.entity.WilayahEntity
-import com.polstat.pkl.database.relation.DataTimWithAll
-import com.polstat.pkl.database.relation.MahasiswaWithAll
 import com.polstat.pkl.model.domain.Session
 import com.polstat.pkl.ui.theme.PklPrimary100
 import com.polstat.pkl.ui.theme.PklPrimary900
@@ -46,8 +44,7 @@ import java.util.Locale
 
 @Composable
 fun ProfileCard(
-    session: Session,
-    dataTim: DataTimEntity?
+    session: Session
 ) {
     Card(
         modifier = Modifier
@@ -75,7 +72,7 @@ fun ProfileCard(
                     .align(Alignment.CenterHorizontally)
             )
             Text(
-                text = session.nama!!,
+                text = session.nama,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.Medium
@@ -84,7 +81,7 @@ fun ProfileCard(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text(
-                    text = session.nim!!,
+                    text = session.nim,
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium
                 )
@@ -94,7 +91,7 @@ fun ProfileCard(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = if (session.isKoor!!) "PML" else "PPL",
+                    text = if (session.isKoor) "PML" else "PPL",
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium
                 )
@@ -103,7 +100,7 @@ fun ProfileCard(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text(
-                    text = dataTim!!.namaTim!!,
+                    text = session.namaTim,
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium
                 )
@@ -113,7 +110,7 @@ fun ProfileCard(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = dataTim.idTim,
+                    text = session.idTim,
                     fontFamily = PoppinsFontFamily,
                     fontWeight = FontWeight.Medium
                 )
@@ -124,7 +121,7 @@ fun ProfileCard(
 
 @Composable
 fun PmlCard(
-    dataTim: DataTimEntity?
+    session: Session
 ) {
     Card(
         modifier = Modifier
@@ -159,14 +156,14 @@ fun PmlCard(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = dataTim!!.namaPML!!,
+                        text = session.namaPml,
                         fontFamily = PoppinsFontFamily,
                         fontWeight = FontWeight.Medium,
                         fontSize = 18.sp,
                         color = Color.DarkGray
                     )
                     Text(
-                        text = dataTim.nimPML!!,
+                        text = session.nimPml,
                         fontFamily = PoppinsFontFamily,
                         fontWeight = FontWeight.Medium,
                         fontSize = 14.sp
@@ -179,10 +176,8 @@ fun PmlCard(
 
 @Composable
 fun ListPplCard(
-    dataTimWithAll: DataTimWithAll
+    listAnggotaTim: List<AnggotaTimEntity>
 ) {
-    var jmlRuta by remember { mutableIntStateOf(0) }
-
     Card(
         modifier = Modifier
             .padding(16.dp)
@@ -214,94 +209,9 @@ fun ListPplCard(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-
-                    if (dataTimWithAll.listMahasiswaWithAll!!.isNotEmpty()) {
-                        dataTimWithAll.listMahasiswaWithAll!!.forEach{ mahasiswaWithAll ->
-
-                            if (mahasiswaWithAll.mahasiswaWithWilayah!!.mahasiswa!!.nim != dataTimWithAll.dataTimWithMahasiswa!!.dataTim!!.nimPML) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(
-                                            start = 10.dp,
-                                            top = 10.dp,
-                                            end = 10.dp
-                                        ),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column {
-                                        Text(
-                                            text = mahasiswaWithAll.mahasiswaWithWilayah!!.mahasiswa!!.nama!!,
-                                            style = TextStyle(
-                                                fontFamily = PoppinsFontFamily,
-                                                fontWeight = FontWeight.Medium,
-                                                fontSize = 14.sp,
-                                                platformStyle = PlatformTextStyle(
-                                                    includeFontPadding = false
-                                                )
-                                            ),
-                                            color = Color.DarkGray
-                                        )
-                                        Text(
-                                            text = mahasiswaWithAll.mahasiswaWithWilayah!!.mahasiswa!!.nim,
-                                            style = TextStyle(
-                                                fontFamily = PoppinsFontFamily,
-                                                fontWeight = FontWeight.Medium,
-                                                fontSize = 12.sp,
-                                                platformStyle = PlatformTextStyle(
-                                                    includeFontPadding = false
-                                                )
-                                            )
-                                        )
-                                    }
-                                    Column {
-                                        if (mahasiswaWithAll.listWilayahWithAll!!.isNotEmpty()) {
-                                            mahasiswaWithAll.listWilayahWithAll!!.forEach { wilayahWithAll ->
-                                                Row(
-                                                    verticalAlignment = Alignment.CenterVertically
-                                                ) {
-                                                    Text(
-                                                        text = wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.noBS,
-                                                        style = TextStyle(
-                                                            fontFamily = PoppinsFontFamily,
-                                                            fontWeight = FontWeight.Medium,
-                                                            fontSize = 18.sp,
-                                                            platformStyle = PlatformTextStyle(
-                                                                includeFontPadding = false
-                                                            )
-                                                        )
-                                                    )
-                                                    Spacer(modifier = Modifier.width(16.dp))
-
-                                                    jmlRuta = 0
-
-                                                    if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
-                                                        wilayahWithAll.listKeluargaWithRuta!!.forEach { keluarga ->
-                                                            jmlRuta += keluarga.listRuta.size
-                                                        }
-                                                    }
-
-                                                    AnimatedCircularProgressIndicator(
-                                                        currentValue = jmlRuta,
-                                                        maxValue = (if (wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.jmlRuta == 0) 99 else wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.jmlRuta)!!,
-                                                        progressBackgroundColor = PklPrimary100,
-                                                        progressIndicatorColor = PklPrimary900,
-                                                        completedColor = PklPrimary900,
-                                                        circularIndicatorDiameter = 66.dp
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(12.dp))
-                            }
-                        }
-                    } else {
-                        // Tampilkan pesan atau lakukan aksi lain jika listMahasiswa kosong
+                    listAnggotaTim.forEach { anggotaTimEntity ->
                         Text(
-                            text = "Tidak ada data mahasiswa.",
+                            text = anggotaTimEntity.nama,
                             style = TextStyle(
                                 fontFamily = PoppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
@@ -309,8 +219,21 @@ fun ListPplCard(
                                 platformStyle = PlatformTextStyle(
                                     includeFontPadding = false
                                 )
+                            ),
+                            color = Color.DarkGray
+                        )
+                        Text(
+                            text = anggotaTimEntity.nim,
+                            style = TextStyle(
+                                fontFamily = PoppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 12.sp,
+                                platformStyle = PlatformTextStyle(
+                                    includeFontPadding = false
+                                )
                             )
                         )
+                        Spacer(modifier = Modifier.height(12.dp))
                     }
                 }
             }
@@ -321,7 +244,7 @@ fun ListPplCard(
 @Composable
 fun WilayahKerjaCard(
     listWilayah: List<WilayahEntity>,
-    listSampelRutaEntity: List<SampelRutaEntity>
+    listAllSampelRuta: List<SampelRutaEntity>
 ) {
     // Second Card - Add another Card element here
     Card(
@@ -403,7 +326,7 @@ fun WilayahKerjaCard(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Text(
-                                        text = "${listSampelRutaEntity.size}",
+                                        text = "${listAllSampelRuta.filter { it.idBS == wilayah.idBS }.size}",
                                         fontFamily = PoppinsFontFamily,
                                         fontWeight = FontWeight.Medium,
                                         fontSize = 30.sp,
@@ -434,7 +357,7 @@ fun WilayahKerjaCard(
 
 @Composable
 fun StatusListingCard(
-    dataTimWithAll: DataTimWithAll
+    listWilayah: List<WilayahEntity>
 ) {
     Card(
         modifier = Modifier
@@ -467,82 +390,77 @@ fun StatusListingCard(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (dataTimWithAll.listMahasiswaWithAll!!.isNotEmpty()) {
-                        dataTimWithAll.listMahasiswaWithAll!!.forEach { mahasiswaWithAll ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                start = 10.dp,
+                                top = 10.dp,
+                                end = 10.dp
+                            ),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
                             Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(
-                                        start = 10.dp,
-                                        top = 10.dp,
-                                        end = 10.dp
-                                    ),
+                                modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Column {
-                                    if (mahasiswaWithAll.listWilayahWithAll!!.isNotEmpty()) {
-                                        mahasiswaWithAll.listWilayahWithAll!!.forEach { wilayahWithAll ->
-                                            Row(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.SpaceBetween,
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                Column {
-                                                    Text(
-                                                        text = wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.noBS,
-                                                        style = TextStyle(
-                                                            fontFamily = PoppinsFontFamily,
-                                                            fontWeight = FontWeight.Medium,
-                                                            fontSize = 18.sp,
-                                                            platformStyle = PlatformTextStyle(
-                                                                includeFontPadding = false
-                                                            )
-                                                        ),
-                                                        color = Color.DarkGray
-                                                    )
-                                                    Text(
-                                                        text = wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.namaKel!!,
-                                                        style = TextStyle(
-                                                            fontFamily = PoppinsFontFamily,
-                                                            fontWeight = FontWeight.Medium,
-                                                            fontSize = 14.sp,
-                                                            platformStyle = PlatformTextStyle(
-                                                                includeFontPadding = false
-                                                            )
-                                                        )
-                                                    )
-                                                    Text(
-                                                        text = wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.namaKec!!,
-                                                        style = TextStyle(
-                                                            fontFamily = PoppinsFontFamily,
-                                                            fontWeight = FontWeight.Medium,
-                                                            fontSize = 14.sp,
-                                                            platformStyle = PlatformTextStyle(
-                                                                includeFontPadding = false
-                                                            )
-                                                        )
-                                                    )
-                                                }
-                                                Text(
-                                                    text = wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.status!!.uppercase(Locale.getDefault()),
-                                                    style = TextStyle(
-                                                        fontFamily = PoppinsFontFamily,
-                                                        fontWeight = FontWeight.Medium,
-                                                        fontSize = 20.sp,
-                                                        platformStyle = PlatformTextStyle(
-                                                            includeFontPadding = false
-                                                        )
-                                                    )
+                                listWilayah.forEach { wilayahEntity ->
+                                    Column {
+                                        Text(
+                                            text = wilayahEntity.noBS,
+                                            style = TextStyle(
+                                                fontFamily = PoppinsFontFamily,
+                                                fontWeight = FontWeight.Medium,
+                                                fontSize = 18.sp,
+                                                platformStyle = PlatformTextStyle(
+                                                    includeFontPadding = false
                                                 )
-                                            }
-                                        }
+                                            ),
+                                            color = Color.DarkGray
+                                        )
+                                        Text(
+                                            text = wilayahEntity.namaKel,
+                                            style = TextStyle(
+                                                fontFamily = PoppinsFontFamily,
+                                                fontWeight = FontWeight.Medium,
+                                                fontSize = 14.sp,
+                                                platformStyle = PlatformTextStyle(
+                                                    includeFontPadding = false
+                                                )
+                                            )
+                                        )
+                                        Text(
+                                            text = wilayahEntity.namaKec,
+                                            style = TextStyle(
+                                                fontFamily = PoppinsFontFamily,
+                                                fontWeight = FontWeight.Medium,
+                                                fontSize = 14.sp,
+                                                platformStyle = PlatformTextStyle(
+                                                    includeFontPadding = false
+                                                )
+                                            )
+                                        )
+
                                     }
+                                    Text(
+                                        text = wilayahEntity.status.uppercase(Locale.getDefault()),
+                                        style = TextStyle(
+                                            fontFamily = PoppinsFontFamily,
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 20.sp,
+                                            platformStyle = PlatformTextStyle(
+                                                includeFontPadding = false
+                                            )
+                                        )
+                                    )
                                 }
                             }
-                            Spacer(modifier = Modifier.height(12.dp))
                         }
                     }
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
             }
         }
@@ -550,11 +468,10 @@ fun StatusListingCard(
 }
 
 @Composable
-fun ProgresListingCard(
-    mahasiswaWithAll: MahasiswaWithAll
+fun ProgresCacahCard(
+    listWilayah: List<WilayahEntity>,
+    listAllSampelRuta: List<SampelRutaEntity>
 ) {
-    var jmlRuta by remember { mutableIntStateOf(0) }
-
     Card(
         modifier = Modifier
             .padding(16.dp)
@@ -568,7 +485,7 @@ fun ProgresListingCard(
     ) {
         Column {
             Text(
-                text = "Progres Listing".uppercase(),
+                text = "Progres Cacah".uppercase(),
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(8.dp),
@@ -586,53 +503,40 @@ fun ProgresListingCard(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (mahasiswaWithAll.listWilayahWithAll!!.isNotEmpty()) {
-                        mahasiswaWithAll.listWilayahWithAll!!.forEach { wilayahWithAll ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(
-                                        start = 10.dp,
-                                        top = 10.dp,
-                                        end = 10.dp
-                                    ),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column {
-                                    Text(
-                                        text = wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.noBS,
-                                        style = TextStyle(
-                                            fontFamily = PoppinsFontFamily,
-                                            fontWeight = FontWeight.Medium,
-                                            fontSize = 20.sp,
-                                            platformStyle = PlatformTextStyle(
-                                                includeFontPadding = false
-                                            )
-                                        ),
-                                        color = Color.DarkGray
+                    listWilayah.forEach { wilayahEntity ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    start = 10.dp,
+                                    top = 10.dp,
+                                    end = 10.dp
+                                ),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = wilayahEntity.noBS,
+                                style = TextStyle(
+                                    fontFamily = PoppinsFontFamily,
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 20.sp,
+                                    platformStyle = PlatformTextStyle(
+                                        includeFontPadding = false
                                     )
-                                }
-
-                                jmlRuta = 0
-
-                                if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
-                                    wilayahWithAll.listKeluargaWithRuta!!.forEach { keluarga ->
-                                        jmlRuta += keluarga.listRuta.size
-                                    }
-                                }
-
-                                AnimatedCircularProgressIndicator(
-                                    currentValue = jmlRuta,
-                                    maxValue = (if (wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.jmlRuta == 0) 99 else wilayahWithAll.wilayahWithKeluarga!!.wilayah!!.jmlRuta)!!,
-                                    progressBackgroundColor = PklPrimary100,
-                                    progressIndicatorColor = PklPrimary900,
-                                    completedColor = PklPrimary900,
-                                    circularIndicatorDiameter = 66.dp
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(12.dp))
+                                ),
+                                color = Color.DarkGray
+                            )
+                            AnimatedCircularProgressIndicator(
+                                currentValue = listAllSampelRuta.filter { it.status == "1" && it.idBS == wilayahEntity.idBS }.size,
+                                maxValue = (if (listAllSampelRuta.filter { it.idBS == wilayahEntity.idBS }.isEmpty()) 99 else listAllSampelRuta.filter { it.idBS == wilayahEntity.idBS }.size),
+                                progressBackgroundColor = PklPrimary100,
+                                progressIndicatorColor = PklPrimary900,
+                                completedColor = PklPrimary900,
+                                circularIndicatorDiameter = 66.dp
+                            )
                         }
+                        Spacer(modifier = Modifier.height(12.dp))
                     }
                 }
             }

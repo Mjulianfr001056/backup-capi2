@@ -4,8 +4,12 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.polstat.pkl.database.relation.WilayahWithAll
-import com.polstat.pkl.database.relation.WilayahWithRuta
+import com.polstat.pkl.database.entity.KeluargaEntity
+import com.polstat.pkl.database.entity.RutaEntity
+import com.polstat.pkl.database.entity.WilayahEntity
+import com.polstat.pkl.database.relation.KeluargaWithRuta
+import com.polstat.pkl.database.relation.RutaWithKeluarga
+import com.polstat.pkl.mapper.toKeluarga
 import com.polstat.pkl.mapper.toKeluargaDto
 import com.polstat.pkl.mapper.toRuta
 import com.polstat.pkl.mapper.toRutaDtoList
@@ -15,14 +19,16 @@ import com.polstat.pkl.model.request.JsonKlg
 import com.polstat.pkl.model.request.SyncRutaRequest
 import com.polstat.pkl.model.response.FinalisasiBSResponse
 import com.polstat.pkl.model.response.SyncRutaResponse
+import com.polstat.pkl.repository.KeluargaRepository
 import com.polstat.pkl.repository.LocalRutaRepository
 import com.polstat.pkl.repository.RemoteRutaRepository
 import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -34,10 +40,11 @@ import javax.inject.Inject
 class ListRutaViewModel @Inject constructor(
     private val sessionRepository: SessionRepository,
     private val wilayahRepository: WilayahRepository,
+    private val keluargaRepository: KeluargaRepository,
     private val localRutaRepository: LocalRutaRepository,
     private val remoteRutaRepository: RemoteRutaRepository,
     private val savedStateHandle: SavedStateHandle
-): ViewModel() {
+) : ViewModel() {
 
     companion object {
         private const val TAG = "CAPI63_LISTRUTA_VM"
@@ -47,27 +54,37 @@ class ListRutaViewModel @Inject constructor(
 
     val session = _session
 
+    val idBS = savedStateHandle.get<String>("idBS")
+
     val isMonitoring = savedStateHandle.get<Boolean>("isMonitoring")
 
-    val noBS = savedStateHandle.get<String>("noBS")
+    val isListRuta = savedStateHandle.get<Boolean>("isListRuta")
 
-    val kodeRuta = savedStateHandle.get<String>("kodeRuta")
+    private val _wilayah = MutableStateFlow(WilayahEntity())
 
-    val kodeKlg = savedStateHandle.get<String>("kodeKlg")
+    val wilayah = _wilayah.asStateFlow()
 
-    private val _wilayahWithRuta = MutableStateFlow(WilayahWithRuta())
+    private val _listKeluargaWithRuta = MutableStateFlow<List<KeluargaWithRuta>>(emptyList())
 
-    val wilayahWithRuta = _wilayahWithRuta.asStateFlow()
+    val listKeluargaWithRuta = _listKeluargaWithRuta.asStateFlow()
 
-    private val _wilayahWithAll = MutableStateFlow(WilayahWithAll())
+    private val _listRutaWithKeluarga = MutableStateFlow<List<RutaWithKeluarga>>(emptyList())
 
-    val wilayahWithAll = _wilayahWithAll.asStateFlow()
+    val listRutaWithKeluarga = _listRutaWithKeluarga.asStateFlow()
+
+    private val _listKeluargaByRuta = MutableStateFlow<List<KeluargaEntity>>(emptyList())
 
     private val _synchronizeRuta = MutableStateFlow(SyncRutaResponse())
 
+    val synchronizeRuta = _synchronizeRuta.asStateFlow()
+
     private val _finalisasiBSResponse = MutableStateFlow(FinalisasiBSResponse())
 
-    private val _deleteRuta = MutableStateFlow(Ruta())
+    val finalisasiBSResponse = _finalisasiBSResponse.asStateFlow()
+
+    private val _deleteRuta = MutableStateFlow(RutaEntity())
+
+    private val _deleteKeluarga = MutableStateFlow(KeluargaEntity())
 
     private val _errorMessage = MutableStateFlow("")
 
@@ -90,58 +107,80 @@ class ListRutaViewModel @Inject constructor(
     val successMessage = _successMessage.asStateFlow()
 
     init {
-        getWilayahWithAll(noBS.toString())
-        Log.d(TAG, "isMonitoring: $isMonitoring")
+        viewModelScope.launch {
+            idBS?.let {
+                getWilayah(it)
+                getListRutaWithKeluarga(it)
+                getListKeluargaWithRuta(it)
+            }
+        }
     }
 
-    private fun getWilayahWithAll(
-        noBS: String
-    ) {
-        viewModelScope.launch {
-            wilayahRepository.getWilayahWithAll(noBS).collectLatest { result ->
+    suspend fun getWilayah(idBS: String) {
+        viewModelScope.launch (Dispatchers.IO) {
+            wilayahRepository.getWilayah(idBS).collectLatest { result ->
                 when(result) {
-                    is Result.Success -> {
-                        result.data?.let { response ->
-                            _wilayahWithAll.value = response
-                            Log.d(TAG, "getWilayahWithAll success: $response")
-                        }
-                    }
-                    is Result.Loading -> {
-                        Log.d(TAG, "getWilayahWithAll: Loading...")
-                    }
                     is Result.Error -> {
                         result.message?.let { error ->
                             _errorMessage.value = error
+                            Log.e(TAG, "getWilayah: Error in getWilayah (${errorMessage.value})")
                         }
                         _showErrorToastChannel.send(true)
-                        Log.e(TAG, "getWilayahWithAll: Error in getWilayahWithAll")
+                    }
+                    is Result.Loading -> Log.d(TAG, "getWilayah: Loading...")
+                    is Result.Success -> {
+                        result.data?.let {
+                            _wilayah.value = it
+                            _successMessage.value = "Berhasil mendapatkan wilayah!"
+                            _showSuccessToastChannel.send(true)
+                            Log.d(TAG, "getWilayah succeed: ${wilayah.value}")
+                        }
                     }
                 }
             }
         }
     }
 
-    private fun getWilayahWithRuta(
-        noBS: String
-    ) {
-        viewModelScope.launch {
-            wilayahRepository.getWilayahWithRuta(noBS).collectLatest { result ->
+    suspend fun getListRutaWithKeluarga(idBS: String) {
+        viewModelScope.launch (Dispatchers.IO) {
+            localRutaRepository.getListRutaWithKeluarga(idBS).collectLatest { result ->
                 when(result) {
-                    is Result.Success -> {
-                        result.data?.let { response ->
-                            _wilayahWithRuta.value = response
-                            Log.d(TAG, "getWilayahWithRuta success: $response")
-                        }
-                    }
-                    is Result.Loading -> {
-                        Log.d(TAG, "getWilayahWithRuta: Loading...")
-                    }
                     is Result.Error -> {
                         result.message?.let { error ->
                             _errorMessage.value = error
+                            Log.e(TAG, "getListRutaWithKeluarga: Error in getListRutaWithKeluarga (${errorMessage.value})")
                         }
                         _showErrorToastChannel.send(true)
-                        Log.e(TAG, "getWilayahWithRuta: Error in getWilayahWithRuta")
+                    }
+                    is Result.Loading -> Log.d(TAG, "getListRutaWithKeluarga: Loading...")
+                    is Result.Success -> {
+                        result.data?.let {
+                            _listRutaWithKeluarga.value = it
+                            Log.d(TAG, "getListRutaWithKeluarga succeed: ${listRutaWithKeluarga.value}")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    suspend fun getListKeluargaWithRuta(idBS: String) {
+        viewModelScope.launch (Dispatchers.IO) {
+            keluargaRepository.getListKeluargaWithRuta(idBS).collectLatest { result ->
+                when(result) {
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            _errorMessage.value = error
+                            Log.e(TAG, "getListKeluargaWithRuta: Error in getListKeluargaWithRuta (${errorMessage.value})")
+                        }
+                        _showErrorToastChannel.send(true)
+                    }
+                    is Result.Loading -> Log.d(TAG, "getListKeluargaWithRuta: Loading...")
+                    is Result.Success -> {
+                        result.data?.let {
+                            _listKeluargaWithRuta.value = it
+                            Log.d(TAG, "getListKeluargaWithRuta succeed: ${listKeluargaWithRuta.value}")
+                        }
                     }
                 }
             }
@@ -149,29 +188,25 @@ class ListRutaViewModel @Inject constructor(
     }
 
     fun synchronizeRuta(
-        wilayahWithAll: WilayahWithAll,
+        listKeluargaWithRuta: List<KeluargaWithRuta>,
         nim: String,
-        noBS: String
+        idBS: String
     ) {
         val jsonKlgInstance = JsonKlg()
 
-        val wilayah = wilayahWithAll.wilayahWithKeluarga!!.wilayah
-
-        val updatedWilayah = wilayah!!.copy(status = "listing-selesai")
-
-        if (wilayahWithAll.listKeluargaWithRuta!!.isNotEmpty()) {
-            wilayahWithAll.listKeluargaWithRuta.forEach{ keluargaWithRuta ->
-                jsonKlgInstance.add(keluargaWithRuta.keluarga.toKeluargaDto(keluargaWithRuta.listRuta.toRutaDtoList()))
-            }
+        listKeluargaWithRuta.filter { it.keluarga.status != "fetch" }.forEach { keluargaWithRuta ->
+            val listFilteredRuta = keluargaWithRuta.listRuta.filter { it.status != "fetch" }
+            jsonKlgInstance.add(keluargaWithRuta.keluarga.toKeluargaDto(listFilteredRuta.toRutaDtoList()))
         }
 
         val syncRutaRequest = SyncRutaRequest(
             nim = nim,
-            no_bs = noBS,
+            id_bs = idBS,
             json = jsonKlgInstance
         )
+        Log.d(TAG, "synchronizeRuta: SyncRutaRequest $syncRutaRequest")
         viewModelScope.launch {
-//            val job = launch {
+            val synchronizeJob = async {
                 remoteRutaRepository.sinkronisasiRuta(syncRutaRequest).collectLatest { result ->
                     when (result) {
                         is Result.Success -> {
@@ -179,81 +214,88 @@ class ListRutaViewModel @Inject constructor(
                                 _synchronizeRuta.value = response
                                 _successMessage.value = "Berhasil melakukan sinkronisasi!"
                                 _showSuccessToastChannel.send(true)
-                                Log.d(
-                                    TAG, "synchronizeRuta succeed: $response"
-                                )
+                                Log.d(TAG, "synchronizeRuta succeed: ${_synchronizeRuta.value}")
                             }
                         }
 
-                        is Result.Loading -> {
-                            Log.d(
-                                TAG,
-                                "synchronizeRuta: Loading..."
-                            )
-                        }
+                        is Result.Loading -> Log.d(TAG, "synchronizeRuta: Loading...")
 
                         is Result.Error -> {
                             result.message?.let { error ->
                                 _errorMessage.value = error
+                                Log.e(TAG, "synchronizeRuta: Error in synchronizeRuta (${errorMessage.value})")
                             }
                             _showErrorToastChannel.send(true)
-                            Log.e(
-                                TAG,
-                                "synchronizeRuta: Error in synchronizeRuta"
-                            )
                         }
                     }
                 }
+            }
+            synchronizeJob.await()
+
+            //Hapus semua data keluarga dan ruta di lokal
+            val deleteAllKeluargaRutaAndRelationByWilayahJob = async {
+                localRutaRepository.deleteAllKeluargaRutaAndRelationByWilayah(idBS).collectLatest { message ->
+                    Log.d(TAG, message)
+                }
+            }
+            deleteAllKeluargaRutaAndRelationByWilayahJob.await()
+
+            //Update data wilayah terbaru
+            wilayahRepository.insertWilayah(synchronizeRuta.value.toWilayah()).collectLatest { message ->
+                Log.d(TAG, message)
+            }
+
+            synchronizeRuta.value.keluarga.forEach { klg ->
+                //Update data keluarga terbaru
+                keluargaRepository.insertKeluarga(klg, KeluargaRepository.Method.Fetch).collectLatest { message ->
+                    Log.d(TAG, message)
+                }
+                klg.ruta.forEach { ruta ->
+                    //Update data ruta terbaru
+                    localRutaRepository.insertRuta(ruta, LocalRutaRepository.Method.Fetch).collectLatest { message ->
+                        Log.d(TAG, message)
+                    }
+
+                    localRutaRepository.insertKeluargaAndRuta(klg.kodeKlg, ruta.kodeRuta).collectLatest { message ->
+                        Log.d(TAG, message)
+                    }
+                }
+            }
+
         }
     }
 
-    fun generateRuta(noBS: String) {
-        val wilayah = _wilayahWithAll.value.wilayahWithKeluarga!!.wilayah
-
-        val updatedWilayah = wilayah!!.copy(status = "telah-disampel")
-
+    fun generateSampel(idBS: String) {
         viewModelScope.launch {
-
-            val job = launch {
-                remoteRutaRepository.generateRuta(noBS).collectLatest { message ->
+            val generateRutaJob = async {
+                remoteRutaRepository.generateRuta(idBS).collectLatest { message ->
                     _successMessage.value = message
                     _showSuccessToastChannel.send(true)
                     Log.d(TAG, message)
                 }
             }
+            generateRutaJob.await()
 
-            job.join()
-
-            delay(2000)
-
-            val job2 = launch {
-                showErrorToastChannel.collectLatest { isError ->
-                    if (!isError) {
-                        launch {
-                            wilayahRepository.updateWilayah(
-                                updatedWilayah.toWilayah(emptyList()),
-                                _session!!.nim!!
-                            )
-                                .collectLatest { message ->
-                                    Log.d(TAG, message)
-                                }
-                        }
-                    }
-                }
+            if (successMessage.value == "Berhasil Ambil Sampel!") {
+                updateWilayah(wilayah.value, "telah-disampel")
+                Log.d(TAG, "generateSampel: status BS berhasil diupdate!")
+            } else {
+                Log.d(TAG, "generateSampel: status BS gagal diupdate!")
             }
-
-            job2.join()
-
-            delay(1000)
-
-            launch {
-                _showErrorToastChannel.send(false)
+        }
+    }
+    
+    suspend fun updateWilayah(wilayahEntity: WilayahEntity, statusBS: String) {
+        val updatedWilayah = wilayahEntity.copy(status = statusBS)
+        viewModelScope.launch { 
+            wilayahRepository.updateWilayah(updatedWilayah).collectLatest { message ->
+                Log.d(TAG, message)
             }
-
         }
     }
 
-    fun deleteRuta(
+
+    suspend fun deleteRuta(
         kodeRuta: String
     ) {
         viewModelScope.launch {
@@ -262,19 +304,19 @@ class ListRutaViewModel @Inject constructor(
                     when (result) {
                         is Result.Success -> {
                             result.data?.let { response ->
-                                _deleteRuta.value = response.toRuta()
+                                _deleteRuta.value = response
                                 Log.d(TAG, "getRuta succeed: $response")
                             }
                         }
-                        is Result.Loading -> {
-                            Log.d(TAG, "getRuta: Loading...")
-                        }
+
+                        is Result.Loading -> Log.d(TAG, "getRuta: Loading...")
+
                         is Result.Error -> {
                             result.message?.let { error ->
                                 _errorMessage.value = error
+                                Log.e(TAG, "getRuta: Error in getRuta (${errorMessage.value}")
                             }
-                            _showErrorToastChannel.send(true)
-                            Log.e(TAG, "getRuta: Error in getRuta")
+//                            _showErrorToastChannel.send(true)
                         }
                     }
                 }
@@ -282,93 +324,116 @@ class ListRutaViewModel @Inject constructor(
 
             job.join() // Menunggu hingga coroutine di atas selesai
 
-            launch {
-                Log.d(TAG, "deleted ruta: ${_deleteRuta.value}")
-                localRutaRepository.fakeDeleteRuta(_deleteRuta.value).collectLatest { message ->
+            val job2 = launch {
+                Log.d(TAG, "deleted ruta: ${_deleteRuta.value.toRuta()}")
+                localRutaRepository.fakeDeleteRuta(_deleteRuta.value.toRuta()).collectLatest { message ->
+                    Log.d(TAG, message)
+                }
+            }
+            job2.join()
+
+            val job3 = launch {
+                keluargaRepository.getAllKeluargaByRuta(_deleteRuta.value.kodeRuta).collectLatest { result ->
+                    when (result) {
+                        is Result.Error -> {
+                            result.message?.let { error ->
+                                _errorMessage.value = error
+                                Log.e(TAG, "getAllKeluargaByRuta: Error in getAllKeluargaByRuta (${errorMessage.value}")
+                            }
+//                            _showErrorToastChannel.send(true)
+                        }
+
+                        is Result.Loading ->  Log.d(TAG, "getRuta: Loading...")
+
+                        is Result.Success -> {
+                            result.data?.let {
+                                _listKeluargaByRuta.value = it
+                                Log.d(TAG, "getAllKeluargaByRuta succeed: ${_listKeluargaByRuta.value}")
+                            }
+                        }
+                    }
+                }
+            }
+            job3.join()
+
+            _listKeluargaByRuta.value.forEach { keluargaEntity ->
+                val updatedKlg = keluargaEntity.copy(status = "update")
+                Log.d(TAG, "deleteRuta: updatedKlg ${updatedKlg.toKeluarga()}")
+                keluargaRepository.updateKeluarga(updatedKlg.toKeluarga()).collectLatest { message ->
                     Log.d(TAG, message)
                 }
             }
         }
     }
 
-    fun finalisasiBS(
-        noBS: String
-    ) {
-        val wilayah = _wilayahWithAll.value.wilayahWithKeluarga!!.wilayah
-
-        val updatedWilayah = wilayah!!.copy(status = "listing-selesai")
-
+    suspend fun deleteKeluarga(kodeKlg: String) {
         viewModelScope.launch {
-            val job = launch {
-                remoteRutaRepository.finalisasiBS(noBS).collectLatest { result ->
+            val getKeluargaJob = async {
+                keluargaRepository.getKeluarga(kodeKlg).collectLatest { result ->
+                    when(result) {
+                        is Result.Error -> {
+                            result.message?.let { error ->
+                                _errorMessage.value = error
+                            }
+                        }
+                        is Result.Loading -> Log.d(TAG, "getKeluarga: Loading...")
+                        is Result.Success -> {
+                            result.data?.let {
+                                _deleteKeluarga.value = it
+                                Log.d(TAG, "deleteKeluarga: Berhasil mendapatkan keluarga! ${_deleteKeluarga.value}")
+                            }
+                        }
+                    }
+                }
+            }
+            getKeluargaJob.await()
+
+            Log.d(TAG, "deleteKeluarga: fakeDeleteKeluarga ${_deleteKeluarga.value.toKeluarga()}")
+            keluargaRepository.fakeDeleteKeluarga(_deleteKeluarga.value.toKeluarga()).collectLatest { message ->
+                Log.d(TAG, message)
+            }
+        }
+    }
+
+    fun finalisasiBS(
+        idBS: String
+    ) {
+        viewModelScope.launch {
+            val finalisasiBSJob = async {
+                remoteRutaRepository.finalisasiBS(idBS).collectLatest { result ->
                     when (result) {
                         is Result.Success -> {
                             result.data?.let { response ->
                                 _finalisasiBSResponse.value = response
-                                Log.d(
-                                    TAG, "finalisasiBS succeed: $response"
-                                )
-                                _successMessage.value = "Berhasil melakukan finalisasi BS!"
+                                Log.d(TAG, "finalisasiBS succeed: $response")
+                                _successMessage.value = "Berhasil melakukan finalisasi blok sensus!"
                                 _showSuccessToastChannel.send(true)
                             }
                         }
 
-                        is Result.Loading -> {
-                            Log.d(
-                                TAG, "finalisasiBS: Loading..."
-                            )
-                        }
+                        is Result.Loading -> Log.d(TAG, "finalisasiBS: Loading...")
 
                         is Result.Error -> {
                             result.message?.let { error ->
                                 _errorMessage.value = error
                             }
                             _showErrorToastChannel.send(true)
-                            Log.e(
-                                TAG, "finalisasiBS: Error in finalisasiBS"
-                            )
+                            Log.e(TAG, "finalisasiBS: Error in finalisasiBS (${errorMessage.value})")
                         }
                     }
                 }
             }
+            finalisasiBSJob.await()
 
-            job.join()
-
-            delay(2000)
-
-            val job2 = launch {
-                _finalisasiBSResponse.value.data?.forEach { ruta ->
-                    localRutaRepository.updateRuta(ruta).collectLatest { message ->
+            finalisasiBSResponse.value.data?.forEach { ruta ->
+                //Update data ruta terbaru
+                localRutaRepository.insertRuta(ruta, LocalRutaRepository.Method.Fetch)
+                    .collectLatest { message ->
                         Log.d(TAG, message)
                     }
-                }
             }
 
-            job2.join()
-
-            val job3 = launch {
-                showErrorToastChannel.collectLatest { isError ->
-                    if (!isError) {
-                        launch {
-                            wilayahRepository.updateWilayah(
-                                updatedWilayah.toWilayah(emptyList()),
-                                _session!!.nim!!
-                            )
-                                .collectLatest { message ->
-                                    Log.d(TAG, message)
-                                }
-                        }
-                    }
-                }
-            }
-
-            job3.join()
-
-            delay(1000)
-
-            launch {
-                _showErrorToastChannel.send(false)
-            }
+            updateWilayah(wilayah.value, "listing-selesai")
         }
     }
 
@@ -381,5 +446,4 @@ class ListRutaViewModel @Inject constructor(
             nama
         }
     }
-
 }

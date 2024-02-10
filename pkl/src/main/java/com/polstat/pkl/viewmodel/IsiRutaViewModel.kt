@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.database.entity.KeluargaEntity
 import com.polstat.pkl.database.entity.RutaEntity
-import com.polstat.pkl.database.relation.WilayahWithAll
 import com.polstat.pkl.model.domain.Keluarga
 import com.polstat.pkl.model.domain.Lokasi
 import com.polstat.pkl.model.domain.Ruta
@@ -39,15 +38,13 @@ class IsiRutaViewModel @Inject constructor(
         private const val TAG = "CAPI63_ISI_RUTA_VM"
     }
 
-    private val _session = sessionRepository.getActiveSession()
-
-    val session = _session
+    private val session = sessionRepository.getActiveSession()
 
     private val _state = MutableStateFlow(IsiRutaScreenState())
 
     val state = _state.asStateFlow()
 
-    val noBS = savedStateHandle.get<String>("noBS").orEmpty()
+    val idBS = savedStateHandle.get<String>("idBS").orEmpty()
 
     private val _lastKeluarga = MutableStateFlow(KeluargaEntity())
 
@@ -67,11 +64,7 @@ class IsiRutaViewModel @Inject constructor(
 
     private val _lokasi = MutableStateFlow(Lokasi())
 
-    val lokasi = _lokasi.asStateFlow()
-
-    private val _wilayahWithAll = MutableStateFlow(WilayahWithAll())
-
-    val wilayahWithAll = _wilayahWithAll.asStateFlow()
+    private val lokasi = _lokasi.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -87,43 +80,38 @@ class IsiRutaViewModel @Inject constructor(
         }
     }
 
-    fun incrementStringNoSegmen(input: String): String {
-        val numberPart = input.filter { it.isDigit() }
-        val incrementedNumber = numberPart.toInt() + 10
-        return "S" + String.format("%03d", incrementedNumber)
-    }
-
-    fun setInitialKlgValue() {
+    private fun setInitialKlgValue() {
         _state.value = state.value.copy(
-            SLS = lastKeluarga.value.SLS,
+            SLS = lastKeluarga.value.banjar,
             noSegmen = incrementStringNoSegmen(lastKeluarga.value.noSegmen),
-            noBgFisik = lastKeluarga.value.noBgFisik,
-            noBgSensus = lastKeluarga.value.noBgSensus
+            noBgFisik = UtilFunctions.convertStringToNumber(lastKeluarga.value.noBgFisik).plus(1).toString(),
+            noBgSensus = UtilFunctions.convertStringToNumber(lastKeluarga.value.noBgSensus).plus(1).toString()
         )
         Log.d(TAG, "setInitialKlgValue: ${state.value}")
     }
 
-    fun insertRuta(
+    private fun insertRuta(
         ruta: Ruta
     ){
         viewModelScope.launch {
-            localRutaRepository.insertRuta(ruta).collectLatest { message ->
+            localRutaRepository.insertRuta(ruta, LocalRutaRepository.Method.Insert).collectLatest { message ->
                 Log.d(TAG, message)
             }
         }
     }
 
-    fun insertKeluarga(
+    private fun insertKeluarga(
         keluarga: Keluarga
     ) {
         viewModelScope.launch {
-            keluargaRepository.insertKeluarga(keluarga).collectLatest { message ->
-                Log.d(TAG, message)
+            keluargaRepository.insertKeluarga(keluarga, KeluargaRepository.Method.Insert)
+                .collectLatest { message ->
+                    Log.d(TAG, message)
             }
         }
     }
 
-    fun insertKeluargaAndRuta(
+    private fun insertKeluargaAndRuta(
         kodeKlg: String,
         kodeRuta: String
     ) {
@@ -145,20 +133,21 @@ class IsiRutaViewModel @Inject constructor(
         }
     }
 
-    suspend fun getLastKeluarga(): KeluargaEntity {
+    private suspend fun getLastKeluarga(): KeluargaEntity {
         var keluargaEntity = KeluargaEntity(
             kodeKlg = "",
-            SLS = "",
-            noBgFisik = "",
-            noBgSensus = "",
-            noSegmen = "",
-            noUrutKlg = 0,
+            banjar = "",
+            noBgFisik = "0",
+            noBgSensus = "0",
+            noSegmen = "S000",
+            noUrutKlg = "0",
             noUrutKlgEgb = 0,
             namaKK = "",
             alamat = "",
             isGenzOrtu = 0,
             penglMkn = 0,
-            noBS = "",
+            idBS = "",
+            nimPencacah = "",
             status = ""
         )
 
@@ -181,20 +170,21 @@ class IsiRutaViewModel @Inject constructor(
         return keluargaEntity
     }
 
-    suspend fun getLastKeluargaEgb(): KeluargaEntity {
+    private suspend fun getLastKeluargaEgb(): KeluargaEntity {
         var keluargaEntity = KeluargaEntity(
             kodeKlg = "",
-            SLS = "",
-            noBgFisik = "",
-            noBgSensus = "",
-            noSegmen = "",
-            noUrutKlg = 0,
+            banjar = "",
+            noBgFisik = "0",
+            noBgSensus = "0",
+            noSegmen = "S000",
+            noUrutKlg = "0",
             noUrutKlgEgb = 0,
             namaKK = "",
             alamat = "",
             isGenzOrtu = 0,
             penglMkn = 0,
-            noBS = "",
+            idBS = "",
+            nimPencacah = "",
             status = ""
         )
 
@@ -217,19 +207,21 @@ class IsiRutaViewModel @Inject constructor(
         return keluargaEntity
     }
 
-    suspend fun getLastRuta(): RutaEntity {
+    private suspend fun getLastRuta(): RutaEntity {
         var rutaEntity = RutaEntity(
             kodeRuta = "",
-            noUrutRuta = 0,
+            noUrutRuta = "0",
             noUrutEgb = 0,
             kkOrKrt = "",
             namaKrt = "",
-            genzOrtu = 0,
+            jmlGenzAnak = 0,
+            jmlGenzDewasa = 0,
             katGenz = 0,
-            long = 0.0,
-            lat = 0.0,
+            longitude = 0.0,
+            latitude = 0.0,
             catatan = "",
-            noBS = "",
+            idBS = "",
+            nimPencacah = "",
             status = ""
         )
 
@@ -252,21 +244,22 @@ class IsiRutaViewModel @Inject constructor(
         return rutaEntity
     }
 
-    fun getRuta(noRuta: String) {
+    fun getRuta(kodeRuta: String) {
         viewModelScope.launch {
-            localRutaRepository.getRuta(noRuta).collectLatest { result ->
+            localRutaRepository.getRuta(kodeRuta).collectLatest { result ->
                 when(result) {
                     is Result.Success -> {
-                        _ruta.value = result.data!!
+                        result.data?.let {
+                            _ruta.value = it
+                        }
                     }
                     is Result.Error -> {
                         result.message?.let { error ->
-                            Log.d(TAG, "Error getLastRuta: $error")
+                            Log.d(TAG, "Error getRuta: $error")
                         }
                     }
-
                     is Result.Loading -> {
-                        Log.d(TAG, "getLastRuta: Loading...")
+                        Log.d(TAG, "getRuta: Loading...")
                     }
                 }
             }
@@ -299,7 +292,7 @@ class IsiRutaViewModel @Inject constructor(
 
                 val updatedState = when {
                     state.value.listNoUrutKlg.isEmpty() || diff > 0 -> {
-                        val newElements = List(event.jmlKlg) { lastKeluarga.value.noUrutKlg + it + 1 }
+                        val newElements = List(event.jmlKlg) { UtilFunctions.convertStringToNumber(lastKeluarga.value.noUrutKlg) + it + 1 }.map { it.toString() }
                         state.value.copy(
                             listNoUrutKlg = newElements,
                             listNamaKK = state.value.listNamaKK + List(diff) { "" },
@@ -310,7 +303,8 @@ class IsiRutaViewModel @Inject constructor(
                             listNoUrutRuta = state.value.listNoUrutRuta + List(diff) { emptyList() },
                             listKkOrKrt = state.value.listKkOrKrt + List(diff) { emptyList() },
                             listNamaKrt = state.value.listNamaKrt + List(diff) { emptyList() },
-                            listGenzOrtu = state.value.listGenzOrtu + List(diff) { emptyList() },
+                            listJmlGenzAnak = state.value.listJmlGenzAnak + List(diff) { emptyList() },
+                            listJmlGenzDewasa = state.value.listJmlGenzDewasa + List(diff) { emptyList() },
                             listKatGenz = state.value.listKatGenz + List(diff) { emptyList() },
                             listLong = state.value.listLong + List(diff) { emptyList() },
                             listLat = state.value.listLat + List(diff) { emptyList() }
@@ -328,7 +322,8 @@ class IsiRutaViewModel @Inject constructor(
                             listNoUrutRuta = state.value.listNoUrutRuta.take(newSize),
                             listKkOrKrt = state.value.listKkOrKrt.take(newSize),
                             listNamaKrt = state.value.listNamaKrt.take(newSize),
-                            listGenzOrtu = state.value.listGenzOrtu.take(newSize),
+                            listJmlGenzAnak = state.value.listJmlGenzAnak.take(newSize),
+                            listJmlGenzDewasa = state.value.listJmlGenzDewasa.take(newSize),
                             listKatGenz = state.value.listKatGenz.take(newSize),
                             listLong = state.value.listLong.take(newSize),
                             listLat = state.value.listLat.take(newSize)
@@ -350,7 +345,8 @@ class IsiRutaViewModel @Inject constructor(
                 Log.d(TAG, "onEvent: listPenglMkn ${state.value.listPenglMkn}")
                 Log.d(TAG, "onEvent: listNoUrutRuta ${state.value.listNoUrutRuta}")
                 Log.d(TAG, "onEvent: listKkOrKrt ${state.value.listKkOrKrt}")
-                Log.d(TAG, "onEvent: listGenzOrtu ${state.value.listGenzOrtu}")
+                Log.d(TAG, "onEvent: listJmlGenzAnak ${state.value.listJmlGenzAnak}")
+                Log.d(TAG, "onEvent: listJmlGenzDewasa ${state.value.listJmlGenzDewasa}")
                 Log.d(TAG, "onEvent: listKatGenz ${state.value.listKatGenz}")
                 Log.d(TAG, "onEvent: listLong ${state.value.listLong}")
                 Log.d(TAG, "onEvent: listLat ${state.value.listLat}")
@@ -374,11 +370,11 @@ class IsiRutaViewModel @Inject constructor(
             is IsiRutaScreenEvent.IsGenzOrtuChanged -> {
                 val newListIsGenzOrtu = state.value.listIsGenzOrtu.toMutableList()
                 newListIsGenzOrtu[index] = event.isGenzOrtu
-                
+
                 _state.emit(state.value.copy(listIsGenzOrtu = newListIsGenzOrtu))
-                
+
                 val newListNoUrutKlgEgb = state.value.listNoUrutKlgEgb.toMutableList()
-                
+
                 if (newListIsGenzOrtu[index] > 0) {
                     val maxElement = newListNoUrutKlgEgb.maxOrNull()
                     if (maxElement == 0) {
@@ -408,9 +404,10 @@ class IsiRutaViewModel @Inject constructor(
                     state.value.listNoUrutRuta[index].isEmpty() || diff > 0 -> {
                         val newListNoUrutRuta = state.value.listNoUrutRuta.toMutableList()
                         newListNoUrutRuta[index] = if (index == 0) {
-                            (lastRuta.value.noUrutRuta + 1..lastRuta.value.noUrutRuta  + newSize).toList()
+                            (UtilFunctions.convertStringToNumber(lastRuta.value.noUrutRuta) + 1..UtilFunctions.convertStringToNumber(lastRuta.value.noUrutRuta) + newSize).toList().map { it.toString() }
+
                         } else {
-                            ((newListNoUrutRuta[index - 1].maxOrNull()?.plus(1) ?: 0)..(newListNoUrutRuta[index - 1].maxOrNull()?.plus(newSize) ?: 0)).toList()
+                            ((newListNoUrutRuta[index - 1].map { UtilFunctions.convertStringToNumber(it) }.max().plus(1))..(newListNoUrutRuta[index - 1].map { UtilFunctions.convertStringToNumber(it) }.max().plus(newSize))).toList().map { it.toString() }
                         }
 
                         val newListKkOrKrt = state.value.listKkOrKrt.toMutableList()
@@ -419,8 +416,11 @@ class IsiRutaViewModel @Inject constructor(
                         val newListNamaKrt = state.value.listNamaKrt.toMutableList()
                         newListNamaKrt[index] = state.value.listNamaKrt[index] + List(diff) { "" }
 
-                        val newListGenzOrtu = state.value.listGenzOrtu.toMutableList()
-                        newListGenzOrtu[index] = state.value.listGenzOrtu[index] + List(diff) { 0 }
+                        val newListJmlGenzAnak = state.value.listJmlGenzAnak.toMutableList()
+                        newListJmlGenzAnak[index] = state.value.listJmlGenzAnak[index] + List(diff) { 0 }
+
+                        val newListJmlGenzDewasa = state.value.listJmlGenzDewasa.toMutableList()
+                        newListJmlGenzDewasa[index] = state.value.listJmlGenzDewasa[index] + List(diff) { 0 }
 
                         val newListKatGenz = state.value.listKatGenz.toMutableList()
                         newListKatGenz[index] = state.value.listKatGenz[index] + List(diff) { 0 }
@@ -431,18 +431,12 @@ class IsiRutaViewModel @Inject constructor(
                         val newListLat = state.value.listLat.toMutableList()
                         newListLat[index] = state.value.listLat[index] + List(diff) { 0.0 }
 
-//                        val newListKkOrKrt = updateList(state.value.listKkOrKrt, index, diff, "")
-//                        val newListNamaKrt = updateList(state.value.listNamaKrt, index, diff, "")
-//                        val newListGenzOrtu = updateList(state.value.listGenzOrtu, index, diff, 0)
-//                        val newListKatGenz = updateList(state.value.listKatGenz, index, diff, 0)
-//                        val newListLong = updateList(state.value.listLong, index, diff, 0.0)
-//                        val newListLat = updateList(state.value.listLat, index, diff, 0.0)
-
                         state.value.copy(
                             listNoUrutRuta = newListNoUrutRuta,
                             listKkOrKrt = newListKkOrKrt,
                             listNamaKrt = newListNamaKrt,
-                            listGenzOrtu = newListGenzOrtu,
+                            listJmlGenzAnak = newListJmlGenzAnak,
+                            listJmlGenzDewasa = newListJmlGenzDewasa,
                             listKatGenz = newListKatGenz,
                             listLong = newListLong,
                             listLat = newListLat,
@@ -450,39 +444,11 @@ class IsiRutaViewModel @Inject constructor(
                     }
 
                     diff < 0 -> {
-
-//                        val newListNoUrutRuta = state.value.listNoUrutRuta.mapIndexed { i, list ->
-//                            if (i == index) list.take(newSize).toMutableList() else list.toMutableList()
-//                        }.toMutableList()
-//
-//                        val newListKkOrKrt = state.value.listKkOrKrt.mapIndexed { i, list ->
-//                            if (i == index) list.take(newSize).toMutableList() else list.toMutableList()
-//                        }.toMutableList()
-//
-//                        val newListNamaKrt = state.value.listNamaKrt.mapIndexed { i, list ->
-//                            if (i == index) list.take(newSize).toMutableList() else list.toMutableList()
-//                        }.toMutableList()
-//
-//                        val newListGenzOrtu = state.value.listGenzOrtu.mapIndexed { i, list ->
-//                            if (i == index) list.take(newSize).toMutableList() else list.toMutableList()
-//                        }.toMutableList()
-//
-//                        val newListKatGenz = state.value.listKatGenz.mapIndexed { i, list ->
-//                            if (i == index) list.take(newSize).toMutableList() else list.toMutableList()
-//                        }.toMutableList()
-//
-//                        val newListLong = state.value.listLong.mapIndexed { i, list ->
-//                            if (i == index) list.take(newSize).toMutableList() else list.toMutableList()
-//                        }.toMutableList()
-//
-//                        val newListLat = state.value.listLat.mapIndexed { i, list ->
-//                            if (i == index) list.take(newSize).toMutableList() else list.toMutableList()
-//                        }.toMutableList()
-
                         val newListNoUrutRuta = updateListAtIndex(state.value.listNoUrutRuta, index, newSize)
                         val newListKkOrKrt = updateListAtIndex(state.value.listKkOrKrt, index, newSize)
                         val newListNamaKrt = updateListAtIndex(state.value.listNamaKrt, index, newSize)
-                        val newListGenzOrtu = updateListAtIndex(state.value.listGenzOrtu, index, newSize)
+                        val newListJmlGenzAnak = updateListAtIndex(state.value.listJmlGenzAnak, index, newSize)
+                        val newListJmlGenzDewasa = updateListAtIndex(state.value.listJmlGenzDewasa, index, newSize)
                         val newListKatGenz = updateListAtIndex(state.value.listKatGenz, index, newSize)
                         val newListLong = updateListAtIndex(state.value.listLong, index, newSize)
                         val newListLat = updateListAtIndex(state.value.listLat, index, newSize)
@@ -491,7 +457,8 @@ class IsiRutaViewModel @Inject constructor(
                             listNoUrutRuta = newListNoUrutRuta,
                             listKkOrKrt = newListKkOrKrt,
                             listNamaKrt = newListNamaKrt,
-                            listGenzOrtu = newListGenzOrtu,
+                            listJmlGenzAnak = newListJmlGenzAnak,
+                            listJmlGenzDewasa = newListJmlGenzDewasa,
                             listKatGenz = newListKatGenz,
                             listLong = newListLong,
                             listLat = newListLat,
@@ -510,7 +477,8 @@ class IsiRutaViewModel @Inject constructor(
 
                 Log.d(TAG, "onEvent: listNoUrutRuta ${state.value.listNoUrutRuta}, indexKlg: $index, indexRuta: $index2")
                 Log.d(TAG, "onEvent: listKkOrKrt ${state.value.listKkOrKrt}, indexKlg: $index, indexRuta: $index2")
-                Log.d(TAG, "onEvent: listGenzOrtu ${state.value.listGenzOrtu}, indexKlg: $index, indexRuta: $index2")
+                Log.d(TAG, "onEvent: listJmlGenzAnak ${state.value.listJmlGenzAnak}, indexKlg: $index, indexRuta: $index2")
+                Log.d(TAG, "onEvent: listJmlGenzDewasa ${state.value.listJmlGenzDewasa}, indexKlg: $index, indexRuta: $index2")
                 Log.d(TAG, "onEvent: listKatGenz ${state.value.listKatGenz}, indexKlg: $index, indexRuta: $index2")
                 Log.d(TAG, "onEvent: listLong ${state.value.listLong}, indexKlg: $index, indexRuta: $index2")
                 Log.d(TAG, "onEvent: listLat ${state.value.listLat}, indexKlg: $index, indexRuta: $index2")
@@ -537,12 +505,19 @@ class IsiRutaViewModel @Inject constructor(
                 }
                 _state.emit(state.value.copy(listNamaKrt = newListNamaKrt))
             }
-            is IsiRutaScreenEvent.GenzOrtuChanged -> {
-                val newListGenzOrtu = state.value.listGenzOrtu.toMutableList()
-                newListGenzOrtu[index] = newListGenzOrtu[index].toMutableList().apply {
-                    set(index2, event.genzOrtu)
+            is IsiRutaScreenEvent.JmlGenzAnakChanged -> {
+                val newListJmlGenzAnak = state.value.listJmlGenzAnak.toMutableList()
+                newListJmlGenzAnak[index] = newListJmlGenzAnak[index].toMutableList().apply {
+                    set(index2, event.jmlGenzAnak)
                 }
-                _state.emit(state.value.copy(listGenzOrtu = newListGenzOrtu))
+                _state.emit(state.value.copy(listJmlGenzAnak = newListJmlGenzAnak))
+            }
+            is IsiRutaScreenEvent.JmlGenzDewasaChanged -> {
+                val newListJmlGenzDewasa = state.value.listJmlGenzDewasa.toMutableList()
+                newListJmlGenzDewasa[index] = newListJmlGenzDewasa[index].toMutableList().apply {
+                    set(index2, event.jmlGenzDewasa)
+                }
+                _state.emit(state.value.copy(listJmlGenzDewasa = newListJmlGenzDewasa))
             }
             is IsiRutaScreenEvent.KatGenzChanged -> {
                 val newListKatGenz = state.value.listKatGenz.toMutableList()
@@ -554,8 +529,10 @@ class IsiRutaViewModel @Inject constructor(
 
             is IsiRutaScreenEvent.submit -> {
 
-                state.value.jmlKlg.let { it ->
-                    repeat(it) { indexKlg ->
+                if (state.value.jmlKlg == 0) {
+                    //Masih proses
+                } else {
+                    repeat(state.value.jmlKlg) { indexKlg ->
                         val keluarga = Keluarga(
                             SLS = state.value.SLS,
                             noSegmen = state.value.noSegmen,
@@ -567,45 +544,44 @@ class IsiRutaViewModel @Inject constructor(
                             isGenzOrtu = state.value.listIsGenzOrtu[indexKlg],
                             noUrutKlgEgb = state.value.listNoUrutKlgEgb[indexKlg],
                             penglMkn = state.value.listPenglMkn[indexKlg],
-                            noBS = noBS,
-                            kodeKlg = "K"+ noBS + UtilFunctions.convertTo3DigitsString(state.value.listNoUrutKlg[indexKlg]),
+                            idBS = idBS,
+                            kodeKlg = "K${idBS.takeLast(4)}${UtilFunctions.padWithZeros(state.value.listNoUrutKlg[indexKlg], 3)}",
+                            nimPencacah = session?.nim ?: "",
                             status = "insert"
                         )
 
                         insertKeluarga(keluarga)
 
-                        state.value.listPenglMkn[indexKlg].let { penglMkn ->
-                            repeat(penglMkn) { indexRuta ->
-                                val genzOrtuRuta = state.value.listGenzOrtu[indexKlg][indexRuta]
+                        repeat(state.value.listPenglMkn[indexKlg]) { indexRuta ->
+                            val ruta = Ruta(
+                                kodeRuta = "R${idBS.takeLast(4)}${UtilFunctions.padWithZeros(state.value.listNoUrutRuta[indexKlg][indexRuta], 3)}",
+                                noUrutRuta = state.value.listNoUrutRuta[indexKlg][indexRuta],
+                                noUrutEgb = 0,
+                                kkOrKrt = when (state.value.listKkOrKrt[indexKlg][indexRuta]) {
+                                    "Kepala Keluarga (KK) saja" -> "1"
+                                    "Kepala Rumah Tangga (KRT) saja" -> "2"
+                                    else -> "3"
+                                },
+                                namaKrt = state.value.listNamaKrt[indexKlg][indexRuta],
+                                jmlGenzAnak = state.value.listJmlGenzAnak[indexKlg][indexRuta],
+                                jmlGenzDewasa = state.value.listJmlGenzDewasa[indexKlg][indexRuta],
+                                katGenz = when {
+                                    state.value.listJmlGenzAnak[indexKlg][indexRuta] > 0 && state.value.listJmlGenzDewasa[indexKlg][indexRuta] == 0 -> 1
+                                    state.value.listJmlGenzAnak[indexKlg][indexRuta] == 0 && state.value.listJmlGenzDewasa[indexKlg][indexRuta] > 0 -> 2
+                                    state.value.listJmlGenzAnak[indexKlg][indexRuta] > 0 && state.value.listJmlGenzDewasa[indexKlg][indexRuta] > 0 -> 3
+                                    else -> 0
+                                },
+                                long = lokasi.value.longitude,
+                                lat = lokasi.value.latitude,
+                                catatan = "",
+                                idBS = idBS,
+                                nimPencacah = session?.nim ?: "",
+                                status = "insert"
+                            )
 
-                                val ruta = Ruta(
-                                    kodeRuta = "R$noBS${UtilFunctions.convertTo3DigitsString(state.value.listNoUrutRuta[indexKlg][indexRuta])}",
-                                    noUrutRuta = state.value.listNoUrutRuta[indexKlg][indexRuta],
-                                    noUrutEgb = 0,
-                                    kkOrKrt = when (state.value.listKkOrKrt[indexKlg][indexRuta]) {
-                                        "Kepala Keluarga (KK) saja" -> "1"
-                                        "Kepala Rumah Tangga (KRT) saja" -> "2"
-                                        else -> "3"
-                                    },
-                                    namaKrt = state.value.listNamaKrt[indexKlg][indexRuta],
-                                    isGenzOrtu = genzOrtuRuta,
-                                    katGenz = when {
-                                        genzOrtuRuta in 1..2 -> 1
-                                        genzOrtuRuta in 3..4 -> 2
-                                        genzOrtuRuta > 4 -> 3
-                                        else -> 0
-                                    },
-                                    long = lokasi.value.longitude,
-                                    lat = lokasi.value.latitude,
-                                    catatan = "",
-                                    noBS = noBS,
-                                    status = "insert"
-                                )
+                            insertRuta(ruta)
 
-                                insertRuta(ruta)
-
-                                insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
-                            }
+                            insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
                         }
                     }
                 }
@@ -623,7 +599,7 @@ class IsiRutaViewModel @Inject constructor(
         }
     }
 
-    fun <T> updateListAtIndex(list: List<List<T>>, index: Int, newSize: Int): List<List<T>> {
+    private fun <T> updateListAtIndex(list: List<List<T>>, index: Int, newSize: Int): List<List<T>> {
         return list.mapIndexed { i, listItem ->
             if (i == index) listItem.take(newSize).toMutableList() else listItem.toMutableList()
         }.toMutableList()
@@ -641,6 +617,75 @@ class IsiRutaViewModel @Inject constructor(
             set(index2, value)
         }
         _state.emit(updateState(state.value.copy()))
+    }
+
+    fun increment(input: String?): String {
+        val numericPart = input?.filter { it.isDigit() }
+        val number = numericPart?.toInt()
+        val formattedNumber = String.format("%0${numericPart?.length}d", number?.plus(1) ?: 0)
+        return input?.replaceFirst(numericPart.toString(), formattedNumber) ?: ""
+    }
+
+    fun decrement(input: String?): String {
+        val numericPart = input?.filter { it.isDigit() }
+        val number = numericPart?.toInt()
+        if (number != null) {
+            if (number < 1) {
+                return input.toString()
+            }
+        }
+        val formattedNumber = String.format("%0${numericPart?.length}d", number?.minus(1) ?: 0)
+        return input?.replaceFirst(numericPart.toString(), formattedNumber) ?: ""
+    }
+
+    fun incrementNoSegmen(input: String?): String {
+        val numericPart = input?.filter { it.isDigit() }
+        val number = numericPart?.toInt()
+        val formattedNumber = String.format("%0${numericPart?.length}d", number?.plus(10) ?: 0)
+        return input?.replaceFirst(numericPart.toString(), formattedNumber) ?: ""
+    }
+
+    private fun incrementStringNoSegmen(input: String): String {
+        val numberPart = input.filter { it.isDigit() }
+        val incrementedNumber = numberPart.toInt() + 10
+        return "S" + String.format("%03d", incrementedNumber)
+    }
+
+    fun decrementNoSegmen(input: String?): String {
+        val numericPart = input?.filter { it.isDigit() }
+        val number = numericPart?.toInt()
+        if (number != null) {
+            if (number < 10) {
+                return input.toString()
+            }
+        }
+        val formattedNumber = String.format("%0${numericPart?.length}d", number?.minus(10) ?: 0)
+        return input?.replaceFirst(numericPart.toString(), formattedNumber) ?: ""
+    }
+
+    fun incrementHuruf(input: String): String {
+        val lastChar = input.last()
+        return if (lastChar.isDigit()) {
+            input + "A"
+        } else {
+            val nextChar = if (lastChar == 'Z') 'A' else lastChar + 1
+            if (nextChar == 'A') {
+                input.dropLast(1) + nextChar + "A"
+            } else {
+                input.dropLast(1) + nextChar
+            }
+        }
+    }
+
+    fun decrementHuruf(input: String): String {
+        val lastChar = input.last()
+        return if (lastChar == 'A' && input.length > 1) {
+            input.dropLast(1)
+        } else if (lastChar > 'A') {
+            input.dropLast(1) + (lastChar - 1)
+        } else {
+            input
+        }
     }
 
 }

@@ -38,7 +38,6 @@ import org.odk.collect.pkl.ui.screen.components.NimTextField
 import org.odk.collect.pkl.ui.screen.components.PasswordTextField
 
 //@Preview(showBackground = true, apiLevel = 28)
-@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun LoginScreen(
     navController: NavController,
@@ -50,8 +49,8 @@ fun LoginScreen(
     val showLoading by viewModel.showLoadingChannel.collectAsState(false)
 
     LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
-        viewModel.showErrorToastChannel.collectLatest { show ->
-            if (show) {
+        viewModel.showErrorToastChannel.collectLatest { isError ->
+            if (isError) {
                 isLoginProcess = false
                 delay(1500)
                 Toast.makeText(context, viewModel.errorMessage.value, Toast.LENGTH_SHORT).show()

@@ -1,5 +1,7 @@
 package com.polstat.pkl.model.domain
 
+//single instance aja
+
 data class DataTim(
     val anggota: List<Mahasiswa> = emptyList(),
     val idTim: String = "[not set]",
