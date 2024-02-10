@@ -62,6 +62,7 @@ fun KeluargaEntity.toKeluargaDto(
         no_segmen = noSegmen,
         no_urut_klg = noUrutKlg,
         no_urut_klg_egb = noUrutKlgEgb,
+        pengl_mkn = penglMkn,
         ruta = ruta,
         nim_pencacah = nimPencacah,
         status = status

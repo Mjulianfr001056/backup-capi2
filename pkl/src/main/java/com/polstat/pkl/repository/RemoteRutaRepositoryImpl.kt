@@ -51,22 +51,31 @@ class RemoteRutaRepositoryImpl @Inject constructor(
         return flow {
             try{
                 rutaApi.generateSampel(noBS)
-                val message = "Berhasil Generate Sampel"
-                Log.d(TAG, "Generate Sampel berhasil !")
+                val message = "Berhasil Ambil Sampel!"
+                Log.d(TAG, message)
                 emit(message)
             } catch (e: IOException) {
-                val message = "Generate Sampel gagal !"
-                Log.d(TAG, "Generate Sampel gagal !", e)
+                val message = "Ambil Sampel gagal!: ${e.message}"
+                Log.d(TAG, message, e)
                 emit(message)
                 e.printStackTrace()
             } catch (e: HttpException) {
-                val message = "Generate Sampel gagal !"
-                Log.d(TAG, "Generate Sampel gagal !", e)
+//                val message = if (statusBS == "listing" && e.code() == 400) {
+//                    "Gagal ambil sampel: Blok Sensus belum di finalisasi!"
+//                } else if (statusBS == "telah-disampel" && e.code() == 400) {
+//                    "Gagal ambil sampel: Blok Sensus sudah pernah diambil sampel!"
+//                } else {
+//                    "Gagal ambil sampel!: ${e.message}"
+//                }
+
+                val message = "Gagal ambil sampel!: ${e.message}"
+
+                Log.d(TAG, message, e)
                 emit(message)
                 e.printStackTrace()
             } catch (e: Exception) {
-                val message = "Generate Sampel gagal !"
-                Log.d(TAG, "Generate Sampel gagal !", e)
+                val message = "Ambil Sampel gagal!: ${e.message}"
+                Log.d(TAG, message, e)
                 emit(message)
                 e.printStackTrace()
             }
@@ -80,19 +89,19 @@ class RemoteRutaRepositoryImpl @Inject constructor(
             emit(Result.Loading(true))
             val finalBSResponse = try {
                 val response = rutaApi.finalisasiBS(noBS)
-                Log.d(TAG, "Finalisasi BS Response berhasil:  $response")
+                Log.d(TAG, "Berhasil melakukan finalisasi blok sensus!")
                 response
             } catch (e: IOException) {
                 e.printStackTrace()
-                emit(Result.Error(message = e.localizedMessage ?: "Finalisasi Error"))
+                emit(Result.Error(message = ("Gagal finalisasi blok sensus!" + e.localizedMessage)))
                 return@flow
             } catch (e: HttpException) {
                 e.printStackTrace()
-                emit(Result.Error(message = e.localizedMessage ?: "Finalisasi Error"))
+                emit(Result.Error(message = ("Gagal finalisasi blok sensus!" + e.localizedMessage)))
                 return@flow
             } catch (e: Exception) {
                 e.printStackTrace()
-                emit(Result.Error(message = e.localizedMessage ?: "Finalisasi Error"))
+                emit(Result.Error(message = ("Gagal finalisasi blok sensus!" + e.localizedMessage)))
                 return@flow
             }
 

@@ -40,15 +40,31 @@ class WilayahRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateWilayah(wilayah: Wilayah): Flow<String> {
+    override suspend fun updateWilayah(wilayahEntity: WilayahEntity): Flow<String> {
         return  flow {
             try {
-                capi63Dao.updateWilayah(wilayah.toWilayahEntity())
+                capi63Dao.updateWilayah(wilayahEntity)
                 val message = "Berhasil mengupdate wilayah!"
                 Log.d(TAG, "updateWilayah: $message")
             } catch (e: Exception) {
                 val message = "Gagal mengupdate wilayah!"
                 Log.d(TAG, "updateWilayah: $message (${e.message})")
+            }
+        }
+    }
+
+    override suspend fun getWilayah(idBS: String): Flow<Result<WilayahEntity>> {
+        return flow {
+            try {
+                emit(Result.Loading(true))
+                val wilayah = capi63Dao.getWilayah(idBS)
+                Log.d(TAG, "Berhasil getWilayah: $wilayah")
+                emit(Result.Success(wilayah))
+            } catch (e: Exception) {
+                Log.d(TAG, "Gagal getWilayah: ${e.message}")
+                emit(Result.Error(null, "Error Get Wilayah: ${e.message}"))
+            } finally {
+                emit(Result.Loading(false))
             }
         }
     }

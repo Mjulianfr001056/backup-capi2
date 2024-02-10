@@ -42,6 +42,7 @@ class AuthRepositoryImpl @Inject constructor(
 
                     idTim = response.dataTim.idTim,
                     namaTim = response.dataTim.namaTim,
+                    namaPml = response.dataTim.namaPML,
                     nimPml = response.dataTim.nimPML,
                     noTlpPml = response.dataTim.teleponPML
                 )

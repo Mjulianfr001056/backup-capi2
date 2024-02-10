@@ -9,7 +9,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -18,12 +17,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddLocation
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.HomeWork
@@ -91,7 +88,7 @@ fun ListSampleScreen(
     viewModel: ListSampelViewModel
 ){
 
-    val noBS = viewModel.noBS
+    val idBS = viewModel.idBS
 
     val isMonitoring = viewModel.isMonitoring
 
@@ -108,6 +105,8 @@ fun ListSampleScreen(
     val isDataInserted = viewModel.isDataInserted.collectAsState()
 
     LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
+        viewModel.updateShowLoading(isDataInserted.value)
+
         viewModel.showErrorToastChannel.collectLatest { show ->
             if (show) {
                 delay(1500)
@@ -121,8 +120,7 @@ fun ListSampleScreen(
 
         viewModel.sampelRutaResponse.collectLatest { response ->
             if (isDataInserted.value) {
-//                viewModel.getSampelByBSFromDB(noBS!!)
-                viewModel.getSampelByBSFromDB("5104030014007B")
+                idBS?.let { viewModel.getSampelByBSFromDB(it) }
             }
         }
     }
@@ -142,7 +140,7 @@ fun ListSampleScreen(
                 modifier = Modifier.shadow(10.dp),
                 title = {
                     Text(
-                        text = "List Sample-${noBS}",
+                        text = "List Sample-${idBS?.takeLast(4)}",
                         style = TextStyle(
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.Medium,
@@ -165,7 +163,7 @@ fun ListSampleScreen(
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            imageVector = Icons.Filled.ArrowBack,
                             tint = Color.White,
                             contentDescription = "Back Icon",
                             modifier = Modifier.size(25.dp)
@@ -200,7 +198,7 @@ fun ListSampleScreen(
                         }
                         IconButton(onClick = {
 //                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${noBS}/$isMonitoring")
-                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/5104030014007B/$isMonitoring")
+                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/$idBS/$isMonitoring")
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Sync,
@@ -238,7 +236,7 @@ fun ListSampleScreen(
                         leadingIcon = {
                             IconButton(onClick = { showSearchBar = false }) {
                                 Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    imageVector = Icons.Filled.ArrowBack,
                                     contentDescription = stringResource(id = R.string.back_icon),
                                     tint = Color.White
                                 )

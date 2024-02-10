@@ -13,10 +13,11 @@ fun Ruta.toRutaEntity(): RutaEntity {
         kkOrKrt = kkOrKrt,
         namaKrt = namaKrt,
         catatan = catatan,
-        genzOrtu = isGenzOrtu,
+        jmlGenzAnak = jmlGenzAnak,
+        jmlGenzDewasa = jmlGenzDewasa,
         katGenz = katGenz,
-        lat = lat,
-        long = long,
+        latitude = lat,
+        longitude = long,
         nimPencacah = nimPencacah,
         status = status
     )
@@ -31,10 +32,11 @@ fun RutaEntity.toRuta(): Ruta {
         kkOrKrt = kkOrKrt,
         namaKrt = namaKrt,
         catatan = catatan,
-        isGenzOrtu = genzOrtu,
+        jmlGenzAnak = jmlGenzAnak,
+        jmlGenzDewasa = jmlGenzDewasa,
         katGenz = katGenz,
-        lat = lat,
-        long = long,
+        lat = latitude,
+        long = longitude,
         nimPencacah = nimPencacah,
         status = status
     )
@@ -43,10 +45,11 @@ fun RutaEntity.toRuta(): Ruta {
 fun RutaEntity.toRutaDto(): RutaDto {
     return RutaDto(
         catatan = catatan,
-        is_genz_ortu = genzOrtu,
+        jml_genz_anak = jmlGenzAnak,
+        jml_genz_dewasa = jmlGenzDewasa,
         kode_ruta = kodeRuta,
-        lat = lat,
-        long = long,
+        lat = latitude,
+        long = longitude,
         nama_krt = namaKrt,
         id_bs = idBS,
         no_urut_ruta = noUrutRuta,

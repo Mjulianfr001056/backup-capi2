@@ -1,6 +1,6 @@
 package org.odk.collect.pkl.navigation
 
-import EditRutaScreen
+//import EditRutaScreen
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -26,7 +26,7 @@ import org.odk.collect.pkl.ui.screen.ListRutaScreen
 import org.odk.collect.pkl.ui.screen.ListSampleScreen
 import org.odk.collect.pkl.ui.screen.LoginScreen
 import org.odk.collect.pkl.ui.screen.OnBoardingScreen
-import org.odk.collect.pkl.ui.screen.SalinRutaScreen
+//import org.odk.collect.pkl.ui.screen.SalinRutaScreen
 import org.odk.collect.pkl.ui.screen.SamplingScreen
 
 @Composable
@@ -110,12 +110,15 @@ fun SamplingNavHost(
                 )
             }
             composable(
-                route = CapiScreen.Listing.LIST_RUTA + "/{idBS}/{isMonitoring}",
+                route = CapiScreen.Listing.LIST_RUTA + "/{idBS}/{isMonitoring}/{isListRuta}",
                 arguments = listOf(
                     navArgument("idBS") {
                         type = NavType.StringType
                     },
                     navArgument("isMonitoring") {
+                        type = NavType.BoolType
+                    },
+                    navArgument("isListRuta") {
                         type = NavType.BoolType
                     }
                 )
@@ -168,10 +171,10 @@ fun SamplingNavHost(
                     }
                 )
             ) {
-                EditRutaScreen(
-                    navController = samplingNavController,
-                    viewModel = hiltViewModel()
-                )
+//                EditRutaScreen(
+//                    navController = samplingNavController,
+//                    viewModel = hiltViewModel()
+//                )
             }
 
             composable(
@@ -185,10 +188,10 @@ fun SamplingNavHost(
                     }
                 )
             ) {
-                SalinRutaScreen(
-                    navController = samplingNavController,
-                    viewModel = hiltViewModel()
-                )
+//                SalinRutaScreen(
+//                    navController = samplingNavController,
+//                    viewModel = hiltViewModel()
+//                )
             }
 
         }

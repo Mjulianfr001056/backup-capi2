@@ -12,6 +12,7 @@ data class KeluargaDto (
     val no_segmen: String?,
     val no_urut_klg: String?,
     val no_urut_klg_egb: Int?,
+    val pengl_mkn: Int?,
     val ruta: List<RutaDto>?,
     val nim_pencacah: String?,
     val status: String?

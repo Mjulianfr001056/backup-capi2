@@ -4,7 +4,9 @@ import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
 import com.polstat.pkl.database.dao.Capi63Dao
 import com.polstat.pkl.database.entity.KeluargaEntity
+import com.polstat.pkl.database.relation.KeluargaWithRuta
 import com.polstat.pkl.mapper.toKeluargaEntity
+import com.polstat.pkl.mapper.toRutaEntity
 import com.polstat.pkl.model.domain.Keluarga
 import com.polstat.pkl.utils.Result
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +29,7 @@ class KeluargaRepositoryImpl @Inject constructor(
             try {
                 val status = method.retrieveMethod()
                 val readyKlg = keluarga.copy(status = status)
-                val message = "Berhasil menambahkan keluarga!"
+                val message = "insertKeluarga: Berhasil menambahkan keluarga! $readyKlg"
 
                 capi63Dao.insertKeluarga(readyKlg.toKeluargaEntity())
                 emit(message)
@@ -39,6 +41,20 @@ class KeluargaRepositoryImpl @Inject constructor(
                 val message = "Gagal menambahkan keluarga! Kesalahan umum: ${e.message}"
                 Log.d(TAG, "insertKeluarga: $message")
                 emit(message)
+            }
+        }
+    }
+
+    override suspend fun fakeDeleteKeluarga(keluarga: Keluarga): Flow<String> {
+        return  flow {
+            try {
+                val updatedKlg = keluarga.copy(status = "delete")
+                capi63Dao.updateKeluarga(updatedKlg.toKeluargaEntity())
+                val message = "Berhasil menghapus keluarga!"
+                Log.d(TAG, "fakeDeleteKeluarga: $message $updatedKlg")
+            } catch (e: Exception) {
+                val message = "Gagal menghapus keluarga!"
+                Log.d(TAG, "fakeDeleteKeluarga: $message (${e.message})")
             }
         }
     }
@@ -163,6 +179,35 @@ class KeluargaRepositoryImpl @Inject constructor(
             } catch (e: Exception) {
                 val message = "Gagal menghapus seluruh keluarga!"
                 Log.d(TAG, "deleteAllKeluarga: $message (${e.message})")
+            }
+        }
+    }
+
+    override suspend fun deleteAllKeluargaByWilayah(idBS: String): Flow<String> {
+        return  flow {
+            try {
+                capi63Dao.deleteAllKeluargaByWilayah(idBS)
+                val message = "Berhasil menghapus seluruh keluarga by wilayah!"
+                Log.d(TAG, "deleteAllKeluargaByWilayah: $message")
+            } catch (e: Exception) {
+                val message = "Gagal menghapus seluruh keluarga by wilayah!"
+                Log.d(TAG, "deleteAllKeluargaByWilayah: $message (${e.message})")
+            }
+        }
+    }
+
+    override suspend fun getListKeluargaWithRuta(idBS: String): Flow<Result<List<KeluargaWithRuta>>> {
+        return flow {
+            try {
+                emit(Result.Loading(true))
+                val listKeluargaWithRuta = capi63Dao.getListKeluargaWithRuta(idBS)
+                Log.d(TAG, "Berhasil getListKeluargaWithRuta: $listKeluargaWithRuta")
+                emit(Result.Success(listKeluargaWithRuta))
+            } catch (e: Exception) {
+                Log.d(TAG, "Gagal getListKeluargaWithRuta: ${e.message}")
+                emit(Result.Error(null, "Error Get List Keluarga With Ruta: ${e.message}"))
+            } finally {
+                emit(Result.Loading(false))
             }
         }
     }

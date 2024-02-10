@@ -1,22 +1,19 @@
 package com.polstat.pkl.viewmodel
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.database.entity.AnggotaTimEntity
 import com.polstat.pkl.database.entity.SampelRutaEntity
 import com.polstat.pkl.database.entity.WilayahEntity
-import com.polstat.pkl.repository.DataTimRepository
+import com.polstat.pkl.repository.AnggotaTimRepository
 import com.polstat.pkl.repository.KeluargaRepository
 import com.polstat.pkl.repository.LocalRutaRepository
-import com.polstat.pkl.repository.MahasiswaRepository
 import com.polstat.pkl.repository.SampelRutaRepository
 import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,13 +25,11 @@ import javax.inject.Inject
 @HiltViewModel
 class BerandaViewModel @Inject constructor(
     private val sessionRepository: SessionRepository,
-    private val dataTimRepository: DataTimRepository,
     private val wilayahRepository: WilayahRepository,
-    private val keluargaRepository: KeluargaRepository,
-    private val localRutaRepository: LocalRutaRepository,
     private val sampelRutaRepository: SampelRutaRepository,
-    private val mahasiswaRepository: MahasiswaRepository,
-    private val sharedPreferences: SharedPreferences
+    private val anggotaTimRepository: AnggotaTimRepository,
+    private val keluargaRepository: KeluargaRepository,
+    private val localRutaRepository: LocalRutaRepository
 ) : ViewModel() {
 
     companion object {
@@ -64,19 +59,86 @@ class BerandaViewModel @Inject constructor(
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
     init {
-        viewModelScope.launch {
+        getAllWilayah()
+        getAllAnggotaTim()
+        getAllSampelRuta()
+    }
 
+    private fun getAllWilayah() {
+        viewModelScope.launch {
+            wilayahRepository.getAllWilayah().collectLatest { result ->
+                when (result) {
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            _errorMessage.value = error
+                            Log.e(TAG, "getAllWilayah: Error in getAllWilayah ($errorMessage)")
+                        }
+                        _showErrorToastChannel.send(true)
+                    }
+
+                    is Result.Loading -> Log.d(TAG, "getAllWilayah: Loading...")
+                    is Result.Success -> {
+                        result.data?.let {
+                            _listWilayah.value = it
+                            Log.d(TAG, "getAllWilayah: $listWilayah")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getAllAnggotaTim() {
+        viewModelScope.launch {
+            anggotaTimRepository.getAllAnggotaTim().collectLatest { result ->
+                when(result) {
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            _errorMessage.value = error
+                            Log.e(TAG, "getAllAnggotaTim: Error in getAllAnggotaTim ($errorMessage)")
+                        }
+                        _showErrorToastChannel.send(true)
+                    }
+                    is Result.Loading -> Log.d(TAG, "getAllAnggotaTim: Loading...")
+                    is Result.Success -> {
+                        result.data?.let {
+                            _listAnggotaTim.value = it
+                            Log.d(TAG, "getAllAnggotaTim: $listAnggotaTim")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getAllSampelRuta() {
+        viewModelScope.launch {
+            sampelRutaRepository.getAllSampelRuta().collectLatest { result ->
+                when(result) {
+                    is Result.Success -> {
+                        result.data?.let { response ->
+                            _listAllSampelRuta.value = response
+                            Log.d(TAG, "getAllSampelRuta succeed: $listAllSampelRuta")
+                        }
+                    }
+                    is Result.Loading -> {
+                        Log.d(TAG, "getAllSampelRutaByNoBS: Loading...")
+                    }
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            _errorMessage.value = error
+                            Log.e(TAG, "getAllSampelRuta: Error in getAllSampelRuta ($errorMessage)")
+                        }
+                        _showErrorToastChannel.send(true)
+                    }
+                }
+            }
         }
     }
 
     fun deleteAllLocalData() {
         viewModelScope.launch {
-
-            dataTimRepository.deleteAllDataTim().collectLatest { message ->
-                Log.d(TAG, "deleteAllLocalData: $message")
-            }
-
-            mahasiswaRepository.deleteAllMahasiswa().collectLatest { message ->
+            anggotaTimRepository.deleteAllAnggotaTim().collectLatest { message ->
                 Log.d(TAG, "deleteAllLocalData: $message")
             }
 
@@ -103,30 +165,5 @@ class BerandaViewModel @Inject constructor(
     fun logout(){
         sessionRepository.logOut()
         Log.d(TAG, "logout: Berhasil logout!")
-    }
-
-    fun getAllSampelRuta() {
-        viewModelScope.launch {
-            sampelRutaRepository.getAllSampelRuta().collectLatest { result ->
-                when(result) {
-                    is Result.Success -> {
-                        result.data?.let { response ->
-                            _listAllSampelRuta.value = response
-                            Log.d(TAG, "getAllSampelRuta succeed: $listAllSampelRuta")
-                        }
-                    }
-                    is Result.Loading -> {
-                        Log.d(TAG, "getAllSampelRutaByNoBS: Loading...")
-                    }
-                    is Result.Error -> {
-                        result.message?.let { error ->
-                            _errorMessage.value = error
-                            Log.e(TAG, "getAllSampelRuta: Error in getAllSampelRuta ($errorMessage)")
-                        }
-                        _showErrorToastChannel.send(true)
-                    }
-                }
-            }
-        }
     }
 }

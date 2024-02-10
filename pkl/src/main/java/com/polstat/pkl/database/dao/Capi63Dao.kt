@@ -14,6 +14,9 @@ import com.polstat.pkl.database.entity.MahasiswaEntity
 import com.polstat.pkl.database.entity.RutaEntity
 import com.polstat.pkl.database.entity.SampelRutaEntity
 import com.polstat.pkl.database.entity.WilayahEntity
+import com.polstat.pkl.database.relation.KeluargaWithRuta
+import com.polstat.pkl.database.relation.RutaWithKeluarga
+
 @Dao
 interface Capi63Dao {
 
@@ -23,6 +26,12 @@ interface Capi63Dao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAnggotaTim(anggotaTimEntity: AnggotaTimEntity)
+
+    @Query("SELECT * FROM anggota_tim")
+    suspend fun getAllAnggotaTim() : List<AnggotaTimEntity>
+
+    @Query("DELETE FROM anggota_tim")
+    suspend fun deleteAllAnggotaTim()
 
     @Query("SELECT * FROM data_tim WHERE idTim = :idTim")
     suspend fun getDataTim(idTim: String) : DataTimEntity
@@ -44,6 +53,9 @@ interface Capi63Dao {
 
     @Update
     suspend fun updateWilayah(wilayahEntity: WilayahEntity)
+
+    @Query("SELECT * FROM wilayah WHERE idBS = :idBS")
+    suspend fun getWilayah(idBS: String) : WilayahEntity
 
     @Query("SELECT * FROM wilayah")
     suspend fun getAllWilayah(): List<WilayahEntity>
@@ -78,6 +90,9 @@ interface Capi63Dao {
     @Query("DELETE FROM keluarga")
     suspend fun deleteAllKeluarga()
 
+    @Query("DELETE FROM keluarga WHERE idBS = :idBS")
+    suspend fun deleteAllKeluargaByWilayah(idBS: String)
+
     // Operasi database untuk entitas Ruta
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -101,6 +116,9 @@ interface Capi63Dao {
     @Query("DELETE FROM ruta")
     suspend fun deleteAllRuta()
 
+    @Query("DELETE FROM ruta WHERE idBS = :idBS")
+    suspend fun deleteAllRutaByWilayah(idBS: String)
+
     @Transaction
     @Query("SELECT * FROM ruta INNER JOIN KeluargaAndRutaEntity ON ruta.kodeRuta = KeluargaAndRutaEntity.kodeRuta WHERE KeluargaAndRutaEntity.kodeKlg = :kodeKlg ORDER BY ruta.noUrutRuta ASC")
     suspend fun getAllRutaByKeluarga(kodeKlg: String): List<RutaEntity>
@@ -108,8 +126,26 @@ interface Capi63Dao {
 
     // Operasi database untuk entitas berelasi
 
+    @Transaction
+    @Query("SELECT * FROM keluarga WHERE idBS = :idBS ORDER BY keluarga.noUrutKlg ASC")
+    fun getListKeluargaWithRuta(idBS: String): List<KeluargaWithRuta>
+
+    @Transaction
+    @Query("SELECT * FROM ruta WHERE idBS = :idBS ORDER BY ruta.noUrutRuta ASC")
+    fun getListRutaWithKeluarga(idBS: String): List<RutaWithKeluarga>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertKelurgaAndRuta(keluargaAndRutaEntity: KeluargaAndRutaEntity)
+
+    @Query("DELETE FROM KeluargaAndRutaEntity WHERE kodeKlg IN (SELECT kodeKlg FROM keluarga WHERE idBS = :idBS) AND kodeRuta IN (SELECT kodeRuta FROM ruta WHERE idBS = :idBS)")
+    suspend fun deleteAllKeluargaAndRutaByWilayah(idBS: String)
+
+    @Transaction
+    suspend fun deleteAllKeluargaRutaAndRelationByWilayah(idBS: String) {
+        deleteAllKeluargaByWilayah(idBS)
+        deleteAllRutaByWilayah(idBS)
+        deleteAllKeluargaAndRutaByWilayah(idBS)
+    }
 
     @Query("DELETE FROM keluargaandrutaentity")
     suspend fun deleteAllKeluargaAndRuta()
@@ -117,7 +153,6 @@ interface Capi63Dao {
     @Transaction
     @Query("SELECT * FROM sampel_ruta WHERE idBS = :idBS")
     suspend fun getSampelRutaByNoBS(idBS: String) : List<SampelRutaEntity>
-
 
     @Query("SELECT * FROM sampel_ruta")
     suspend fun getAllSampelRuta() : List<SampelRutaEntity>

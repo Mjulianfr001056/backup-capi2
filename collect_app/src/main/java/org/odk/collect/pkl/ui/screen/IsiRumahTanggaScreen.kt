@@ -1,13 +1,10 @@
 package org.odk.collect.pkl.ui.screen
 
-import android.annotation.SuppressLint
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,10 +22,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.PhotoCamera
-import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -36,9 +31,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -50,23 +43,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.addOutline
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
@@ -74,7 +56,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -86,8 +67,6 @@ import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklAccent
 import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary
-import com.polstat.pkl.ui.theme.PklPrimary100
-import com.polstat.pkl.ui.theme.PklPrimary300
 import com.polstat.pkl.ui.theme.PklPrimary700
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PklSecondary
@@ -98,7 +77,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
 
-@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun IsiRumahTanggaScreen(
     navController: NavHostController,
@@ -106,7 +84,7 @@ fun IsiRumahTanggaScreen(
 ) {
     val state = viewModel.state.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    val noBS = viewModel.noBS
+    val idBS = viewModel.idBS
     val lastKeluarga = viewModel.lastKeluarga.collectAsState()
     val lastKeluargaEgb = viewModel.lastKeluargaEgb.collectAsState()
     val lastRuta = viewModel.lastRuta.collectAsState()
@@ -121,7 +99,7 @@ fun IsiRumahTanggaScreen(
         topBar = {
             IsiRumahTanggaTopBar(
                 navController = navController,
-                noBS = noBS
+                idBS = idBS
             )
         },
         modifier = Modifier.fillMaxSize()
@@ -137,7 +115,7 @@ fun IsiRumahTanggaScreen(
                     .padding(15.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                if (lastKeluarga.value.noUrutKlg != "") {
+                if (lastKeluarga.value.noBgFisik != "0") {
                     Card(
                         border = BorderStroke(1.dp, PklSecondary),
                         colors = CardDefaults.cardColors(
@@ -172,8 +150,7 @@ fun IsiRumahTanggaScreen(
                                 )
                                 TableCellForm(
                                     label = "No. Klg",
-//                                    value = ": ${UtilFunctions.convertTo3DigitsString(lastKeluarga.value.noUrutKlg)}",
-                                    value = ": ${lastKeluarga.value.noUrutKlg}",
+                                    value = ": ${UtilFunctions.padWithZeros(lastKeluarga.value.noUrutKlg)}",
                                     fontSize = 10.sp,
                                     weight = weight
                                 )
@@ -181,7 +158,7 @@ fun IsiRumahTanggaScreen(
                             Row {
                                 TableCellForm(
                                     label = "No. Bg Fisik",
-                                    value = ": ${UtilFunctions.padWithZeros(lastKeluarga.value.noBgFisik, 3)}",
+                                    value = ": ${UtilFunctions.padWithZeros(lastKeluarga.value.noBgFisik)}",
                                     fontSize = 10.sp,
                                     weight = weight
                                 )
@@ -197,13 +174,13 @@ fun IsiRumahTanggaScreen(
                             Row {
                                 TableCellForm(
                                     label = "No. Bg Sensus",
-                                    value = ": ${UtilFunctions.padWithZeros(lastKeluarga.value.noBgSensus, 3)}",
+                                    value = ": ${UtilFunctions.padWithZeros(lastKeluarga.value.noBgSensus)}",
                                     fontSize = 10.sp,
                                     weight = weight
                                 )
                                 TableCellForm(
                                     label = "No. Ruta",
-                                    value = ": ${UtilFunctions.convertTo3DigitsString(lastRuta.value.noUrutRuta)}",
+                                    value = ": ${UtilFunctions.padWithZeros(lastRuta.value.noUrutRuta)}",
                                     fontSize = 10.sp,
                                     weight = weight
                                 )
@@ -272,7 +249,7 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoSegmenChanged(
-                                    incrementNoSegmen(
+                                    viewModel.incrementNoSegmen(
                                         state.value.noSegmen
                                     )
                                 )
@@ -283,7 +260,7 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoSegmenChanged(
-                                    decrementNoSegmen(
+                                    viewModel.decrementNoSegmen(
                                         state.value.noSegmen
                                     )
                                 )
@@ -295,7 +272,7 @@ fun IsiRumahTanggaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 InputNomorHuruf(
-                    value = UtilFunctions.padWithZeros(state.value.noBgFisik, 3),
+                    value = state.value.noBgFisik,
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
@@ -314,7 +291,7 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoBgFisikChanged(
-                                    increment(state.value.noBgFisik)
+                                    viewModel.increment(state.value.noBgFisik)
                                 )
                             )
                         }
@@ -323,7 +300,7 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoBgFisikChanged(
-                                    incrementHuruf(state.value.noBgFisik)
+                                    viewModel.incrementHuruf(state.value.noBgFisik)
                                 )
                             )
                         }
@@ -332,7 +309,7 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoBgFisikChanged(
-                                    decrement(state.value.noBgFisik)
+                                    viewModel.decrement(state.value.noBgFisik)
                                 )
                             )
                         }
@@ -341,7 +318,7 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoBgFisikChanged(
-                                    decrementHuruf(state.value.noBgFisik)
+                                    viewModel.decrementHuruf(state.value.noBgFisik)
                                 )
                             )
                         }
@@ -351,7 +328,7 @@ fun IsiRumahTanggaScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 InputNomorHuruf(
-                    value = UtilFunctions.padWithZeros(state.value.noBgSensus, 3),
+                    value = state.value.noBgSensus,
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
@@ -370,7 +347,7 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoBgSensusChanged(
-                                    increment(state.value.noBgSensus)
+                                    viewModel.increment(state.value.noBgSensus)
                                 )
                             )
                         }
@@ -379,7 +356,7 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoBgSensusChanged(
-                                    incrementHuruf(state.value.noBgSensus)
+                                    viewModel.incrementHuruf(state.value.noBgSensus)
                                 )
                             )
                         }
@@ -388,7 +365,7 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoBgSensusChanged(
-                                    decrement(state.value.noBgSensus)
+                                    viewModel.decrement(state.value.noBgSensus)
                                 )
                             )
                         }
@@ -397,7 +374,7 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.NoBgSensusChanged(
-                                    decrementHuruf(state.value.noBgSensus)
+                                    viewModel.decrementHuruf(state.value.noBgSensus)
                                 )
                             )
                         }
@@ -428,7 +405,7 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.JmlKlgChanged(
-                                    increment(state.value.jmlKlg.toString()).toInt()
+                                    viewModel.increment(state.value.jmlKlg.toString()).toInt()
                                 )
                             )
                         }
@@ -437,7 +414,7 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(
                                 IsiRutaScreenEvent.JmlKlgChanged(
-                                    decrement(state.value.jmlKlg.toString()).toInt()
+                                    viewModel.decrement(state.value.jmlKlg.toString()).toInt()
                                 )
                             )
                         }
@@ -481,11 +458,11 @@ fun IsiRumahTanggaScreen(
                         coroutineScope.launch {
                             viewModel.onEvent(IsiRutaScreenEvent.submit)
                         }
-                        Toast.makeText(context, "Ruta berhasil ditambahkan!", Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(context, "Keluarga dan Ruta berhasil ditambahkan!", Toast.LENGTH_SHORT).show()
                         val isMonitoring = false
-                        navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${noBS}/$isMonitoring") {
-                            popUpTo(CapiScreen.Listing.LIST_RUTA + "/${noBS}/$isMonitoring") {
+                        val isListRuta = true
+                        navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
+                            popUpTo(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
                                 inclusive = true
                             }
                         }
@@ -516,13 +493,13 @@ fun KeteranganKeluarga(
     val state = viewModel.state.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
-    InputNomor(
-        value = state.value.listNoUrutKlg[index].toString(),
+    InputNomorHuruf(
+        value = state.value.listNoUrutKlg[index],
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
                     event = IsiRutaScreenEvent.NoUrutKlgChanged(
-                        it.toIntOrNull() ?: 0
+                        it
                     ),
                     index = index
                 )
@@ -539,7 +516,17 @@ fun KeteranganKeluarga(
             coroutineScope.launch {
                 viewModel.onEvent(
                     event = IsiRutaScreenEvent.NoUrutKlgChanged(
-                        increment(state.value.listNoUrutKlg[index].toString()).toInt()
+                        viewModel.increment(state.value.listNoUrutKlg[index])
+                    ),
+                    index = index
+                )
+            }
+        },
+        onIncrementHuruf = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    event = IsiRutaScreenEvent.NoUrutKlgChanged(
+                        viewModel.incrementHuruf(state.value.listNoUrutKlg[index])
                     ),
                     index = index
                 )
@@ -549,7 +536,17 @@ fun KeteranganKeluarga(
             coroutineScope.launch {
                 viewModel.onEvent(
                     event = IsiRutaScreenEvent.NoUrutKlgChanged(
-                        decrement(state.value.listNoUrutKlg[index].toString()).toInt()
+                        viewModel.decrement(state.value.listNoUrutKlg[index])
+                    ),
+                    index = index
+                )
+            }
+        },
+        onDecrementHuruf = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    event = IsiRutaScreenEvent.NoUrutKlgChanged(
+                        viewModel.decrementHuruf(state.value.listNoUrutKlg[index])
                     ),
                     index = index
                 )
@@ -660,7 +657,7 @@ fun KeteranganKeluarga(
             coroutineScope.launch {
                 viewModel.onEvent(
                     event = IsiRutaScreenEvent.IsGenzOrtuChanged(
-                        increment(state.value.listIsGenzOrtu[index].toString()).toInt()
+                        viewModel.increment(state.value.listIsGenzOrtu[index].toString()).toInt()
                     ),
                     index = index
                 )
@@ -670,7 +667,7 @@ fun KeteranganKeluarga(
             coroutineScope.launch {
                 viewModel.onEvent(
                     event = IsiRutaScreenEvent.IsGenzOrtuChanged(
-                        decrement(state.value.listIsGenzOrtu[index].toString()).toInt()
+                        viewModel.decrement(state.value.listIsGenzOrtu[index].toString()).toInt()
                     ),
                     index = index
                 )
@@ -704,7 +701,7 @@ fun KeteranganKeluarga(
                 coroutineScope.launch {
                     viewModel.onEvent(
                         event = IsiRutaScreenEvent.NoUrutKlgEgbChanged(
-                            increment(state.value.listNoUrutKlgEgb[index].toString()).toInt()
+                            viewModel.increment(state.value.listNoUrutKlgEgb[index].toString()).toInt()
                         ),
                         index = index
                     )
@@ -714,7 +711,7 @@ fun KeteranganKeluarga(
                 coroutineScope.launch {
                     viewModel.onEvent(
                         event = IsiRutaScreenEvent.NoUrutKlgEgbChanged(
-                            decrement(state.value.listNoUrutKlgEgb[index].toString()).toInt()
+                            viewModel.decrement(state.value.listNoUrutKlgEgb[index].toString()).toInt()
                         ),
                         index = index
                     )
@@ -746,7 +743,7 @@ fun KeteranganKeluarga(
             coroutineScope.launch {
                 viewModel.onEvent(
                     event = IsiRutaScreenEvent.PenglMknChanged(
-                        increment(state.value.listPenglMkn[index].toString()).toInt()
+                        viewModel.increment(state.value.listPenglMkn[index].toString()).toInt()
                     ),
                     index = index
                 )
@@ -756,7 +753,7 @@ fun KeteranganKeluarga(
             coroutineScope.launch {
                 viewModel.onEvent(
                     event = IsiRutaScreenEvent.PenglMknChanged(
-                        decrement(state.value.listPenglMkn[index].toString()).toInt()
+                        viewModel.decrement(state.value.listPenglMkn[index].toString()).toInt()
                     ),
                     index = index
                 )
@@ -810,13 +807,13 @@ fun KeteranganRuta(
     val kkKrtOptions =
         listOf("Kepala Keluarga (KK) saja", "Kepala Rumah Tangga (KRT) saja", "KK Sekaligus KRT")
 
-    InputNomor(
-        value = state.value.listNoUrutRuta[indexKlg][indexRuta].toString(),
+    InputNomorHuruf(
+        value = state.value.listNoUrutRuta[indexKlg][indexRuta],
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
                     IsiRutaScreenEvent.NoUrutRutaChanged(
-                        it.toIntOrNull() ?: 0
+                        it
                     ),
                     indexKlg,
                     indexRuta
@@ -834,7 +831,18 @@ fun KeteranganRuta(
             coroutineScope.launch {
                 viewModel.onEvent(
                     IsiRutaScreenEvent.NoUrutRutaChanged(
-                        increment(state.value.listNoUrutRuta[indexKlg][indexRuta].toString()).toInt()
+                        viewModel.increment(state.value.listNoUrutRuta[indexKlg][indexRuta])
+                    ),
+                    indexKlg,
+                    indexRuta
+                )
+            }
+        },
+        onIncrementHuruf = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    IsiRutaScreenEvent.NoUrutRutaChanged(
+                        viewModel.incrementHuruf(state.value.listNoUrutRuta[indexKlg][indexRuta])
                     ),
                     indexKlg,
                     indexRuta
@@ -845,7 +853,18 @@ fun KeteranganRuta(
             coroutineScope.launch {
                 viewModel.onEvent(
                     IsiRutaScreenEvent.NoUrutRutaChanged(
-                        decrement(state.value.listNoUrutRuta[indexKlg][indexRuta].toString()).toInt()
+                        viewModel.decrement(state.value.listNoUrutRuta[indexKlg][indexRuta])
+                    ),
+                    indexKlg,
+                    indexRuta
+                )
+            }
+        },
+        onDecrementHuruf = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    IsiRutaScreenEvent.NoUrutRutaChanged(
+                        viewModel.decrementHuruf(state.value.listNoUrutRuta[indexKlg][indexRuta])
                     ),
                     indexKlg,
                     indexRuta
@@ -934,14 +953,12 @@ fun KeteranganRuta(
         )
     )
 
-    Spacer(modifier = Modifier.padding(10.dp))
-
     InputNomor(
-        value = state.value.listGenzOrtu[indexKlg][indexRuta].toString(),
+        value = state.value.listJmlGenzAnak[indexKlg][indexRuta].toString(),
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    IsiRutaScreenEvent.GenzOrtuChanged(it.toIntOrNull() ?: 0),
+                    IsiRutaScreenEvent.JmlGenzAnakChanged(it.toIntOrNull() ?: 0),
                     indexKlg,
                     indexRuta
                 )
@@ -949,7 +966,7 @@ fun KeteranganRuta(
         },
         label = {
             Text(
-                text = "15. Keberadaan Gen Z dan Orang Tua dalam Rumah Tangga",
+                text = "15. Jumlah Gen Z anak eligible (kelahiran 2007-2012)",
                 fontFamily = PoppinsFontFamily,
                 fontWeight = FontWeight.SemiBold
             )
@@ -957,8 +974,8 @@ fun KeteranganRuta(
         onIncrement = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    IsiRutaScreenEvent.GenzOrtuChanged(
-                        increment(state.value.listGenzOrtu[indexKlg][indexRuta].toString()).toInt()
+                    IsiRutaScreenEvent.JmlGenzAnakChanged(
+                        viewModel.increment(state.value.listJmlGenzAnak[indexKlg][indexRuta].toString()).toInt()
                     ),
                     indexKlg,
                     indexRuta
@@ -968,8 +985,50 @@ fun KeteranganRuta(
         onDecrement = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    IsiRutaScreenEvent.GenzOrtuChanged(
-                        decrement(state.value.listGenzOrtu[indexKlg][indexRuta].toString()).toInt()
+                    IsiRutaScreenEvent.JmlGenzAnakChanged(
+                        viewModel.decrement(state.value.listJmlGenzAnak[indexKlg][indexRuta].toString()).toInt()
+                    ),
+                    indexKlg,
+                    indexRuta
+                )
+            }
+        },
+    )
+
+    InputNomor(
+        value = state.value.listJmlGenzDewasa[indexKlg][indexRuta].toString(),
+        onValueChange = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    IsiRutaScreenEvent.JmlGenzDewasaChanged(it.toIntOrNull() ?: 0),
+                    indexKlg,
+                    indexRuta
+                )
+            }
+        },
+        label = {
+            Text(
+                text = "15b. Jumlah Gen Z dewasa eligible (kelahiran 1997-2006)",
+                fontFamily = PoppinsFontFamily,
+                fontWeight = FontWeight.SemiBold
+            )
+        },
+        onIncrement = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    IsiRutaScreenEvent.JmlGenzDewasaChanged(
+                        viewModel.increment(state.value.listJmlGenzDewasa[indexKlg][indexRuta].toString()).toInt()
+                    ),
+                    indexKlg,
+                    indexRuta
+                )
+            }
+        },
+        onDecrement = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    IsiRutaScreenEvent.JmlGenzDewasaChanged(
+                        viewModel.decrement(state.value.listJmlGenzDewasa[indexKlg][indexRuta].toString()).toInt()
                     ),
                     indexKlg,
                     indexRuta
@@ -980,32 +1039,32 @@ fun KeteranganRuta(
 
     Spacer(modifier = Modifier.padding(10.dp))
 
-    if (state.value.listGenzOrtu[indexKlg][indexRuta] > 0) {
-        Column(
-            modifier = Modifier.padding(horizontal = 14.dp)
-        ) {
-            Text(
-                text = "16. Unggah Foto",
-                fontFamily = PoppinsFontFamily,
-                fontWeight = FontWeight.SemiBold
-            )
-
-            var imageUri by remember { mutableStateOf(EMPTY_IMAGE_URI) }
-            if (imageUri != EMPTY_IMAGE_URI) {
-
-            } else {
-                ImagePicker(onCameraClicked = {}, onGaleryClicked = {})
-                var showGallerySelect by remember { mutableStateOf(false) }
-                if (showGallerySelect) {
-
-                } else {
-
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.padding(10.dp))
-    }
+//    if (state.value.listGenzOrtu[indexKlg][indexRuta] > 0) {
+//        Column(
+//            modifier = Modifier.padding(horizontal = 14.dp)
+//        ) {
+//            Text(
+//                text = "16. Unggah Foto",
+//                fontFamily = PoppinsFontFamily,
+//                fontWeight = FontWeight.SemiBold
+//            )
+//
+//            var imageUri by remember { mutableStateOf(EMPTY_IMAGE_URI) }
+//            if (imageUri != EMPTY_IMAGE_URI) {
+//
+//            } else {
+//                ImagePicker(onCameraClicked = {}, onGaleryClicked = {})
+//                var showGallerySelect by remember { mutableStateOf(false) }
+//                if (showGallerySelect) {
+//
+//                } else {
+//
+//                }
+//            }
+//        }
+//
+//        Spacer(modifier = Modifier.padding(10.dp))
+//    }
 }
 
 @Composable
@@ -1191,37 +1250,11 @@ fun InputNomorHuruf(
     )
 }
 
-fun incrementHuruf(input: String): String {
-    val lastChar = input.last()
-    return if (lastChar.isDigit()) {
-        input + "A"
-    } else {
-        val nextChar = if (lastChar == 'Z') 'A' else lastChar + 1
-        if (nextChar == 'A') {
-            input.dropLast(1) + nextChar + "A"
-        } else {
-            input.dropLast(1) + nextChar
-        }
-    }
-}
-
-fun decrementHuruf(input: String): String {
-    val lastChar = input.last()
-    return if (lastChar == 'A' && input.length > 1) {
-        input.dropLast(1)
-    } else if (lastChar > 'A') {
-        input.dropLast(1) + (lastChar - 1)
-    } else {
-        input
-    }
-}
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IsiRumahTanggaTopBar(
     navController: NavHostController,
-    noBS: String?
+    idBS: String?
 ) {
     TopAppBar(
         title = {
@@ -1246,15 +1279,16 @@ fun IsiRumahTanggaTopBar(
             IconButton(
                 onClick = {
                     val isMonitoring = false
-                    navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$noBS/$isMonitoring") {
-                        popUpTo(CapiScreen.Listing.LIST_RUTA + "/$noBS/$isMonitoring") {
+                    val isListRuta = true
+                    navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
+                        popUpTo(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
                             inclusive = true
                         }
                     }
                 }
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "kembali",
                     tint = Color.White,
                     modifier = Modifier.size(25.dp)
@@ -1264,150 +1298,112 @@ fun IsiRumahTanggaTopBar(
     )
 }
 
-@Composable
-fun ImagePicker(
-    onCameraClicked: () -> Unit,
-    onGaleryClicked: () -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .background(
-                color = PklPrimary100.copy(alpha = 0.2f),
-                shape = RoundedCornerShape(16.dp)
-            )
-            .padding(4.dp)
-            .dashedBorder(
-                color = PklSecondary,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .padding(8.dp)
-            .size(250.dp, 75.dp),
-        contentAlignment = Alignment.Center,
-        content = {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Upload,
-                    contentDescription = "Upload",
-                    tint = PklPrimary300
-                )
-                Text(
-                    text = "Unggah Foto Rumah Tangga",
-                    color = PklSecondary,
-                    fontFamily = PoppinsFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 10.sp,
-                    modifier = Modifier.padding(vertical = 5.dp)
-                )
-                Row {
-                    OutlinedIconButton(
-                        onClick = { onCameraClicked() },
-                        colors = IconButtonDefaults.outlinedIconButtonColors(
-                            containerColor = PklPrimary300,
-                            contentColor = PklBase
-                        ),
-                        border = BorderStroke(width = 1.dp, color = PklPrimary900),
-                        modifier = Modifier.size(24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.PhotoCamera,
-                            contentDescription = "Camera",
-                            modifier = Modifier.size(12.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(10.dp))
-                    OutlinedIconButton(
-                        onClick = { onGaleryClicked() },
-                        colors = IconButtonDefaults.outlinedIconButtonColors(
-                            containerColor = PklPrimary300,
-                            contentColor = PklBase
-                        ),
-                        border = BorderStroke(width = 1.dp, color = PklPrimary900),
-                        modifier = Modifier.size(24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.PhotoLibrary,
-                            contentDescription = "PhotoLibrary",
-                            modifier = Modifier.size(12.dp)
-                        )
-                    }
-                }
-            }
-        }
-    )
-}
-
-fun Modifier.dashedBorder(
-    color: Color,
-    shape: Shape,
-    strokeWidth: Dp = 1.dp,
-    dashWidth: Dp = 4.dp,
-    gapWidth: Dp = 4.dp,
-    cap: StrokeCap = StrokeCap.Round
-) = this.drawWithContent {
-    val outline = shape.createOutline(size, layoutDirection, this)
-
-    val path = Path()
-    path.addOutline(outline)
-
-    val stroke = Stroke(
-        cap = cap,
-        width = strokeWidth.toPx(),
-        pathEffect = PathEffect.dashPathEffect(
-            intervals = floatArrayOf(dashWidth.toPx(), gapWidth.toPx()),
-            phase = 0f
-        )
-    )
-
-    this.drawContent()
-
-    drawPath(
-        path = path,
-        style = stroke,
-        color = color
-    )
-}
-
-fun increment(input: String?): String {
-    val numericPart = input?.filter { it.isDigit() }
-    val number = numericPart?.toInt()
-    val formattedNumber = String.format("%0${numericPart?.length}d", number?.plus(1) ?: 0)
-    return input?.replaceFirst(numericPart.toString(), formattedNumber) ?: ""
-}
-
-fun decrement(input: String?): String {
-    val numericPart = input?.filter { it.isDigit() }
-    val number = numericPart?.toInt()
-    if (number != null) {
-        if (number < 1) {
-            return input.toString()
-        }
-    }
-    val formattedNumber = String.format("%0${numericPart?.length}d", number?.minus(1) ?: 0)
-    return input?.replaceFirst(numericPart.toString(), formattedNumber) ?: ""
-}
-
-fun incrementNoSegmen(input: String?): String {
-    val numericPart = input?.filter { it.isDigit() }
-    val number = numericPart?.toInt()
-    val formattedNumber = String.format("%0${numericPart?.length}d", number?.plus(10) ?: 0)
-    return input?.replaceFirst(numericPart.toString(), formattedNumber) ?: ""
-}
-
-fun decrementNoSegmen(input: String?): String {
-    val numericPart = input?.filter { it.isDigit() }
-    val number = numericPart?.toInt()
-    if (number != null) {
-        if (number < 10) {
-            return input.toString()
-        }
-    }
-    val formattedNumber = String.format("%0${numericPart?.length}d", number?.minus(10) ?: 0)
-    return input?.replaceFirst(numericPart.toString(), formattedNumber) ?: ""
-}
+//@Composable
+//fun ImagePicker(
+//    onCameraClicked: () -> Unit,
+//    onGaleryClicked: () -> Unit,
+//) {
+//    Box(
+//        modifier = Modifier
+//            .background(
+//                color = PklPrimary100.copy(alpha = 0.2f),
+//                shape = RoundedCornerShape(16.dp)
+//            )
+//            .padding(4.dp)
+//            .dashedBorder(
+//                color = PklSecondary,
+//                shape = RoundedCornerShape(12.dp)
+//            )
+//            .padding(8.dp)
+//            .size(250.dp, 75.dp),
+//        contentAlignment = Alignment.Center,
+//        content = {
+//            Column(
+//                horizontalAlignment = Alignment.CenterHorizontally,
+//                verticalArrangement = Arrangement.Center,
+//                modifier = Modifier.fillMaxSize()
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Default.Upload,
+//                    contentDescription = "Upload",
+//                    tint = PklPrimary300
+//                )
+//                Text(
+//                    text = "Unggah Foto Rumah Tangga",
+//                    color = PklSecondary,
+//                    fontFamily = PoppinsFontFamily,
+//                    fontWeight = FontWeight.Medium,
+//                    fontSize = 10.sp,
+//                    modifier = Modifier.padding(vertical = 5.dp)
+//                )
+//                Row {
+//                    OutlinedIconButton(
+//                        onClick = { onCameraClicked() },
+//                        colors = IconButtonDefaults.outlinedIconButtonColors(
+//                            containerColor = PklPrimary300,
+//                            contentColor = PklBase
+//                        ),
+//                        border = BorderStroke(width = 1.dp, color = PklPrimary900),
+//                        modifier = Modifier.size(24.dp)
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Default.PhotoCamera,
+//                            contentDescription = "Camera",
+//                            modifier = Modifier.size(12.dp)
+//                        )
+//                    }
+//                    Spacer(modifier = Modifier.width(10.dp))
+//                    OutlinedIconButton(
+//                        onClick = { onGaleryClicked() },
+//                        colors = IconButtonDefaults.outlinedIconButtonColors(
+//                            containerColor = PklPrimary300,
+//                            contentColor = PklBase
+//                        ),
+//                        border = BorderStroke(width = 1.dp, color = PklPrimary900),
+//                        modifier = Modifier.size(24.dp)
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Default.PhotoLibrary,
+//                            contentDescription = "PhotoLibrary",
+//                            modifier = Modifier.size(12.dp)
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//    )
+//}
+//
+//fun Modifier.dashedBorder(
+//    color: Color,
+//    shape: Shape,
+//    strokeWidth: Dp = 1.dp,
+//    dashWidth: Dp = 4.dp,
+//    gapWidth: Dp = 4.dp,
+//    cap: StrokeCap = StrokeCap.Round
+//) = this.drawWithContent {
+//    val outline = shape.createOutline(size, layoutDirection, this)
+//
+//    val path = Path()
+//    path.addOutline(outline)
+//
+//    val stroke = Stroke(
+//        cap = cap,
+//        width = strokeWidth.toPx(),
+//        pathEffect = PathEffect.dashPathEffect(
+//            intervals = floatArrayOf(dashWidth.toPx(), gapWidth.toPx()),
+//            phase = 0f
+//        )
+//    )
+//
+//    this.drawContent()
+//
+//    drawPath(
+//        path = path,
+//        style = stroke,
+//        color = color
+//    )
+//}
 
 @Preview
 @Composable
@@ -1427,4 +1423,4 @@ fun IsiRumahTanggaPreview() {
     }
 }
 
-val EMPTY_IMAGE_URI: Uri = Uri.parse("file://dev/null")
+//val EMPTY_IMAGE_URI: Uri = Uri.parse("file://dev/null")

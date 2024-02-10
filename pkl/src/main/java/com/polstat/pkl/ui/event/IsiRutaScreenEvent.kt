@@ -6,7 +6,7 @@ sealed class IsiRutaScreenEvent {
     data class NoBgFisikChanged(val noBgFisik: String) : IsiRutaScreenEvent()
     data class NoBgSensusChanged(val noBgSensus: String) : IsiRutaScreenEvent()
     data class JmlKlgChanged(val jmlKlg: Int) : IsiRutaScreenEvent()
-    data class NoUrutKlgChanged(val noUrutKlg: Int) : IsiRutaScreenEvent()
+    data class NoUrutKlgChanged(val noUrutKlg: String) : IsiRutaScreenEvent()
     data class NamaKKChanged(val namaKK: String) : IsiRutaScreenEvent()
     data class AlamatChanged(val alamat: String) : IsiRutaScreenEvent()
     data class IsGenzOrtuChanged(val isGenzOrtu: Int) : IsiRutaScreenEvent()
@@ -15,7 +15,8 @@ sealed class IsiRutaScreenEvent {
     data class NoUrutRutaChanged(val noUrutRuta: String) : IsiRutaScreenEvent()
     data class KKOrKRTChanged(val kkOrKRT: String) : IsiRutaScreenEvent()
     data class NamaKRTChanged(val namaKRT: String) : IsiRutaScreenEvent()
-    data class GenzOrtuChanged(val genzOrtu: Int) : IsiRutaScreenEvent()
+    data class JmlGenzAnakChanged(val jmlGenzAnak: Int) : IsiRutaScreenEvent()
+    data class JmlGenzDewasaChanged(val jmlGenzDewasa: Int) : IsiRutaScreenEvent()
     data class KatGenzChanged(val katGenz: Int) : IsiRutaScreenEvent()
     object submit : IsiRutaScreenEvent()
 }
