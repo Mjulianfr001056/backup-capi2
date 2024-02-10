@@ -13,7 +13,7 @@ data class SampelRuta(
     var genzOrtuKeluarga: String = "[not set]",
     var alamat: String = "[not set]",
     var namaKrt: String = "[not set]",
-    var genzOrtuRuta: Int = -1,
+    var katGenz: Int = -1,
     var long: Double = -1.0,
     var lat: Double = -1.0,
     var status: String = "[not set]"

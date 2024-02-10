@@ -291,9 +291,9 @@ fun PreviewSample(){
             genzOrtuKeluarga = "2",
             alamat = "Krapyak, Bantul, DIY",
             namaKrt = "KH Ahmad Syamsuri",
-            genzOrtuRuta = 2,
-            long = 0.0,
-            lat = 0.0,
+            katGenz = 2,
+            longitude = 0.0,
+            latitude = 0.0,
             status = "1"
         ),
         onPetunjukArahClicked = {},
@@ -550,8 +550,8 @@ private fun Sample(
                 ) {
                     Button(
                         onClick = {
-                            val latitude = sampelRuta.lat
-                            val longitude = sampelRuta.long
+                            val latitude = sampelRuta.latitude
+                            val longitude = sampelRuta.longitude
 
                             val gmmIntentUri = Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude")
 
