@@ -27,8 +27,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -80,7 +82,10 @@ fun SamplingScreen(
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()
-                    .background(color = PklBase),
+                    .paint(
+                        painter = painterResource(id = R.drawable.pb_bg_background),
+                        contentScale = ContentScale.Crop
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 HorizontalMenu(
@@ -107,15 +112,8 @@ fun HorizontalMenu(navController: NavHostController, isPml: Boolean?) {
                     }
                 )
                 Spacer(modifier = Modifier.width(30.dp))
-//                MenuButton(
-//                    image = painterResource(R.drawable.password_master),
-//                    name = "Password Master",
-//                    onCardClicked = {
-//                        navController.navigate("password")
-//                    }
-//                )
                 MenuButton(
-                    image = painterResource(R.drawable.password_master),
+                    image = painterResource(R.drawable.monitoring),
                     name = "Monitoring",
                     onCardClicked = {
                         val isMonitoring = true
