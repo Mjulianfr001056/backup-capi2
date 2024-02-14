@@ -184,7 +184,6 @@ fun ListRutaScreen(
                     }
                     IconButton(
                         onClick = {
-
                             coroutineScope.launch {
                                 val synchronizeRutaJob = async {
                                     idBS?.let {
@@ -538,10 +537,10 @@ fun RutaOrKlgRow(
         val noUrut = if (isListRuta) rutaWithKeluarga.ruta.noUrutRuta else keluargaWithRuta.keluarga.noUrutKlg
         val nama = if (isListRuta) rutaWithKeluarga.ruta.namaKrt else keluargaWithRuta.keluarga.namaKK
 
-        TableCell(text = UtilFunctions.padWithZeros(selectedData.noBgFisik, 3), fontSize = 14.sp, weight = colWeight1)
-        TableCell(text = UtilFunctions.padWithZeros(selectedData.noBgSensus, 3), fontSize = 14.sp, weight = colWeight1)
-        TableCell(text = UtilFunctions.padWithZeros(noUrut, 3), fontSize = 14.sp, weight = colWeight1)
-        TableCell(text = viewModel.sederhanakanNama(nama), fontSize = 14.sp, weight = colWeight2)
+        TableCell(text = UtilFunctions.padWithZeros(selectedData.noBgFisik, 3), fontSize = 12.sp, weight = colWeight1)
+        TableCell(text = UtilFunctions.padWithZeros(selectedData.noBgSensus, 3), fontSize = 12.sp, weight = colWeight1)
+        TableCell(text = UtilFunctions.padWithZeros(noUrut, 3), fontSize = 12.sp, weight = colWeight1)
+        TableCell(text = viewModel.sederhanakanNama(nama), fontSize = 12.sp, weight = colWeight2)
 
         IconButton(
             modifier = Modifier.weight(colWeight1),
@@ -610,7 +609,7 @@ fun RutaOrKlgRow(
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_urut_ruta_egb,
-                                                value = if (rutaWithKeluarga.ruta.noUrutEgb == null) "N/A" else UtilFunctions.convertTo4DigitsString(rutaWithKeluarga.ruta.noUrutEgb)
+                                                value = if (rutaWithKeluarga.ruta.noUrutEgb == null || rutaWithKeluarga.ruta.noUrutEgb == 0) "N/A" else UtilFunctions.convertTo4DigitsString(rutaWithKeluarga.ruta.noUrutEgb)
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.identifikasi_kk_krt,
