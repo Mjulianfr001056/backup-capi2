@@ -78,10 +78,6 @@ class ListRutaViewModel @Inject constructor(
 
     val synchronizeRuta = _synchronizeRuta.asStateFlow()
 
-    private val _finalisasiBSResponse = MutableStateFlow(FinalisasiBSResponse())
-
-    val finalisasiBSResponse = _finalisasiBSResponse.asStateFlow()
-
     private val _deleteRuta = MutableStateFlow(RutaEntity())
 
     private val _deleteKeluarga = MutableStateFlow(KeluargaEntity())
@@ -265,36 +261,6 @@ class ListRutaViewModel @Inject constructor(
         }
     }
 
-    fun generateSampel(idBS: String) {
-        viewModelScope.launch {
-            val generateRutaJob = async {
-                remoteRutaRepository.generateRuta(idBS).collectLatest { message ->
-                    _successMessage.value = message
-                    _showSuccessToastChannel.send(true)
-                    Log.d(TAG, message)
-                }
-            }
-            generateRutaJob.await()
-
-            if (successMessage.value == "Berhasil Ambil Sampel!") {
-                updateWilayah(wilayah.value, "telah-disampel")
-                Log.d(TAG, "generateSampel: status BS berhasil diupdate!")
-            } else {
-                Log.d(TAG, "generateSampel: status BS gagal diupdate!")
-            }
-        }
-    }
-    
-    suspend fun updateWilayah(wilayahEntity: WilayahEntity, statusBS: String) {
-        val updatedWilayah = wilayahEntity.copy(status = statusBS)
-        viewModelScope.launch { 
-            wilayahRepository.updateWilayah(updatedWilayah).collectLatest { message ->
-                Log.d(TAG, message)
-            }
-        }
-    }
-
-
     suspend fun deleteRuta(
         kodeRuta: String
     ) {
@@ -392,48 +358,6 @@ class ListRutaViewModel @Inject constructor(
             keluargaRepository.fakeDeleteKeluarga(_deleteKeluarga.value.toKeluarga()).collectLatest { message ->
                 Log.d(TAG, message)
             }
-        }
-    }
-
-    fun finalisasiBS(
-        idBS: String
-    ) {
-        viewModelScope.launch {
-            val finalisasiBSJob = async {
-                remoteRutaRepository.finalisasiBS(idBS).collectLatest { result ->
-                    when (result) {
-                        is Result.Success -> {
-                            result.data?.let { response ->
-                                _finalisasiBSResponse.value = response
-                                Log.d(TAG, "finalisasiBS succeed: $response")
-                                _successMessage.value = "Berhasil melakukan finalisasi blok sensus!"
-                                _showSuccessToastChannel.send(true)
-                            }
-                        }
-
-                        is Result.Loading -> Log.d(TAG, "finalisasiBS: Loading...")
-
-                        is Result.Error -> {
-                            result.message?.let { error ->
-                                _errorMessage.value = error
-                            }
-                            _showErrorToastChannel.send(true)
-                            Log.e(TAG, "finalisasiBS: Error in finalisasiBS (${errorMessage.value})")
-                        }
-                    }
-                }
-            }
-            finalisasiBSJob.await()
-
-            finalisasiBSResponse.value.data?.forEach { ruta ->
-                //Update data ruta terbaru
-                localRutaRepository.insertRuta(ruta, LocalRutaRepository.Method.Fetch)
-                    .collectLatest { message ->
-                        Log.d(TAG, message)
-                    }
-            }
-
-            updateWilayah(wilayah.value, "listing-selesai")
         }
     }
 

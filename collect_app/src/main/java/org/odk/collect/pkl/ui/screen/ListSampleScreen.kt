@@ -198,6 +198,7 @@ fun ListSampleScreen(
                         }
                         IconButton(onClick = {
 //                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${noBS}/$isMonitoring")
+                            viewModel.updateSyncStatus(true)
                             navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/$idBS/$isMonitoring")
                         }) {
                             Icon(

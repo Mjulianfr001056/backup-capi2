@@ -63,6 +63,9 @@ interface Capi63Dao {
     @Query("DELETE FROM wilayah")
     suspend fun deleteAllWilayah()
 
+    @Query("DELETE FROM wilayah WHERE idBS = :idBS")
+    suspend fun deleteWilayah(idBS: String)
+
     // Operasi database untuk entitas Keluarga
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -21,8 +21,11 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,6 +38,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,10 +68,12 @@ import com.polstat.pkl.ui.theme.PklPrimary
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.viewmodel.ListBSViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
+import org.odk.collect.pkl.ui.screen.components.LoadingDialog
 import java.util.Date
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -86,7 +92,12 @@ fun ListBSScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
+    val showLoading by viewModel.showLoadingChannel.collectAsState(true)
+
+    val isSuccessed = viewModel.isSuccesed.collectAsState()
+
     LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
+        viewModel.updateShowLoading(isSuccessed.value)
         viewModel.showErrorToastChannel.collectLatest { show ->
             if (show) {
                 delay(1500)
@@ -94,6 +105,10 @@ fun ListBSScreen(
             }
         }
     }
+
+    LoadingDialog(
+        showDialog = showLoading
+    )
 
     Scaffold(
         topBar = {
@@ -170,7 +185,8 @@ fun ListBSScreen(
                     listWilayah = listWilayahValue,
                     navController = navController,
                     modifier = Modifier.padding(innerPadding),
-                    isMonitoring = isMonitoring
+                    isMonitoring = isMonitoring,
+                    viewModel = viewModel
                 )
             }
         },
@@ -181,9 +197,23 @@ fun ListBSScreen(
 private fun BlokSensus(
     onLihatRutaClicked: () -> Unit,
     onLihatSampleClicked: () -> Unit,
-    wilayah: WilayahEntity
+    wilayah: WilayahEntity,
+    viewModel: ListBSViewModel,
+    navController: NavHostController
 ) {
     var expanded by remember { mutableStateOf(false) }
+
+    val isMonitoring = viewModel.isMonitoring?: false
+
+    var showMenu by remember { mutableStateOf(false) }
+
+    var openFinalisasiBSDialog by remember { mutableStateOf(false) }
+
+    var enableFinalisasiBSButton by remember { mutableStateOf(false) }
+
+    var checkedCheckbox by remember { mutableStateOf(false) }
+
+    val coroutineScope = rememberCoroutineScope()
 
     Box(
         modifier = Modifier
@@ -387,18 +417,131 @@ private fun BlokSensus(
                             colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)) {
                             Text(stringResource(R.string.lihat_ruta), fontFamily = PoppinsFontFamily, fontSize = 13.sp, color = Color.White, textAlign = TextAlign.Center)
                         }
-                        if (wilayah.status == "telah-disampel") {
-                        Button(onClick = {
-                            onLihatSampleClicked()
-                        },
-                            shape = MaterialTheme.shapes.small,
-                            contentPadding = PaddingValues(10.dp),
-                            modifier = Modifier.padding(horizontal = 2.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)) {
-                            Text(stringResource(R.string.lihat_sampel), fontFamily = PoppinsFontFamily, fontSize = 13.sp, color = Color.White, textAlign = TextAlign.Center)
+                        if (wilayah.status == "listing" && isMonitoring) {
+                            Button(onClick = {
+                                showMenu = false
+                                openFinalisasiBSDialog = true
+                            },
+                                shape = MaterialTheme.shapes.small,
+                                contentPadding = PaddingValues(10.dp),
+                                modifier = Modifier.padding(horizontal = 2.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)) {
+                                Text("Finalisasi", fontFamily = PoppinsFontFamily, fontSize = 13.sp, color = Color.White, textAlign = TextAlign.Center)
+                            }
                         }
+                        if (wilayah.status == "listing-selesai" && isMonitoring) {
+                            Button(onClick = {
+                                coroutineScope.launch {
+                                    val generateRutaJob =
+                                        async { viewModel.generateSampel(wilayah.idBS) }
+                                    generateRutaJob.await()
+                                    delay(2000L)
+
+                                    if (viewModel.successMessage.value == "Berhasil Ambil Sampel!") {
+                                        navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+                                            popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+                                                inclusive = true
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                                shape = MaterialTheme.shapes.small,
+                                contentPadding = PaddingValues(10.dp),
+                                modifier = Modifier.padding(horizontal = 2.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)) {
+                                Text("Ambil Sampel", fontFamily = PoppinsFontFamily, fontSize = 13.sp, color = Color.White, textAlign = TextAlign.Center)
+                            }
+                        }
+                        if (wilayah.status == "telah-disampel") {
+                            Button(onClick = {
+                                onLihatSampleClicked()
+                            },
+                                shape = MaterialTheme.shapes.small,
+                                contentPadding = PaddingValues(10.dp),
+                                modifier = Modifier.padding(horizontal = 2.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = PklPrimary)) {
+                                Text(stringResource(R.string.lihat_sampel), fontFamily = PoppinsFontFamily, fontSize = 13.sp, color = Color.White, textAlign = TextAlign.Center)
+                            }
                         }
                     }
+
+                    if (openFinalisasiBSDialog) {
+                        AlertDialog(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            onDismissRequest = { openFinalisasiBSDialog = false },
+                            confirmButton = {
+                                Button(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    onClick = {
+                                        openFinalisasiBSDialog = false
+                                        coroutineScope.launch {
+                                            val finalisasiBSJob = async {
+                                                wilayah.idBS?.let { viewModel.finalisasiBS(it) }
+                                            }
+                                            finalisasiBSJob.await()
+
+                                            if (finalisasiBSJob.isCompleted){
+                                                navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+                                                    popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+                                                        inclusive = true
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    enabled = enableFinalisasiBSButton,
+                                    content = {
+                                        Text(
+                                            text = stringResource(id = R.string.kirim_hasil_listing).uppercase(),
+                                            fontFamily = PoppinsFontFamily,
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 16.sp,
+                                            color = PklBase
+                                        )
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = PklPrimary900)
+                                )
+                            },
+                            title = {
+                                Text(
+                                    text = stringResource(id = R.string.konfirmasi_finalisasi_bs),
+                                    fontFamily = PoppinsFontFamily,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 18.sp,
+                                    color = PklPrimary900,
+                                    textAlign = TextAlign.Center
+                                )
+                            },
+                            text = {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    Arrangement.Start,
+                                    Alignment.CenterVertically
+                                ) {
+                                    Checkbox(
+                                        checked = checkedCheckbox,
+                                        onCheckedChange = { checkedCheckbox = it },
+                                        colors = CheckboxDefaults.colors(
+                                            checkedColor = PklPrimary900,
+                                            checkmarkColor = PklBase,
+                                        )
+                                    )
+                                    Text(
+                                        text = stringResource(id = R.string.pernyataan_konfirmasi_finalisasi_bs),
+                                        fontFamily = PoppinsFontFamily,
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 14.sp,
+                                        color = Color.Black
+                                    )
+                                }
+                            },
+                            shape = RoundedCornerShape(15.dp),
+                            containerColor = PklBase
+                        )
+                    }
+                    enableFinalisasiBSButton = checkedCheckbox
                 }
             }
         }
@@ -410,7 +553,8 @@ private fun ListBS(
     listWilayah: List<WilayahEntity>?,
     navController: NavHostController,
     isMonitoring : Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: ListBSViewModel
 ) {
     LazyColumn(
         modifier
@@ -432,7 +576,9 @@ private fun ListBS(
                     onLihatSampleClicked = {
                         navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${wilayah.idBS}/$isMonitoring")
                     },
-                    wilayah = wilayah
+                    wilayah = wilayah,
+                    viewModel = viewModel,
+                    navController = navController
                 )
             }
         }
@@ -474,6 +620,8 @@ fun BS() {
             status = "telah-disampel",
             tglListing = Date(),
             tglPeriksa = Date()
-        )
+        ),
+        viewModel = hiltViewModel(),
+        navController = rememberNavController()
     )
 }

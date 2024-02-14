@@ -17,4 +17,6 @@ interface WilayahRepository {
 
     suspend fun deleteAllWilayah() : Flow<String>
 
+    suspend fun deleteWilayah(idBS: String) : Flow<String>
+
 }
