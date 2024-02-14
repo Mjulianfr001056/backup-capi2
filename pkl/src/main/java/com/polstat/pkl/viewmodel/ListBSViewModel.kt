@@ -4,24 +4,16 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.polstat.pkl.database.entity.KeluargaEntity
 import com.polstat.pkl.database.entity.WilayahEntity
-import com.polstat.pkl.mapper.toKeluarga
 import com.polstat.pkl.mapper.toWilayah
-import com.polstat.pkl.model.domain.Keluarga
-import com.polstat.pkl.model.domain.Wilayah
 import com.polstat.pkl.model.response.FinalisasiBSResponse
-import com.polstat.pkl.repository.LocalRutaRepository
-import com.polstat.pkl.repository.MahasiswaRepository
 import com.polstat.pkl.repository.RemoteRutaRepository
 import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -33,8 +25,6 @@ import javax.inject.Inject
 class ListBSViewModel @Inject constructor(
     private val sessionRepository: SessionRepository,
     private val wilayahRepository: WilayahRepository,
-    private val mahasiswaRepository: MahasiswaRepository,
-    private val localRutaRepository: LocalRutaRepository,
     private val remoteRutaRepository: RemoteRutaRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -132,7 +122,6 @@ class ListBSViewModel @Inject constructor(
                                 deleteWilayah(idBS)
                                 _successMessage.value = "Berhasil melakukan finalisasi blok sensus!"
                                 _showSuccessToastChannel.send(true)
-                                _isSuccesed.value = true
                             }
                         }
 
@@ -141,6 +130,7 @@ class ListBSViewModel @Inject constructor(
                         is Result.Error -> {
                             result.message?.let { error ->
                                 _errorMessage.value = error
+                                _isSuccesed.value = true
                             }
                             _showErrorToastChannel.send(true)
                             Log.e(TAG, "finalisasiBS: Error in finalisasiBS (${errorMessage.value})")
@@ -159,58 +149,52 @@ class ListBSViewModel @Inject constructor(
     fun generateSampel(idBS: String) {
         viewModelScope.launch {
             _isSuccesed.value = false
-            val generateRutaJob = async {
-                remoteRutaRepository.generateRuta(idBS).collectLatest { message ->
-                    _successMessage.value = message
+            try {
+                remoteRutaRepository.generateRuta(idBS).collectLatest { result ->
+                    updateStatusWilayah(idBS, "telah-disampel")
+                    _successMessage.value = result
                     _showSuccessToastChannel.send(true)
-                    Log.d(TAG, message)
+                    Log.d(TAG, result)
                 }
-            }
-            generateRutaJob.await()
-
-            if (successMessage.value == "Berhasil Ambil Sampel!") {
-                getWilayah(idBS)
-                Log.d(TAG, "generateSampel: status BS berhasil diupdate!")
-            } else {
-                Log.d(TAG, "generateSampel: status BS gagal diupdate!")
-                _isSuccesed.value = true
+            } catch (e: Exception) {
+                Log.e(TAG, "Error generating ruta: ${e.message}")
             }
         }
     }
 
-    suspend fun getWilayah(idBS: String) {
-        viewModelScope.launch (Dispatchers.IO) {
-            wilayahRepository.getWilayah(idBS).collectLatest { result ->
-                when(result) {
-                    is Result.Error -> {
-                        result.message?.let { error ->
-                            _errorMessage.value = error
-                            Log.e(TAG, "getWilayah: Error in getWilayah (${errorMessage.value})")
-                            _isSuccesed.value = true
-                        }
-                        _showErrorToastChannel.send(true)
-                    }
-                    is Result.Loading -> Log.d(TAG, "getWilayah: Loading...")
-                    is Result.Success -> {
-                        result.data?.let {
-                            _wilayah.value = it
-                            _successMessage.value = "Berhasil mendapatkan wilayah!"
-                            _showSuccessToastChannel.send(true)
-                            Log.d(TAG, "getWilayah succeed: ${wilayah.value}")
 
-                            updateWilayah(it, "telah-disampel")
-                            _isSuccesed.value = true
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    suspend fun getWilayah(idBS: String) {
+//        viewModelScope.launch (Dispatchers.IO) {
+//            wilayahRepository.getWilayah(idBS).collectLatest { result ->
+//                when(result) {
+//                    is Result.Error -> {
+//                        result.message?.let { error ->
+//                            _errorMessage.value = error
+//                            Log.e(TAG, "getWilayah: Error in getWilayah (${errorMessage.value})")
+//                            _isSuccesed.value = true
+//                        }
+//                        _showErrorToastChannel.send(true)
+//                    }
+//                    is Result.Loading -> Log.d(TAG, "getWilayah: Loading...")
+//                    is Result.Success -> {
+//                        result.data?.let {
+//                            _wilayah.value = it
+//                            _successMessage.value = "Berhasil mendapatkan wilayah!"
+//                            _showSuccessToastChannel.send(true)
+//                            Log.d(TAG, "getWilayah succeed: ${wilayah.value}")
+//
+//                            updateStatusWilayah(it, "telah-disampel")
+//                            _isSuccesed.value = true
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
-    suspend fun updateWilayah(wilayahEntity: WilayahEntity, statusBS: String) {
-        val updatedWilayah = wilayahEntity.copy(status = statusBS)
+    suspend fun updateStatusWilayah(idBS: String, statusBS: String) {
         viewModelScope.launch {
-            wilayahRepository.updateWilayah(updatedWilayah).collectLatest { message ->
+            wilayahRepository.updateStatusWilayah(idBS, statusBS).collectLatest { message ->
                 Log.d(TAG, message)
             }
         }
@@ -218,30 +202,6 @@ class ListBSViewModel @Inject constructor(
 
     suspend fun deleteWilayah(idBS: String) {
         viewModelScope.launch {
-//            val getWilayahJob = async {
-//                wilayahRepository.getWilayah(idBS).collectLatest { result ->
-//                    when(result) {
-//                        is Result.Error -> {
-//                            result.message?.let { error ->
-//                                _errorMessage.value = error
-//                            }
-//                        }
-//                        is Result.Loading -> Log.d(TAG, "getWilayah: Loading...")
-//                        is Result.Success -> {
-//                            result.data?.let {
-//                                _deleteWilayah.value = it
-//                                Log.d(TAG, "deleteWilayah: Berhasil mendapatkan wilayah! ${_deleteWilayah.value}")
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            getWilayahJob.await()
-
-//            Log.d(TAG, "deleteWilayah: fakeDeleteKeluarga ${_deleteWilayah.value.toWilayah}")
-//            wilayahRepository.fakeDeleteWilayah(_deleteWilayah.value.toWilayah()).collectLatest { message ->
-//                Log.d(TAG, message)
-//            }
             wilayahRepository.deleteWilayah(idBS).collectLatest { message ->
                 Log.d(TAG, message)
             }

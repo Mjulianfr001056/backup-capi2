@@ -54,6 +54,9 @@ interface Capi63Dao {
     @Update
     suspend fun updateWilayah(wilayahEntity: WilayahEntity)
 
+    @Query("UPDATE Wilayah SET status = :status WHERE idBS = :idBS")
+    suspend fun updateStatusWilayah(idBS: String, status: String)
+
     @Query("SELECT * FROM wilayah WHERE idBS = :idBS")
     suspend fun getWilayah(idBS: String) : WilayahEntity
 

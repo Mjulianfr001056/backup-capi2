@@ -371,14 +371,6 @@ private fun BlokSensus(
                             )
                         }
                     }
-//                    Column (modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-//                        Row {
-//                            Text(text = stringResource(R.string.total), fontFamily = PoppinsFontFamily, fontSize = 15.sp, color = Color.Gray)
-//                        }
-//                        Row {
-//                            Text(text = "0", style = MaterialTheme.typography.headlineLarge, color = PklPrimary, fontWeight = FontWeight.Bold)
-//                        }
-//                    }
                 }
             }
             Box(
@@ -435,14 +427,10 @@ private fun BlokSensus(
                                     val generateRutaJob =
                                         async { viewModel.generateSampel(wilayah.idBS) }
                                     generateRutaJob.await()
-                                    delay(2000L)
-
-                                    if (viewModel.successMessage.value == "Berhasil Ambil Sampel!") {
-                                        navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
-                                            popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
-                                                inclusive = true
-                                            }
-                                        }
+                                }
+                                navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+                                    popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+                                        inclusive = true
                                     }
                                 }
                             },
@@ -482,12 +470,17 @@ private fun BlokSensus(
                                             }
                                             finalisasiBSJob.await()
 
-                                            if (finalisasiBSJob.isCompleted){
-                                                navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
-                                                    popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
-                                                        inclusive = true
-                                                    }
-                                                }
+//                                            if (finalisasiBSJob.isCompleted){
+//                                                navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+//                                                    popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+//                                                        inclusive = true
+//                                                    }
+//                                                }
+//                                            }
+                                        }
+                                        navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+                                            popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+                                                inclusive = true
                                             }
                                         }
                                     },

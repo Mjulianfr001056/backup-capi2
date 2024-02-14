@@ -53,6 +53,19 @@ class WilayahRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateStatusWilayah(idBS: String, status: String): Flow<String> {
+        return  flow {
+            try {
+                capi63Dao.updateStatusWilayah(idBS, status)
+                val message = "Berhasil mengupdate status wilayah!"
+                Log.d(TAG, "updateStatusWilayah: $message")
+            } catch (e: Exception) {
+                val message = "Gagal mengupdate status wilayah!"
+                Log.d(TAG, "updateStatusWilayah: $message (${e.message})")
+            }
+        }
+    }
+
     override suspend fun getWilayah(idBS: String): Flow<Result<WilayahEntity>> {
         return flow {
             try {
