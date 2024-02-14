@@ -59,8 +59,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
@@ -422,7 +425,12 @@ fun ListRutaScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(color = PklBase),
+//                    .background(color = PklBase)
+                    .paint(
+                        painter = painterResource(id = R.drawable.pb_bg_background),
+                        contentScale = ContentScale.Crop
+                    )
+                ,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {

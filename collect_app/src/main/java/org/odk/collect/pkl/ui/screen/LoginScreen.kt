@@ -64,7 +64,7 @@ fun LoginScreen(
             if (response.status == "success" && isLoginProcess) {
                 isLoginProcess = false
                 delay(1000)
-                Toast.makeText(context, "Login Success", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Login berhasil!", Toast.LENGTH_SHORT).show()
                 navController.navigate(CapiScreen.Top.MAIN){
                     popUpTo(CapiScreen.Top.AUTH){
                         inclusive = true

@@ -1,6 +1,6 @@
 package org.odk.collect.pkl.ui.screen
 
-import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,7 +29,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.polstat.pkl.R
 import org.odk.collect.pkl.ui.screen.components.BottomNavBar
 import org.odk.collect.pkl.ui.screen.components.ListPplCard
 import org.odk.collect.pkl.ui.screen.components.PmlCard
@@ -49,7 +54,6 @@ import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.viewmodel.BerandaViewModel
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
 import org.odk.collect.pkl.ui.screen.components.ProgresCacahCard
@@ -95,6 +99,7 @@ fun BerandaScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -171,6 +176,7 @@ fun BerandaScreen(
 //                                        delay(1000)
 //                                        System.exit(0)
                                     }
+                                    Toast.makeText(context, "Logout berhasil!", Toast.LENGTH_SHORT).show()
                                 }
                             )
                         }
@@ -186,7 +192,11 @@ fun BerandaScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .background(PklBase)
+                .paint(
+                    painter = painterResource(id = R.drawable.pb_bg_background),
+                    contentScale = ContentScale.Crop
+                )
+//                .background(PklBase)
                 .verticalScroll(rememberScrollState())
         ) {
 
