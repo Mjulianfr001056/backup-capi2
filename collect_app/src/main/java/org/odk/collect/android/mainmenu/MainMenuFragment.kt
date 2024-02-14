@@ -105,7 +105,9 @@ class MainMenuFragment(
         val projectsMenuItem = menu.findItem(org.odk.collect.android.R.id.projects)
         (projectsMenuItem.actionView as ProjectIconView).apply {
             project = currentProjectViewModel.currentProject.value
-            setOnClickListener { onOptionsItemSelected(projectsMenuItem) }
+            setOnClickListener {
+                onOptionsItemSelected(projectsMenuItem)
+            }
             contentDescription = getString(R.string.projects)
         }
     }

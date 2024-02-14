@@ -228,36 +228,37 @@ class ListRutaViewModel @Inject constructor(
             }
             synchronizeJob.await()
 
-            //Hapus semua data keluarga dan ruta di lokal
-            val deleteAllKeluargaRutaAndRelationByWilayahJob = async {
-                localRutaRepository.deleteAllKeluargaRutaAndRelationByWilayah(idBS).collectLatest { message ->
-                    Log.d(TAG, message)
-                }
-            }
-            deleteAllKeluargaRutaAndRelationByWilayahJob.await()
-
-            //Update data wilayah terbaru
-            wilayahRepository.insertWilayah(synchronizeRuta.value.toWilayah()).collectLatest { message ->
-                Log.d(TAG, message)
-            }
-
-            synchronizeRuta.value.keluarga.forEach { klg ->
-                //Update data keluarga terbaru
-                keluargaRepository.insertKeluarga(klg, KeluargaRepository.Method.Fetch).collectLatest { message ->
-                    Log.d(TAG, message)
-                }
-                klg.ruta.forEach { ruta ->
-                    //Update data ruta terbaru
-                    localRutaRepository.insertRuta(ruta, LocalRutaRepository.Method.Fetch).collectLatest { message ->
-                        Log.d(TAG, message)
-                    }
-
-                    localRutaRepository.insertKeluargaAndRuta(klg.kodeKlg, ruta.kodeRuta).collectLatest { message ->
+            if (successMessage.value == "Berhasil melakukan sinkronisasi!") {
+                //Hapus semua data keluarga dan ruta di lokal
+                val deleteAllKeluargaRutaAndRelationByWilayahJob = async {
+                    localRutaRepository.deleteAllKeluargaRutaAndRelationByWilayah(idBS).collectLatest { message ->
                         Log.d(TAG, message)
                     }
                 }
-            }
+                deleteAllKeluargaRutaAndRelationByWilayahJob.await()
 
+                //Update data wilayah terbaru
+                wilayahRepository.insertWilayah(synchronizeRuta.value.toWilayah()).collectLatest { message ->
+                    Log.d(TAG, message)
+                }
+
+                synchronizeRuta.value.keluarga.forEach { klg ->
+                    //Update data keluarga terbaru
+                    keluargaRepository.insertKeluarga(klg, KeluargaRepository.Method.Fetch).collectLatest { message ->
+                        Log.d(TAG, message)
+                    }
+                    klg.ruta.forEach { ruta ->
+                        //Update data ruta terbaru
+                        localRutaRepository.insertRuta(ruta, LocalRutaRepository.Method.Fetch).collectLatest { message ->
+                            Log.d(TAG, message)
+                        }
+
+                        localRutaRepository.insertKeluargaAndRuta(klg.kodeKlg, ruta.kodeRuta).collectLatest { message ->
+                            Log.d(TAG, message)
+                        }
+                    }
+                }
+            }
         }
     }
 

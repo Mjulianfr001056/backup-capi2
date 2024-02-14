@@ -1,10 +1,12 @@
 package org.odk.collect.pkl.ui.screen
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -63,6 +65,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.polstat.pkl.R
 import com.polstat.pkl.ui.event.IsiRutaScreenEvent
+import com.polstat.pkl.ui.state.Message
 import com.polstat.pkl.ui.theme.Capi63Theme
 import com.polstat.pkl.ui.theme.PklAccent
 import com.polstat.pkl.ui.theme.PklBase
@@ -70,12 +73,14 @@ import com.polstat.pkl.ui.theme.PklPrimary
 import com.polstat.pkl.ui.theme.PklPrimary700
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PklSecondary
+import com.polstat.pkl.ui.theme.PklTertiary300
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.utils.UtilFunctions
 import com.polstat.pkl.viewmodel.IsiRutaViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
+import timber.log.Timber
 
 @Composable
 fun IsiRumahTanggaScreen(
@@ -89,6 +94,8 @@ fun IsiRumahTanggaScreen(
     val lastKeluargaEgb = viewModel.lastKeluargaEgb.collectAsState()
     val lastRuta = viewModel.lastRuta.collectAsState()
     val context = LocalContext.current
+    var isKlgValid = viewModel.isKlgValid.collectAsState()
+    var isRutaValid = viewModel.isRutaValid.collectAsState()
 
     viewModel.getRutaLocation()
     LaunchedEffect(key1 = Unit) {
@@ -191,7 +198,7 @@ fun IsiRumahTanggaScreen(
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                TextField(
+                CustomTextField(
                     value = state.value.SLS,
                     onValueChange = {
                         coroutineScope.launch {
@@ -207,23 +214,69 @@ fun IsiRumahTanggaScreen(
                             fontWeight = FontWeight.SemiBold
                         )
                     },
-                    textStyle = TextStyle.Default.copy(
-                        fontFamily = PoppinsFontFamily,
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                        focusedIndicatorColor = PklPrimary700,
-                        unfocusedIndicatorColor = PklAccent,
-                    ),
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Next
-                    )
+                    isWarningOrError = state.value.SLSMsg.warning != null || state.value.SLSMsg.error != null,
+                    message = state.value.SLSMsg
                 )
+
+//                TextField(
+//                    value = state.value.SLS,
+//                    onValueChange = {
+//                        coroutineScope.launch {
+//                            viewModel.onEvent(
+//                                IsiRutaScreenEvent.SLSChanged(it)
+//                            )
+//                        }
+//                    },
+//                    label = {
+//                        Text(
+//                            text = "1. Satuan Lingkungan Setempat (SLS)",
+//                            fontFamily = PoppinsFontFamily,
+//                            fontWeight = FontWeight.SemiBold
+//                        )
+//                    },
+//                    textStyle = TextStyle.Default.copy(
+//                        fontFamily = PoppinsFontFamily,
+//                        fontWeight = FontWeight.SemiBold
+//                    ),
+//                    singleLine = true,
+//                    modifier = Modifier.fillMaxWidth(),
+//                    colors = TextFieldDefaults.colors(
+//                        focusedContainerColor = Color.Transparent,
+//                        unfocusedContainerColor = Color.Transparent,
+//                        disabledContainerColor = Color.Transparent,
+//                        focusedIndicatorColor = PklPrimary700,
+//                        unfocusedIndicatorColor = PklAccent,
+//                        errorContainerColor = Color.Transparent
+//                    ),
+//                    keyboardOptions = KeyboardOptions.Default.copy(
+//                        imeAction = ImeAction.Next
+//                    ),
+//                    isError = state.value.SLSMsg.warning != null || state.value.SLSMsg.error != null,
+//                    supportingText = {
+//                        Row(
+//                            modifier = Modifier.fillMaxWidth(),
+//                            horizontalArrangement = Arrangement.SpaceBetween
+//                        ) {
+//                            if (state.value.SLSMsg.warning != null){
+//                                Text(
+//                                    text = state.value.SLSMsg.warning ?: "",
+//                                    fontFamily = PoppinsFontFamily,
+//                                    fontWeight = FontWeight.W600,
+//                                    fontSize = 12.sp,
+//                                    color = PklTertiary300
+//                                )
+//                            } else {
+//                                Text(
+//                                    text = state.value.SLSMsg.error ?: "",
+//                                    fontFamily = PoppinsFontFamily,
+//                                    fontWeight = FontWeight.W600,
+//                                    fontSize = 12.sp,
+//                                    color = PklPrimary900
+//                                )
+//                            }
+//                        }
+//                    }
+//                )
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
@@ -232,9 +285,7 @@ fun IsiRumahTanggaScreen(
                     onValueChange = {
                         coroutineScope.launch {
                             viewModel.onEvent(
-                                IsiRutaScreenEvent.NoSegmenChanged(
-                                    it
-                                )
+                                IsiRutaScreenEvent.NoSegmenChanged(it)
                             )
                         }
                     },
@@ -266,7 +317,9 @@ fun IsiRumahTanggaScreen(
                                 )
                             )
                         }
-                    }
+                    },
+                    isWarningOrError = state.value.noSegmenMsg.warning != null || state.value.noSegmenMsg.error != null,
+                    message = state.value.noSegmenMsg
                 )
 
                 Spacer(modifier = Modifier.padding(10.dp))
@@ -322,7 +375,9 @@ fun IsiRumahTanggaScreen(
                                 )
                             )
                         }
-                    }
+                    },
+                    isWarningOrError = state.value.noBgFisikMsg.warning != null || state.value.noBgFisikMsg.error != null,
+                    message = state.value.noBgFisikMsg
                 )
 
                 Spacer(modifier = Modifier.padding(10.dp))
@@ -378,7 +433,9 @@ fun IsiRumahTanggaScreen(
                                 )
                             )
                         }
-                    }
+                    },
+                    isWarningOrError = state.value.noBgSensusMsg.warning != null || state.value.noBgSensusMsg.error != null,
+                    message = state.value.noBgSensusMsg
                 )
 
                 Spacer(modifier = Modifier.padding(10.dp))
@@ -456,14 +513,29 @@ fun IsiRumahTanggaScreen(
                 Button(
                     onClick = {
                         coroutineScope.launch {
-                            viewModel.onEvent(IsiRutaScreenEvent.submit)
-                        }
-                        Toast.makeText(context, "Keluarga dan Ruta berhasil ditambahkan!", Toast.LENGTH_SHORT).show()
-                        val isMonitoring = false
-                        val isListRuta = true
-                        navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
-                            popUpTo(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
-                                inclusive = true
+                            val onEventJob = async {
+                                viewModel.onEvent(IsiRutaScreenEvent.submit)
+                            }
+                            onEventJob.await()
+                            val isMonitoring = false
+                            val isListRuta = true
+                            Timber.tag("IsiRumahTanggaScreen").d("IsiRumahTanggaScreen: %s", isKlgValid.value)
+                            if (isKlgValid.value && isRutaValid.value) {
+                                Toast.makeText(context, "Keluarga dan Ruta berhasil ditambahkan!", Toast.LENGTH_SHORT).show()
+                                navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
+                                    popUpTo(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
+                                        inclusive = true
+                                    }
+                                }
+                            } else if(isKlgValid.value && state.value.jmlKlg == 1) {
+                                Toast.makeText(context, "Keluarga berhasil ditambahkan!", Toast.LENGTH_SHORT).show()
+                                navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
+                                    popUpTo(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
+                                        inclusive = true
+                                    }
+                                }
+                            } else {
+                                Toast.makeText(context, "Keluarga dan Ruta gagal ditambahkan!", Toast.LENGTH_SHORT).show()
                             }
                         }
                     },
@@ -498,9 +570,7 @@ fun KeteranganKeluarga(
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    event = IsiRutaScreenEvent.NoUrutKlgChanged(
-                        it
-                    ),
+                    event = IsiRutaScreenEvent.NoUrutKlgChanged(it),
                     index = index
                 )
             }
@@ -551,19 +621,19 @@ fun KeteranganKeluarga(
                     index = index
                 )
             }
-        }
+        },
+        isWarningOrError = state.value.listNoUrutKlgMsg[index].warning != null || state.value.listNoUrutKlgMsg[index].error != null,
+        message = state.value.listNoUrutKlgMsg[index]
     )
 
     Spacer(modifier = Modifier.padding(10.dp))
 
-    TextField(
+    CustomTextField(
         value = state.value.listNamaKK[index],
         onValueChange = {
             coroutineScope.launch {
                 viewModel.onEvent(
-                    event = IsiRutaScreenEvent.NamaKKChanged(
-                        it
-                    ),
+                    event = IsiRutaScreenEvent.NamaKKChanged(it),
                     index = index
                 )
             }
@@ -575,27 +645,50 @@ fun KeteranganKeluarga(
                 fontWeight = FontWeight.SemiBold
             )
         },
-        textStyle = TextStyle.Default.copy(
-            fontFamily = PoppinsFontFamily,
-            fontWeight = FontWeight.SemiBold
-        ),
-        singleLine = true,
-        modifier = Modifier.fillMaxWidth(),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            disabledContainerColor = Color.Transparent,
-            focusedIndicatorColor = PklPrimary700,
-            unfocusedIndicatorColor = PklAccent,
-        ),
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Next
-        )
+        isWarningOrError = state.value.listNamaKKMsg[index].warning != null || state.value.listNamaKKMsg[index].error != null,
+        message = state.value.listNamaKKMsg[index]
     )
+
+//    TextField(
+//        value = state.value.listNamaKK[index],
+//        onValueChange = {
+//            coroutineScope.launch {
+//                viewModel.onEvent(
+//                    event = IsiRutaScreenEvent.NamaKKChanged(
+//                        it
+//                    ),
+//                    index = index
+//                )
+//            }
+//        },
+//        label = {
+//            Text(
+//                text = "7. Nama Kepala Keluarga",
+//                fontFamily = PoppinsFontFamily,
+//                fontWeight = FontWeight.SemiBold
+//            )
+//        },
+//        textStyle = TextStyle.Default.copy(
+//            fontFamily = PoppinsFontFamily,
+//            fontWeight = FontWeight.SemiBold
+//        ),
+//        singleLine = true,
+//        modifier = Modifier.fillMaxWidth(),
+//        colors = TextFieldDefaults.colors(
+//            focusedContainerColor = Color.Transparent,
+//            unfocusedContainerColor = Color.Transparent,
+//            disabledContainerColor = Color.Transparent,
+//            focusedIndicatorColor = PklPrimary700,
+//            unfocusedIndicatorColor = PklAccent,
+//        ),
+//        keyboardOptions = KeyboardOptions.Default.copy(
+//            imeAction = ImeAction.Next
+//        )
+//    )
 
     Spacer(modifier = Modifier.padding(10.dp))
 
-    TextField(
+    CustomTextField(
         value = state.value.listAlamat[index],
         onValueChange = {
             coroutineScope.launch {
@@ -614,23 +707,46 @@ fun KeteranganKeluarga(
                 fontWeight = FontWeight.SemiBold
             )
         },
-        textStyle = TextStyle.Default.copy(
-            fontFamily = PoppinsFontFamily,
-            fontWeight = FontWeight.SemiBold
-        ),
-        singleLine = false,
-        modifier = Modifier.fillMaxWidth(),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            disabledContainerColor = Color.Transparent,
-            focusedIndicatorColor = PklPrimary700,
-            unfocusedIndicatorColor = PklAccent,
-        ),
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Next
-        )
+        isWarningOrError = state.value.listAlamatMsg[index].warning != null || state.value.listAlamatMsg[index].error != null,
+        message = state.value.listAlamatMsg[index]
     )
+
+//    TextField(
+//        value = state.value.listAlamat[index],
+//        onValueChange = {
+//            coroutineScope.launch {
+//                viewModel.onEvent(
+//                    event = IsiRutaScreenEvent.AlamatChanged(
+//                        it
+//                    ),
+//                    index = index
+//                )
+//            }
+//        },
+//        label = {
+//            Text(
+//                text = "8. Alamat",
+//                fontFamily = PoppinsFontFamily,
+//                fontWeight = FontWeight.SemiBold
+//            )
+//        },
+//        textStyle = TextStyle.Default.copy(
+//            fontFamily = PoppinsFontFamily,
+//            fontWeight = FontWeight.SemiBold
+//        ),
+//        singleLine = false,
+//        modifier = Modifier.fillMaxWidth(),
+//        colors = TextFieldDefaults.colors(
+//            focusedContainerColor = Color.Transparent,
+//            unfocusedContainerColor = Color.Transparent,
+//            disabledContainerColor = Color.Transparent,
+//            focusedIndicatorColor = PklPrimary700,
+//            unfocusedIndicatorColor = PklAccent,
+//        ),
+//        keyboardOptions = KeyboardOptions.Default.copy(
+//            imeAction = ImeAction.Next
+//        )
+//    )
 
     Spacer(modifier = Modifier.padding(10.dp))
 
@@ -716,7 +832,9 @@ fun KeteranganKeluarga(
                         index = index
                     )
                 }
-            }
+            },
+            isWarningOrError = state.value.listNoUrutKlgEgbMsg[index].warning != null || state.value.listNoUrutKlgEgbMsg[index].error != null,
+            message = state.value.listNoUrutKlgEgbMsg[index]
         )
     }
 
@@ -804,8 +922,7 @@ fun KeteranganRuta(
 ) {
     val state = viewModel.state.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    val kkKrtOptions =
-        listOf("Kepala Keluarga (KK) saja", "Kepala Rumah Tangga (KRT) saja", "KK Sekaligus KRT")
+    val kkKrtOptions = listOf("Kepala Keluarga (KK) saja", "Kepala Rumah Tangga (KRT) saja", "KK Sekaligus KRT")
 
     InputNomorHuruf(
         value = state.value.listNoUrutRuta[indexKlg][indexRuta],
@@ -870,7 +987,9 @@ fun KeteranganRuta(
                     indexRuta
                 )
             }
-        }
+        },
+        isWarningOrError = state.value.listNoUrutRutaMsg[indexKlg][indexRuta].warning != null || state.value.listNoUrutRutaMsg[indexKlg][indexRuta].error != null,
+        message = state.value.listNoUrutRutaMsg[indexKlg][indexRuta]
     )
 
     Spacer(modifier = Modifier.padding(10.dp))
@@ -887,6 +1006,7 @@ fun KeteranganRuta(
         RadioButtons(
             options = kkKrtOptions,
             selectedOption = state.value.listKkOrKrt[indexKlg][indexRuta],
+            message = state.value.listKkOrKrtMsg[indexKlg][indexRuta],
             onOptionSelected = { option ->
                 coroutineScope.launch {
                     val task1 = async {
@@ -917,7 +1037,7 @@ fun KeteranganRuta(
 
     Spacer(modifier = Modifier.padding(10.dp))
 
-    TextField(
+    CustomTextField(
         value = state.value.listNamaKrt[indexKlg][indexRuta],
         onValueChange = {
             coroutineScope.launch {
@@ -935,23 +1055,45 @@ fun KeteranganRuta(
                 fontWeight = FontWeight.SemiBold
             )
         },
-        textStyle = TextStyle.Default.copy(
-            fontFamily = PoppinsFontFamily,
-            fontWeight = FontWeight.SemiBold
-        ),
-        singleLine = true,
-        modifier = Modifier.fillMaxWidth(),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            disabledContainerColor = Color.Transparent,
-            focusedIndicatorColor = PklPrimary700,
-            unfocusedIndicatorColor = PklAccent,
-        ),
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Next
-        )
+        isWarningOrError = state.value.listNamaKrtMsg[indexKlg][indexRuta].warning != null || state.value.listNamaKrtMsg[indexKlg][indexRuta].error != null,
+        message = state.value.listNamaKrtMsg[indexKlg][indexRuta]
     )
+
+//    TextField(
+//        value = state.value.listNamaKrt[indexKlg][indexRuta],
+//        onValueChange = {
+//            coroutineScope.launch {
+//                viewModel.onEvent(
+//                    IsiRutaScreenEvent.NamaKRTChanged(it),
+//                    indexKlg,
+//                    indexRuta
+//                )
+//            }
+//        },
+//        label = {
+//            Text(
+//                text = "14. Nama Kepala Rumah Tangga",
+//                fontFamily = PoppinsFontFamily,
+//                fontWeight = FontWeight.SemiBold
+//            )
+//        },
+//        textStyle = TextStyle.Default.copy(
+//            fontFamily = PoppinsFontFamily,
+//            fontWeight = FontWeight.SemiBold
+//        ),
+//        singleLine = true,
+//        modifier = Modifier.fillMaxWidth(),
+//        colors = TextFieldDefaults.colors(
+//            focusedContainerColor = Color.Transparent,
+//            unfocusedContainerColor = Color.Transparent,
+//            disabledContainerColor = Color.Transparent,
+//            focusedIndicatorColor = PklPrimary700,
+//            unfocusedIndicatorColor = PklAccent,
+//        ),
+//        keyboardOptions = KeyboardOptions.Default.copy(
+//            imeAction = ImeAction.Next
+//        )
+//    )
 
     InputNomor(
         value = state.value.listJmlGenzAnak[indexKlg][indexRuta].toString(),
@@ -1039,6 +1181,45 @@ fun KeteranganRuta(
 
     Spacer(modifier = Modifier.padding(10.dp))
 
+    TextField(
+        value = state.value.listCatatan[indexKlg][indexRuta],
+        onValueChange = {
+            coroutineScope.launch {
+                viewModel.onEvent(
+                    IsiRutaScreenEvent.CatatanChanged(it),
+                    indexKlg,
+                    indexRuta
+                )
+            }
+        },
+        label = {
+            Text(
+                text = "16. Catatan",
+                fontFamily = PoppinsFontFamily,
+                fontWeight = FontWeight.SemiBold
+            )
+        },
+        textStyle = TextStyle.Default.copy(
+            fontFamily = PoppinsFontFamily,
+            fontWeight = FontWeight.SemiBold
+        ),
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
+            focusedIndicatorColor = PklPrimary700,
+            unfocusedIndicatorColor = PklAccent,
+        ),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Next
+        ),
+        maxLines = 3
+    )
+
+    Spacer(modifier = Modifier.padding(10.dp))
+
 //    if (state.value.listGenzOrtu[indexKlg][indexRuta] > 0) {
 //        Column(
 //            modifier = Modifier.padding(horizontal = 14.dp)
@@ -1071,6 +1252,7 @@ fun KeteranganRuta(
 fun RadioButtons(
     options: List<String>,
     selectedOption: String,
+    message: Message,
     onOptionSelected: (String) -> Unit
 ) {
     Column {
@@ -1099,6 +1281,28 @@ fun RadioButtons(
                 )
             }
         }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            if (message.warning != null){
+                Text(
+                    text = message.warning ?: "",
+                    fontFamily = PoppinsFontFamily,
+                    fontWeight = FontWeight.W600,
+                    fontSize = 12.sp,
+                    color = PklTertiary300
+                )
+            } else {
+                Text(
+                    text = message.error ?: "",
+                    fontFamily = PoppinsFontFamily,
+                    fontWeight = FontWeight.W600,
+                    fontSize = 12.sp,
+                    color = PklPrimary900
+                )
+            }
+        }
     }
 }
 
@@ -1111,7 +1315,9 @@ fun InputNomor(
     modifier: Modifier = Modifier,
     onIncrement: () -> Unit = {},
     onDecrement: () -> Unit = {},
-    readOnly: Boolean = false
+    readOnly: Boolean = false,
+    isWarningOrError: Boolean = false,
+    message: Message = Message()
 ) {
     TextField(
         value = value.toString(),
@@ -1125,6 +1331,7 @@ fun InputNomor(
             disabledContainerColor = Color.Transparent,
             focusedIndicatorColor = PklPrimary700,
             unfocusedIndicatorColor = PklAccent,
+            errorContainerColor = Color.Transparent
         ),
         textStyle = TextStyle.Default.copy(
             fontFamily = PoppinsFontFamily,
@@ -1171,8 +1378,34 @@ fun InputNomor(
                 }
             }
         },
-        readOnly = readOnly
+        readOnly = readOnly,
+        isError = isWarningOrError,
+        supportingText = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                if (message.warning != null){
+                    Text(
+                        text = message.warning ?: "",
+                        fontFamily = PoppinsFontFamily,
+                        fontWeight = FontWeight.W600,
+                        fontSize = 12.sp,
+                        color = PklTertiary300
+                    )
+                } else {
+                    Text(
+                        text = message.error ?: "",
+                        fontFamily = PoppinsFontFamily,
+                        fontWeight = FontWeight.W600,
+                        fontSize = 12.sp,
+                        color = PklPrimary900
+                    )
+                }
+            }
+        }
     )
+
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -1186,7 +1419,9 @@ fun InputNomorHuruf(
     onIncrementHuruf: () -> Unit = {},
     onDecrement: () -> Unit = {},
     onDecrementHuruf: () -> Unit = {},
-    readOnly: Boolean = false
+    readOnly: Boolean = false,
+    isWarningOrError: Boolean = false,
+    message: Message = Message()
 ) {
     TextField(
         value = value.toString(),
@@ -1200,6 +1435,7 @@ fun InputNomorHuruf(
             disabledContainerColor = Color.Transparent,
             focusedIndicatorColor = PklPrimary700,
             unfocusedIndicatorColor = PklAccent,
+            errorContainerColor = Color.Transparent
         ),
         textStyle = TextStyle.Default.copy(
             fontFamily = PoppinsFontFamily,
@@ -1246,7 +1482,32 @@ fun InputNomorHuruf(
                 }
             }
         },
-        readOnly = readOnly
+        readOnly = readOnly,
+        isError = isWarningOrError,
+        supportingText = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                if (message.warning != null){
+                    Text(
+                        text = message.warning ?: "",
+                        fontFamily = PoppinsFontFamily,
+                        fontWeight = FontWeight.W600,
+                        fontSize = 12.sp,
+                        color = PklTertiary300
+                    )
+                } else {
+                    Text(
+                        text = message.error ?: "",
+                        fontFamily = PoppinsFontFamily,
+                        fontWeight = FontWeight.W600,
+                        fontSize = 12.sp,
+                        color = PklPrimary900
+                    )
+                }
+            }
+        }
     )
 }
 
@@ -1295,6 +1556,66 @@ fun IsiRumahTanggaTopBar(
                 )
             }
         }
+    )
+}
+
+@Composable
+fun CustomTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: @Composable (() -> Unit),
+    modifier: Modifier = Modifier,
+    readOnly: Boolean = false,
+    isWarningOrError: Boolean = false,
+    message: Message = Message()
+) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = label,
+        modifier = modifier.fillMaxWidth(),
+        textStyle = TextStyle.Default.copy(
+            fontFamily = PoppinsFontFamily,
+            fontWeight = FontWeight.SemiBold
+        ),
+        singleLine = true,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
+            focusedIndicatorColor = PklPrimary700,
+            unfocusedIndicatorColor = PklAccent,
+            errorContainerColor = Color.Transparent
+        ),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Next
+        ),
+        isError = isWarningOrError,
+        supportingText = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                if (message.warning != null){
+                    Text(
+                        text = message.warning ?: "",
+                        fontFamily = PoppinsFontFamily,
+                        fontWeight = FontWeight.W600,
+                        fontSize = 12.sp,
+                        color = PklTertiary300
+                    )
+                } else {
+                    Text(
+                        text = message.error ?: "",
+                        fontFamily = PoppinsFontFamily,
+                        fontWeight = FontWeight.W600,
+                        fontSize = 12.sp,
+                        color = PklPrimary900
+                    )
+                }
+            }
+        },
+        readOnly = readOnly
     )
 }
 

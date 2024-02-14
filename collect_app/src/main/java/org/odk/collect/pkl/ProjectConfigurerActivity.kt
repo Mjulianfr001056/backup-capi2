@@ -42,7 +42,7 @@ class ProjectConfigurerActivity : ComponentActivity(){
         val token = intent.getStringExtra("token")
 
         val settingsJson = appConfigurationGenerator.getAppConfigurationAsJsonWithServerDetails(
-            "https://central.pkl63.stis.ac.id/v1/key/${token}/projects/2",
+            "https://central.pkl63.stis.ac.id/v1/key/${token}/projects/4",
             "",
             ""
         )
