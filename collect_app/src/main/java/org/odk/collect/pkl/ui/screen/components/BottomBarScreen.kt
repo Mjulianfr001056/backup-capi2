@@ -46,17 +46,17 @@ data class BottomNavigationItem(
 
 val items = listOf(
     BottomNavigationItem(
-        title = "sampling",
-        unselectedIcon = Icons.Outlined.List,
-        selectedIcon = Icons.Filled.List
-    ),
-    BottomNavigationItem(
-        title = "beranda",
+        title = "Beranda",
         unselectedIcon = Icons.Outlined.Home,
         selectedIcon = Icons.Filled.Home,
     ),
     BottomNavigationItem(
-        title = "kuesioner",
+        title = "Sampling",
+        unselectedIcon = Icons.Outlined.List,
+        selectedIcon = Icons.Filled.List
+    ),
+    BottomNavigationItem(
+        title = "Kuesioner",
         unselectedIcon = Icons.Outlined.Assignment,
         selectedIcon = Icons.Filled.Assignment
     )
