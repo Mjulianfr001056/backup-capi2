@@ -106,14 +106,10 @@ fun ListRutaScreen(
     var showSearchBar by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
     var isListRuta = viewModel.isListRuta?: true
-    var openFinalisasiBSDialog by remember { mutableStateOf(false) }
-    var enableFinalisasiBSButton by remember { mutableStateOf(false) }
-    var checkedCheckbox by remember { mutableStateOf(false) }
     val session = viewModel.session
     val listRutaWithKeluarga = viewModel.listRutaWithKeluarga.collectAsState()
     val listKeluargaWithRuta = viewModel.listKeluargaWithRuta.collectAsState()
     val idBS = viewModel.idBS
-    val statusBS = viewModel.wilayah.collectAsState().value.status
     val isMonitoring = viewModel.isMonitoring?: false
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -229,43 +225,6 @@ fun ListRutaScreen(
                             y = (-3).dp
                         )
                     ) {
-                        if (session?.isKoor == true && isMonitoring) {
-                            DropdownMenuItem(
-                                text = { Text(text = stringResource(id = R.string.finalisasi_bs)) },
-                                onClick = {
-                                    showMenu = false
-                                    openFinalisasiBSDialog = true
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(text = stringResource(id = R.string.ambil_sampel)) },
-                                onClick = {
-                                    showMenu = false
-                                    if (idBS != null) {
-                                        coroutineScope.launch {
-                                            if (statusBS == "listing-selesai") {
-                                                val generateRutaJob = async { viewModel.generateSampel(idBS) }
-                                                generateRutaJob.await()
-                                                delay(2000L)
-
-                                                if (viewModel.successMessage.value == "Berhasil Ambil Sampel!"){
-                                                    navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
-                                                        popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
-                                                            inclusive = true
-                                                        }
-                                                    }
-                                                }
-
-                                            } else if (statusBS == "listing") {
-                                                Toast.makeText(context, "Gagal ambil sampel: Blok sensus belum dilakukan finalisasi!", Toast.LENGTH_SHORT).show()
-                                            } else {
-                                                Toast.makeText(context, "Gagal ambil sampel: Blok sensus sudah pernah diambil sampel!", Toast.LENGTH_SHORT).show()
-                                            }
-                                        }
-                                    }
-                                }
-                            )
-                        }
                         DropdownMenuItem(
                             text = {
                                 val resourceId = if (isListRuta) R.string.tampilkan_list_keluarga else R.string.tampilkan_list_ruta
@@ -331,87 +290,6 @@ fun ListRutaScreen(
                     )
                 }
             }
-            if (openFinalisasiBSDialog) {
-                AlertDialog(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    onDismissRequest = { openFinalisasiBSDialog = false },
-                    confirmButton = {
-                        Button(
-                            modifier = Modifier.fillMaxWidth(),
-                            onClick = {
-                                openFinalisasiBSDialog = false
-                                coroutineScope.launch {
-                                    if (statusBS == "listing") {
-                                        val finalisasiBSJob = async {
-                                            idBS?.let { viewModel.finalisasiBS(it) }
-                                        }
-                                        finalisasiBSJob.await()
-                                        delay(2000L)
-
-                                        if (viewModel.successMessage.value == "Berhasil melakukan finalisasi blok sensus!") {
-                                            navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
-                                                popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
-                                                    inclusive = true
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        Toast.makeText(context, "Gagal Finalisasi: Blok sensus sudah pernah dilakukan finalisasi!", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-                            },
-                            enabled = enableFinalisasiBSButton,
-                            content = {
-                                Text(
-                                    text = stringResource(id = R.string.kirim_hasil_listing).uppercase(),
-                                    fontFamily = PoppinsFontFamily,
-                                    fontWeight = FontWeight.Medium,
-                                    fontSize = 16.sp,
-                                    color = PklBase
-                                )
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = PklPrimary900)
-                        )
-                    },
-                    title = {
-                        Text(
-                            text = stringResource(id = R.string.konfirmasi_finalisasi_bs),
-                            fontFamily = PoppinsFontFamily,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 18.sp,
-                            color = PklPrimary900,
-                            textAlign = TextAlign.Center
-                        )
-                    },
-                    text = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            Arrangement.Start,
-                            Alignment.CenterVertically
-                        ) {
-                            Checkbox(
-                                checked = checkedCheckbox,
-                                onCheckedChange = { checkedCheckbox = it },
-                                colors = CheckboxDefaults.colors(
-                                    checkedColor = PklPrimary900,
-                                    checkmarkColor = PklBase,
-                                )
-                            )
-                            Text(
-                                text = stringResource(id = R.string.pernyataan_konfirmasi_finalisasi_bs),
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp,
-                                color = Color.Black
-                            )
-                        }
-                    },
-                    shape = RoundedCornerShape(15.dp),
-                    containerColor = PklBase
-                )
-            }
-            enableFinalisasiBSButton = checkedCheckbox
         },
         content = { innerPadding ->
 

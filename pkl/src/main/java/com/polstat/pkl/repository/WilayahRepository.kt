@@ -11,10 +11,14 @@ interface WilayahRepository {
 
     suspend fun updateWilayah(wilayahEntity: WilayahEntity) : Flow<String>
 
+    suspend fun updateStatusWilayah(idBS: String, status: String) : Flow<String>
+
     suspend fun getWilayah(idBS: String) : Flow<Result<WilayahEntity>>
 
     suspend fun getAllWilayah(): Flow<Result<List<WilayahEntity>>>
 
     suspend fun deleteAllWilayah() : Flow<String>
+
+    suspend fun deleteWilayah(idBS: String) : Flow<String>
 
 }

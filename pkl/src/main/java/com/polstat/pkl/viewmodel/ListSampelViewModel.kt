@@ -76,8 +76,11 @@ class ListSampelViewModel @Inject constructor(
                     getSampelByBSFromDB(it)
                 }
                 getSampelByBSFromDbJob.await()
-                if (listSampelRuta.value.isEmpty()) {
+                if (listSampelRuta.value.isEmpty() || _isSyncing.value) {
                     getSampelRutaFromWSAndInsertThem(it)
+                    _isSyncing.value = false
+                } else {
+                    _isDataInserted.value = true
                 }
             }
         }
@@ -121,6 +124,9 @@ class ListSampelViewModel @Inject constructor(
                         Log.d(TAG, message)
                     }
                 }
+                _isDataInserted.value = true
+            } else {
+                Log.d(TAG, "No data received from WS")
                 _isDataInserted.value = true
             }
         }
@@ -198,5 +204,9 @@ class ListSampelViewModel @Inject constructor(
 
     fun updateShowLoading(isDataInserted: Boolean) {
         _showLoadingChannel.trySend(!isDataInserted)
+    }
+
+    fun updateSyncStatus(isSyncing: Boolean) {
+        _isSyncing.value = isSyncing
     }
 }
