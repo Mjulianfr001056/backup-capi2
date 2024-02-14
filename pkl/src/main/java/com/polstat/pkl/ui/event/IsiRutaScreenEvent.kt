@@ -18,5 +18,6 @@ sealed class IsiRutaScreenEvent {
     data class JmlGenzAnakChanged(val jmlGenzAnak: Int) : IsiRutaScreenEvent()
     data class JmlGenzDewasaChanged(val jmlGenzDewasa: Int) : IsiRutaScreenEvent()
     data class KatGenzChanged(val katGenz: Int) : IsiRutaScreenEvent()
+    data class CatatanChanged(val catatan: String) : IsiRutaScreenEvent()
     object submit : IsiRutaScreenEvent()
 }
