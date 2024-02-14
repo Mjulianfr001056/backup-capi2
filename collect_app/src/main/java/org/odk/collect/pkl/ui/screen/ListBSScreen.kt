@@ -427,10 +427,16 @@ private fun BlokSensus(
                                     val generateRutaJob =
                                         async { viewModel.generateSampel(wilayah.idBS) }
                                     generateRutaJob.await()
-                                }
-                                navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
-                                    popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
-                                        inclusive = true
+
+                                    viewModel.navigateToListBS.collect { shouldNavigate ->
+                                        if (shouldNavigate == true) {
+                                            navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+                                                popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+                                                    inclusive = true
+                                                }
+                                            }
+                                            viewModel.resetNavigateToListBS()
+                                        }
                                     }
                                 }
                             },
@@ -470,17 +476,15 @@ private fun BlokSensus(
                                             }
                                             finalisasiBSJob.await()
 
-//                                            if (finalisasiBSJob.isCompleted){
-//                                                navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
-//                                                    popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
-//                                                        inclusive = true
-//                                                    }
-//                                                }
-//                                            }
-                                        }
-                                        navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
-                                            popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
-                                                inclusive = true
+                                            viewModel.navigateToListBS.collect { shouldNavigate ->
+                                                if (shouldNavigate == true) {
+                                                    navController.navigate(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+                                                        popUpTo(CapiScreen.Listing.LIST_BS + "/$isMonitoring") {
+                                                            inclusive = true
+                                                        }
+                                                    }
+                                                    viewModel.resetNavigateToListBS()
+                                                }
                                             }
                                         }
                                     },

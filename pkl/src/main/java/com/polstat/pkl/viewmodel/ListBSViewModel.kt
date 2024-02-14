@@ -15,6 +15,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -74,6 +75,11 @@ class ListBSViewModel @Inject constructor(
     private val _isSuccesed = MutableStateFlow(false)
 
     val isSuccesed = _isSuccesed.asStateFlow()
+
+    private val _navigateToListBS = MutableStateFlow<Boolean?>(null)
+
+    val navigateToListBS: StateFlow<Boolean?> = _navigateToListBS
+
 
     init {
         getAllWilayah()
@@ -142,6 +148,7 @@ class ListBSViewModel @Inject constructor(
 
             wilayahRepository.insertWilayah(_finalisasiBSResponse.value.toWilayah()).collectLatest { message ->
                 Log.d(TAG, message)
+                _navigateToListBS.value = true
             }
         }
     }
@@ -152,6 +159,7 @@ class ListBSViewModel @Inject constructor(
             try {
                 remoteRutaRepository.generateRuta(idBS).collectLatest { result ->
                     updateStatusWilayah(idBS, "telah-disampel")
+                    _navigateToListBS.value = true
                     _successMessage.value = result
                     _showSuccessToastChannel.send(true)
                     Log.d(TAG, result)
@@ -161,36 +169,6 @@ class ListBSViewModel @Inject constructor(
             }
         }
     }
-
-
-//    suspend fun getWilayah(idBS: String) {
-//        viewModelScope.launch (Dispatchers.IO) {
-//            wilayahRepository.getWilayah(idBS).collectLatest { result ->
-//                when(result) {
-//                    is Result.Error -> {
-//                        result.message?.let { error ->
-//                            _errorMessage.value = error
-//                            Log.e(TAG, "getWilayah: Error in getWilayah (${errorMessage.value})")
-//                            _isSuccesed.value = true
-//                        }
-//                        _showErrorToastChannel.send(true)
-//                    }
-//                    is Result.Loading -> Log.d(TAG, "getWilayah: Loading...")
-//                    is Result.Success -> {
-//                        result.data?.let {
-//                            _wilayah.value = it
-//                            _successMessage.value = "Berhasil mendapatkan wilayah!"
-//                            _showSuccessToastChannel.send(true)
-//                            Log.d(TAG, "getWilayah succeed: ${wilayah.value}")
-//
-//                            updateStatusWilayah(it, "telah-disampel")
-//                            _isSuccesed.value = true
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     suspend fun updateStatusWilayah(idBS: String, statusBS: String) {
         viewModelScope.launch {
@@ -210,5 +188,9 @@ class ListBSViewModel @Inject constructor(
 
     fun updateShowLoading(isSuccesed: Boolean) {
         _showLoadingChannel.trySend(!isSuccesed)
+    }
+
+    fun resetNavigateToListBS() {
+        _navigateToListBS.value = null
     }
 }
