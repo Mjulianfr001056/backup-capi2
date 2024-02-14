@@ -215,7 +215,7 @@ fun BerandaScreen(
                 ListPplCard(listAnggotaTim = listAnggotaTim.value)
                 StatusListingCard(listWilayah = listWilayah.value)
             } else {
-                session?.let { PmlCard(session = it) }
+                session?.let { PmlCard(session = it, context) }
                 ProgresCacahCard(listWilayah = listWilayah.value, listAllSampelRuta = listAllSampelRuta.value)
             }
         }

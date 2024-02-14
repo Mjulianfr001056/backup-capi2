@@ -12,9 +12,9 @@ sealed class CapiScreen{
     }
 
     object Main : CapiScreen() {
-        const val BERANDA = "Beranda"
-        const val SAMPLING = "Sampling"
-        const val KUESIONER = "Kuesioner"
+        const val BERANDA = "beranda"
+        const val SAMPLING = "sampling"
+        const val KUESIONER = "kuesioner"
     }
 
     object Sampling : CapiScreen(){

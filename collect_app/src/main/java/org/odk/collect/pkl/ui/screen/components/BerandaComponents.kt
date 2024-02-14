@@ -1,45 +1,69 @@
 package org.odk.collect.pkl.ui.screen.components
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import com.polstat.pkl.R
 import com.polstat.pkl.database.entity.AnggotaTimEntity
 import com.polstat.pkl.database.entity.SampelRutaEntity
 import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.model.domain.Session
+import com.polstat.pkl.ui.theme.PklBase
 import com.polstat.pkl.ui.theme.PklPrimary100
 import com.polstat.pkl.ui.theme.PklPrimary900
 import com.polstat.pkl.ui.theme.PoppinsFontFamily
+import com.polstat.pkl.utils.UtilFunctions
+import org.odk.collect.pkl.ui.screen.DetailCard
+import org.odk.collect.pkl.ui.screen.DetailRutaTextField
 import java.util.Locale
 
 @Composable
@@ -121,13 +145,17 @@ fun ProfileCard(
 
 @Composable
 fun PmlCard(
-    session: Session
+    session: Session,
+    context: Context
 ) {
+    var hubungiPml by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .padding(16.dp)
             .shadow(8.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable { hubungiPml = true },
         colors = CardDefaults.cardColors(
             containerColor = PklPrimary900,
             contentColor = Color.Gray,
@@ -171,8 +199,137 @@ fun PmlCard(
                 }
             }
         }
+
+        if (hubungiPml) {
+            // Intent to open WhatsApp
+            Dialog(
+                onDismissRequest = { hubungiPml = false },
+                content = {
+                    Column(
+                        modifier = Modifier
+                            .background(
+                                color = Color.White,
+                                shape = RoundedCornerShape(15.dp)
+                            )
+                            .height(250.dp),
+                        Arrangement.Center,
+                        Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    color = PklPrimary900,
+                                    shape = RoundedCornerShape(
+                                        topStart = 15.dp,
+                                        topEnd = 15.dp
+                                    )
+                                )
+                                .padding(
+                                    top = 10.dp,
+                                    bottom = 10.dp
+                                ),
+                            text = stringResource(id = R.string.hubungi_pml).uppercase(),
+                            textAlign = TextAlign.Center,
+                            color = Color.White,
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 20.sp
+                        )
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "${session.namaPml}".uppercase(),
+                                fontSize = 20.sp,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = "${session.noTlpPml}",
+                                fontSize = 20.sp,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Divider(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(
+                                        top = 10.dp,
+                                        bottom = 10.dp
+                                    )
+                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.clickable {
+                                    openWhatsAppViaIntent(session, context)
+                                }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_whatsapp),
+                                    contentDescription = "WhatsApp Logo",
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .padding(start = 10.dp),
+                                    tint = Color(0xFF25CF43)
+                                )
+                                Text(
+                                    text = "Hubungi via WhatsApp",
+                                    fontSize = 20.sp,
+                                    textAlign = TextAlign.Center,
+                                    fontWeight = FontWeight.Medium,
+                                    modifier = Modifier
+                                        .padding(start = 10.dp)
+                                )
+                            }
+                        }
+
+                        Text(modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = PklPrimary900,
+                                shape = RoundedCornerShape(
+                                    bottomStart = 15.dp,
+                                    bottomEnd = 15.dp
+                                )
+                            )
+                            .clickable { hubungiPml = false }
+                            .padding(
+                                top = 10.dp,
+                                bottom = 10.dp
+                            ),
+                            textAlign = TextAlign.Center,
+                            text = stringResource(id = R.string.close_popup_list_ruta).uppercase(),
+                            color = Color.White,
+                            fontFamily = PoppinsFontFamily,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Medium)
+                    }
+                }
+            )
+        }
     }
 }
+
+fun openWhatsAppViaIntent(
+    session: Session,
+    context: Context
+) {
+    val phoneNumber = "${session.noTlpPml}."
+    try {
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = Uri.parse("https://wa.me/$phoneNumber")
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        // Handle exception if WhatsApp is not installed or any other issue
+        Toast.makeText(context, "WhatsApp tidak terinstall", Toast.LENGTH_SHORT).show()
+    }
+}
+
 
 @Composable
 fun ListPplCard(
