@@ -17,9 +17,9 @@ fun SampelRuta.toSampelRutaEntity(): SampelRutaEntity {
         genzOrtuKeluarga = genzOrtuKeluarga,
         alamat = alamat,
         namaKrt = namaKrt,
-        genzOrtuRuta = genzOrtuRuta,
-        long = long,
-        lat = lat,
+        katGenz = katGenz,
+        longitude = long,
+        latitude = lat,
         status = status
     )
 }

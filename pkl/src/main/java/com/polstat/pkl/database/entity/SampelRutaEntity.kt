@@ -20,9 +20,9 @@ data class SampelRutaEntity (
     var genzOrtuKeluarga: String = "[Not set]",//
     var alamat: String = "[Not set]",
     var namaKrt: String = "[Not set]",
-    var genzOrtuRuta: Int = -1,
-    var long: Double = -1.0,
-    var lat: Double = -1.0,
+    var katGenz: Int = -1,
+    var longitude: Double = -1.0,
+    var latitude: Double = -1.0,
     var status: String = "[Not set]" // pertimbangkan boolean
 )
 

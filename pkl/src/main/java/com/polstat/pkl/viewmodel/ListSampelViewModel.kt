@@ -110,6 +110,7 @@ class ListSampelViewModel @Inject constructor(
                         }
                         _showErrorToastChannel.send(true)
                         Log.e(TAG, "Error in Fetch Sampel Ruta")
+                        _isDataInserted.value = true
                     }
                 }
             }
@@ -146,6 +147,7 @@ class ListSampelViewModel @Inject constructor(
                         }
                         _showErrorToastChannel.send(true)
                         Log.e(TAG, "getSampelByBS: Error in getSampelByBS")
+                        _isDataInserted.value = true
                     }
                 }
             }
