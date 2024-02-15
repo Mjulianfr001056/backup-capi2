@@ -212,7 +212,7 @@ fun BerandaScreen(
             )
 
             if (session?.isKoor == true) {
-                ListPplCard(listAnggotaTim = listAnggotaTim.value)
+                ListPplCard(listAnggotaTim = listAnggotaTim.value, context)
                 StatusListingCard(listWilayah = listWilayah.value)
             } else {
                 session?.let { PmlCard(session = it, context) }

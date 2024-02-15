@@ -247,13 +247,15 @@ fun PmlCard(
                                 text = "${session.namaPml}".uppercase(),
                                 fontSize = 20.sp,
                                 textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Black
                             )
                             Text(
                                 text = "${session.noTlpPml}",
                                 fontSize = 20.sp,
                                 textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Black
                             )
                             Divider(
                                 modifier = Modifier
@@ -266,7 +268,7 @@ fun PmlCard(
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.clickable {
-                                    openWhatsAppViaIntent(session, context)
+                                    openWhatsAppViaIntent(session.noTlpPml, context)
                                 }
                             ) {
                                 Icon(
@@ -281,6 +283,7 @@ fun PmlCard(
                                     text = "Hubungi via WhatsApp",
                                     fontSize = 20.sp,
                                     textAlign = TextAlign.Center,
+                                    color = Color.Black,
                                     fontWeight = FontWeight.Medium,
                                     modifier = Modifier
                                         .padding(start = 10.dp)
@@ -315,26 +318,13 @@ fun PmlCard(
     }
 }
 
-fun openWhatsAppViaIntent(
-    session: Session,
-    context: Context
-) {
-    val phoneNumber = "${session.noTlpPml}."
-    try {
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.data = Uri.parse("https://wa.me/$phoneNumber")
-        context.startActivity(intent)
-    } catch (e: Exception) {
-        // Handle exception if WhatsApp is not installed or any other issue
-        Toast.makeText(context, "WhatsApp tidak terinstall", Toast.LENGTH_SHORT).show()
-    }
-}
-
-
 @Composable
 fun ListPplCard(
-    listAnggotaTim: List<AnggotaTimEntity>
+    listAnggotaTim: List<AnggotaTimEntity>,
+    context: Context
 ) {
+    var selectedItemIndex by remember { mutableStateOf(-1) }
+
     Card(
         modifier = Modifier
             .padding(16.dp)
@@ -366,35 +356,177 @@ fun ListPplCard(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    listAnggotaTim.forEach { anggotaTimEntity ->
-                        Text(
-                            text = anggotaTimEntity.nama,
-                            style = TextStyle(
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp,
-                                platformStyle = PlatformTextStyle(
-                                    includeFontPadding = false
+                    listAnggotaTim.forEachIndexed { index, anggotaTimEntity ->
+                        Box(
+                            modifier = Modifier
+                                .clickable { selectedItemIndex = index }
+                                .fillMaxWidth()
+                        ) {
+                            Column {
+                                Text(
+                                    text = anggotaTimEntity.nama,
+                                    style = TextStyle(
+                                        fontFamily = PoppinsFontFamily,
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 18.sp,
+                                        platformStyle = PlatformTextStyle(
+                                            includeFontPadding = false
+                                        )
+                                    ),
+                                    color = Color.DarkGray
                                 )
-                            ),
-                            color = Color.DarkGray
-                        )
-                        Text(
-                            text = anggotaTimEntity.nim,
-                            style = TextStyle(
-                                fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 12.sp,
-                                platformStyle = PlatformTextStyle(
-                                    includeFontPadding = false
+                                Text(
+                                    text = anggotaTimEntity.nim,
+                                    style = TextStyle(
+                                        fontFamily = PoppinsFontFamily,
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 12.sp,
+                                        platformStyle = PlatformTextStyle(
+                                            includeFontPadding = false
+                                        )
+                                    )
                                 )
-                            )
+                                Spacer(modifier = Modifier.height(12.dp))
+                            }
+                        }
+                    }
+                    selectedItemIndex.takeIf { it != -1 }?.let { index ->
+                        Dialog(
+                            onDismissRequest = { selectedItemIndex = -1 },
+                            content = {
+                                val selectedAnggota = listAnggotaTim[index]
+                                Column(
+                                    modifier = Modifier
+                                        .background(
+                                            color = Color.White,
+                                            shape = RoundedCornerShape(15.dp)
+                                        )
+                                        .height(250.dp),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(
+                                                color = PklPrimary900,
+                                                shape = RoundedCornerShape(
+                                                    topStart = 15.dp,
+                                                    topEnd = 15.dp
+                                                )
+                                            )
+                                            .padding(
+                                                top = 10.dp,
+                                                bottom = 10.dp
+                                            ),
+                                        text = stringResource(id = R.string.hubungi_ppl).uppercase(),
+                                        textAlign = TextAlign.Center,
+                                        color = Color.White,
+                                        fontFamily = PoppinsFontFamily,
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 20.sp
+                                    )
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .weight(1f),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(
+                                            text = "${selectedAnggota.nama}".uppercase(),
+                                            fontSize = 20.sp,
+                                            textAlign = TextAlign.Center,
+                                            fontWeight = FontWeight.Medium,
+                                            color = Color.Black
+                                        )
+                                        Text(
+                                            text = "${selectedAnggota.noTlp}",
+                                            fontSize = 20.sp,
+                                            textAlign = TextAlign.Center,
+                                            fontWeight = FontWeight.Medium,
+                                            color = Color.Black
+                                        )
+                                        Divider(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(
+                                                    top = 10.dp,
+                                                    bottom = 10.dp
+                                                )
+                                        )
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.clickable {
+                                                openWhatsAppViaIntent(
+                                                    selectedAnggota.noTlp,
+                                                    context
+                                                )
+                                            }
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.ic_whatsapp),
+                                                contentDescription = "WhatsApp Logo",
+                                                modifier = Modifier
+                                                    .size(50.dp)
+                                                    .padding(start = 10.dp),
+                                                tint = Color(0xFF25CF43)
+                                            )
+                                            Text(
+                                                text = "Hubungi via WhatsApp",
+                                                fontSize = 20.sp,
+                                                textAlign = TextAlign.Center,
+                                                color = Color.Black,
+                                                fontWeight = FontWeight.Medium,
+                                                modifier = Modifier.padding(start = 10.dp)
+                                            )
+                                        }
+                                    }
+
+                                    Text(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(
+                                                color = PklPrimary900,
+                                                shape = RoundedCornerShape(
+                                                    bottomStart = 15.dp,
+                                                    bottomEnd = 15.dp
+                                                )
+                                            )
+                                            .clickable { selectedItemIndex = -1 }
+                                            .padding(
+                                                top = 10.dp,
+                                                bottom = 10.dp
+                                            ),
+                                        textAlign = TextAlign.Center,
+                                        text = stringResource(id = R.string.close_popup_list_ruta).uppercase(),
+                                        color = Color.White,
+                                        fontFamily = PoppinsFontFamily,
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+                            }
                         )
-                        Spacer(modifier = Modifier.height(12.dp))
                     }
                 }
             }
         }
+    }
+}
+
+
+fun openWhatsAppViaIntent(
+    phoneNumber: String,
+    context: Context
+) {
+    try {
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = Uri.parse("https://wa.me/$phoneNumber")
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        // Handle exception if WhatsApp is not installed or any other issue
+        Toast.makeText(context, "WhatsApp tidak terinstall", Toast.LENGTH_SHORT).show()
     }
 }
 
