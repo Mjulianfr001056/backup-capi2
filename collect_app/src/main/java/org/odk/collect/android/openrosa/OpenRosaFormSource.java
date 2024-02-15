@@ -3,6 +3,8 @@ package org.odk.collect.android.openrosa;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
 
+import android.util.Log;
+
 import org.jetbrains.annotations.NotNull;
 import org.odk.collect.android.utilities.DocumentFetchResult;
 import org.odk.collect.android.utilities.WebCredentialsUtils;
@@ -19,6 +21,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.net.ssl.SSLException;
+
+import timber.log.Timber;
 
 public class OpenRosaFormSource implements FormSource {
 
@@ -90,9 +94,12 @@ public class OpenRosaFormSource implements FormSource {
         }
     }
 
+    //Link download kuesioner di sini
+    //https://central.pkl63.stis.ac.id/v1/key/{user_token}/projects/{projects_id}/forms/{forms}.xml
     @Override
     @NotNull
     public InputStream fetchForm(String formURL) throws FormSourceException {
+        Timber.tag("CAPI63_Download").d("fetchForm:%s", formURL);
         HttpGetResult result = mapException(() -> openRosaXMLFetcher.fetch(formURL, null));
 
         if (result.getInputStream() == null) {
