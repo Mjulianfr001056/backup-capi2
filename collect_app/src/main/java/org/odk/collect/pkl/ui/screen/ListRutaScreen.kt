@@ -44,6 +44,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -1128,32 +1129,42 @@ fun DetailRutaTextField(
             text = stringResource(id = label),
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
-            fontSize = 14.sp,
+            fontSize = 16.sp,
             color = PklPrimary900
         )
-        OutlinedTextField(
-            value = value,
-            onValueChange = {},
+//        OutlinedTextField(
+//            value = value,
+//            onValueChange = {},
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(0.dp)
+//                .background(Color.Transparent)
+//            ,
+//            readOnly = true,
+//            colors = TextFieldDefaults.colors(
+//                focusedContainerColor = Color.Transparent,
+//                unfocusedContainerColor = Color.Transparent,
+//                focusedTextColor = Color.Black,
+//                unfocusedTextColor = Color.Black,
+//                focusedIndicatorColor = PklPrimary900,
+//                unfocusedIndicatorColor = PklPrimary900
+//            ),
+//            textStyle = TextStyle(
+//                fontFamily = PoppinsFontFamily,
+//                fontWeight = FontWeight.Medium,
+//                fontSize = 14.sp
+//            ),
+//            shape = RoundedCornerShape(10.dp)
+//        )
+        Text(
+            text = value,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(0.dp)
-                .background(Color.Transparent)
-            ,
-            readOnly = true,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
-                focusedIndicatorColor = PklPrimary900,
-                unfocusedIndicatorColor = PklPrimary900
-            ),
-            textStyle = TextStyle(
-                fontFamily = PoppinsFontFamily,
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp
-            ),
-            shape = RoundedCornerShape(10.dp)
+                .padding(0.dp),
+            color = Color.Black,
+            fontFamily = PoppinsFontFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp,
         )
     }
 }
