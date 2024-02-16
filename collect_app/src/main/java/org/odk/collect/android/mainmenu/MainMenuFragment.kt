@@ -106,7 +106,7 @@ class MainMenuFragment(
         (projectsMenuItem.actionView as ProjectIconView).apply {
             project = currentProjectViewModel.currentProject.value
             setOnClickListener {
-                onOptionsItemSelected(projectsMenuItem)
+//                onOptionsItemSelected(projectsMenuItem)
             }
             contentDescription = getString(R.string.projects)
         }
