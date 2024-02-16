@@ -409,7 +409,7 @@ fun RutaOrKlgRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(50.dp)
+            .height(40.dp)
             .combinedClickable(onLongClick = {
                 if ((userNim == rutaWithKeluarga.ruta.nimPencacah) || (userNim == keluargaWithRuta.keluarga.nimPencacah)) {
                     openActionDialog = true

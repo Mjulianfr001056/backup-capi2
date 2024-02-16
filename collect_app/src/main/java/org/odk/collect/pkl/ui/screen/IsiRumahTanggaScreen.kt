@@ -158,21 +158,21 @@ fun IsiRumahTanggaScreen(
                                 TableCellForm(
                                     label = "No. Segmen",
                                     value = ": ${lastKeluarga.value.noSegmen}",
-                                    fontSize = 10.sp,
+                                    fontSize = 12.sp,
                                     weight = weight
                                 )
                                 TableCellForm(
                                     label = "No. Klg",
-                                    value = ": ${UtilFunctions.padWithZeros(lastKeluarga.value.noUrutKlg)}",
-                                    fontSize = 10.sp,
+                                    value = ": ${UtilFunctions.padWithZeros(lastKeluarga.value.noUrutKlg, 3)}",
+                                    fontSize = 12.sp,
                                     weight = weight
                                 )
                             }
                             Row {
                                 TableCellForm(
                                     label = "No. Bg Fisik",
-                                    value = ": ${UtilFunctions.padWithZeros(lastKeluarga.value.noBgFisik)}",
-                                    fontSize = 10.sp,
+                                    value = ": ${UtilFunctions.padWithZeros(lastKeluarga.value.noBgFisik, 3)}",
+                                    fontSize = 12.sp,
                                     weight = weight
                                 )
                                 TableCellForm(
@@ -180,21 +180,21 @@ fun IsiRumahTanggaScreen(
                                     value = ": ${
                                         UtilFunctions.convertTo3DigitsString(lastKeluargaEgb.value.noUrutKlgEgb)
                                     }",
-                                    fontSize = 10.sp,
+                                    fontSize = 12.sp,
                                     weight = weight
                                 )
                             }
                             Row {
                                 TableCellForm(
                                     label = "No. Bg Sensus",
-                                    value = ": ${UtilFunctions.padWithZeros(lastKeluarga.value.noBgSensus)}",
-                                    fontSize = 10.sp,
+                                    value = ": ${UtilFunctions.padWithZeros(lastKeluarga.value.noBgSensus, 3)}",
+                                    fontSize = 12.sp,
                                     weight = weight
                                 )
                                 TableCellForm(
                                     label = "No. Ruta",
-                                    value = ": ${UtilFunctions.padWithZeros(lastRuta.value.noUrutRuta)}",
-                                    fontSize = 10.sp,
+                                    value = ": ${UtilFunctions.padWithZeros(lastRuta.value.noUrutRuta, 3)}",
+                                    fontSize = 12.sp,
                                     weight = weight
                                 )
                             }
