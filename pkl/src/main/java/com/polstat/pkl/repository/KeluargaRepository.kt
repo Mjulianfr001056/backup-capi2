@@ -20,9 +20,9 @@ interface KeluargaRepository {
 
     suspend fun getAllKeluargaByRuta(kodeRuta: String) : Flow<Result<List<KeluargaEntity>>>
 
-    suspend fun getLastKeluarga() : Flow<Result<KeluargaEntity>>
+    suspend fun getLastKeluarga(idBS: String) : Flow<Result<KeluargaEntity>>
 
-    suspend fun getLastKeluargaEgb() : Flow<Result<KeluargaEntity>>
+    suspend fun getLastKeluargaEgb(idBS: String) : Flow<Result<KeluargaEntity>>
 
     suspend fun updateKeluarga(keluarga: Keluarga) : Flow<String>
 
@@ -32,6 +32,8 @@ interface KeluargaRepository {
 
     suspend fun getListKeluargaWithRuta(idBS: String) : Flow<Result<List<KeluargaWithRuta>>>
 
+    suspend fun updateStatusKeluarga(kodeKlg: String) : Flow<String>
+
     sealed class Method {
         object Insert : Method()
         object Fetch : Method()
@@ -40,6 +42,7 @@ interface KeluargaRepository {
             return when(this) {
                 is Insert -> "insert"
                 is Fetch -> "fetch"
+                else -> {""}
             }
         }
     }

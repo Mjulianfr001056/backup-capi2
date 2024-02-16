@@ -71,21 +71,7 @@ class AuthViewModel @Inject constructor(
     val visiblePermissionDialogQueue = mutableListOf<String>()
 
     init {
-        viewModelScope.launch {
-            delay(10000L)
-            getLocationUseCase.invoke().collect { location ->
-                if (location != null && _session?.nim != null) {
-                    Log.d(TAG, "getLocationUseCase: Nim = ${_session.nim}")
-                    locationRepository.updateLocation(
-                        _session.nim,
-                        location.longitude,
-                        location.latitude,
-                        location.accuracy
-                    )
-                }
-                Log.d(TAG, "getCurrentLocation: ${location?.latitude}, ${location?.longitude}, ${location?.accuracy}")
-            }
-        }
+
     }
 
     fun isLoggedIn() : Boolean {

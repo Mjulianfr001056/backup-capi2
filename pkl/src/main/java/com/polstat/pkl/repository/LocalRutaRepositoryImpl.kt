@@ -143,12 +143,12 @@ class LocalRutaRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getLastRuta(): Flow<Result<RutaEntity>> {
+    override suspend fun getLastRuta(idBS: String): Flow<Result<RutaEntity>> {
         return flow {
             try {
                 emit(Result.Loading(true))
 
-                val lastRuta = capi63Dao.getLastRuta()
+                val lastRuta = capi63Dao.getLastRuta(idBS)
 
                 Log.d(TAG, "Berhasil getLastRuta: $lastRuta")
 

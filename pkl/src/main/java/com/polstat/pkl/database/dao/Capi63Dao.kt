@@ -87,11 +87,11 @@ interface Capi63Dao {
     @Query("SELECT * FROM keluarga INNER JOIN KeluargaAndRutaEntity ON keluarga.kodeKlg = KeluargaAndRutaEntity.kodeKlg WHERE KeluargaAndRutaEntity.kodeRuta = :kodeRuta ORDER BY CAST(keluarga.noUrutKlg AS INTEGER) ASC")
     suspend fun getAllKeluargaByRuta(kodeRuta: String): List<KeluargaEntity>
 
-    @Query("SELECT * FROM keluarga WHERE status != 'delete' ORDER BY CAST(noUrutKlg AS INTEGER) DESC LIMIT 1")
-    suspend fun getLastKeluarga(): KeluargaEntity
+    @Query("SELECT * FROM keluarga WHERE idBS = :idBS AND status != 'delete' ORDER BY CAST(noUrutKlg AS INTEGER) DESC LIMIT 1")
+    suspend fun getLastKeluarga(idBS: String): KeluargaEntity
 
-    @Query("SELECT * FROM keluarga WHERE status != 'delete' ORDER BY CAST(noUrutKlgEgb AS INTEGER) DESC LIMIT 1")
-    suspend fun getLastKeluargaEgb(): KeluargaEntity
+    @Query("SELECT * FROM keluarga WHERE idBS = :idBS AND status != 'delete' ORDER BY CAST(noUrutKlgEgb AS INTEGER) DESC LIMIT 1")
+    suspend fun getLastKeluargaEgb(idBS: String): KeluargaEntity
 
     @Query("DELETE FROM keluarga")
     suspend fun deleteAllKeluarga()
@@ -116,8 +116,8 @@ interface Capi63Dao {
     @Query("SELECT * FROM ruta WHERE idBS = :idBS ORDER BY CAST(noUrutRuta AS INTEGER) ASC")
     suspend fun getAllRutaByWilayah(idBS: String) : List<RutaEntity>
 
-    @Query("SELECT * FROM ruta WHERE status != 'delete' ORDER BY CAST(noUrutRuta AS INTEGER) DESC LIMIT 1")
-    suspend fun getLastRuta(): RutaEntity
+    @Query("SELECT * FROM ruta WHERE idBS = :idBS AND status != 'delete' ORDER BY CAST(noUrutRuta AS INTEGER) DESC LIMIT 1")
+    suspend fun getLastRuta(idBS: String): RutaEntity
 
     @Query("DELETE FROM ruta")
     suspend fun deleteAllRuta()
@@ -164,4 +164,7 @@ interface Capi63Dao {
     suspend fun getAllSampelRuta() : List<SampelRutaEntity>
     @Query("DELETE FROM sampel_ruta")
     suspend fun deleteAllSampelRuta()
+
+    @Query("UPDATE keluarga SET status = :status WHERE kodeKlg = :kodeKlg")
+    fun updateStatusKeluarga(kodeKlg: String, status: String = "update")
 }

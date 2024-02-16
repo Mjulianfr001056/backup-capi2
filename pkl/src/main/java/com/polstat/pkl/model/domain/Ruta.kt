@@ -13,6 +13,7 @@ data class Ruta(
     val lat: Double = -1.0,
     val catatan: String = "[not set]",
     val idBS: String = "[not set]",
+    val noSegmen: String = "[not set]",
     val nimPencacah: String = "[not set]",
     val status: String = "[not set]"
 )

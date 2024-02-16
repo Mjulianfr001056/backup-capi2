@@ -19,6 +19,7 @@ fun Ruta.toRutaEntity(): RutaEntity {
         latitude = lat,
         longitude = long,
         nimPencacah = nimPencacah,
+        noSegmen = noSegmen,
         status = status
     )
 }
@@ -38,6 +39,7 @@ fun RutaEntity.toRuta(): Ruta {
         lat = latitude,
         long = longitude,
         nimPencacah = nimPencacah,
+        noSegmen = noSegmen,
         status = status
     )
 }
@@ -56,6 +58,7 @@ fun RutaEntity.toRutaDto(): RutaDto {
         kat_genz = katGenz,
         kk_or_krt = kkOrKrt,
         nim_pencacah = nimPencacah,
+        no_segmen = noSegmen,
         status = status
     )
 }

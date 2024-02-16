@@ -31,8 +31,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -46,6 +44,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -90,7 +89,6 @@ import com.polstat.pkl.utils.UtilFunctions
 import com.polstat.pkl.viewmodel.ListRutaViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
@@ -137,7 +135,7 @@ fun ListRutaScreen(
             TopAppBar(
                 title = {
                     val textId = if (isListRuta) R.string.list_ruta_title else R.string.list_keluarga
-                    val status = if (isMonitoring == true) stringResource(R.string.monitoring) else stringResource(R.string.listing)
+                    val status = if (isMonitoring) stringResource(R.string.monitoring) else stringResource(R.string.listing)
 
                     Text(
                         text = stringResource(id = textId).uppercase() + " ($status)",
@@ -366,7 +364,7 @@ fun ListRutaScreen(
             }
         },
         floatingActionButton = {
-            if (isMonitoring == false){
+            if (!isMonitoring){
                 FloatingActionButton(
                     modifier = Modifier
                         .padding(all = 16.dp),
@@ -413,7 +411,9 @@ fun RutaOrKlgRow(
             .fillMaxWidth()
             .height(50.dp)
             .combinedClickable(onLongClick = {
-                openActionDialog = true
+                if ((userNim == rutaWithKeluarga.ruta.nimPencacah) || (userNim == keluargaWithRuta.keluarga.nimPencacah)) {
+                    openActionDialog = true
+                }
             },
                 onClick = { }),
         Arrangement.SpaceEvenly,
@@ -881,12 +881,40 @@ fun RutaOrKlgRow(
                             Arrangement.Center,
                             Alignment.CenterHorizontally
                         ) {
-//                          untuk edit ruta
+//                            Text(modifier = Modifier
+//                                .fillMaxWidth()
+//                                .clickable {
+////                                    navController.navigate(CapiScreen.Listing.SALIN_RUTA + "/${ruta.noBS}/${ruta.kodeRuta}")
+////                                    navController.navigate(CapiScreen.Listing.SALIN_RUTA + "/${ruta.idBS}/${ruta.kodeRuta}")
+//                                }
+//                                .padding(
+//                                    top = 10.dp,
+//                                    bottom = 10.dp
+//                                ),
+//                                textAlign = TextAlign.Center,
+//                                text = stringResource(id = R.string.salin_action_art),
+//                                fontSize = 16.sp,
+//                                fontFamily = PoppinsFontFamily,
+//                                fontWeight = FontWeight.Medium)
+
+//                          untuk menghapus ruta/klg
+//                                untuk edit ruta
                             Text(modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-//                                    navController.navigate(CapiScreen.Listing.EDIT_RUTA + "/${ruta.idBS}/${keluarga.kodeKlg}/${ruta.kodeRuta}")
-//                                    navController.navigate(CapiScreen.Listing.EDIT_RUTA + "/${ruta.noBS}/${keluarga.kodeKlg}/${ruta.kodeRuta}")
+                                    val idBS: String
+                                    val allKodeKlgStr: String
+                                    var kodeRuta = "-1"
+                                    if (isListRuta) {
+                                        idBS = rutaWithKeluarga.ruta.idBS
+                                        val allKodeKlg = viewModel.getAllKodeKlgFromRutaWithKeluarga(rutaWithKeluarga)
+                                        allKodeKlgStr = allKodeKlg.joinToString(separator = ";")
+                                        kodeRuta = rutaWithKeluarga.ruta.kodeRuta
+                                    } else {
+                                        idBS = keluargaWithRuta.keluarga.idBS
+                                        allKodeKlgStr = keluargaWithRuta.keluarga.kodeKlg
+                                    }
+                                    navController.navigate(CapiScreen.Listing.EDIT_RUTA + "/$idBS/$allKodeKlgStr/$kodeRuta/$isMonitoring/$isListRuta")
                                 }
                                 .padding(
                                     top = 10.dp,
@@ -901,37 +929,18 @@ fun RutaOrKlgRow(
                             Text(modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-//                                    navController.navigate(CapiScreen.Listing.SALIN_RUTA + "/${ruta.noBS}/${ruta.kodeRuta}")
-//                                    navController.navigate(CapiScreen.Listing.SALIN_RUTA + "/${ruta.idBS}/${ruta.kodeRuta}")
+                                    openDeleteConfirmDialog = true
                                 }
                                 .padding(
                                     top = 10.dp,
                                     bottom = 10.dp
                                 ),
                                 textAlign = TextAlign.Center,
-                                text = stringResource(id = R.string.salin_action_art),
+                                text = stringResource(id = R.string.hapus_action_art),
                                 fontSize = 16.sp,
                                 fontFamily = PoppinsFontFamily,
-                                fontWeight = FontWeight.Medium)
-
-//                          untuk menghapus ruta/klg
-                            if (userNim == (if (isListRuta) rutaWithKeluarga.ruta.nimPencacah else keluargaWithRuta.keluarga.nimPencacah)) {
-                                Text(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        openDeleteConfirmDialog = true
-                                    }
-                                    .padding(
-                                        top = 10.dp,
-                                        bottom = 10.dp
-                                    ),
-                                    textAlign = TextAlign.Center,
-                                    text = stringResource(id = R.string.hapus_action_art),
-                                    fontSize = 16.sp,
-                                    fontFamily = PoppinsFontFamily,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
+                                fontWeight = FontWeight.Medium
+                            )
                         }
                     }
                 }
@@ -952,7 +961,7 @@ fun RutaOrKlgRow(
                         onClick = {
                             openDeleteConfirmDialog = false
                             openActionDialog = false
-                            val isMonitoring = false
+//                            val isMonitoring = false
 
                             if (isListRuta) {
                                 coroutineScope.launch {
@@ -1120,32 +1129,42 @@ fun DetailRutaTextField(
             text = stringResource(id = label),
             fontFamily = PoppinsFontFamily,
             fontWeight = FontWeight.Medium,
-            fontSize = 14.sp,
+            fontSize = 16.sp,
             color = PklPrimary900
         )
-        OutlinedTextField(
-            value = value,
-            onValueChange = {},
+//        OutlinedTextField(
+//            value = value,
+//            onValueChange = {},
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(0.dp)
+//                .background(Color.Transparent)
+//            ,
+//            readOnly = true,
+//            colors = TextFieldDefaults.colors(
+//                focusedContainerColor = Color.Transparent,
+//                unfocusedContainerColor = Color.Transparent,
+//                focusedTextColor = Color.Black,
+//                unfocusedTextColor = Color.Black,
+//                focusedIndicatorColor = PklPrimary900,
+//                unfocusedIndicatorColor = PklPrimary900
+//            ),
+//            textStyle = TextStyle(
+//                fontFamily = PoppinsFontFamily,
+//                fontWeight = FontWeight.Medium,
+//                fontSize = 14.sp
+//            ),
+//            shape = RoundedCornerShape(10.dp)
+//        )
+        Text(
+            text = value,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(0.dp)
-                .background(Color.Transparent)
-            ,
-            readOnly = true,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
-                focusedIndicatorColor = PklPrimary900,
-                unfocusedIndicatorColor = PklPrimary900
-            ),
-            textStyle = TextStyle(
-                fontFamily = PoppinsFontFamily,
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp
-            ),
-            shape = RoundedCornerShape(10.dp)
+                .padding(0.dp),
+            color = Color.Black,
+            fontFamily = PoppinsFontFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp,
         )
     }
 }

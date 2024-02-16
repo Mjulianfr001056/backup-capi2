@@ -26,6 +26,16 @@ class UtilFunctions {
 //            }
 //        }
 
+        fun checkStringAngka(inputStr: String): String {
+            // Cek apakah string adalah numerik atau berakhir dengan satu huruf kapital setelah karakter numerik
+            return if (inputStr.matches(Regex("^[0-9]+[A-Z]?$"))) {
+                inputStr
+            } else {
+                ""
+            }
+        }
+
+
         fun convertStringToNumber(str: String): Int {
             // Trim string dan periksa kasus khusus
             val trimmedStr = str.trimStart('0').trim() // Menghapus leading zeros dan whitespace
@@ -43,6 +53,10 @@ class UtilFunctions {
             }
         }
 
+        fun isValidNoSegmenFormat(input: String): Boolean {
+            val regex = Regex("S[0-9]{3}")
+            return regex.matches(input)
+        }
 
     }
 }

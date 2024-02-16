@@ -371,4 +371,9 @@ class ListRutaViewModel @Inject constructor(
             nama
         }
     }
+
+    // Fungsi untuk mendapatkan semua kodeKlg
+    fun getAllKodeKlgFromRutaWithKeluarga(rutaWithKeluarga: RutaWithKeluarga): List<String> {
+        return rutaWithKeluarga.listKeluarga.map { it.kodeKlg }
+    }
 }

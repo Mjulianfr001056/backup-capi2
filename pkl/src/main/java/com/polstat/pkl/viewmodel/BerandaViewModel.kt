@@ -9,12 +9,15 @@ import com.polstat.pkl.database.entity.WilayahEntity
 import com.polstat.pkl.repository.AnggotaTimRepository
 import com.polstat.pkl.repository.KeluargaRepository
 import com.polstat.pkl.repository.LocalRutaRepository
+import com.polstat.pkl.repository.LocationRepository
 import com.polstat.pkl.repository.SampelRutaRepository
 import com.polstat.pkl.repository.SessionRepository
 import com.polstat.pkl.repository.WilayahRepository
 import com.polstat.pkl.utils.Result
+import com.polstat.pkl.utils.location.GetLocationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -29,7 +32,9 @@ class BerandaViewModel @Inject constructor(
     private val sampelRutaRepository: SampelRutaRepository,
     private val anggotaTimRepository: AnggotaTimRepository,
     private val keluargaRepository: KeluargaRepository,
-    private val localRutaRepository: LocalRutaRepository
+    private val localRutaRepository: LocalRutaRepository,
+    private val getLocationUseCase: GetLocationUseCase,
+    private val locationRepository: LocationRepository
 ) : ViewModel() {
 
     companion object {
@@ -58,7 +63,29 @@ class BerandaViewModel @Inject constructor(
 
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
+    private val _isAskLocation = MutableStateFlow(false)
+
+    val askLocation = _isAskLocation.asStateFlow()
+
     init {
+        viewModelScope.launch {
+//            delay(10000L)
+            getLocationUseCase.invoke().collect { location ->
+                if (location == null) {
+                    _isAskLocation.value = true
+                }
+                if (location != null && session?.nim != null) {
+                    Log.d(TAG, "getLocationUseCase: Nim = ${session.nim}")
+                    locationRepository.updateLocation(
+                        session.nim,
+                        location.longitude,
+                        location.latitude,
+                        location.accuracy
+                    )
+                }
+                Log.d(TAG, "getCurrentLocation: ${location?.latitude}, ${location?.longitude}, ${location?.accuracy}")
+            }
+        }
         getAllWilayah()
         getAllAnggotaTim()
         getAllSampelRuta()

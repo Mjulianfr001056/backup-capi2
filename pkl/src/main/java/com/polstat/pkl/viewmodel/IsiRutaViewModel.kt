@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.database.entity.KeluargaEntity
 import com.polstat.pkl.database.entity.RutaEntity
+import com.polstat.pkl.database.relation.RutaWithKeluarga
 import com.polstat.pkl.model.domain.Keluarga
 import com.polstat.pkl.model.domain.Lokasi
 import com.polstat.pkl.model.domain.Ruta
@@ -19,6 +20,7 @@ import com.polstat.pkl.utils.Result
 import com.polstat.pkl.utils.UtilFunctions
 import com.polstat.pkl.utils.location.GetLocationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,6 +50,14 @@ class IsiRutaViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     val idBS = savedStateHandle.get<String>("idBS").orEmpty()
+
+    val kodeKlg = savedStateHandle.get<String>("kodeKlg")
+
+    val kodeRuta = savedStateHandle.get<String>("kodeRuta")
+
+    val isListRuta = savedStateHandle.get<Boolean>("isListRuta")
+
+    val isMonitoring = savedStateHandle.get<Boolean>("isMonitoring")
 
     private val _lastKeluarga = MutableStateFlow(KeluargaEntity())
 
@@ -85,17 +95,41 @@ class IsiRutaViewModel @Inject constructor(
 
     val klgQueue = _klgQueue.asStateFlow()
 
+    var allKodeKlg : List<String> = emptyList()
+
     init {
-        viewModelScope.launch {
-            val getLastKeluargaTask = async { getLastKeluarga() }
-            val getLastKeluargaEgbTask = async { getLastKeluargaEgb() }
-            val getLastRutaTask = async { getLastRuta() }
+        if (kodeKlg == null && kodeRuta == null) {
+            viewModelScope.launch {
+                val getLastKeluargaTask = async { getLastKeluarga(idBS) }
+                val getLastKeluargaEgbTask = async { getLastKeluargaEgb(idBS) }
+                val getLastRutaTask = async { getLastRuta(idBS) }
 
-            _lastKeluarga.value = getLastKeluargaTask.await()
-            _lastKeluargaEgb.value = getLastKeluargaEgbTask.await()
-            _lastRuta.value = getLastRutaTask.await()
+                _lastKeluarga.value = getLastKeluargaTask.await()
+                _lastKeluargaEgb.value = getLastKeluargaEgbTask.await()
+                _lastRuta.value = getLastRutaTask.await()
 
-            setInitialKlgValue()
+                setInitialKlgValue()
+            }
+        } else {
+            viewModelScope.launch {
+                if (kodeKlg != null && kodeRuta != null) {
+                    Log.d(TAG, "idBS: $idBS")
+                    Log.d(TAG, "kodeKlg: $kodeKlg")
+                    Log.d(TAG, "kodeRuta: $kodeRuta")
+                    if (isListRuta == true) {
+                        allKodeKlg = kodeKlg.split(";")
+                    }
+                    setRutaValueEdit()
+                    setKeluargaValueEdit()
+                    getRuta(kodeRuta)
+                    getKeluarga(kodeKlg)
+                    delay(500L)
+                    setRutaValueEdit()
+                    setKeluargaValueEdit()
+                    Log.d(TAG, "allKodeKlg: $allKodeKlg")
+                }
+            }
+
         }
     }
 
@@ -107,6 +141,84 @@ class IsiRutaViewModel @Inject constructor(
             noBgSensus = UtilFunctions.convertStringToNumber(lastKeluarga.value.noBgSensus).plus(1).toString()
         )
         Log.d(TAG, "setInitialKlgValue: ${state.value}")
+    }
+//    kkOrKrt = when (state.value.listKkOrKrt[indexKlg][indexRuta]) {
+//        "Kepala Keluarga (KK) saja" -> "1"
+//        "Kepala Rumah Tangga (KRT) saja" -> "2"
+//        "KK Sekaligus KRT" -> "3"
+//        else -> "0"
+//    },
+    private fun setRutaValueEdit() {
+        _state.value = state.value.copy(
+            SLS = keluarga.value.banjar,
+            SLSMsg = Message(),
+            noBgSensus = keluarga.value.noBgSensus,
+            noBgSensusMsg = Message(),
+            noBgFisik = keluarga.value.noBgFisik,
+            noBgFisikMsg = Message(),
+            noSegmen = keluarga.value.noSegmen,
+            noSegmenMsg = Message(),
+            listNoUrutKlg = listOf(keluarga.value.noUrutKlg),
+            listNoUrutKlgMsg = listOf(Message()),
+            listNoUrutKlgEgb = listOf(keluarga.value.noUrutKlgEgb),
+            listNoUrutKlgEgbMsg = listOf(Message()),
+            listNamaKK = listOf(keluarga.value.namaKK),
+            listNamaKKMsg = listOf(Message()),
+            listAlamat = listOf(keluarga.value.alamat),
+            listAlamatMsg = listOf(Message()),
+            listIsGenzOrtu = listOf(keluarga.value.isGenzOrtu),
+            listIsGenzOrtuMsg = listOf(Message()),
+            listPenglMkn = listOf(keluarga.value.penglMkn),
+            listPenglMknMsg = listOf(Message()),
+            listNoUrutRuta = listOf(listOf(ruta.value.noUrutRuta)),
+            listNoUrutRutaMsg = listOf(listOf(Message())),
+            listKkOrKrt = listOf(listOf(
+                    when (ruta.value.kkOrKrt) {
+                        "1" -> "Kepala Keluarga (KK) saja"
+                        "2" -> "Kepala Rumah Tangga (KRT) saja"
+                        "3" -> "KK Sekaligus KRT"
+                        else -> "N/A"
+                    }
+                )
+            ),
+            listKkOrKrtMsg = listOf(listOf(Message())),
+            listNamaKrt = listOf(listOf(ruta.value.namaKrt)),
+            listNamaKrtMsg = listOf(listOf(Message())),
+            listJmlGenzAnak = listOf(listOf(ruta.value.jmlGenzAnak)),
+            listJmlGenzAnakMsg = listOf(listOf(Message())),
+            listJmlGenzDewasa = listOf(listOf(ruta.value.jmlGenzDewasa)),
+            listJmlGenzDewasaMsg = listOf(listOf(Message())),
+            listKatGenz = listOf(listOf(ruta.value.katGenz)),
+            listKatGenzMsg = listOf(listOf(Message())),
+            listCatatan = listOf(listOf(ruta.value.catatan))
+        )
+        Log.d(TAG, "setInitialRutaValueEdit: ${state.value}")
+    }
+
+    private fun setKeluargaValueEdit() {
+        _state.value = state.value.copy(
+            SLS = keluarga.value.banjar,
+            SLSMsg = Message(),
+            noBgSensus = keluarga.value.noBgSensus,
+            noBgSensusMsg = Message(),
+            noBgFisik = keluarga.value.noBgFisik,
+            noBgFisikMsg = Message(),
+            noSegmen = keluarga.value.noSegmen,
+            noSegmenMsg = Message(),
+            listNoUrutKlg = listOf(keluarga.value.noUrutKlg),
+            listNoUrutKlgMsg = listOf(Message()),
+            listNoUrutKlgEgb = listOf(keluarga.value.noUrutKlgEgb),
+            listNoUrutKlgEgbMsg = listOf(Message()),
+            listNamaKK = listOf(keluarga.value.namaKK),
+            listNamaKKMsg = listOf(Message()),
+            listAlamat = listOf(keluarga.value.alamat),
+            listAlamatMsg = listOf(Message()),
+            listIsGenzOrtu = listOf(keluarga.value.isGenzOrtu),
+            listIsGenzOrtuMsg = listOf(Message()),
+            listPenglMkn = listOf(keluarga.value.penglMkn),
+            listPenglMknMsg = listOf(Message())
+        )
+        Log.d(TAG, "setInitialKlgValueEdit: ${state.value}")
     }
 
     private fun getKeluarga(
@@ -142,6 +254,16 @@ class IsiRutaViewModel @Inject constructor(
         }
     }
 
+    private fun updateRuta(
+        ruta: Ruta
+    ){
+        viewModelScope.launch {
+            localRutaRepository.updateRuta(ruta).collectLatest { message ->
+                Log.d(TAG, message)
+            }
+        }
+    }
+
     private fun insertKeluarga(
         keluarga: Keluarga
     ) {
@@ -153,6 +275,17 @@ class IsiRutaViewModel @Inject constructor(
         }
     }
 
+    private fun updateKeluarga(
+        keluarga: Keluarga
+    ) {
+        viewModelScope.launch {
+            keluargaRepository.updateKeluarga(keluarga)
+                .collectLatest { message ->
+                    Log.d(TAG, message)
+                }
+        }
+    }
+
     private fun insertKeluargaAndRuta(
         kodeKlg: String,
         kodeRuta: String
@@ -160,6 +293,16 @@ class IsiRutaViewModel @Inject constructor(
         viewModelScope.launch {
             localRutaRepository.insertKeluargaAndRuta(kodeKlg, kodeRuta).collectLatest { message ->
                 Log.d(TAG, message)
+            }
+        }
+    }
+
+    private suspend fun updateStatusListKeluarga(listKodeKlg: List<String>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            listKodeKlg.forEach { kodeKlg ->
+                keluargaRepository.updateStatusKeluarga(kodeKlg).collectLatest { message ->
+                    Log.d(TAG, message)
+                }
             }
         }
     }
@@ -175,7 +318,7 @@ class IsiRutaViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getLastKeluarga(): KeluargaEntity {
+    private suspend fun getLastKeluarga(idBS: String): KeluargaEntity {
         var keluargaEntity = KeluargaEntity(
             kodeKlg = "",
             banjar = "",
@@ -193,7 +336,7 @@ class IsiRutaViewModel @Inject constructor(
             status = ""
         )
 
-        keluargaRepository.getLastKeluarga().collectLatest { result ->
+        keluargaRepository.getLastKeluarga(idBS).collectLatest { result ->
             when (result) {
                 is Result.Success -> {
                     result.data?.let { keluarga ->
@@ -212,7 +355,7 @@ class IsiRutaViewModel @Inject constructor(
         return keluargaEntity
     }
 
-    private suspend fun getLastKeluargaEgb(): KeluargaEntity {
+    private suspend fun getLastKeluargaEgb(idBS: String): KeluargaEntity {
         var keluargaEntity = KeluargaEntity(
             kodeKlg = "",
             banjar = "",
@@ -230,7 +373,7 @@ class IsiRutaViewModel @Inject constructor(
             status = ""
         )
 
-        keluargaRepository.getLastKeluargaEgb().collectLatest { result ->
+        keluargaRepository.getLastKeluargaEgb(idBS).collectLatest { result ->
             when (result) {
                 is Result.Success -> {
                     result.data?.let { keluarga ->
@@ -249,7 +392,7 @@ class IsiRutaViewModel @Inject constructor(
         return keluargaEntity
     }
 
-    private suspend fun getLastRuta(): RutaEntity {
+    private suspend fun getLastRuta(idBS: String): RutaEntity {
         var rutaEntity = RutaEntity(
             kodeRuta = "",
             noUrutRuta = "0",
@@ -267,7 +410,7 @@ class IsiRutaViewModel @Inject constructor(
             status = ""
         )
 
-        localRutaRepository.getLastRuta().collectLatest { result ->
+        localRutaRepository.getLastRuta(idBS).collectLatest { result ->
             when (result) {
                 is Result.Success -> {
                     result.data?.let { ruta ->
@@ -319,14 +462,24 @@ class IsiRutaViewModel @Inject constructor(
             }
             is IsiRutaScreenEvent.NoSegmenChanged -> {
                 _state.emit(state.value.copy(noSegmen = event.noSegmen))
+                if (!UtilFunctions.isValidNoSegmenFormat(state.value.noSegmen)) {
+                    _state.emit(state.value.copy(noSegmenMsg = Message(null, "Error: No segmen tidak valid! (Format No segmen: Sxxx)")))
+                } else {
+                    _state.emit(state.value.copy(noSegmenMsg = Message()))
+                }
             }
             is IsiRutaScreenEvent.NoBgFisikChanged -> {
                 _state.emit(state.value.copy(noBgFisik = event.noBgFisik))
+                if (state.value.noBgSensus < state.value.noBgFisik) {
+                    _state.emit(state.value.copy(noBgSensusMsg = Message(null, "Error: Bangunan sensus harus >= bangunan fisik!")))
+                } else {
+                    _state.emit(state.value.copy(noBgSensusMsg = Message()))
+                }
             }
             is IsiRutaScreenEvent.NoBgSensusChanged -> {
                 _state.emit(state.value.copy(noBgSensus = event.noBgSensus))
-                if (state.value.noBgSensus > state.value.noBgFisik) {
-                    _state.emit(state.value.copy(noBgSensusMsg = Message(warning = "Warning: Nomor Bangunan Sensus > Nomor Bangunan Fisik")))
+                if (state.value.noBgSensus < state.value.noBgFisik) {
+                    _state.emit(state.value.copy(noBgSensusMsg = Message(null, "Error: Bangunan sensus harus >= bangunan fisik!")))
                 } else {
                     _state.emit(state.value.copy(noBgSensusMsg = Message()))
                 }
@@ -496,9 +649,19 @@ class IsiRutaViewModel @Inject constructor(
                         val newListNoUrutRuta = state.value.listNoUrutRuta.toMutableList()
                         newListNoUrutRuta[index] = if (index == 0) {
                             (UtilFunctions.convertStringToNumber(lastRuta.value.noUrutRuta) + 1..UtilFunctions.convertStringToNumber(lastRuta.value.noUrutRuta) + newSize).toList().map { it.toString() }
-
                         } else {
-                            ((newListNoUrutRuta[index - 1].map { UtilFunctions.convertStringToNumber(it) }.max().plus(1))..(newListNoUrutRuta[index - 1].map { UtilFunctions.convertStringToNumber(it) }.max().plus(newSize))).toList().map { it.toString() }
+                            var beforeIndex = index - 1
+                            while(newListNoUrutRuta[beforeIndex].isEmpty()) {
+                                if (beforeIndex == 0) {
+                                    break
+                                }
+                                beforeIndex--
+                            }
+                            if (beforeIndex == 0 && newListNoUrutRuta[beforeIndex].isEmpty()) {
+                                (UtilFunctions.convertStringToNumber(lastRuta.value.noUrutRuta) + 1..UtilFunctions.convertStringToNumber(lastRuta.value.noUrutRuta) + newSize).toList().map { it.toString() }
+                            } else {
+                                ((newListNoUrutRuta[beforeIndex].map { UtilFunctions.convertStringToNumber(it) }.max().plus(1))..(newListNoUrutRuta[beforeIndex].map { UtilFunctions.convertStringToNumber(it) }.max().plus(newSize))).toList().map { it.toString() }
+                            }
                         }
 
                         val newListKkOrKrt = state.value.listKkOrKrt.toMutableList()
@@ -716,6 +879,7 @@ class IsiRutaViewModel @Inject constructor(
                             nimPencacah = session?.nim ?: "",
                             status = "insert"
                         )
+                        Log.d(TAG, "onEvent: Keluarga Insert $keluarga")
 
                         validateKlg(keluarga, indexKlg)
 
@@ -747,11 +911,13 @@ class IsiRutaViewModel @Inject constructor(
                                 },
                                 long = lokasi.value.longitude,
                                 lat = lokasi.value.latitude,
-                                catatan = "",
+                                catatan = state.value.listCatatan[indexKlg][indexRuta],
                                 idBS = idBS,
                                 nimPencacah = session?.nim ?: "",
+                                noSegmen = state.value.noSegmen,
                                 status = "insert"
                             )
+                            Log.d(TAG, "onEvent: Ruta Insert $ruta")
 
                             validateRuta(ruta, indexKlg, indexRuta)
 
@@ -761,16 +927,6 @@ class IsiRutaViewModel @Inject constructor(
                                 Log.d(TAG, "onEvent: $keluarga")
                             }
 
-                            Log.d(TAG, "onEvent: isRutaValid.value=${isRutaValid.value}")
-//                            if (isRutaValid.value) {
-//                                insertRuta(ruta)
-//                            }
-                            Log.d(TAG, "onEvent: isKlgValid.value={${isKlgValid.value} & isRutaValid.value=${isRutaValid.value}")
-//                            if (isKlgValid.value && isRutaValid.value) {
-//                                insertKeluarga(keluarga)
-//                                insertRuta(ruta)
-//                                insertKeluargaAndRuta(keluarga.kodeKlg, ruta.kodeRuta)
-//                            }
                         }
 
                         if (isKlgValid.value) {
@@ -794,7 +950,84 @@ class IsiRutaViewModel @Inject constructor(
                             insertKeluarga(klg)
                         }
                     }
+                }
+            }
 
+            IsiRutaScreenEvent.edit -> {
+                if (isListRuta == true) {
+//                    var keluarga = Keluarga(
+//                        SLS = state.value.SLS,
+//                        noSegmen = state.value.noSegmen,
+//                        noBgFisik = state.value.noBgFisik,
+//                        noBgSensus = state.value.noBgSensus,
+//                        noUrutKlg = state.value.listNoUrutKlg[0],
+//                        namaKK = state.value.listNamaKK[0],
+//                        alamat = state.value.listAlamat[0],
+//                        isGenzOrtu = state.value.listIsGenzOrtu[0],
+//                        noUrutKlgEgb = state.value.listNoUrutKlgEgb[0],
+//                        penglMkn = state.value.listPenglMkn[0],
+//                        idBS = idBS,
+//                        kodeKlg = "K${idBS}${state.value.noSegmen}${UtilFunctions.padWithZeros(state.value.listNoUrutKlg[0], 3)}",
+//                        nimPencacah = session?.nim ?: "",
+//                        status = "update"
+//                    )
+
+                    val ruta = Ruta(
+                        kodeRuta = ruta.value.kodeRuta,
+                        noUrutRuta = state.value.listNoUrutRuta[0][0],
+                        noUrutEgb = 0,
+                        kkOrKrt = when (state.value.listKkOrKrt[0][0]) {
+                            "Kepala Keluarga (KK) saja" -> "1"
+                            "Kepala Rumah Tangga (KRT) saja" -> "2"
+                            "KK Sekaligus KRT" -> "3"
+                            else -> "0"
+                        },
+                        namaKrt = state.value.listNamaKrt[0][0],
+                        jmlGenzAnak = state.value.listJmlGenzAnak[0][0],
+                        jmlGenzDewasa = state.value.listJmlGenzDewasa[0][0],
+                        katGenz = when {
+                            state.value.listJmlGenzAnak[0][0] > 0 && state.value.listJmlGenzDewasa[0][0] == 0 -> 1
+                            state.value.listJmlGenzAnak[0][0] == 0 && state.value.listJmlGenzDewasa[0][0] > 0 -> 2
+                            state.value.listJmlGenzAnak[0][0] > 0 && state.value.listJmlGenzDewasa[0][0] > 0 -> 3
+                            else -> 0
+                        },
+                        long = ruta.value.longitude,
+                        lat = ruta.value.latitude,
+                        catatan = state.value.listCatatan[0][0],
+                        idBS = idBS,
+                        nimPencacah = session?.nim ?: "",
+                        noSegmen = ruta.value.noSegmen,
+                        status = "update"
+                    )
+
+                    validateRuta(ruta, 0, 0)
+                    if (isRutaValid.value) {
+                        viewModelScope.launch (Dispatchers.IO) {
+                            updateStatusListKeluarga(allKodeKlg)
+                            updateRuta(ruta)
+                        }
+                    }
+                } else {
+                    var keluarga = Keluarga(
+                        SLS = state.value.SLS,
+                        noSegmen = state.value.noSegmen,
+                        noBgFisik = state.value.noBgFisik,
+                        noBgSensus = state.value.noBgSensus,
+                        noUrutKlg = state.value.listNoUrutKlg[0],
+                        namaKK = state.value.listNamaKK[0],
+                        alamat = state.value.listAlamat[0],
+                        isGenzOrtu = state.value.listIsGenzOrtu[0],
+                        noUrutKlgEgb = state.value.listNoUrutKlgEgb[0],
+                        penglMkn = state.value.listPenglMkn[0],
+                        idBS = idBS,
+                        kodeKlg = keluarga.value.kodeKlg,
+                        nimPencacah = session?.nim ?: "",
+                        status = "update"
+                    )
+                    validateKlg(keluarga, 0)
+                    if (isKlgValid.value) {
+                        updateKeluarga(keluarga)
+                    }
                 }
             }
         }
@@ -802,60 +1035,100 @@ class IsiRutaViewModel @Inject constructor(
     }
 
     suspend fun validateKlg(klg: Keluarga, index: Int) {
-//        viewModelScope.launch {
+        // viewModelScope.launch {
 
-            getKeluarga(klg.kodeKlg)
-            delay(500L)
+        getKeluarga(klg.kodeKlg)
+        delay(500L)
 
-            Log.d(TAG, "validateKlg: Start!")
-            var tempState = state.value
+        Log.d(TAG, "validateKlg: Start!")
+        var tempState = state.value
 
-            tempState = tempState.copy(
-                SLSMsg = if (klg.SLS == "") {
-                    Message(null, "Error: Kolom SLS tidak boleh kosong!")
-                } else {
-                    Message()
-                },
-                noSegmenMsg = if (klg.noSegmen == "") {
-                    Message(null, "Error: Kolom No Segmen tidak boleh kosong!")
-                } else {
-                    Message()
-                },
-                noBgFisikMsg = if (klg.noBgFisik == "") {
-                    Message(null, "Error: Kolom No Bangungan Fisik tidak boleh kosong!")
-                } else {
-                    Message()
-                },
-                noBgSensusMsg = if (klg.noBgSensus == "") {
-                    Message(null, "Error: Kolom No Bangungan Sensus tidak boleh kosong!")
+        tempState = tempState.copy(
+            SLSMsg = if (klg.SLS == "") {
+                Message(null, "Error: Kolom SLS tidak boleh kosong!")
+            } else {
+                Message()
+            },
+            noSegmenMsg = if (klg.noSegmen == "") {
+                Message(null, "Error: Kolom No Segmen tidak boleh kosong!")
+            } else {
+                if (!UtilFunctions.isValidNoSegmenFormat(state.value.noSegmen)) {
+                    Message(null, "Error: No segmen tidak valid! (Format No segmen: Sxxx)")
                 } else {
                     Message()
                 }
-            )
+            },
+            noBgFisikMsg = if (klg.noBgFisik == "") {
+                Message(null, "Error: Kolom No Bangungan Fisik tidak boleh kosong!")
+            } else {
+                Message()
+            },
+            noBgSensusMsg = if (klg.noBgSensus == "") {
+                Message(null, "Error: Kolom No Bangungan Sensus tidak boleh kosong!")
+            } else {
+                if (state.value.noBgSensus < state.value.noBgFisik) {
+                    Message(null, "Error: Bangunan sensus harus >= bangunan fisik!")
+                } else {
+                    Message()
+                }
+            }
+        )
 
 
-            Log.d(TAG, "validateKlg: Validate no urut klg!")
-            Log.d(TAG, "validateKlg: ${UtilFunctions.convertStringToNumber(keluarga.value.noUrutKlg)} == ${UtilFunctions.convertStringToNumber(klg.noUrutKlg)}")
-            val newListNoUrutKlgMsg = tempState.listNoUrutKlgMsg.toMutableList()
+        Log.d(TAG, "validateKlg: Validate no urut klg!")
+        Log.d(TAG, "validateKlg: ${UtilFunctions.convertStringToNumber(keluarga.value.noUrutKlg)} == ${UtilFunctions.convertStringToNumber(klg.noUrutKlg)}")
+
+        val newListNoUrutKlgMsg = tempState.listNoUrutKlgMsg.toMutableList()
+        if (klg.status == "insert") {
             newListNoUrutKlgMsg[index] = if (UtilFunctions.convertStringToNumber(keluarga.value.noUrutKlg) == UtilFunctions.convertStringToNumber(klg.noUrutKlg)) {
                 Message(null, "Error: No urut keluarga telah ada sebelumnya!")
             } else {
                 Message()
             }
+        }
 
-            val newListNamaKKMsg = tempState.listNamaKKMsg.toMutableList()
-            newListNamaKKMsg[index] = if (klg.namaKK == "") {
-                Message(null, "Error: Kolom Nama Kepala Keluarga tidak boleh kosong!")
-            } else {
-                Message()
-            }
+        val newListNamaKKMsg = tempState.listNamaKKMsg.toMutableList()
+        newListNamaKKMsg[index] = if (klg.namaKK == "") {
+            Message(null, "Error: Kolom Nama Kepala Keluarga tidak boleh kosong!")
+        } else {
+            Message()
+        }
 
-            val newListAlamatMsg = tempState.listAlamatMsg.toMutableList()
-            newListAlamatMsg[index] = if (klg.alamat == "") {
-                Message(null, "Error: Kolom Alamat tidak boleh kosong!")
-            } else {
-                Message()
-            }
+        val newListAlamatMsg = tempState.listAlamatMsg.toMutableList()
+        newListAlamatMsg[index] = if (klg.alamat == "") {
+            Message(null, "Error: Kolom Alamat tidak boleh kosong!")
+        } else {
+            Message()
+        }
+
+        if (tempState.jmlKlg == 1 && klg.isGenzOrtu == 0) {
+            // Update state sekali dengan semua perubahan
+            _state.emit(
+                tempState.copy(
+                    listNoUrutKlgMsg = newListNoUrutKlgMsg,
+                    listNamaKKMsg = newListNamaKKMsg,
+                    listAlamatMsg = newListAlamatMsg
+                )
+            )
+
+            // Cek apakah ada error, jika tidak maka set isKlgValid menjadi true
+            val isNoError = listOf(
+                tempState.SLSMsg,
+                tempState.noSegmenMsg,
+                tempState.noBgFisikMsg,
+                tempState.noBgSensusMsg,
+                *newListNoUrutKlgMsg.toTypedArray(),
+                *newListNamaKKMsg.toTypedArray(),
+                *newListAlamatMsg.toTypedArray()
+            ).all { it.error == null }
+
+            _isKlgValid.emit(isNoError) // Emit nilai isNoError langsung
+
+            Log.d(TAG, "validateKlg: isKlgValid=$isNoError")
+            Log.d(TAG, "validateKlg: tempState=$tempState")
+
+
+        } else {
 
             val newListNoUrutKlgEgbMsg = tempState.listNoUrutKlgEgbMsg.toMutableList()
             newListNoUrutKlgEgbMsg[index] = if (klg.noUrutKlgEgb == lastKeluargaEgb.value.noUrutKlgEgb) {
@@ -865,23 +1138,129 @@ class IsiRutaViewModel @Inject constructor(
             }
 
             // Update state sekali dengan semua perubahan
-            _state.emit(tempState.copy(
-                listNoUrutKlgMsg = newListNoUrutKlgMsg,
-                listNamaKKMsg = newListNamaKKMsg,
-                listAlamatMsg = newListAlamatMsg,
-                listNoUrutKlgEgbMsg = newListNoUrutKlgEgbMsg
-            ))
+            _state.emit(
+                tempState.copy(
+                    listNoUrutKlgMsg = newListNoUrutKlgMsg,
+                    listNamaKKMsg = newListNamaKKMsg,
+                    listAlamatMsg = newListAlamatMsg,
+                    listNoUrutKlgEgbMsg = newListNoUrutKlgEgbMsg
+                )
+            )
 
             // Cek apakah ada error, jika tidak maka set isKlgValid menjadi true
-            val isNoError = listOf(tempState.SLSMsg, *newListNoUrutKlgMsg.toTypedArray(), *newListNamaKKMsg.toTypedArray(), *newListAlamatMsg.toTypedArray(), *newListNoUrutKlgEgbMsg.toTypedArray()).all { it.error == null }
+            val isNoError = listOf(
+                tempState.SLSMsg,
+                tempState.noSegmenMsg,
+                tempState.noBgFisikMsg,
+                tempState.noBgSensusMsg,
+                *newListNoUrutKlgMsg.toTypedArray(),
+                *newListNamaKKMsg.toTypedArray(),
+                *newListAlamatMsg.toTypedArray(),
+                *newListNoUrutKlgEgbMsg.toTypedArray()
+            ).all { it.error == null }
 
-            if (isNoError) {
-                _isKlgValid.emit(true)
-            } else {
-                _isKlgValid.emit(false)
-            }
-//        }
+            _isKlgValid.emit(isNoError) // Emit nilai isNoError langsung
+
+            Log.d(TAG, "validateKlg: isKlgValid=$isNoError")
+            Log.d(TAG, "validateKlg: tempState=$tempState")
+
+        }
     }
+
+
+//    suspend fun validateKlg(klg: Keluarga, index: Int) {
+////        viewModelScope.launch {
+//
+//            getKeluarga(klg.kodeKlg)
+//            delay(500L)
+//
+//            Log.d(TAG, "validateKlg: Start!")
+//            var tempState = state.value
+//
+//            tempState = tempState.copy(
+//                SLSMsg = if (klg.SLS == "") {
+//                    Message(null, "Error: Kolom SLS tidak boleh kosong!")
+//                } else {
+//                    Message()
+//                },
+//                noSegmenMsg = if (klg.noSegmen == "") {
+//                    Message(null, "Error: Kolom No Segmen tidak boleh kosong!")
+//                } else {
+//                    if (!UtilFunctions.isValidNoSegmenFormat(state.value.noSegmen)) {
+//                        Message(null, "Error: No segmen tidak valid! (Format No segmen: Sxxx)")
+//                    } else {
+//                        Message()
+//                    }
+//                },
+//                noBgFisikMsg = if (klg.noBgFisik == "") {
+//                    Message(null, "Error: Kolom No Bangungan Fisik tidak boleh kosong!")
+//                } else {
+//                    Message()
+//                },
+//                noBgSensusMsg = if (klg.noBgSensus == "") {
+//                    Message(null, "Error: Kolom No Bangungan Sensus tidak boleh kosong!")
+//                } else {
+//                    if (state.value.noBgSensus < state.value.noBgFisik) {
+//                        Message(null, "Error: Bangunan sensus harus >= bangunan fisik!")
+//                    } else {
+//                        Message()
+//                    }
+//                }
+//            )
+//
+//
+//            Log.d(TAG, "validateKlg: Validate no urut klg!")
+//            Log.d(TAG, "validateKlg: ${UtilFunctions.convertStringToNumber(keluarga.value.noUrutKlg)} == ${UtilFunctions.convertStringToNumber(klg.noUrutKlg)}")
+//
+//            val newListNoUrutKlgMsg = tempState.listNoUrutKlgMsg.toMutableList()
+//            if (klg.status == "insert") {
+//                newListNoUrutKlgMsg[index] = if (UtilFunctions.convertStringToNumber(keluarga.value.noUrutKlg) == UtilFunctions.convertStringToNumber(klg.noUrutKlg)) {
+//                    Message(null, "Error: No urut keluarga telah ada sebelumnya!")
+//                } else {
+//                    Message()
+//                }
+//            }
+//
+//            val newListNamaKKMsg = tempState.listNamaKKMsg.toMutableList()
+//            newListNamaKKMsg[index] = if (klg.namaKK == "") {
+//                Message(null, "Error: Kolom Nama Kepala Keluarga tidak boleh kosong!")
+//            } else {
+//                Message()
+//            }
+//
+//            val newListAlamatMsg = tempState.listAlamatMsg.toMutableList()
+//            newListAlamatMsg[index] = if (klg.alamat == "") {
+//                Message(null, "Error: Kolom Alamat tidak boleh kosong!")
+//            } else {
+//                Message()
+//            }
+//
+//            val newListNoUrutKlgEgbMsg = tempState.listNoUrutKlgEgbMsg.toMutableList()
+//            newListNoUrutKlgEgbMsg[index] = if (klg.noUrutKlgEgb == lastKeluargaEgb.value.noUrutKlgEgb) {
+//                Message(null, "Error: No urut keluarga eligible telah ada sebelumnya!")
+//            } else {
+//                Message()
+//            }
+//
+//            // Update state sekali dengan semua perubahan
+//            _state.emit(tempState.copy(
+//                listNoUrutKlgMsg = newListNoUrutKlgMsg,
+//                listNamaKKMsg = newListNamaKKMsg,
+//                listAlamatMsg = newListAlamatMsg,
+//                listNoUrutKlgEgbMsg = newListNoUrutKlgEgbMsg
+//            ))
+//
+//            // Cek apakah ada error, jika tidak maka set isKlgValid menjadi true
+//            val isNoError = listOf(tempState.SLSMsg, tempState.noSegmenMsg, tempState.noBgFisikMsg, tempState.noBgSensusMsg, *newListNoUrutKlgMsg.toTypedArray(), *newListNamaKKMsg.toTypedArray(), *newListAlamatMsg.toTypedArray(), *newListNoUrutKlgEgbMsg.toTypedArray()).all { it.error == null }
+//
+//            if (isNoError) {
+//                _isKlgValid.emit(true)
+//            } else {
+//                _isKlgValid.emit(false)
+//            }
+//        Log.d(TAG, "validateKlg: isKlgValid=${isKlgValid.value}")
+////        }
+//    }
 
     suspend fun validateRuta(
         rt: Ruta,
@@ -894,10 +1273,12 @@ class IsiRutaViewModel @Inject constructor(
         var tempState = state.value
 
         val newListNoUrutRutaMsg = tempState.listNoUrutRutaMsg.map { it.toMutableList() }.toMutableList()
-        newListNoUrutRutaMsg[indexKlg][indexRuta] = if (UtilFunctions.convertStringToNumber(ruta.value.noUrutRuta) == UtilFunctions.convertStringToNumber(rt.noUrutRuta)) {
-            Message(null, "Error: No urut ruta telah ada sebelumnya!")
-        } else {
-            Message()
+        if (rt.status == "insert") {
+            newListNoUrutRutaMsg[indexKlg][indexRuta] = if (UtilFunctions.convertStringToNumber(ruta.value.noUrutRuta) == UtilFunctions.convertStringToNumber(rt.noUrutRuta)) {
+                Message(null, "Error: No urut ruta telah ada sebelumnya!")
+            } else {
+                Message()
+            }
         }
 
         val newListKkOrKrtMsg = tempState.listKkOrKrtMsg.map { it.toMutableList() }.toMutableList()
@@ -931,6 +1312,7 @@ class IsiRutaViewModel @Inject constructor(
 
         // Set _isRutaValid berdasarkan hasil pengecekan error
         _isRutaValid.emit(isNoError)
+        Log.d(TAG, "validateKlg: isRutaValid=${isRutaValid.value}")
     }
 
 //    private fun <T> updateList(list: List<List<T>>, index: Int, diff: Int, defaultValue: T): List<List<T>> {
@@ -970,7 +1352,10 @@ class IsiRutaViewModel @Inject constructor(
 //        return input?.replaceFirst(numericPart.toString(), formattedNumber) ?: ""
 //    }
 
-    fun increment(input: String?): String {
+    fun increment(rawInput: String?): String {
+
+        val input = UtilFunctions.checkStringAngka(rawInput.toString())
+
         // Cek jika input kosong atau null, langsung kembalikan "0"
         if (input.isNullOrEmpty()) return "0"
 
@@ -994,7 +1379,10 @@ class IsiRutaViewModel @Inject constructor(
 //        return input?.replaceFirst(numericPart.toString(), formattedNumber) ?: ""
 //    }
 
-    fun decrement(input: String?): String {
+    fun decrement(rawInput: String?): String {
+
+        val input = UtilFunctions.checkStringAngka(rawInput.toString())
+
         // Cek jika input kosong atau null, langsung kembalikan "0"
         if (input.isNullOrEmpty()) return "0"
 
@@ -1142,5 +1530,4 @@ class IsiRutaViewModel @Inject constructor(
         }
         return stringBuilder.toString()
     }
-
 }

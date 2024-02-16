@@ -18,6 +18,7 @@ data class RutaEntity (
     var longitude: Double = -1.0,
     var catatan: String = "[not set]",
     var idBS: String = "[not set]",
+    var noSegmen: String = "[not set]",
     var nimPencacah: String = "[not set]",
     var status: String = "[not set]"
 )

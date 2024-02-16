@@ -99,12 +99,12 @@ class KeluargaRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getLastKeluarga(): Flow<Result<KeluargaEntity>> {
+    override suspend fun getLastKeluarga(idBS: String): Flow<Result<KeluargaEntity>> {
         return flow {
             try {
                 emit(Result.Loading(true))
 
-                val lastKeluarga = capi63Dao.getLastKeluarga()
+                val lastKeluarga = capi63Dao.getLastKeluarga(idBS)
 
                 Log.d(TAG, "Berhasil getLastKeluarga: $lastKeluarga")
 
@@ -118,12 +118,12 @@ class KeluargaRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getLastKeluargaEgb(): Flow<Result<KeluargaEntity>> {
+    override suspend fun getLastKeluargaEgb(idBS: String): Flow<Result<KeluargaEntity>> {
         return flow {
             try {
                 emit(Result.Loading(true))
 
-                val lastKeluargaEgb = capi63Dao.getLastKeluargaEgb()
+                val lastKeluargaEgb = capi63Dao.getLastKeluargaEgb(idBS)
 
                 Log.d(TAG, "Berhasil getLastKeluargaEgb: $lastKeluargaEgb")
 
@@ -211,4 +211,18 @@ class KeluargaRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun updateStatusKeluarga(kodeKlg: String): Flow<String> {
+        return  flow {
+            try {
+                capi63Dao.updateStatusKeluarga(kodeKlg)
+                val message = "Berhasil mengupdate keluarga!"
+                Log.d(TAG, "updateStatusKeluarga: $message")
+            } catch (e: Exception) {
+                val message = "Gagal mengupdate keluarga!"
+                Log.d(TAG, "updateStatusKeluarga: $message (${e.message})")
+            }
+        }
+    }
+
 }
