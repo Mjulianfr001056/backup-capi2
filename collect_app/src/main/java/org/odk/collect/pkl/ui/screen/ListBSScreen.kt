@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -221,7 +222,7 @@ private fun BlokSensus(
     Box(
         modifier = Modifier
             .fillMaxWidth(0.95f)
-            .padding(10.dp)
+            .padding(top = 20.dp, bottom = 8.dp, start = 10.dp, end = 10.dp)
             .shadow(elevation = 15.dp, shape = RoundedCornerShape(10.dp))
             .background(color = Color.White),
     ) {
@@ -234,7 +235,8 @@ private fun BlokSensus(
             ) {
                 Text(
                     text = stringResource(R.string.blok_sensus) + wilayah.noBS,
-                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 20.sp,
                     modifier = Modifier.padding(horizontal = 8.dp),
                     color = Color.DarkGray
                 )
@@ -248,7 +250,7 @@ private fun BlokSensus(
                     Row {
                         Text(
                             text = stringResource(R.string.kec) + wilayah.namaKec + stringResource(R.string.kel) + wilayah.namaKel,
-                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.padding(start = 8.dp),
                             color = Color.DarkGray
                         )
@@ -256,7 +258,7 @@ private fun BlokSensus(
                     Row {
                         Text(
                             text = wilayah.namaKab + ", " + "Bali",
-                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.padding(start = 8.dp),
                             color = Color.DarkGray
                         )
@@ -303,7 +305,9 @@ private fun BlokSensus(
                     .padding(horizontal = 16.dp))
             }
             if (expanded) {
-                Row (verticalAlignment = Alignment.CenterVertically){
+                Row (
+                    verticalAlignment = Alignment.CenterVertically
+                ){
                     Column (modifier = Modifier.padding(start = 20.dp)) {
                         Row {
                             Text(
@@ -313,6 +317,7 @@ private fun BlokSensus(
                                 fontWeight = FontWeight.Bold
                             )
                         }
+                        Spacer(modifier = Modifier.padding(3.dp))
                         Row {
                             Text(
                                 text = stringResource(R.string.jmlKlg),
@@ -328,6 +333,7 @@ private fun BlokSensus(
                                 color = PklPrimary
                             )
                         }
+                        Spacer(modifier = Modifier.padding(2.dp))
                         Row {
                             Text(
                                 text = stringResource(R.string.jmlKlgEgb),
@@ -343,6 +349,7 @@ private fun BlokSensus(
                                 color = PklPrimary
                             )
                         }
+                        Spacer(modifier = Modifier.padding(2.dp))
                         Row {
                             Text(
                                 text = stringResource(R.string.jmlRuta),
@@ -358,6 +365,7 @@ private fun BlokSensus(
                                 color = PklPrimary
                             )
                         }
+                        Spacer(modifier = Modifier.padding(2.dp))
                         Row {
                             Text(
                                 text = stringResource(R.string.jmlRutaEgb),
@@ -402,10 +410,10 @@ private fun BlokSensus(
                     Row (
                         modifier = Modifier
                             .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
                     ) {
-                        Button(onClick = {
-                            onLihatRutaClicked()
-                        },
+                        Button(
+                            onClick = { onLihatRutaClicked() },
                             shape = MaterialTheme.shapes.small,
                             contentPadding = PaddingValues(10.dp),
                             modifier = Modifier.padding(horizontal = 2.dp),
