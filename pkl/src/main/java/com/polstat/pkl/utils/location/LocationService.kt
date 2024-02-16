@@ -26,7 +26,7 @@ class LocationService @Inject constructor(
 
         if (!context.hasLocationPermission()) {
             trySend(null)
-            return@callbackFlow
+//            return@callbackFlow
         }
 
         val request = LocationRequest.Builder(600000L)
@@ -53,10 +53,6 @@ class LocationService @Inject constructor(
             stopLocationUpdates(locationCallback)
         }
     }
-
-//    override fun requestCurrentLocation(): Flow<Lokasi?> {
-//        TODO("Not yet implemented")
-//    }
 
     private fun stopLocationUpdates(locationCallback: LocationCallback) {
         locationClient.removeLocationUpdates(locationCallback)

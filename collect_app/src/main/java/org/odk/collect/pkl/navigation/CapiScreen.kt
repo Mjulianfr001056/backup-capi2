@@ -38,6 +38,7 @@ sealed class CapiScreen{
 
     object Beranda : CapiScreen() {
         const val START = "start"
+        const val ASK_LOCATION = "ask_location"
     }
 
     object Kuesioner : CapiScreen() {

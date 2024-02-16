@@ -20,6 +20,7 @@ import com.polstat.pkl.viewmodel.AuthViewModel
 import com.polstat.pkl.viewmodel.KuesionerViewModel
 import org.odk.collect.pkl.ProjectConfigurerActivity
 import org.odk.collect.pkl.ui.screen.BerandaScreen
+import org.odk.collect.pkl.ui.screen.EditRutaScreen
 import org.odk.collect.pkl.ui.screen.IsiRumahTanggaScreen
 import org.odk.collect.pkl.ui.screen.ListBSScreen
 import org.odk.collect.pkl.ui.screen.ListRutaScreen
@@ -28,6 +29,7 @@ import org.odk.collect.pkl.ui.screen.LoginScreen
 import org.odk.collect.pkl.ui.screen.OnBoardingScreen
 //import org.odk.collect.pkl.ui.screen.SalinRutaScreen
 import org.odk.collect.pkl.ui.screen.SamplingScreen
+import org.odk.collect.pkl.ui.screen.components.AskLocationPermissionScreen
 
 @Composable
 fun AppNavHost(
@@ -158,7 +160,7 @@ fun SamplingNavHost(
                 )
             }
             composable(
-                route = CapiScreen.Listing.EDIT_RUTA + "/{idBS}/{kodeKlg}/{kodeRuta}",
+                route = CapiScreen.Listing.EDIT_RUTA + "/{idBS}/{kodeKlg}/{kodeRuta}/{isMonitoring}/{isListRuta}",
                 arguments = listOf(
                     navArgument("idBS") {
                         type = NavType.StringType
@@ -168,13 +170,19 @@ fun SamplingNavHost(
                     },
                     navArgument("kodeRuta") {
                         type = NavType.StringType
+                    },
+                    navArgument("isMonitoring") {
+                        type = NavType.BoolType
+                    },
+                    navArgument("isListRuta") {
+                        type = NavType.BoolType
                     }
                 )
             ) {
-//                EditRutaScreen(
-//                    navController = samplingNavController,
-//                    viewModel = hiltViewModel()
-//                )
+                EditRutaScreen(
+                    navController = samplingNavController,
+                    viewModel = hiltViewModel()
+                )
             }
 
             composable(
@@ -240,6 +248,9 @@ fun BerandaNavHost(
         navController = berandaNavController,
         startDestination = CapiScreen.Beranda.START
     ){
+        composable(CapiScreen.Beranda.ASK_LOCATION) {
+            AskLocationPermissionScreen(viewModel = hiltViewModel())
+        }
         composable(CapiScreen.Beranda.START){
             BerandaScreen(
                 rootController = rootController,

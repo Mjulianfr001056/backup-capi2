@@ -33,7 +33,7 @@ interface LocalRutaRepository {
 
     suspend fun getAllRutaByWilayah(idBS: String) : Flow<Result<List<RutaEntity>>>
 
-    suspend fun getLastRuta() : Flow<Result<RutaEntity>>
+    suspend fun getLastRuta(idBS: String) : Flow<Result<RutaEntity>>
 
     suspend fun getAllRutaByKeluarga(kodeKlg: String) : Flow<Result<List<RutaEntity>>>
 

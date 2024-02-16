@@ -1,6 +1,5 @@
 package org.odk.collect.pkl.ui.screen
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -1349,7 +1348,11 @@ fun InputNomor(
                 Box(
                     modifier = Modifier
                         .combinedClickable(
-                            onClick = { onDecrement() },
+                            onClick = {
+                                if (!readOnly) {
+                                    onDecrement()
+                                }
+                            },
                             onLongClick = {}
                         )
                         .clip(RoundedCornerShape(10.dp))
@@ -1369,7 +1372,11 @@ fun InputNomor(
                 Box(
                     modifier = Modifier
                         .combinedClickable(
-                            onClick = { onIncrement() },
+                            onClick = {
+                                if (!readOnly) {
+                                    onIncrement()
+                                }
+                            },
                             onLongClick = {}
                         )
                         .clip(RoundedCornerShape(10.dp))
@@ -1453,8 +1460,16 @@ fun InputNomorHuruf(
                 Box(
                     modifier = Modifier
                         .combinedClickable(
-                            onClick = { onDecrement() },
-                            onLongClick = { onDecrementHuruf() }
+                            onClick = {
+                                if (!readOnly) {
+                                    onDecrement()
+                                }
+                            },
+                            onLongClick = {
+                                if (!readOnly) {
+                                    onDecrementHuruf()
+                                }
+                            }
                         )
                         .clip(RoundedCornerShape(10.dp))
                 ) {
@@ -1473,8 +1488,16 @@ fun InputNomorHuruf(
                 Box(
                     modifier = Modifier
                         .combinedClickable(
-                            onClick = { onIncrement() },
-                            onLongClick = { onIncrementHuruf() }
+                            onClick = {
+                                if (!readOnly) {
+                                    onIncrement()
+                                }
+                            },
+                            onLongClick = {
+                                if (!readOnly) {
+                                    onIncrementHuruf()
+                                }
+                            }
                         )
                         .clip(RoundedCornerShape(10.dp))
                 ) {
