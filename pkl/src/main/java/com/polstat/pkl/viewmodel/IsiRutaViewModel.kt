@@ -584,7 +584,7 @@ class IsiRutaViewModel @Inject constructor(
                 _state.emit(state.value.copy(listNoUrutKlg = newListNoUrutKlg))
                 if (UtilFunctions.convertStringToNumber(state.value.listNoUrutKlg[index]) != UtilFunctions.convertStringToNumber(lastKeluarga.value.noUrutKlg).plus(1)) {
                     val newListNoUrutKlgMsg = state.value.listNoUrutKlgMsg.toMutableList()
-                    newListNoUrutKlgMsg[index] = Message(warning = "Warning: Nomor urut keluarga terakhir = ${lastKeluarga.value.noUrutKlg}")
+                    newListNoUrutKlgMsg[index] = Message(warning = "Warning: Nomor urut keluarga terakhir yang telah diinput = ${lastKeluarga.value.noUrutKlg}")
                     _state.emit(state.value.copy(listNoUrutKlgMsg = newListNoUrutKlgMsg))
                 } else {
                     val newListNoUrutKlgMsg = state.value.listNoUrutKlgMsg.toMutableList()
@@ -629,7 +629,7 @@ class IsiRutaViewModel @Inject constructor(
                 _state.emit(state.value.copy(listNoUrutKlgEgb = newListNoUrutKlgEgb))
                 if (state.value.listNoUrutKlgEgb[index] != lastKeluargaEgb.value.noUrutKlgEgb.plus(1)) {
                     val newListNoUrutKlgEgbMsg = state.value.listNoUrutKlgEgbMsg.toMutableList()
-                    newListNoUrutKlgEgbMsg[index] = Message(warning = "Warning: Nomor urut keluarga eligible terakhir = ${lastKeluargaEgb.value.noUrutKlgEgb}")
+                    newListNoUrutKlgEgbMsg[index] = Message(warning = "Warning: Nomor urut keluarga eligible terakhir yang telah diinput = ${lastKeluargaEgb.value.noUrutKlgEgb}")
                     _state.emit(state.value.copy(listNoUrutKlgEgbMsg = newListNoUrutKlgEgbMsg))
                 } else {
                     val newListNoUrutKlgEgbMsg = state.value.listNoUrutKlgEgbMsg.toMutableList()
@@ -789,7 +789,7 @@ class IsiRutaViewModel @Inject constructor(
                 _state.emit(state.value.copy(listNoUrutRuta = newListNoUrutRuta))
                 if (UtilFunctions.convertStringToNumber(state.value.listNoUrutRuta[index][index2]) != UtilFunctions.convertStringToNumber(lastRuta.value.noUrutRuta).plus(1)) {
                     val newListNoUrutRutaMsg = state.value.listNoUrutRutaMsg.map { it.toMutableList() }.toMutableList()
-                    newListNoUrutRutaMsg[index][index2] = Message(warning = "Warning: Nomor urut ruta terakhir = ${lastRuta.value.noUrutRuta}")
+                    newListNoUrutRutaMsg[index][index2] = Message(warning = "Warning: Nomor urut ruta terakhir yang telah diinput = ${lastRuta.value.noUrutRuta}")
                     _state.emit(state.value.copy(listNoUrutRutaMsg = newListNoUrutRutaMsg))
                 } else {
                     val newListNoUrutRutaMsg = state.value.listNoUrutRutaMsg.map { it.toMutableList() }.toMutableList()
@@ -945,7 +945,7 @@ class IsiRutaViewModel @Inject constructor(
                                 insertKeluargaAndRuta(klg.kodeKlg, rt.kodeRuta)
                             }
                         }
-                    } else if (isKlgValid.value && state.value.jmlKlg == 1) {
+                    } else if (isKlgValid.value && state.value.jmlKlg == 1 && state.value.listNoUrutKlg[0] == "") {
                         klgQueue.value.forEach { klg ->
                             insertKeluarga(klg)
                         }
@@ -1083,7 +1083,11 @@ class IsiRutaViewModel @Inject constructor(
             newListNoUrutKlgMsg[index] = if (UtilFunctions.convertStringToNumber(keluarga.value.noUrutKlg) == UtilFunctions.convertStringToNumber(klg.noUrutKlg)) {
                 Message(null, "Error: No urut keluarga telah ada sebelumnya!")
             } else {
-                Message()
+                if (UtilFunctions.isDuplicateElement(tempState.listNoUrutKlg.subList(0, index), klg.noUrutKlg)) {
+                    Message(null, "Error: No urut keluarga tidak boleh sama dengan keluarga lain!")
+                } else {
+                    Message()
+                }
             }
         }
 
@@ -1277,7 +1281,11 @@ class IsiRutaViewModel @Inject constructor(
             newListNoUrutRutaMsg[indexKlg][indexRuta] = if (UtilFunctions.convertStringToNumber(ruta.value.noUrutRuta) == UtilFunctions.convertStringToNumber(rt.noUrutRuta)) {
                 Message(null, "Error: No urut ruta telah ada sebelumnya!")
             } else {
-                Message()
+                if (UtilFunctions.isDuplicateElementFromNestedList(tempState.listNoUrutRuta.subList(0, indexKlg), rt.noUrutRuta)) {
+                    Message(null, "Error: No urut ruta tidak boleh sama dengan ruta lain!")
+                } else {
+                    Message()
+                }
             }
         }
 
@@ -1312,7 +1320,8 @@ class IsiRutaViewModel @Inject constructor(
 
         // Set _isRutaValid berdasarkan hasil pengecekan error
         _isRutaValid.emit(isNoError)
-        Log.d(TAG, "validateKlg: isRutaValid=${isRutaValid.value}")
+        Log.d(TAG, "validateRuta: isRutaValid=${isRutaValid.value}")
+        Log.d(TAG, "validateRuta: tempState=$tempState")
     }
 
 //    private fun <T> updateList(list: List<List<T>>, index: Int, diff: Int, defaultValue: T): List<List<T>> {
