@@ -1105,7 +1105,7 @@ class IsiRutaViewModel @Inject constructor(
             Message()
         }
 
-        if (tempState.jmlKlg == 1 && klg.isGenzOrtu == 0) {
+        if (klg.isGenzOrtu == 0) {
             // Update state sekali dengan semua perubahan
             _state.emit(
                 tempState.copy(
