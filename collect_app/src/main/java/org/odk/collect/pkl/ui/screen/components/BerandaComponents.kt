@@ -818,7 +818,7 @@ fun ProgresCacahCard(
                             )
                             AnimatedCircularProgressIndicator(
                                 currentValue = listAllSampelRuta.filter { it.status == "1" && it.idBS == wilayahEntity.idBS }.size,
-                                maxValue = (if (listAllSampelRuta.filter { it.idBS == wilayahEntity.idBS }.isEmpty()) 99 else listAllSampelRuta.filter { it.idBS == wilayahEntity.idBS }.size),
+                                maxValue = (if (listAllSampelRuta.filter { it.idBS == wilayahEntity.idBS }.isEmpty()) 10 else listAllSampelRuta.filter { it.idBS == wilayahEntity.idBS }.size),
                                 progressBackgroundColor = PklPrimary100,
                                 progressIndicatorColor = PklPrimary900,
                                 completedColor = PklPrimary900,
