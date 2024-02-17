@@ -491,7 +491,7 @@ fun RutaOrKlgRow(
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_urut_krt_ruta,
-                                                value = UtilFunctions.padWithZeros(rutaWithKeluarga.ruta.noUrutRuta)
+                                                value = UtilFunctions.padWithZeros(rutaWithKeluarga.ruta.noUrutRuta, 3)
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_urut_ruta_egb,
@@ -690,15 +690,15 @@ fun RutaOrKlgRow(
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_urut_bangunan_fisik_ruta,
-                                                value = UtilFunctions.padWithZeros(keluargaWithRuta.keluarga.noBgFisik)
+                                                value = UtilFunctions.padWithZeros(keluargaWithRuta.keluarga.noBgFisik, 3)
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_urut_bangunan_sensus_ruta,
-                                                value = UtilFunctions.padWithZeros(keluargaWithRuta.keluarga.noBgSensus)
+                                                value = UtilFunctions.padWithZeros(keluargaWithRuta.keluarga.noBgSensus, 3)
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nomor_urut_keluarga,
-                                                value = UtilFunctions.padWithZeros(keluargaWithRuta.keluarga.noUrutKlg)
+                                                value = UtilFunctions.padWithZeros(keluargaWithRuta.keluarga.noUrutKlg, 3)
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nama_kepala_keluarga,
@@ -714,12 +714,17 @@ fun RutaOrKlgRow(
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.no_urut_keluarga_egb,
-                                                value = UtilFunctions.convertTo4DigitsString(keluargaWithRuta.keluarga.noUrutKlgEgb)
+                                                value = UtilFunctions.convertTo3DigitsString(keluargaWithRuta.keluarga.noUrutKlgEgb)
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.jml_pengelolaan_makan_keluarga,
                                                 value = "${keluargaWithRuta.keluarga.penglMkn}"
                                             )
+                                            DetailRutaTextField(
+                                                label = R.string.nim_pencacah,
+                                                value = keluargaWithRuta.keluarga.nimPencacah
+                                            )
+                                            Spacer(modifier = Modifier.size(5.dp))
                                             Text(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 text = stringResource(id = R.string.daftar_ruta_terkait).uppercase(),
@@ -969,6 +974,7 @@ fun RutaOrKlgRow(
                                         viewModel.deleteRuta(rutaWithKeluarga.ruta.kodeRuta)
                                     }
                                     deleteRutaJob.await()
+                                    delay(500L)
                                     navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
                                         popUpTo(CapiScreen.Listing.LIST_BS + "/$idBS/$isMonitoring/$isListRuta") {
                                             inclusive = true
@@ -982,6 +988,7 @@ fun RutaOrKlgRow(
                                         viewModel.deleteKeluarga(keluargaWithRuta.keluarga.kodeKlg)
                                     }
                                     deleteKlgJob.await()
+                                    delay(500L)
                                     navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
                                         popUpTo(CapiScreen.Listing.LIST_BS + "/$idBS/$isMonitoring/$isListRuta") {
                                             inclusive = true

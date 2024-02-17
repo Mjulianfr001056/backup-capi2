@@ -80,6 +80,7 @@ import com.polstat.pkl.ui.theme.PoppinsFontFamily
 import com.polstat.pkl.utils.UtilFunctions
 import com.polstat.pkl.viewmodel.IsiRutaViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
 import timber.log.Timber
@@ -523,9 +524,9 @@ fun IsiRumahTanggaScreen(
                                 viewModel.onEvent(IsiRutaScreenEvent.submit)
                             }
                             onEventJob.await()
+                            delay(1000L)
                             val isMonitoring = false
                             val isListRuta = true
-                            Timber.tag("IsiRumahTanggaScreen").d("IsiRumahTanggaScreen: %s", isKlgValid.value)
                             if (isKlgValid.value && isRutaValid.value) {
                                 Toast.makeText(context, "Keluarga dan Ruta berhasil ditambahkan!", Toast.LENGTH_SHORT).show()
                                 navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
@@ -533,7 +534,7 @@ fun IsiRumahTanggaScreen(
                                         inclusive = true
                                     }
                                 }
-                            } else if(isKlgValid.value && state.value.jmlKlg == 1) {
+                            } else if(isKlgValid.value && state.value.jmlKlg == 1 && state.value.listNoUrutKlg[0] == "") {
                                 Toast.makeText(context, "Keluarga berhasil ditambahkan!", Toast.LENGTH_SHORT).show()
                                 navController.navigate(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {
                                     popUpTo(CapiScreen.Listing.LIST_RUTA + "/$idBS/$isMonitoring/$isListRuta") {

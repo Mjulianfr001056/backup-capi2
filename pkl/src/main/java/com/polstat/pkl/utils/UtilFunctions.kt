@@ -58,5 +58,12 @@ class UtilFunctions {
             return regex.matches(input)
         }
 
+        fun isDuplicateElement(list: List<String>, element: String): Boolean {
+            return list.contains(element)
+        }
+
+        fun isDuplicateElementFromNestedList(nestedList: List<List<String>>, element: String) : Boolean {
+            return nestedList.any { it.contains(element) }
+        }
     }
 }
