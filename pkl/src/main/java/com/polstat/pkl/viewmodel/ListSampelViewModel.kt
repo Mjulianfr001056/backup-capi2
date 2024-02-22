@@ -163,6 +163,11 @@ class ListSampelViewModel @Inject constructor(
                     _successMessage.value = "Data tidak ditemukan"
                     _showSuccessToastChannel.send(true)
                 }
+
+                if (!_listSampelRuta.value.isNullOrEmpty()){
+                    _successMessage.value = "Data berhasil ditampilkan"
+                    _showSuccessToastChannel.send(true)
+                }
             }
         }
     }

@@ -167,6 +167,11 @@ class ListRutaViewModel @Inject constructor(
                     _successMessage.value = "Data tidak ditemukan"
                     _showSuccessToastChannel.send(true)
                 }
+
+                if (!_listRutaWithKeluarga.value.isNullOrEmpty()){
+                    _successMessage.value = "Data berhasil ditampilkan"
+                    _showSuccessToastChannel.send(true)
+                }
             }
         }
     }
@@ -195,6 +200,11 @@ class ListRutaViewModel @Inject constructor(
                 }
                 if (_listKeluargaWithRuta.value.isNullOrEmpty()){
                     _successMessage.value = "Data tidak ditemukan"
+                    _showSuccessToastChannel.send(true)
+                }
+
+                if (!_listKeluargaWithRuta.value.isNullOrEmpty()){
+                    _successMessage.value = "Data berhasil ditampilkan"
                     _showSuccessToastChannel.send(true)
                 }
             }
