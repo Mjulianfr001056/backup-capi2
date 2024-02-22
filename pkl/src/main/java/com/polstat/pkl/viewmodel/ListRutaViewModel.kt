@@ -102,12 +102,17 @@ class ListRutaViewModel @Inject constructor(
 
     val successMessage = _successMessage.asStateFlow()
 
+    private val _isSuccesed = MutableStateFlow(false)
+
+    val isSuccesed = _isSuccesed.asStateFlow()
+
     init {
         viewModelScope.launch {
             idBS?.let {
                 getWilayah(it)
                 getListRutaWithKeluarga(it)
                 getListKeluargaWithRuta(it)
+                _isSuccesed.value = true
             }
         }
     }
@@ -122,13 +127,12 @@ class ListRutaViewModel @Inject constructor(
                             Log.e(TAG, "getWilayah: Error in getWilayah (${errorMessage.value})")
                         }
                         _showErrorToastChannel.send(true)
+                        _isSuccesed.value = true
                     }
                     is Result.Loading -> Log.d(TAG, "getWilayah: Loading...")
                     is Result.Success -> {
                         result.data?.let {
                             _wilayah.value = it
-                            _successMessage.value = "Berhasil mendapatkan wilayah!"
-                            _showSuccessToastChannel.send(true)
                             Log.d(TAG, "getWilayah succeed: ${wilayah.value}")
                         }
                     }
@@ -147,14 +151,21 @@ class ListRutaViewModel @Inject constructor(
                             Log.e(TAG, "getListRutaWithKeluarga: Error in getListRutaWithKeluarga (${errorMessage.value})")
                         }
                         _showErrorToastChannel.send(true)
+                        _isSuccesed.value = true
                     }
                     is Result.Loading -> Log.d(TAG, "getListRutaWithKeluarga: Loading...")
                     is Result.Success -> {
                         result.data?.let {
                             _listRutaWithKeluarga.value = it
+                            _successMessage.value = "Data berhasil ditampilkan"
                             Log.d(TAG, "getListRutaWithKeluarga succeed: ${listRutaWithKeluarga.value}")
                         }
+                        _showSuccessToastChannel.send(true)
                     }
+                }
+                if (_listRutaWithKeluarga.value.isNullOrEmpty()){
+                    _successMessage.value = "Data tidak ditemukan"
+                    _showSuccessToastChannel.send(true)
                 }
             }
         }
@@ -170,14 +181,21 @@ class ListRutaViewModel @Inject constructor(
                             Log.e(TAG, "getListKeluargaWithRuta: Error in getListKeluargaWithRuta (${errorMessage.value})")
                         }
                         _showErrorToastChannel.send(true)
+                        _isSuccesed.value = true
                     }
                     is Result.Loading -> Log.d(TAG, "getListKeluargaWithRuta: Loading...")
                     is Result.Success -> {
                         result.data?.let {
                             _listKeluargaWithRuta.value = it
+                            _successMessage.value = "Data berhasil ditampilkan"
                             Log.d(TAG, "getListKeluargaWithRuta succeed: ${listKeluargaWithRuta.value}")
                         }
+                        _showSuccessToastChannel.send(true)
                     }
+                }
+                if (_listKeluargaWithRuta.value.isNullOrEmpty()){
+                    _successMessage.value = "Data tidak ditemukan"
+                    _showSuccessToastChannel.send(true)
                 }
             }
         }
@@ -222,6 +240,7 @@ class ListRutaViewModel @Inject constructor(
                                 Log.e(TAG, "synchronizeRuta: Error in synchronizeRuta (${errorMessage.value})")
                             }
                             _showErrorToastChannel.send(true)
+                            _isSuccesed.value = true
                         }
                     }
                 }
@@ -258,6 +277,7 @@ class ListRutaViewModel @Inject constructor(
                         }
                     }
                 }
+                _isSuccesed.value = true
             }
         }
     }
@@ -283,7 +303,8 @@ class ListRutaViewModel @Inject constructor(
                                 _errorMessage.value = error
                                 Log.e(TAG, "getRuta: Error in getRuta (${errorMessage.value}")
                             }
-//                            _showErrorToastChannel.send(true)
+                            _showErrorToastChannel.send(true)
+                            _isSuccesed.value = true
                         }
                     }
                 }
@@ -330,6 +351,8 @@ class ListRutaViewModel @Inject constructor(
                     Log.d(TAG, message)
                 }
             }
+
+            _isSuccesed.value = true
         }
     }
 
@@ -342,6 +365,7 @@ class ListRutaViewModel @Inject constructor(
                             result.message?.let { error ->
                                 _errorMessage.value = error
                             }
+                            _isSuccesed.value = true
                         }
                         is Result.Loading -> Log.d(TAG, "getKeluarga: Loading...")
                         is Result.Success -> {
@@ -359,6 +383,7 @@ class ListRutaViewModel @Inject constructor(
             keluargaRepository.fakeDeleteKeluarga(_deleteKeluarga.value.toKeluarga()).collectLatest { message ->
                 Log.d(TAG, message)
             }
+            _isSuccesed.value = true
         }
     }
 
@@ -375,5 +400,9 @@ class ListRutaViewModel @Inject constructor(
     // Fungsi untuk mendapatkan semua kodeKlg
     fun getAllKodeKlgFromRutaWithKeluarga(rutaWithKeluarga: RutaWithKeluarga): List<String> {
         return rutaWithKeluarga.listKeluarga.map { it.kodeKlg }
+    }
+
+    fun updateShowLoading(isSuccesed: Boolean) {
+        _showLoadingChannel.trySend(!isSuccesed)
     }
 }

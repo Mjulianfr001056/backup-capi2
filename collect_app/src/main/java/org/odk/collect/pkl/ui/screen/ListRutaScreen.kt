@@ -3,10 +3,12 @@ package org.odk.collect.pkl.ui.screen
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -92,6 +94,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
+import org.odk.collect.pkl.ui.screen.components.LoadingDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("UNUSED_EXPRESSION")
@@ -111,8 +114,21 @@ fun ListRutaScreen(
     val isMonitoring = viewModel.isMonitoring?: false
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val showLoading by viewModel.showLoadingChannel.collectAsState(true)
+    val isSuccessed = viewModel.isSuccesed.collectAsState()
+
+    LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
+        viewModel.updateShowLoading(isSuccessed.value)
+        viewModel.showErrorToastChannel.collectLatest { isError ->
+            if (isError) {
+                delay(1500)
+                Toast.makeText(context, viewModel.errorMessage.value, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     LaunchedEffect(key1 = viewModel.showSuccessToastChannel) {
+        viewModel.updateShowLoading(isSuccessed.value)
         viewModel.showSuccessToastChannel.collectLatest { isSuccess ->
             if (isSuccess) {
                 delay(1500)
@@ -121,14 +137,9 @@ fun ListRutaScreen(
         }
     }
 
-    LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
-        viewModel.showErrorToastChannel.collectLatest { isError ->
-            if (isError) {
-                delay(1500)
-                Toast.makeText(context, viewModel.errorMessage.value, Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
+    LoadingDialog(
+        showDialog = showLoading
+    )
 
     Scaffold(
         topBar = {
@@ -298,67 +309,99 @@ fun ListRutaScreen(
 
             val filteredKeluargaList = listKeluargaWithRuta.value.filter { it.keluarga.status != "delete" }.filter { it.keluarga.kodeKlg.contains(text, ignoreCase = true) || it.keluarga.namaKK.contains(text, ignoreCase = true) }
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-//                    .background(color = PklBase)
-                    .paint(
-                        painter = painterResource(id = R.drawable.pb_bg_background),
-                        contentScale = ContentScale.Crop
-                    )
-                ,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
-            ) {
-                item {
-                    Row(
-                        modifier = Modifier
-                            .padding(innerPadding)
-                            .fillMaxWidth()
-                            .height(50.dp)
-                            .background(PklPrimary300),
-                        Arrangement.SpaceEvenly,
-                        Alignment.CenterVertically,
+            if (filteredRutaList.isNullOrEmpty() && isListRuta || filteredKeluargaList.isNullOrEmpty() &&!isListRuta ){
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = Color.Transparent),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(16.dp)
                     ) {
-                        TableCell(text = stringResource(id = R.string.no_bf_list_ruta), fontSize = 12.sp, color = Color.White, weight = colWeight1)
-                        TableCell(text = stringResource(id = R.string.no_bs_list_ruta), color = Color.White, fontSize = 12.sp, weight = colWeight1)
-
-                        if (isListRuta) {
-                            TableCell(text = stringResource(id = R.string.no_ruta_list_ruta), color = Color.White, fontSize = 12.sp, weight = colWeight1)
-                            TableCell(text = stringResource(id = R.string.nama_krt_list_ruta), color = Color.White, fontSize = 12.sp, weight = colWeight2)
-//                        TableCell(text = stringResource(id = R.string.detail_list_ruta_klg), color = Color.White, fontSize = 12.sp, weight = colWeight1)
-                        }
-                        else {
-                            TableCell(text = stringResource(id = R.string.no_urut_klg), color = Color.White, fontSize = 12.sp, weight = colWeight1)
-                            TableCell(text = stringResource(id = R.string.nama_kepala_keluarga), color = Color.White, fontSize = 12.sp, weight = colWeight2)
-//                        TableCell(text = stringResource(id = R.string.detail_list_ruta_klg), color = Color.White, fontSize = 12.sp, weight = colWeight1)
-                        }
+                        Image(
+                            painter = painterResource(id = R.drawable.dokumen_hilang),
+                            contentDescription = "Empty List Image",
+                            modifier = Modifier
+                                .size(250.dp, 250.dp)
+                                .padding(16.dp),
+                            contentScale = ContentScale.Crop
+                        )
+                        Text(
+                            text = "Tidak Ditemukan!",
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            color = Color.Black
+                        )
                     }
                 }
-
-                val itemsList = if (isListRuta) filteredRutaList else filteredKeluargaList
-
-                items(itemsList.size) { index ->
-                    if (isListRuta) {
-                        val rutaWithKeluargaItem = itemsList[index] as RutaWithKeluarga
-                        RutaOrKlgRow(
-                            rutaWithKeluarga = rutaWithKeluargaItem,
-                            viewModel = viewModel,
-                            navController = navController,
-                            userNim = session?.nim ?: "",
-                            isMonitoring = isMonitoring,
-                            isListRuta = true
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+//                    .background(color = PklBase)
+                        .paint(
+                            painter = painterResource(id = R.drawable.pb_bg_background),
+                            contentScale = ContentScale.Crop
                         )
-                    } else {
-                        val keluargaWithRutaItem = itemsList[index] as KeluargaWithRuta
-                        RutaOrKlgRow(
-                            keluargaWithRuta = keluargaWithRutaItem,
-                            viewModel = viewModel,
-                            navController = navController,
-                            userNim = session?.nim ?: "",
-                            isMonitoring = isMonitoring,
-                            isListRuta = false
-                        )
+                    ,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .fillMaxWidth()
+                                .height(50.dp)
+                                .background(PklPrimary300),
+                            Arrangement.SpaceEvenly,
+                            Alignment.CenterVertically,
+                        ) {
+                            TableCell(text = stringResource(id = R.string.no_bf_list_ruta), fontSize = 12.sp, color = Color.White, weight = colWeight1)
+                            TableCell(text = stringResource(id = R.string.no_bs_list_ruta), color = Color.White, fontSize = 12.sp, weight = colWeight1)
+
+                            if (isListRuta) {
+                                TableCell(text = stringResource(id = R.string.no_ruta_list_ruta), color = Color.White, fontSize = 12.sp, weight = colWeight1)
+                                TableCell(text = stringResource(id = R.string.nama_krt_list_ruta), color = Color.White, fontSize = 12.sp, weight = colWeight2)
+//                        TableCell(text = stringResource(id = R.string.detail_list_ruta_klg), color = Color.White, fontSize = 12.sp, weight = colWeight1)
+                            }
+                            else {
+                                TableCell(text = stringResource(id = R.string.no_urut_klg), color = Color.White, fontSize = 12.sp, weight = colWeight1)
+                                TableCell(text = stringResource(id = R.string.nama_kepala_keluarga), color = Color.White, fontSize = 12.sp, weight = colWeight2)
+//                        TableCell(text = stringResource(id = R.string.detail_list_ruta_klg), color = Color.White, fontSize = 12.sp, weight = colWeight1)
+                            }
+                        }
+                    }
+
+                    val itemsList = if (isListRuta) filteredRutaList else filteredKeluargaList
+
+                    items(itemsList.size) { index ->
+                        if (isListRuta) {
+                            val rutaWithKeluargaItem = itemsList[index] as RutaWithKeluarga
+                            RutaOrKlgRow(
+                                rutaWithKeluarga = rutaWithKeluargaItem,
+                                viewModel = viewModel,
+                                navController = navController,
+                                userNim = session?.nim ?: "",
+                                isMonitoring = isMonitoring,
+                                isListRuta = true
+                            )
+                        } else {
+                            val keluargaWithRutaItem = itemsList[index] as KeluargaWithRuta
+                            RutaOrKlgRow(
+                                keluargaWithRuta = keluargaWithRutaItem,
+                                viewModel = viewModel,
+                                navController = navController,
+                                userNim = session?.nim ?: "",
+                                isMonitoring = isMonitoring,
+                                isListRuta = false
+                            )
+                        }
                     }
                 }
             }

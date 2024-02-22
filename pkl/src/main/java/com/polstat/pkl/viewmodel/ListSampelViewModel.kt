@@ -141,8 +141,10 @@ class ListSampelViewModel @Inject constructor(
                     is Result.Success -> {
                         result.data?.let { response ->
                             _listSampelRuta.value = response
+                            _successMessage.value = "Data berhasil ditampilkan"
                             Log.d(TAG, "getSampelByBS success: $response")
                         }
+                        _showSuccessToastChannel.send(true)
                     }
                     is Result.Loading -> {
                         Log.d(TAG, "getSampelByBS: Loading...")
@@ -155,6 +157,11 @@ class ListSampelViewModel @Inject constructor(
                         Log.e(TAG, "getSampelByBS: Error in getSampelByBS")
                         _isDataInserted.value = true
                     }
+                }
+
+                if (_listSampelRuta.value.isNullOrEmpty()){
+                    _successMessage.value = "Data tidak ditemukan"
+                    _showSuccessToastChannel.send(true)
                 }
             }
         }
