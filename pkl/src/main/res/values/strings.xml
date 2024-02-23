@@ -57,6 +57,7 @@
     <string name="nomor_urut_ruta_egb">Nomor Urut Rumah Tangga Eligible</string>
     <string name="catatan">Catatan</string>
     <string name="nim_pencacah">Nim Pencacah</string>
+    <string name="is_enable">Apakah ruta dapat dikunjungi ketika periode pencacahan</string>
     <string name="close_popup_list_ruta">close</string>
     <string name="search_list_ruta">Masukkan kode ruta atau nama KRT</string>
     <string name="search_list_sampel">Masukkan kata kunci</string>
@@ -91,6 +92,7 @@
     <string name="salin_action_art">Salin Ruta</string>
     <string name="detail_keluarga">detail keluarga</string>
     <string name="kode_ruta">Kode Ruta</string>
+    <string name="no_segmen">No Segmen</string>
     <string name="daftar_klg_terkait">Daftar Keluarga Terkait</string>
     <string name="kode_klg">Kode Keluarga</string>
     <string name="daftar_ruta_terkait">Daftar Ruta Terkait</string>

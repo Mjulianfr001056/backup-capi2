@@ -123,13 +123,15 @@ class LocalRutaRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getRuta(
+        idBS: String,
+        noSegmen: String,
         kodeRuta: String
     ): Flow<Result<RutaEntity>> {
         return flow {
             try {
                 emit(Result.Loading(true))
 
-                val rutaEntity = capi63Dao.getRuta(kodeRuta)
+                val rutaEntity = capi63Dao.getRuta(idBS, noSegmen, kodeRuta)
 
                 Log.d(TAG, "Berhasil getKodeRuta: $rutaEntity")
 
@@ -143,12 +145,12 @@ class LocalRutaRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getLastRuta(idBS: String): Flow<Result<RutaEntity>> {
+    override suspend fun getLastRuta(idBS: String, noSegmen: String): Flow<Result<RutaEntity>> {
         return flow {
             try {
                 emit(Result.Loading(true))
 
-                val lastRuta = capi63Dao.getLastRuta(idBS)
+                val lastRuta = capi63Dao.getLastRuta(idBS, noSegmen)
 
                 Log.d(TAG, "Berhasil getLastRuta: $lastRuta")
 
@@ -162,16 +164,16 @@ class LocalRutaRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllRutaByWilayah(idBS: String): Flow<Result<List<RutaEntity>>> {
+    override suspend fun getAllRutaByWilayahAndNoSegmen(idBS: String, noSegmen: String): Flow<Result<List<RutaEntity>>> {
         return flow {
             try {
                 emit(Result.Loading(true))
-                val listAllRutaByWilayah = capi63Dao.getAllRutaByWilayah(idBS)
-                Log.d(TAG, "Berhasil getAllRutaByWilayah: $listAllRutaByWilayah")
-                emit(Result.Success(listAllRutaByWilayah))
+                val listAllRutaByWilayahAndNoSegmen = capi63Dao.getAllRutaByWilayahAndNoSegmen(idBS, noSegmen)
+                Log.d(TAG, "Berhasil getAllRutaByWilayahAndNoSegmen: $listAllRutaByWilayahAndNoSegmen")
+                emit(Result.Success(listAllRutaByWilayahAndNoSegmen))
             } catch (e: Exception) {
-                Log.d(TAG, "Gagal getAllRutaByWilayah: ${e.message}")
-                emit(Result.Error(null, "Error Get All Ruta By Wilayah: ${e.message}"))
+                Log.d(TAG, "Gagal getAllRutaByWilayahAndNoSegmen: ${e.message}")
+                emit(Result.Error(null, "Error Get All Ruta By Wilayah And NoSegmen: ${e.message}"))
             } finally {
                 emit(Result.Loading(false))
             }

@@ -269,6 +269,10 @@ dependencies {
     implementation "androidx.compose.material:material:1.6.0"
     implementation "androidx.compose.material:material-icons-core:1.6.0"
 
+    // Cascade
+//    implementation "me.saket.cascade:cascade:2.3.0"
+//    implementation "me.saket.cascade:cascade-compose:2.3.0"
+
     // Navigation
     implementation ("androidx.navigation:navigation-compose:2.7.6")
     implementation("androidx.navigation:navigation-runtime-ktx:2.7.6")

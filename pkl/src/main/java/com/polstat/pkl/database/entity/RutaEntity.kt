@@ -20,6 +20,7 @@ data class RutaEntity (
     var idBS: String = "[not set]",
     var noSegmen: String = "[not set]",
     var nimPencacah: String = "[not set]",
+    var isEnable: String = "[not set]",
     var status: String = "[not set]"
 )
 

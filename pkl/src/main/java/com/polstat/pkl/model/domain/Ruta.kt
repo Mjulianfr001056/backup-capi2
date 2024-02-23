@@ -15,5 +15,6 @@ data class Ruta(
     val idBS: String = "[not set]",
     val noSegmen: String = "[not set]",
     val nimPencacah: String = "[not set]",
+    val isEnable: String = "[not set]",
     val status: String = "[not set]"
 )

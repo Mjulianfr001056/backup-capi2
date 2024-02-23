@@ -80,12 +80,12 @@ class KeluargaRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getKeluarga(kodeKlg: String): Flow<Result<KeluargaEntity>> {
+    override suspend fun getKeluarga(idBS: String, noSegmen: String, kodeKlg: String): Flow<Result<KeluargaEntity>> {
         return flow {
             try {
                 emit(Result.Loading(true))
 
-                val keluarga = capi63Dao.getKeluarga(kodeKlg)
+                val keluarga = capi63Dao.getKeluarga(idBS, noSegmen, kodeKlg)
 
                 Log.d(TAG, "Berhasil getKeluarga: $keluarga")
 
@@ -99,12 +99,12 @@ class KeluargaRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getLastKeluarga(idBS: String): Flow<Result<KeluargaEntity>> {
+    override suspend fun getLastKeluarga(idBS: String, noSegmen: String): Flow<Result<KeluargaEntity>> {
         return flow {
             try {
                 emit(Result.Loading(true))
 
-                val lastKeluarga = capi63Dao.getLastKeluarga(idBS)
+                val lastKeluarga = capi63Dao.getLastKeluarga(idBS, noSegmen)
 
                 Log.d(TAG, "Berhasil getLastKeluarga: $lastKeluarga")
 
@@ -118,12 +118,12 @@ class KeluargaRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getLastKeluargaEgb(idBS: String): Flow<Result<KeluargaEntity>> {
+    override suspend fun getLastKeluargaEgb(idBS: String, noSegmen: String): Flow<Result<KeluargaEntity>> {
         return flow {
             try {
                 emit(Result.Loading(true))
 
-                val lastKeluargaEgb = capi63Dao.getLastKeluargaEgb(idBS)
+                val lastKeluargaEgb = capi63Dao.getLastKeluargaEgb(idBS, noSegmen)
 
                 Log.d(TAG, "Berhasil getLastKeluargaEgb: $lastKeluargaEgb")
 
@@ -131,6 +131,25 @@ class KeluargaRepositoryImpl @Inject constructor(
             } catch (e: Exception) {
                 Log.d(TAG, "Gagal getLastKeluargaEgb: ${e.message}")
                 emit(Result.Error(null, "Error fetching Last Keluarga Egb: ${e.message}"))
+            } finally {
+                emit(Result.Loading(false))
+            }
+        }
+    }
+
+    override suspend fun getKeluargaWithLastNoSegmen(idBS: String): Flow<Result<KeluargaEntity>> {
+        return flow {
+            try {
+                emit(Result.Loading(true))
+
+                val keluargaWithLastNoSegmen = capi63Dao.getKeluargaWithLastNoSegmen(idBS)
+
+                Log.d(TAG, "Berhasil getKeluargaWithLastNoSegmen: $keluargaWithLastNoSegmen")
+
+                emit(Result.Success(keluargaWithLastNoSegmen))
+            } catch (e: Exception) {
+                Log.d(TAG, "Gagal getKeluargaWithLastNoSegmen: ${e.message}")
+                emit(Result.Error(null, "Error fetching KeluargaWithLastNoSegmen: ${e.message}"))
             } finally {
                 emit(Result.Loading(false))
             }

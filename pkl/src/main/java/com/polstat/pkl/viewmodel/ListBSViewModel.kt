@@ -94,7 +94,7 @@ class ListBSViewModel @Inject constructor(
                     is Result.Error -> {
                         result.message?.let { error ->
                             _errorMessage.value = error
-                            Log.e(TAG, "getAllWilayah: Error in getAllWilayah ($errorMessage)")
+                            Log.e(TAG, "getAllWilayah: Error in getAllWilayah (${errorMessage.value})")
                             _isSuccesed.value = true
                         }
                         _showErrorToastChannel.send(true)

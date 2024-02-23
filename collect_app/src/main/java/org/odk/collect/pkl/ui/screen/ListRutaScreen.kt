@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -39,12 +40,10 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -108,6 +107,7 @@ fun ListRutaScreen(
     val listRutaWithKeluarga = viewModel.listRutaWithKeluarga.collectAsState()
     val listKeluargaWithRuta = viewModel.listKeluargaWithRuta.collectAsState()
     val idBS = viewModel.idBS
+    val wilayah = viewModel.wilayah.collectAsState()
     val isMonitoring = viewModel.isMonitoring?: false
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -136,9 +136,10 @@ fun ListRutaScreen(
                 title = {
                     val textId = if (isListRuta) R.string.list_ruta_title else R.string.list_keluarga
                     val status = if (isMonitoring) stringResource(R.string.monitoring) else stringResource(R.string.listing)
+                    val noBS = idBS?.takeLast(4)
 
                     Text(
-                        text = stringResource(id = textId).uppercase() + " ($status)",
+                        text = stringResource(id = textId).uppercase() + " ($status-$noBS)",
                         style = TextStyle(
                             fontFamily = PoppinsFontFamily,
                             fontWeight = FontWeight.Medium,
@@ -292,11 +293,12 @@ fun ListRutaScreen(
         content = { innerPadding ->
 
             val colWeight1 = .15f
-            val colWeight2 = .55f
+            val colWeight2 = .21f
+            val colWeight3 = .64f
 
             val filteredRutaList = listRutaWithKeluarga.value.filter { it.ruta.status != "delete" }.filter { it.ruta.kodeRuta.contains(text, ignoreCase = true) || it.ruta.namaKrt.contains(text, ignoreCase = true) }
 
-            val filteredKeluargaList = listKeluargaWithRuta.value.filter { it.keluarga.status != "delete" }.filter { it.keluarga.kodeKlg.contains(text, ignoreCase = true) || it.keluarga.namaKK.contains(text, ignoreCase = true) }
+            val filteredKeluargaList = listKeluargaWithRuta.value.filter { it.keluarga.status != "delete" && it.keluarga.namaKK != "" }.filter { it.keluarga.kodeKlg.contains(text, ignoreCase = true) || it.keluarga.namaKK.contains(text, ignoreCase = true) }
 
             LazyColumn(
                 modifier = Modifier
@@ -306,6 +308,7 @@ fun ListRutaScreen(
                         painter = painterResource(id = R.drawable.pb_bg_background),
                         contentScale = ContentScale.Crop
                     )
+                    .padding(innerPadding)
                 ,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
@@ -313,24 +316,23 @@ fun ListRutaScreen(
                 item {
                     Row(
                         modifier = Modifier
-                            .padding(innerPadding)
+//                            .padding(innerPadding)
                             .fillMaxWidth()
-                            .height(50.dp)
+                            .height(60.dp)
                             .background(PklPrimary300),
                         Arrangement.SpaceEvenly,
                         Alignment.CenterVertically,
                     ) {
-                        TableCell(text = stringResource(id = R.string.no_bf_list_ruta), fontSize = 12.sp, color = Color.White, weight = colWeight1)
-                        TableCell(text = stringResource(id = R.string.no_bs_list_ruta), color = Color.White, fontSize = 12.sp, weight = colWeight1)
+                        TableCell(text = stringResource(id = R.string.no_segmen), fontSize = 14.sp, color = Color.White, weight = colWeight2)
 
                         if (isListRuta) {
-                            TableCell(text = stringResource(id = R.string.no_ruta_list_ruta), color = Color.White, fontSize = 12.sp, weight = colWeight1)
-                            TableCell(text = stringResource(id = R.string.nama_krt_list_ruta), color = Color.White, fontSize = 12.sp, weight = colWeight2)
+                            TableCell(text = stringResource(id = R.string.no_ruta_list_ruta), color = Color.White, fontSize = 14.sp, weight = colWeight1)
+                            TableCell(text = stringResource(id = R.string.nama_krt_list_ruta), color = Color.White, fontSize = 14.sp, weight = colWeight3)
 //                        TableCell(text = stringResource(id = R.string.detail_list_ruta_klg), color = Color.White, fontSize = 12.sp, weight = colWeight1)
                         }
                         else {
-                            TableCell(text = stringResource(id = R.string.no_urut_klg), color = Color.White, fontSize = 12.sp, weight = colWeight1)
-                            TableCell(text = stringResource(id = R.string.nama_kepala_keluarga), color = Color.White, fontSize = 12.sp, weight = colWeight2)
+                            TableCell(text = stringResource(id = R.string.no_urut_klg), color = Color.White, fontSize = 14.sp, weight = colWeight1)
+                            TableCell(text = stringResource(id = R.string.nama_kepala_keluarga), color = Color.White, fontSize = 14.sp, weight = colWeight3)
 //                        TableCell(text = stringResource(id = R.string.detail_list_ruta_klg), color = Color.White, fontSize = 12.sp, weight = colWeight1)
                         }
                     }
@@ -364,7 +366,7 @@ fun ListRutaScreen(
             }
         },
         floatingActionButton = {
-            if (!isMonitoring){
+            if (!isMonitoring && wilayah.value.status == "listing"){
                 FloatingActionButton(
                     modifier = Modifier
                         .padding(all = 16.dp),
@@ -402,17 +404,21 @@ fun RutaOrKlgRow(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val idBS = viewModel.idBS
+    val wilayah = viewModel.wilayah.collectAsState()
 
     val colWeight1 = .15f
-    val colWeight2 = .55f
+    val colWeight2 = .21f
+    val colWeight3 = .64f
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(40.dp)
+            .height(45.dp)
             .combinedClickable(onLongClick = {
                 if ((userNim == rutaWithKeluarga.ruta.nimPencacah) || (userNim == keluargaWithRuta.keluarga.nimPencacah)) {
-                    openActionDialog = true
+                    if (wilayah.value.status == "listing") {
+                        openActionDialog = true
+                    }
                 }
             },
                 onClick = { }),
@@ -423,10 +429,11 @@ fun RutaOrKlgRow(
         val noUrut = if (isListRuta) rutaWithKeluarga.ruta.noUrutRuta else keluargaWithRuta.keluarga.noUrutKlg
         val nama = if (isListRuta) rutaWithKeluarga.ruta.namaKrt else keluargaWithRuta.keluarga.namaKK
 
-        TableCell(text = UtilFunctions.padWithZeros(selectedData.noBgFisik, 3), fontSize = 12.sp, weight = colWeight1)
-        TableCell(text = UtilFunctions.padWithZeros(selectedData.noBgSensus, 3), fontSize = 12.sp, weight = colWeight1)
-        TableCell(text = UtilFunctions.padWithZeros(noUrut, 3), fontSize = 12.sp, weight = colWeight1)
-        TableCell(text = viewModel.sederhanakanNama(nama), fontSize = 12.sp, weight = colWeight2)
+        TableCell(text = UtilFunctions.padWithZeros(selectedData.noSegmen, 3), fontSize = 14.sp, weight = colWeight2)
+        Spacer(modifier = Modifier.width(10.dp))
+        TableCell(text = UtilFunctions.padWithZeros(noUrut, 3), fontSize = 14.sp, weight = colWeight1)
+        Spacer(modifier = Modifier.width(10.dp))
+        TableCell(text = viewModel.sederhanakanNama(nama), fontSize = 14.sp, weight = colWeight3)
 
         IconButton(
             modifier = Modifier.weight(colWeight1),
@@ -490,6 +497,10 @@ fun RutaOrKlgRow(
                                                 value = rutaWithKeluarga.ruta.kodeRuta
                                             )
                                             DetailRutaTextField(
+                                                label = R.string.kode_ruta,
+                                                value = rutaWithKeluarga.ruta.noSegmen
+                                            )
+                                            DetailRutaTextField(
                                                 label = R.string.nomor_urut_krt_ruta,
                                                 value = UtilFunctions.padWithZeros(rutaWithKeluarga.ruta.noUrutRuta, 3)
                                             )
@@ -515,15 +526,24 @@ fun RutaOrKlgRow(
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.kategori_jml_genz,
-                                                value = "${rutaWithKeluarga.ruta.katGenz}"
+                                                value = when (rutaWithKeluarga.ruta.katGenz) {
+                                                    1 -> "Kategori Gen Z Anak (1)"
+                                                    2 -> "Kategori Gen Z Dewasa (2)"
+                                                    3 -> "Kategori Gen Z Anak dan Dewasa (3)"
+                                                    else -> "Bukan Kategori Gen Z dan Dewasa"
+                                                }
                                             )
                                             DetailRutaTextField(
-                                                label = R.string.catatan,
-                                                value = rutaWithKeluarga.ruta.catatan.ifEmpty { "N/A" }
+                                                label = R.string.is_enable,
+                                                value = if (rutaWithKeluarga.ruta.isEnable == "1") "Ya" else "Tidak"
                                             )
                                             DetailRutaTextField(
                                                 label = R.string.nim_pencacah,
                                                 value = rutaWithKeluarga.ruta.nimPencacah.ifEmpty { "N/A" }
+                                            )
+                                            DetailRutaTextField(
+                                                label = R.string.catatan,
+                                                value = rutaWithKeluarga.ruta.catatan.ifEmpty { "N/A" }
                                             )
                                             Spacer(modifier = Modifier.size(5.dp))
                                             Text(
@@ -537,7 +557,7 @@ fun RutaOrKlgRow(
                                             )
                                         }
 
-                                        val daftarKeluargaByRuta = rutaWithKeluarga.listKeluarga.filter { it.status != "delete" }
+                                        val daftarKeluargaByRuta = rutaWithKeluarga.listKeluarga.filter { it.status != "delete" && it.namaKK != "" }
                                         items(daftarKeluargaByRuta.size) { itemIndex ->
                                             val keluargaByRuta = daftarKeluargaByRuta[itemIndex]
                                             var expanded by remember { mutableStateOf(false) }
@@ -907,19 +927,25 @@ fun RutaOrKlgRow(
                             Text(modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    val idBS: String
+                                    val newIdBS: String
+                                    val noSegmen: String
                                     val allKodeKlgStr: String
                                     var kodeRuta = "-1"
                                     if (isListRuta) {
-                                        idBS = rutaWithKeluarga.ruta.idBS
-                                        val allKodeKlg = viewModel.getAllKodeKlgFromRutaWithKeluarga(rutaWithKeluarga)
+                                        newIdBS = rutaWithKeluarga.ruta.idBS
+                                        noSegmen = rutaWithKeluarga.ruta.noSegmen
+                                        val allKodeKlg =
+                                            viewModel.getAllKodeKlgFromRutaWithKeluarga(
+                                                rutaWithKeluarga
+                                            )
                                         allKodeKlgStr = allKodeKlg.joinToString(separator = ";")
                                         kodeRuta = rutaWithKeluarga.ruta.kodeRuta
                                     } else {
-                                        idBS = keluargaWithRuta.keluarga.idBS
+                                        newIdBS = keluargaWithRuta.keluarga.idBS
+                                        noSegmen = keluargaWithRuta.keluarga.noSegmen
                                         allKodeKlgStr = keluargaWithRuta.keluarga.kodeKlg
                                     }
-                                    navController.navigate(CapiScreen.Listing.EDIT_RUTA + "/$idBS/$allKodeKlgStr/$kodeRuta/$isMonitoring/$isListRuta")
+                                    navController.navigate(CapiScreen.Listing.EDIT_RUTA + "/$newIdBS/$noSegmen/$allKodeKlgStr/$kodeRuta/$isMonitoring/$isListRuta")
                                 }
                                 .padding(
                                     top = 10.dp,
@@ -971,7 +997,7 @@ fun RutaOrKlgRow(
                             if (isListRuta) {
                                 coroutineScope.launch {
                                     val deleteRutaJob = async {
-                                        viewModel.deleteRuta(rutaWithKeluarga.ruta.kodeRuta)
+                                        viewModel.deleteRuta(rutaWithKeluarga.ruta.idBS, rutaWithKeluarga.ruta.noSegmen, rutaWithKeluarga.ruta.kodeRuta)
                                     }
                                     deleteRutaJob.await()
                                     delay(500L)
@@ -985,7 +1011,7 @@ fun RutaOrKlgRow(
                             } else {
                                 coroutineScope.launch {
                                     val deleteKlgJob = async {
-                                        viewModel.deleteKeluarga(keluargaWithRuta.keluarga.kodeKlg)
+                                        viewModel.deleteKeluarga(keluargaWithRuta.keluarga.idBS, keluargaWithRuta.keluarga.noSegmen, keluargaWithRuta.keluarga.kodeKlg)
                                     }
                                     deleteKlgJob.await()
                                     delay(500L)
@@ -1191,11 +1217,11 @@ fun DetailCard(
         listOf(
             R.string.kode_klg to keluarga.kodeKlg,
             R.string.sls to keluarga.banjar,
-            R.string.no_bf_list_ruta to UtilFunctions.padWithZeros(keluarga.noBgFisik),
-            R.string.no_bs_list_ruta to UtilFunctions.padWithZeros(keluarga.noBgSensus),
+            R.string.no_bf_list_ruta to UtilFunctions.padWithZeros(keluarga.noBgFisik, 3),
+            R.string.no_bs_list_ruta to UtilFunctions.padWithZeros(keluarga.noBgSensus, 3),
             R.string.nomor_segmen_ruta to keluarga.noSegmen,
-            R.string.nomor_urut_keluarga to UtilFunctions.padWithZeros(keluarga.noUrutKlg),
-            R.string.no_urut_keluarga_egb to keluarga.noUrutKlgEgb,
+            R.string.nomor_urut_keluarga to UtilFunctions.padWithZeros(keluarga.noUrutKlg, 3),
+            R.string.no_urut_keluarga_egb to UtilFunctions.convertTo3DigitsString(keluarga.noUrutKlgEgb),
             R.string.nama_kepala_keluarga to keluarga.namaKK,
             R.string.alamat_ruta to keluarga.alamat,
             R.string.keberadaan_genz_ortu_keluarga to keluarga.isGenzOrtu,
@@ -1205,15 +1231,23 @@ fun DetailCard(
     } else {
         listOf(
             R.string.kode_ruta to ruta.kodeRuta,
-            R.string.no_list_ruta to UtilFunctions.padWithZeros(ruta.noUrutRuta),
-            R.string.nomor_urut_ruta_egb to if (ruta.noUrutEgb == null) "N/A" else ruta.noUrutEgb,
+            R.string.no_segmen to ruta.noSegmen,
+            R.string.no_list_ruta to UtilFunctions.padWithZeros(ruta.noUrutRuta, 3),
+            R.string.nomor_urut_ruta_egb to if (ruta.noUrutEgb == null) "N/A" else UtilFunctions.convertTo3DigitsString(ruta.noUrutEgb),
             R.string.identifikasi_kk_krt to ruta.kkOrKrt,
             R.string.nama_krt_list_ruta to ruta.namaKrt,
             R.string.jml_genz_anak to ruta.jmlGenzAnak,
             R.string.jml_genz_dewasa to ruta.jmlGenzDewasa,
-            R.string.kategori_jml_genz to ruta.katGenz,
-            R.string.catatan to ruta.catatan.ifEmpty { "N/A" },
-            R.string.nim_pencacah to ruta.nimPencacah
+            R.string.kategori_jml_genz to when (ruta.katGenz) {
+                1 -> "Kategori Gen Z Anak (1)"
+                2 -> "Kategori Gen Z Dewasa (2)"
+                3 -> "Kategori Gen Z Anak dan Dewasa (3)"
+                else -> "Bukan Kategori Gen Z dan Dewasa"
+            },
+            R.string.is_enable to if (ruta.isEnable == "1") "Ya" else "Tidak",
+            R.string.nim_pencacah to ruta.nimPencacah,
+            R.string.catatan to ruta.catatan.ifEmpty { "N/A" }
+
         )
     }
 

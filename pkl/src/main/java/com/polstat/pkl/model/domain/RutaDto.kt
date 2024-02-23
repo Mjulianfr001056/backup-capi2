@@ -14,5 +14,6 @@ data class RutaDto (
     val id_bs: String?,
     val no_segmen: String?,
     val nim_pencacah: String?,
+    val is_enable: String?,
     val status: String?
 )

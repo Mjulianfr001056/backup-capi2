@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.database.entity.KeluargaEntity
 import com.polstat.pkl.database.entity.RutaEntity
 import com.polstat.pkl.database.relation.RutaWithKeluarga
+import com.polstat.pkl.mapper.toRutaEntity
+import com.polstat.pkl.mapper.toRutaList
 import com.polstat.pkl.model.domain.Keluarga
 import com.polstat.pkl.model.domain.Lokasi
 import com.polstat.pkl.model.domain.Ruta
@@ -51,6 +53,8 @@ class IsiRutaViewModel @Inject constructor(
 
     val idBS = savedStateHandle.get<String>("idBS").orEmpty()
 
+    val noSegmen = savedStateHandle.get<String>("noSegmen").orEmpty()
+
     val kodeKlg = savedStateHandle.get<String>("kodeKlg")
 
     val kodeRuta = savedStateHandle.get<String>("kodeRuta")
@@ -59,15 +63,15 @@ class IsiRutaViewModel @Inject constructor(
 
     val isMonitoring = savedStateHandle.get<Boolean>("isMonitoring")
 
-    private val _lastKeluarga = MutableStateFlow(KeluargaEntity())
+    val _lastKeluarga = MutableStateFlow(KeluargaEntity())
 
     val lastKeluarga = _lastKeluarga.asStateFlow()
 
-    private val _lastKeluargaEgb = MutableStateFlow(KeluargaEntity())
+    val _lastKeluargaEgb = MutableStateFlow(KeluargaEntity())
 
     val lastKeluargaEgb = _lastKeluargaEgb.asStateFlow()
 
-    private val _lastRuta = MutableStateFlow(RutaEntity())
+    val _lastRuta = MutableStateFlow(RutaEntity())
 
     val lastRuta = _lastRuta.asStateFlow()
 
@@ -83,6 +87,10 @@ class IsiRutaViewModel @Inject constructor(
 
     private val lokasi = _lokasi.asStateFlow()
 
+    private val _lastNoSegmen = MutableStateFlow("[not set]")
+
+    val lastNoSegmen = _lastNoSegmen.asStateFlow()
+
     private val _isKlgValid = MutableStateFlow(false)
 
     val isKlgValid = _isKlgValid.asStateFlow()
@@ -97,23 +105,53 @@ class IsiRutaViewModel @Inject constructor(
 
     var allKodeKlg : List<String> = emptyList()
 
+    val _existingRutaFromDB = MutableStateFlow<List<RutaEntity>>(mutableListOf())
+
+    val existingRutaFromDB = _existingRutaFromDB.asStateFlow()
+
+    private val _listRutaDropdown = MutableStateFlow<List<Ruta>>(mutableListOf())
+
+    val listRutaDropdown = _listRutaDropdown.asStateFlow()
+
+    val isSetInitialKlgValueFinished = MutableStateFlow(false)
+
+    val isSetAllExistingRutaFinished = MutableStateFlow(false)
+
+    val isGetLastNoSegmenFinished = MutableStateFlow(false)
+
+    val isSubmitted = MutableStateFlow(false)
+
     init {
         if (kodeKlg == null && kodeRuta == null) {
             viewModelScope.launch {
-                val getLastKeluargaTask = async { getLastKeluarga(idBS) }
-                val getLastKeluargaEgbTask = async { getLastKeluargaEgb(idBS) }
-                val getLastRutaTask = async { getLastRuta(idBS) }
+                val getLastNoSegmenTask = async { getLastNoSegmen(idBS) }
+                _lastNoSegmen.value = getLastNoSegmenTask.await()
+                Log.d(TAG, "nilai NoSegmen1: ${lastNoSegmen.value}")
 
-                _lastKeluarga.value = getLastKeluargaTask.await()
-                _lastKeluargaEgb.value = getLastKeluargaEgbTask.await()
-                _lastRuta.value = getLastRutaTask.await()
+                delay(2000L)
+                if (isGetLastNoSegmenFinished.value) {
+                    Log.d(TAG, "nilai NoSegmen2: ${lastNoSegmen.value}")
+                    val getLastKeluargaTask = async { getLastKeluarga(idBS, state.value.noSegmen) }
+                    val getLastKeluargaEgbTask =
+                        async { getLastKeluargaEgb(idBS, state.value.noSegmen) }
+                    val getLastRutaTask = async { getLastRuta(idBS, state.value.noSegmen) }
+                    val getAllRutaByWilayahTask =
+                        async { getAllRutaByWilayahAndNoSegmen(idBS, state.value.noSegmen) }
 
-                setInitialKlgValue()
+                    _lastKeluarga.value = getLastKeluargaTask.await()
+                    _lastKeluargaEgb.value = getLastKeluargaEgbTask.await()
+                    _lastRuta.value = getLastRutaTask.await()
+                    _existingRutaFromDB.value = getAllRutaByWilayahTask.await()
+
+                    setInitialKlgValue()
+//                setAllExistingRuta()
+                }
             }
         } else {
             viewModelScope.launch {
                 if (kodeKlg != null && kodeRuta != null) {
                     Log.d(TAG, "idBS: $idBS")
+                    Log.d(TAG, "noSegmen: $noSegmen")
                     Log.d(TAG, "kodeKlg: $kodeKlg")
                     Log.d(TAG, "kodeRuta: $kodeRuta")
                     if (isListRuta == true) {
@@ -121,8 +159,8 @@ class IsiRutaViewModel @Inject constructor(
                     }
                     setRutaValueEdit()
                     setKeluargaValueEdit()
-                    getRuta(kodeRuta)
-                    getKeluarga(kodeKlg)
+                    getRuta(idBS, noSegmen, kodeRuta)
+                    getKeluarga(idBS, noSegmen, kodeKlg)
                     delay(500L)
                     setRutaValueEdit()
                     setKeluargaValueEdit()
@@ -133,21 +171,74 @@ class IsiRutaViewModel @Inject constructor(
         }
     }
 
-    private fun setInitialKlgValue() {
-        _state.value = state.value.copy(
+    fun setAllExistingRuta() {
+        isSetAllExistingRutaFinished.value = false
+        val listRutaInState: MutableList<Ruta> = mutableListOf()
+
+        repeat(state.value.jmlKlg) { i ->
+            repeat(state.value.listPenglMkn[i]) { j ->
+                val rutainState = Ruta(
+                    kodeRuta = "R${idBS}${state.value.noSegmen}${
+                        UtilFunctions.padWithZeros(
+                            state.value.listNoUrutRuta[i][j],
+                            3
+                        )
+                    }",
+                    noUrutRuta = state.value.listNoUrutRuta[i][j],
+                    noUrutEgb = 0,
+                    kkOrKrt = when (state.value.listKkOrKrt[i][j]) {
+                        "Kepala Keluarga (KK) saja" -> "1"
+                        "Kepala Rumah Tangga (KRT) saja" -> "2"
+                        "KK Sekaligus KRT" -> "3"
+                        else -> "0"
+                    },
+                    namaKrt = state.value.listNamaKrt[i][j],
+                    jmlGenzAnak = state.value.listJmlGenzAnak[i][j],
+                    jmlGenzDewasa = state.value.listJmlGenzDewasa[i][j],
+                    katGenz = when {
+                        state.value.listJmlGenzAnak[i][j] > 0 && state.value.listJmlGenzDewasa[i][j] == 0 -> 1
+                        state.value.listJmlGenzAnak[i][j] == 0 && state.value.listJmlGenzDewasa[i][j] > 0 -> 2
+                        state.value.listJmlGenzAnak[i][j] > 0 && state.value.listJmlGenzDewasa[i][j] > 0 -> 3
+                        else -> 0
+                    },
+                    isEnable = when (state.value.listIsEnable[i][j]) {
+                        "Ya" -> "1"
+                        "Tidak" -> "0"
+                        else -> "-1"
+                    },
+                    long = lokasi.value.longitude,
+                    lat = lokasi.value.latitude,
+                    catatan = state.value.listCatatan[i][j],
+                    idBS = idBS,
+                    nimPencacah = session?.nim ?: "",
+                    noSegmen = state.value.noSegmen,
+                    status = "insert"
+                )
+
+                listRutaInState.add(rutainState)
+            }
+        }
+        _listRutaDropdown.value = existingRutaFromDB.value.toRutaList() + listRutaInState
+        isSetAllExistingRutaFinished.value = true
+        Log.d(TAG, "setAllExistingRuta: List ruta dropdown ${listRutaDropdown.value}")
+        Log.d(TAG, "isSetAllExistingRutaFinished: ${isSetAllExistingRutaFinished.value}")
+    }
+
+
+    fun setInitialKlgValue() {
+        isSetAllExistingRutaFinished.value = false
+        val newState = IsiRutaScreenState()
+        _state.value = newState.copy(
             SLS = lastKeluarga.value.banjar,
             noSegmen = lastKeluarga.value.noSegmen,
-            noBgFisik = UtilFunctions.convertStringToNumber(lastKeluarga.value.noBgFisik).plus(1).toString(),
+            noBgFisik = UtilFunctions.convertStringToNumber(lastKeluarga.value.noBgFisik).toString(),
             noBgSensus = UtilFunctions.convertStringToNumber(lastKeluarga.value.noBgSensus).plus(1).toString()
         )
+        isSetAllExistingRutaFinished.value = true
         Log.d(TAG, "setInitialKlgValue: ${state.value}")
+        Log.d(TAG, "isSetInitialKlgValueFinished: ${isSetAllExistingRutaFinished.value}")
     }
-//    kkOrKrt = when (state.value.listKkOrKrt[indexKlg][indexRuta]) {
-//        "Kepala Keluarga (KK) saja" -> "1"
-//        "Kepala Rumah Tangga (KRT) saja" -> "2"
-//        "KK Sekaligus KRT" -> "3"
-//        else -> "0"
-//    },
+
     private fun setRutaValueEdit() {
         _state.value = state.value.copy(
             SLS = keluarga.value.banjar,
@@ -221,11 +312,36 @@ class IsiRutaViewModel @Inject constructor(
         Log.d(TAG, "setInitialKlgValueEdit: ${state.value}")
     }
 
+    fun getAllRutaByWilayahAndNoSegmen(idBS: String, noSegmen: String) : List<RutaEntity> {
+        viewModelScope.launch {
+            localRutaRepository.getAllRutaByWilayahAndNoSegmen(idBS, noSegmen).collectLatest { result ->
+                when(result) {
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            Log.d(TAG, "Error getAllRutaByWilayahAndNoSegmen: $error")
+                        }
+                    }
+                    is Result.Loading -> Log.d(TAG, "getAllRutaByWilayahNoSegmen: Loading...")
+                    is Result.Success -> {
+                        result.data?.let { listRuta ->
+                            _existingRutaFromDB.value = listRuta
+                            Log.d(TAG, "getAllRutaByWilayah: Berhasil mendapatkan semua ruta ${existingRutaFromDB.value}")
+                        }
+                    }
+                }
+            }
+        }
+
+        return existingRutaFromDB.value
+    }
+
     private fun getKeluarga(
+        idBS: String,
+        noSegmen: String,
         kodeKlg: String
     ) {
         viewModelScope.launch {
-            keluargaRepository.getKeluarga(kodeKlg).collectLatest { result ->
+            keluargaRepository.getKeluarga(idBS, noSegmen, kodeKlg).collectLatest { result ->
                 when(result) {
                     is Result.Error -> {
                         result.message?.let { error ->
@@ -318,13 +434,13 @@ class IsiRutaViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getLastKeluarga(idBS: String): KeluargaEntity {
+    suspend fun getLastKeluarga(idBS: String, noSegmen: String): KeluargaEntity {
         var keluargaEntity = KeluargaEntity(
             kodeKlg = "",
-            banjar = "",
+            banjar = state.value.SLS,
             noBgFisik = "0",
             noBgSensus = "0",
-            noSegmen = "S000",
+            noSegmen = state.value.noSegmen,
             noUrutKlg = "0",
             noUrutKlgEgb = 0,
             namaKK = "",
@@ -336,7 +452,7 @@ class IsiRutaViewModel @Inject constructor(
             status = ""
         )
 
-        keluargaRepository.getLastKeluarga(idBS).collectLatest { result ->
+        keluargaRepository.getLastKeluarga(idBS, noSegmen).collectLatest { result ->
             when (result) {
                 is Result.Success -> {
                     result.data?.let { keluarga ->
@@ -355,7 +471,7 @@ class IsiRutaViewModel @Inject constructor(
         return keluargaEntity
     }
 
-    private suspend fun getLastKeluargaEgb(idBS: String): KeluargaEntity {
+    suspend fun getLastKeluargaEgb(idBS: String, noSegmen: String): KeluargaEntity {
         var keluargaEntity = KeluargaEntity(
             kodeKlg = "",
             banjar = "",
@@ -373,7 +489,7 @@ class IsiRutaViewModel @Inject constructor(
             status = ""
         )
 
-        keluargaRepository.getLastKeluargaEgb(idBS).collectLatest { result ->
+        keluargaRepository.getLastKeluargaEgb(idBS, noSegmen).collectLatest { result ->
             when (result) {
                 is Result.Success -> {
                     result.data?.let { keluarga ->
@@ -392,7 +508,7 @@ class IsiRutaViewModel @Inject constructor(
         return keluargaEntity
     }
 
-    private suspend fun getLastRuta(idBS: String): RutaEntity {
+    suspend fun getLastRuta(idBS: String, noSegmen: String): RutaEntity {
         var rutaEntity = RutaEntity(
             kodeRuta = "",
             noUrutRuta = "0",
@@ -402,6 +518,7 @@ class IsiRutaViewModel @Inject constructor(
             jmlGenzAnak = 0,
             jmlGenzDewasa = 0,
             katGenz = 0,
+            isEnable = "",
             longitude = 0.0,
             latitude = 0.0,
             catatan = "",
@@ -410,7 +527,7 @@ class IsiRutaViewModel @Inject constructor(
             status = ""
         )
 
-        localRutaRepository.getLastRuta(idBS).collectLatest { result ->
+        localRutaRepository.getLastRuta(idBS, noSegmen).collectLatest { result ->
             when (result) {
                 is Result.Success -> {
                     result.data?.let { ruta ->
@@ -429,9 +546,41 @@ class IsiRutaViewModel @Inject constructor(
         return rutaEntity
     }
 
-    fun getRuta(kodeRuta: String) {
+    fun getLastNoSegmen(idBS: String) : String {
+        isGetLastNoSegmenFinished.value = false
+        Log.d(TAG, "getLastNoSegmen: isGetLastNoSegmenFinished1=${isGetLastNoSegmenFinished.value}")
         viewModelScope.launch {
-            localRutaRepository.getRuta(kodeRuta).collectLatest { result ->
+            keluargaRepository.getKeluargaWithLastNoSegmen(idBS).collectLatest { result ->
+                when(result) {
+                    is Result.Error -> {
+                        result.message?.let { error ->
+                            Log.d(TAG, "Error getLastNoSegmen: $error")
+                        }
+                    }
+                    is Result.Loading -> Log.d(TAG, "getLastNoSegmen: Loading...")
+                    is Result.Success -> {
+                        result.data?.let {
+                            _lastNoSegmen.value = it.noSegmen
+                            _state.emit(
+                                state.value.copy(
+                                    noSegmen = it.noSegmen,
+                                    SLS = it.banjar
+                                )
+                            )
+                            isGetLastNoSegmenFinished.value = true
+                            Log.d(TAG, "getLastNoSegmen: isGetLastNoSegmenFinished2=${isGetLastNoSegmenFinished.value}")
+                            Log.d(TAG, "getLastNoSegmen: Berhasil mendapatkan last noSegmen ${lastNoSegmen.value}")
+                        }
+                    }
+                }
+            }
+        }
+        return lastNoSegmen.value
+    }
+
+    fun getRuta(idBS: String, noSegmen: String, kodeRuta: String) {
+        viewModelScope.launch {
+            localRutaRepository.getRuta(idBS, noSegmen, kodeRuta).collectLatest { result ->
                 when(result) {
                     is Result.Success -> {
                         result.data?.let {
@@ -458,7 +607,7 @@ class IsiRutaViewModel @Inject constructor(
     ) {
         when(event) {
             is IsiRutaScreenEvent.SLSChanged -> {
-                _state.emit(state.value.copy(SLS = event.sls))
+                _state.emit(state.value.copy(SLS = event.sls.uppercase()))
             }
             is IsiRutaScreenEvent.NoSegmenChanged -> {
                 _state.emit(state.value.copy(noSegmen = event.noSegmen))
@@ -471,7 +620,7 @@ class IsiRutaViewModel @Inject constructor(
             is IsiRutaScreenEvent.NoBgFisikChanged -> {
                 _state.emit(state.value.copy(noBgFisik = event.noBgFisik))
                 if (state.value.noBgSensus < state.value.noBgFisik) {
-                    _state.emit(state.value.copy(noBgSensusMsg = Message(null, "Error: Bangunan sensus harus >= bangunan fisik!")))
+                    _state.emit(state.value.copy(noBgSensusMsg = Message("Warning: Bangunan sensus harus >= bangunan fisik!")))
                 } else {
                     _state.emit(state.value.copy(noBgSensusMsg = Message()))
                 }
@@ -479,12 +628,16 @@ class IsiRutaViewModel @Inject constructor(
             is IsiRutaScreenEvent.NoBgSensusChanged -> {
                 _state.emit(state.value.copy(noBgSensus = event.noBgSensus))
                 if (state.value.noBgSensus < state.value.noBgFisik) {
-                    _state.emit(state.value.copy(noBgSensusMsg = Message(null, "Error: Bangunan sensus harus >= bangunan fisik!")))
+                    _state.emit(state.value.copy(noBgSensusMsg = Message("Warning: Bangunan sensus harus >= bangunan fisik!")))
                 } else {
                     _state.emit(state.value.copy(noBgSensusMsg = Message()))
                 }
             }
             is IsiRutaScreenEvent.JmlKlgChanged -> {
+                if (event.jmlKlg > 0) {
+                    _state.emit(state.value.copy(jmlKlgMsg = Message()))
+                }
+
                 val newSize = event.jmlKlg
                 val oldSize = state.value.listNoUrutKlg.size
 
@@ -500,12 +653,14 @@ class IsiRutaViewModel @Inject constructor(
                             listIsGenzOrtu = state.value.listIsGenzOrtu + List(diff) { 0 },
                             listNoUrutKlgEgb = state.value.listNoUrutKlgEgb + List(diff) { 0 },
                             listPenglMkn = state.value.listPenglMkn + List(diff) { 0 },
+                            listAnotherRuta = state.value.listAnotherRuta + List(diff) { Ruta() },
                             listNoUrutRuta = state.value.listNoUrutRuta + List(diff) { emptyList() },
                             listKkOrKrt = state.value.listKkOrKrt + List(diff) { emptyList() },
                             listNamaKrt = state.value.listNamaKrt + List(diff) { emptyList() },
                             listJmlGenzAnak = state.value.listJmlGenzAnak + List(diff) { emptyList() },
                             listJmlGenzDewasa = state.value.listJmlGenzDewasa + List(diff) { emptyList() },
                             listKatGenz = state.value.listKatGenz + List(diff) { emptyList() },
+                            listIsEnable = state.value.listIsEnable + List(diff) { emptyList() },
                             listLong = state.value.listLong + List(diff) { emptyList() },
                             listLat = state.value.listLat + List(diff) { emptyList() },
                             listCatatan = state.value.listCatatan + List(diff) { emptyList() },
@@ -515,12 +670,14 @@ class IsiRutaViewModel @Inject constructor(
                             listIsGenzOrtuMsg = state.value.listIsGenzOrtuMsg + List(diff) { Message() },
                             listNoUrutKlgEgbMsg = state.value.listNoUrutKlgEgbMsg + List(diff) { Message() },
                             listPenglMknMsg = state.value.listPenglMknMsg + List(diff) { Message() },
+                            listAnotherRutaMsg = state.value.listAnotherRutaMsg + List(diff) { Message() },
                             listNoUrutRutaMsg = state.value.listNoUrutRutaMsg + List(diff) { emptyList() },
                             listKkOrKrtMsg = state.value.listKkOrKrtMsg + List(diff) { emptyList() },
                             listNamaKrtMsg = state.value.listNamaKrtMsg + List(diff) { emptyList() },
                             listJmlGenzAnakMsg = state.value.listJmlGenzAnakMsg + List(diff) { emptyList() },
                             listJmlGenzDewasaMsg = state.value.listJmlGenzDewasaMsg + List(diff) { emptyList() },
-                            listKatGenzMsg = state.value.listKatGenzMsg + List(diff) { emptyList() }
+                            listKatGenzMsg = state.value.listKatGenzMsg + List(diff) { emptyList() },
+                            listIsEnableMsg = state.value.listIsEnableMsg + List(diff) { emptyList() },
                         )
                     }
 
@@ -532,12 +689,14 @@ class IsiRutaViewModel @Inject constructor(
                             listIsGenzOrtu = state.value.listIsGenzOrtu.take(newSize),
                             listNoUrutKlgEgb = state.value.listNoUrutKlgEgb.take(newSize),
                             listPenglMkn = state.value.listPenglMkn.take(newSize),
+                            listAnotherRuta = state.value.listAnotherRuta.take(newSize),
                             listNoUrutRuta = state.value.listNoUrutRuta.take(newSize),
                             listKkOrKrt = state.value.listKkOrKrt.take(newSize),
                             listNamaKrt = state.value.listNamaKrt.take(newSize),
                             listJmlGenzAnak = state.value.listJmlGenzAnak.take(newSize),
                             listJmlGenzDewasa = state.value.listJmlGenzDewasa.take(newSize),
                             listKatGenz = state.value.listKatGenz.take(newSize),
+                            listIsEnable = state.value.listIsEnable.take(newSize),
                             listLong = state.value.listLong.take(newSize),
                             listLat = state.value.listLat.take(newSize),
                             listCatatan = state.value.listCatatan.take(newSize),
@@ -547,12 +706,14 @@ class IsiRutaViewModel @Inject constructor(
                             listIsGenzOrtuMsg = state.value.listIsGenzOrtuMsg.take(newSize),
                             listNoUrutKlgEgbMsg = state.value.listNoUrutKlgEgbMsg.take(newSize),
                             listPenglMknMsg = state.value.listPenglMknMsg.take(newSize),
+                            listAnotherRutaMsg = state.value.listAnotherRutaMsg.take(newSize),
                             listNoUrutRutaMsg = state.value.listNoUrutRutaMsg.take(newSize),
                             listKkOrKrtMsg = state.value.listKkOrKrtMsg.take(newSize),
                             listNamaKrtMsg = state.value.listNamaKrtMsg.take(newSize),
                             listJmlGenzAnakMsg = state.value.listJmlGenzAnakMsg.take(newSize),
                             listJmlGenzDewasaMsg = state.value.listJmlGenzDewasaMsg.take(newSize),
-                            listKatGenzMsg = state.value.listKatGenzMsg.take(newSize)
+                            listKatGenzMsg = state.value.listKatGenzMsg.take(newSize),
+                            listIsEnableMsg = state.value.listIsEnableMsg.take(newSize),
                         )
                     }
 
@@ -569,6 +730,7 @@ class IsiRutaViewModel @Inject constructor(
                 Log.d(TAG, "onEvent: listIsGenzOrtu ${state.value.listIsGenzOrtu}")
                 Log.d(TAG, "onEvent: listNoUrutKlgEgb ${state.value.listNoUrutKlgEgb}")
                 Log.d(TAG, "onEvent: listPenglMkn ${state.value.listPenglMkn}")
+                Log.d(TAG, "onEvent: listAnotherRuta ${state.value.listAnotherRuta}")
                 Log.d(TAG, "onEvent: listNoUrutRuta ${state.value.listNoUrutRuta}")
                 Log.d(TAG, "onEvent: listKkOrKrt ${state.value.listKkOrKrt}")
                 Log.d(TAG, "onEvent: listJmlGenzAnak ${state.value.listJmlGenzAnak}")
@@ -577,6 +739,17 @@ class IsiRutaViewModel @Inject constructor(
                 Log.d(TAG, "onEvent: listLong ${state.value.listLong}")
                 Log.d(TAG, "onEvent: listLat ${state.value.listLat}")
 
+            }
+            is IsiRutaScreenEvent.AnotherRutaChanged -> {
+                if (event.anotherRuta.kodeRuta != "[not set]") {
+                    val newListAnotherRutaMsg = state.value.listAnotherRutaMsg.toMutableList()
+                    newListAnotherRutaMsg[index] = Message()
+                    _state.emit(state.value.copy(listAnotherRutaMsg = newListAnotherRutaMsg))
+                }
+
+                val newListAnotherRuta = state.value.listAnotherRuta.toMutableList()
+                newListAnotherRuta[index] = event.anotherRuta
+                _state.emit(state.value.copy(listAnotherRuta = newListAnotherRuta))
             }
             is IsiRutaScreenEvent.NoUrutKlgChanged -> {
                 val newListNoUrutKlg = state.value.listNoUrutKlg.toMutableList()
@@ -594,12 +767,12 @@ class IsiRutaViewModel @Inject constructor(
             }
             is IsiRutaScreenEvent.NamaKKChanged -> {
                 val newListNamaKK = state.value.listNamaKK.toMutableList()
-                newListNamaKK[index] = event.namaKK
+                newListNamaKK[index] = event.namaKK.uppercase()
                 _state.emit(state.value.copy(listNamaKK = newListNamaKK))
             }
             is IsiRutaScreenEvent.AlamatChanged -> {
                 val newListAlamat = state.value.listAlamat.toMutableList()
-                newListAlamat[index] = event.alamat
+                newListAlamat[index] = event.alamat.uppercase()
                 _state.emit(state.value.copy(listAlamat = newListAlamat))
             }
             is IsiRutaScreenEvent.IsGenzOrtuChanged -> {
@@ -679,6 +852,9 @@ class IsiRutaViewModel @Inject constructor(
                         val newListKatGenz = state.value.listKatGenz.toMutableList()
                         newListKatGenz[index] = state.value.listKatGenz[index] + List(diff) { 0 }
 
+                        val newListIsEnable = state.value.listIsEnable.toMutableList()
+                        newListIsEnable[index] = state.value.listIsEnable[index] + List(diff) { "" }
+
                         val newListLong = state.value.listLong.toMutableList()
                         newListLong[index] = state.value.listLong[index] + List(diff) { 0.0 }
 
@@ -706,6 +882,9 @@ class IsiRutaViewModel @Inject constructor(
                         val newListKatGenzMsg = state.value.listKatGenzMsg.toMutableList()
                         newListKatGenzMsg[index] = state.value.listKatGenzMsg[index] + List(diff) { Message() }
 
+                        val newListIsEnableMsg = state.value.listIsEnableMsg.toMutableList()
+                        newListIsEnableMsg[index] = state.value.listIsEnableMsg[index] + List(diff) { Message() }
+
 
                         state.value.copy(
                             listNoUrutRuta = newListNoUrutRuta,
@@ -714,6 +893,7 @@ class IsiRutaViewModel @Inject constructor(
                             listJmlGenzAnak = newListJmlGenzAnak,
                             listJmlGenzDewasa = newListJmlGenzDewasa,
                             listKatGenz = newListKatGenz,
+                            listIsEnable = newListIsEnable,
                             listLong = newListLong,
                             listLat = newListLat,
                             listCatatan = newListCatatan,
@@ -723,6 +903,7 @@ class IsiRutaViewModel @Inject constructor(
                             listJmlGenzAnakMsg = newListJmlGenzAnakMsg,
                             listJmlGenzDewasaMsg = newListJmlGenzDewasaMsg,
                             listKatGenzMsg = newListKatGenzMsg,
+                            listIsEnableMsg = newListIsEnableMsg,
                         )
                     }
 
@@ -733,6 +914,7 @@ class IsiRutaViewModel @Inject constructor(
                         val newListJmlGenzAnak = updateListAtIndex(state.value.listJmlGenzAnak, index, newSize)
                         val newListJmlGenzDewasa = updateListAtIndex(state.value.listJmlGenzDewasa, index, newSize)
                         val newListKatGenz = updateListAtIndex(state.value.listKatGenz, index, newSize)
+                        val newListIsEnable = updateListAtIndex(state.value.listIsEnable, index, newSize)
                         val newListLong = updateListAtIndex(state.value.listLong, index, newSize)
                         val newListLat = updateListAtIndex(state.value.listLat, index, newSize)
                         val newListCatatan = updateListAtIndex(state.value.listCatatan, index, newSize)
@@ -742,6 +924,7 @@ class IsiRutaViewModel @Inject constructor(
                         val newListJmlGenzAnakMsg = updateListAtIndex(state.value.listJmlGenzAnakMsg, index, newSize)
                         val newListJmlGenzDewasaMsg = updateListAtIndex(state.value.listJmlGenzDewasaMsg, index, newSize)
                         val newListKatGenzMsg = updateListAtIndex(state.value.listKatGenzMsg, index, newSize)
+                        val newListIsEnableMsg = updateListAtIndex(state.value.listIsEnableMsg, index, newSize)
 
                         state.value.copy(
                             listNoUrutRuta = newListNoUrutRuta,
@@ -750,6 +933,7 @@ class IsiRutaViewModel @Inject constructor(
                             listJmlGenzAnak = newListJmlGenzAnak,
                             listJmlGenzDewasa = newListJmlGenzDewasa,
                             listKatGenz = newListKatGenz,
+                            listIsEnable = newListIsEnable,
                             listLong = newListLong,
                             listLat = newListLat,
                             listCatatan = newListCatatan,
@@ -759,6 +943,7 @@ class IsiRutaViewModel @Inject constructor(
                             listJmlGenzAnakMsg = newListJmlGenzAnakMsg,
                             listJmlGenzDewasaMsg = newListJmlGenzDewasaMsg,
                             listKatGenzMsg = newListKatGenzMsg,
+                            listIsEnableMsg = newListIsEnableMsg
                         )
                     }
 
@@ -772,7 +957,7 @@ class IsiRutaViewModel @Inject constructor(
 
                 _state.emit(state.value.copy(listPenglMkn = newListPenglMkn))
 
-                Log.d(TAG, "onEvent: listNoUrutRuta ${state.value.listNoUrutRuta}, indexKlg: $index, indexRuta: $index2")
+                Log.d(TAG, "onEvent: listNoUrutRuta ${state.value.listNoUrutRuta}, i: $index, indexRuta: $index2")
                 Log.d(TAG, "onEvent: listKkOrKrt ${state.value.listKkOrKrt}, indexKlg: $index, indexRuta: $index2")
                 Log.d(TAG, "onEvent: listJmlGenzAnak ${state.value.listJmlGenzAnak}, indexKlg: $index, indexRuta: $index2")
                 Log.d(TAG, "onEvent: listJmlGenzDewasa ${state.value.listJmlGenzDewasa}, indexKlg: $index, indexRuta: $index2")
@@ -807,7 +992,7 @@ class IsiRutaViewModel @Inject constructor(
             is IsiRutaScreenEvent.NamaKRTChanged -> {
                 val newListNamaKrt = state.value.listNamaKrt.toMutableList()
                 newListNamaKrt[index] = newListNamaKrt[index].toMutableList().apply {
-                    set(index2, event.namaKRT)
+                    set(index2, event.namaKRT.uppercase())
                 }
                 _state.emit(state.value.copy(listNamaKrt = newListNamaKrt))
 
@@ -823,18 +1008,28 @@ class IsiRutaViewModel @Inject constructor(
 
             }
             is IsiRutaScreenEvent.JmlGenzAnakChanged -> {
-                val newListJmlGenzAnak = state.value.listJmlGenzAnak.toMutableList()
-                newListJmlGenzAnak[index] = newListJmlGenzAnak[index].toMutableList().apply {
-                    set(index2, event.jmlGenzAnak)
+                val totalGenzAnakLainnya = state.value.listJmlGenzAnak[index].filterIndexed { i, _ -> i != index2 }.sum()
+                val totalGenzDewasaLainnya = state.value.listJmlGenzDewasa[index].sum()
+
+                if (state.value.listIsGenzOrtu[index] - (totalGenzAnakLainnya + totalGenzDewasaLainnya) - event.jmlGenzAnak >= 0) {
+                    val newListJmlGenzAnak = state.value.listJmlGenzAnak.toMutableList()
+                    newListJmlGenzAnak[index] = newListJmlGenzAnak[index].toMutableList().apply {
+                        set(index2, event.jmlGenzAnak)
+                    }
+                    _state.emit(state.value.copy(listJmlGenzAnak = newListJmlGenzAnak))
                 }
-                _state.emit(state.value.copy(listJmlGenzAnak = newListJmlGenzAnak))
             }
             is IsiRutaScreenEvent.JmlGenzDewasaChanged -> {
-                val newListJmlGenzDewasa = state.value.listJmlGenzDewasa.toMutableList()
-                newListJmlGenzDewasa[index] = newListJmlGenzDewasa[index].toMutableList().apply {
-                    set(index2, event.jmlGenzDewasa)
+                val totalGenzDewasaLainnya = state.value.listJmlGenzDewasa[index].filterIndexed { i, _ -> i != index2 }.sum()
+                val totalGenzAnakLainnya = state.value.listJmlGenzAnak[index].sum()
+
+                if (state.value.listIsGenzOrtu[index] - (totalGenzDewasaLainnya + totalGenzAnakLainnya) - event.jmlGenzDewasa >= 0) {
+                    val newListJmlGenzDewasa = state.value.listJmlGenzDewasa.toMutableList()
+                    newListJmlGenzDewasa[index] = newListJmlGenzDewasa[index].toMutableList().apply {
+                        set(index2, event.jmlGenzDewasa)
+                    }
+                    _state.emit(state.value.copy(listJmlGenzDewasa = newListJmlGenzDewasa))
                 }
-                _state.emit(state.value.copy(listJmlGenzDewasa = newListJmlGenzDewasa))
             }
             is IsiRutaScreenEvent.KatGenzChanged -> {
                 val newListKatGenz = state.value.listKatGenz.toMutableList()
@@ -842,6 +1037,14 @@ class IsiRutaViewModel @Inject constructor(
                     set(index2, event.katGenz)
                 }
                 _state.emit(state.value.copy(listKatGenz = newListKatGenz))
+            }
+
+            is IsiRutaScreenEvent.IsEnableChanged -> {
+                val newListIsEnable = state.value.listIsEnable.toMutableList()
+                newListIsEnable[index] = newListIsEnable[index].toMutableList().apply {
+                    set(index2, event.isEnable)
+                }
+                _state.emit(state.value.copy(listIsEnable = newListIsEnable))
             }
 
             is IsiRutaScreenEvent.CatatanChanged -> {
@@ -853,12 +1056,13 @@ class IsiRutaViewModel @Inject constructor(
             }
 
             is IsiRutaScreenEvent.submit -> {
-
+                isSubmitted.value = true
                 if (state.value.jmlKlg == 0) {
-                    //Masih proses
+                    _state.emit(state.value.copy(jmlKlgMsg = Message(null, "Error: Harus ada keluarga yang diinput!")))
                 } else {
+                    _state.emit(state.value.copy(jmlKlgMsg = Message()))
                     repeat(state.value.jmlKlg) { indexKlg ->
-                        val kodeKlg = if (state.value.listNoUrutKlg[indexKlg] == "") {
+                        val kodeKlg = if (state.value.listNoUrutKlg[indexKlg] == "" || state.value.listNoUrutKlg[indexKlg] == "0") {
                             "K${idBS}${state.value.noSegmen}${generateRandomDigitString( 3)}"
                         } else {
                             "K${idBS}${state.value.noSegmen}${UtilFunctions.padWithZeros(state.value.listNoUrutKlg[indexKlg], 3)}"
@@ -884,49 +1088,103 @@ class IsiRutaViewModel @Inject constructor(
                         validateKlg(keluarga, indexKlg)
 
                         Log.d(TAG, "onEvent: isKlgValid.value=${isKlgValid.value}")
-//                        if (isKlgValid.value) {
-//                            insertKeluarga(keluarga)
-//                        }
-//                        _klgQueue.value.add(indexKlg, keluarga)
 
-                        repeat(state.value.listPenglMkn[indexKlg]) { indexRuta ->
+                        if (state.value.listPenglMkn[indexKlg] == 0) {
                             val ruta = Ruta(
-                                kodeRuta = "R${idBS}${state.value.noSegmen}${UtilFunctions.padWithZeros(state.value.listNoUrutRuta[indexKlg][indexRuta], 3)}",
-                                noUrutRuta = state.value.listNoUrutRuta[indexKlg][indexRuta],
+                                kodeRuta = state.value.listAnotherRuta[indexKlg].kodeRuta,
+                                noUrutRuta = state.value.listAnotherRuta[indexKlg].noUrutRuta,
                                 noUrutEgb = 0,
-                                kkOrKrt = when (state.value.listKkOrKrt[indexKlg][indexRuta]) {
-                                    "Kepala Keluarga (KK) saja" -> "1"
-                                    "Kepala Rumah Tangga (KRT) saja" -> "2"
-                                    "KK Sekaligus KRT" -> "3"
-                                    else -> "0"
-                                },
-                                namaKrt = state.value.listNamaKrt[indexKlg][indexRuta],
-                                jmlGenzAnak = state.value.listJmlGenzAnak[indexKlg][indexRuta],
-                                jmlGenzDewasa = state.value.listJmlGenzDewasa[indexKlg][indexRuta],
-                                katGenz = when {
-                                    state.value.listJmlGenzAnak[indexKlg][indexRuta] > 0 && state.value.listJmlGenzDewasa[indexKlg][indexRuta] == 0 -> 1
-                                    state.value.listJmlGenzAnak[indexKlg][indexRuta] == 0 && state.value.listJmlGenzDewasa[indexKlg][indexRuta] > 0 -> 2
-                                    state.value.listJmlGenzAnak[indexKlg][indexRuta] > 0 && state.value.listJmlGenzDewasa[indexKlg][indexRuta] > 0 -> 3
-                                    else -> 0
-                                },
-                                long = lokasi.value.longitude,
-                                lat = lokasi.value.latitude,
-                                catatan = state.value.listCatatan[indexKlg][indexRuta],
-                                idBS = idBS,
-                                nimPencacah = session?.nim ?: "",
-                                noSegmen = state.value.noSegmen,
+                                kkOrKrt = state.value.listAnotherRuta[indexKlg].kkOrKrt,
+                                namaKrt = state.value.listAnotherRuta[indexKlg].namaKrt,
+                                jmlGenzAnak = state.value.listAnotherRuta[indexKlg].jmlGenzAnak,
+                                jmlGenzDewasa = state.value.listAnotherRuta[indexKlg].jmlGenzDewasa,
+                                katGenz = state.value.listAnotherRuta[indexKlg].katGenz,
+                                isEnable = state.value.listAnotherRuta[indexKlg].isEnable,
+                                long = state.value.listAnotherRuta[indexKlg].long,
+                                lat = state.value.listAnotherRuta[indexKlg].lat,
+                                catatan = state.value.listAnotherRuta[indexKlg].catatan,
+                                idBS = state.value.listAnotherRuta[indexKlg].idBS,
+                                nimPencacah = state.value.listAnotherRuta[indexKlg].nimPencacah,
+                                noSegmen = state.value.listAnotherRuta[indexKlg].noSegmen,
                                 status = "insert"
                             )
                             Log.d(TAG, "onEvent: Ruta Insert $ruta")
 
-                            validateRuta(ruta, indexKlg, indexRuta)
+                            if (ruta.kodeRuta != "[not set]") {
+                                if (existingRutaFromDB.value.contains(ruta.toRutaEntity())) {
+                                    var listRuta = keluarga.ruta + ruta
+                                    keluarga = keluarga.copy(ruta = listRuta)
+                                    Log.d(TAG, "onEvent: $keluarga")
 
-                            if (isRutaValid.value) {
-                                var listRuta = keluarga.ruta + ruta
-                                keluarga = keluarga.copy(ruta = listRuta)
-                                Log.d(TAG, "onEvent: $keluarga")
+                                    _isRutaValid.value = true
+                                } else {
+                                    val idx = UtilFunctions.getIndex1AndIndex2FromNestedList(state.value.listNoUrutRuta, ruta.noUrutRuta)
+                                    Log.d(TAG, "onEvent: noUrutRuta=${ruta.noUrutRuta}")
+                                    Log.d(TAG, "onEvent: indexKlg=${idx[0]}")
+                                    Log.d(TAG, "onEvent: indexRuta=${idx[1]}")
+                                    validateRuta(ruta, idx[0], idx[1])
+
+                                    if (isRutaValid.value) {
+                                        var listRuta = keluarga.ruta + ruta
+                                        keluarga = keluarga.copy(ruta = listRuta)
+                                        Log.d(TAG, "onEvent: $keluarga")
+                                    }
+                                }
+                            } else {
+                                if (keluarga.noUrutKlg != "" && keluarga.noUrutKlg != "0") {
+                                    val newListAnotherRutaMsg = state.value.listAnotherRutaMsg.toMutableList()
+                                    newListAnotherRutaMsg[indexKlg] = Message(null, "Error: Harus ada rumah tangga yang dipilih!")
+                                    _state.emit(state.value.copy(listAnotherRutaMsg = newListAnotherRutaMsg))
+                                } else {
+                                    val newListAnotherRutaMsg = state.value.listAnotherRutaMsg.toMutableList()
+                                    newListAnotherRutaMsg[indexKlg] = Message()
+                                    _state.emit(state.value.copy(listAnotherRutaMsg = newListAnotherRutaMsg))
+                                }
                             }
+                        } else {
+                            repeat(state.value.listPenglMkn[indexKlg]) { indexRuta ->
+                                val ruta = Ruta(
+                                    kodeRuta = "R${idBS}${state.value.noSegmen}${UtilFunctions.padWithZeros(state.value.listNoUrutRuta[indexKlg][indexRuta], 3)}",
+                                    noUrutRuta = state.value.listNoUrutRuta[indexKlg][indexRuta],
+                                    noUrutEgb = 0,
+                                    kkOrKrt = when (state.value.listKkOrKrt[indexKlg][indexRuta]) {
+                                        "Kepala Keluarga (KK) saja" -> "1"
+                                        "Kepala Rumah Tangga (KRT) saja" -> "2"
+                                        "KK Sekaligus KRT" -> "3"
+                                        else -> "0"
+                                    },
+                                    namaKrt = state.value.listNamaKrt[indexKlg][indexRuta],
+                                    jmlGenzAnak = state.value.listJmlGenzAnak[indexKlg][indexRuta],
+                                    jmlGenzDewasa = state.value.listJmlGenzDewasa[indexKlg][indexRuta],
+                                    katGenz = when {
+                                        state.value.listJmlGenzAnak[indexKlg][indexRuta] > 0 && state.value.listJmlGenzDewasa[indexKlg][indexRuta] == 0 -> 1
+                                        state.value.listJmlGenzAnak[indexKlg][indexRuta] == 0 && state.value.listJmlGenzDewasa[indexKlg][indexRuta] > 0 -> 2
+                                        state.value.listJmlGenzAnak[indexKlg][indexRuta] > 0 && state.value.listJmlGenzDewasa[indexKlg][indexRuta] > 0 -> 3
+                                        else -> 0
+                                    },
+                                    isEnable = when (state.value.listIsEnable[indexKlg][indexRuta]) {
+                                        "Ya" -> "1"
+                                        "Tidak" -> "0"
+                                        else -> "-1"
+                                    },
+                                    long = lokasi.value.longitude,
+                                    lat = lokasi.value.latitude,
+                                    catatan = state.value.listCatatan[indexKlg][indexRuta],
+                                    idBS = idBS,
+                                    nimPencacah = session?.nim ?: "",
+                                    noSegmen = state.value.noSegmen,
+                                    status = "insert"
+                                )
+                                Log.d(TAG, "onEvent: Ruta Insert $ruta")
 
+                                validateRuta(ruta, indexKlg, indexRuta)
+
+                                if (isRutaValid.value) {
+                                    var listRuta = keluarga.ruta + ruta
+                                    keluarga = keluarga.copy(ruta = listRuta)
+                                    Log.d(TAG, "onEvent: $keluarga")
+                                }
+                            }
                         }
 
                         if (isKlgValid.value) {
@@ -949,8 +1207,14 @@ class IsiRutaViewModel @Inject constructor(
                         klgQueue.value.forEach { klg ->
                             insertKeluarga(klg)
                         }
+                    } else if (isKlgValid.value && state.value.jmlKlg == 1 && state.value.listNoUrutKlg[0] == "0") {
+                        klgQueue.value.forEach { klg ->
+                            insertKeluarga(klg)
+                        }
                     }
                 }
+                delay(2000L)
+                isSubmitted.value = false
             }
 
             IsiRutaScreenEvent.edit -> {
@@ -990,6 +1254,11 @@ class IsiRutaViewModel @Inject constructor(
                             state.value.listJmlGenzAnak[0][0] == 0 && state.value.listJmlGenzDewasa[0][0] > 0 -> 2
                             state.value.listJmlGenzAnak[0][0] > 0 && state.value.listJmlGenzDewasa[0][0] > 0 -> 3
                             else -> 0
+                        },
+                        isEnable = when (state.value.listIsEnable[0][0]) {
+                            "Ya" -> "1"
+                            "Tidak" -> "0"
+                            else -> "-1"
                         },
                         long = ruta.value.longitude,
                         lat = ruta.value.latitude,
@@ -1037,7 +1306,7 @@ class IsiRutaViewModel @Inject constructor(
     suspend fun validateKlg(klg: Keluarga, index: Int) {
         // viewModelScope.launch {
 
-        getKeluarga(klg.kodeKlg)
+        getKeluarga(klg.idBS, klg.noSegmen, klg.kodeKlg)
         delay(500L)
 
         Log.d(TAG, "validateKlg: Start!")
@@ -1092,10 +1361,14 @@ class IsiRutaViewModel @Inject constructor(
         }
 
         val newListNamaKKMsg = tempState.listNamaKKMsg.toMutableList()
-        newListNamaKKMsg[index] = if (klg.namaKK == "") {
-            Message(null, "Error: Kolom Nama Kepala Keluarga tidak boleh kosong!")
-        } else {
+        newListNamaKKMsg[index] = if (klg.noUrutKlg == "" || klg.noUrutKlg == "0") {
             Message()
+        } else {
+            if (klg.namaKK == "") {
+                Message(null, "Error: Kolom Nama Kepala Keluarga tidak boleh kosong!")
+            } else {
+                Message()
+            }
         }
 
         val newListAlamatMsg = tempState.listAlamatMsg.toMutableList()
@@ -1133,7 +1406,6 @@ class IsiRutaViewModel @Inject constructor(
 
 
         } else {
-
             val newListNoUrutKlgEgbMsg = tempState.listNoUrutKlgEgbMsg.toMutableList()
             newListNoUrutKlgEgbMsg[index] = if (klg.noUrutKlgEgb == lastKeluargaEgb.value.noUrutKlgEgb) {
                 Message(null, "Error: No urut keluarga eligible telah ada sebelumnya!")
@@ -1171,107 +1443,12 @@ class IsiRutaViewModel @Inject constructor(
         }
     }
 
-
-//    suspend fun validateKlg(klg: Keluarga, index: Int) {
-////        viewModelScope.launch {
-//
-//            getKeluarga(klg.kodeKlg)
-//            delay(500L)
-//
-//            Log.d(TAG, "validateKlg: Start!")
-//            var tempState = state.value
-//
-//            tempState = tempState.copy(
-//                SLSMsg = if (klg.SLS == "") {
-//                    Message(null, "Error: Kolom SLS tidak boleh kosong!")
-//                } else {
-//                    Message()
-//                },
-//                noSegmenMsg = if (klg.noSegmen == "") {
-//                    Message(null, "Error: Kolom No Segmen tidak boleh kosong!")
-//                } else {
-//                    if (!UtilFunctions.isValidNoSegmenFormat(state.value.noSegmen)) {
-//                        Message(null, "Error: No segmen tidak valid! (Format No segmen: Sxxx)")
-//                    } else {
-//                        Message()
-//                    }
-//                },
-//                noBgFisikMsg = if (klg.noBgFisik == "") {
-//                    Message(null, "Error: Kolom No Bangungan Fisik tidak boleh kosong!")
-//                } else {
-//                    Message()
-//                },
-//                noBgSensusMsg = if (klg.noBgSensus == "") {
-//                    Message(null, "Error: Kolom No Bangungan Sensus tidak boleh kosong!")
-//                } else {
-//                    if (state.value.noBgSensus < state.value.noBgFisik) {
-//                        Message(null, "Error: Bangunan sensus harus >= bangunan fisik!")
-//                    } else {
-//                        Message()
-//                    }
-//                }
-//            )
-//
-//
-//            Log.d(TAG, "validateKlg: Validate no urut klg!")
-//            Log.d(TAG, "validateKlg: ${UtilFunctions.convertStringToNumber(keluarga.value.noUrutKlg)} == ${UtilFunctions.convertStringToNumber(klg.noUrutKlg)}")
-//
-//            val newListNoUrutKlgMsg = tempState.listNoUrutKlgMsg.toMutableList()
-//            if (klg.status == "insert") {
-//                newListNoUrutKlgMsg[index] = if (UtilFunctions.convertStringToNumber(keluarga.value.noUrutKlg) == UtilFunctions.convertStringToNumber(klg.noUrutKlg)) {
-//                    Message(null, "Error: No urut keluarga telah ada sebelumnya!")
-//                } else {
-//                    Message()
-//                }
-//            }
-//
-//            val newListNamaKKMsg = tempState.listNamaKKMsg.toMutableList()
-//            newListNamaKKMsg[index] = if (klg.namaKK == "") {
-//                Message(null, "Error: Kolom Nama Kepala Keluarga tidak boleh kosong!")
-//            } else {
-//                Message()
-//            }
-//
-//            val newListAlamatMsg = tempState.listAlamatMsg.toMutableList()
-//            newListAlamatMsg[index] = if (klg.alamat == "") {
-//                Message(null, "Error: Kolom Alamat tidak boleh kosong!")
-//            } else {
-//                Message()
-//            }
-//
-//            val newListNoUrutKlgEgbMsg = tempState.listNoUrutKlgEgbMsg.toMutableList()
-//            newListNoUrutKlgEgbMsg[index] = if (klg.noUrutKlgEgb == lastKeluargaEgb.value.noUrutKlgEgb) {
-//                Message(null, "Error: No urut keluarga eligible telah ada sebelumnya!")
-//            } else {
-//                Message()
-//            }
-//
-//            // Update state sekali dengan semua perubahan
-//            _state.emit(tempState.copy(
-//                listNoUrutKlgMsg = newListNoUrutKlgMsg,
-//                listNamaKKMsg = newListNamaKKMsg,
-//                listAlamatMsg = newListAlamatMsg,
-//                listNoUrutKlgEgbMsg = newListNoUrutKlgEgbMsg
-//            ))
-//
-//            // Cek apakah ada error, jika tidak maka set isKlgValid menjadi true
-//            val isNoError = listOf(tempState.SLSMsg, tempState.noSegmenMsg, tempState.noBgFisikMsg, tempState.noBgSensusMsg, *newListNoUrutKlgMsg.toTypedArray(), *newListNamaKKMsg.toTypedArray(), *newListAlamatMsg.toTypedArray(), *newListNoUrutKlgEgbMsg.toTypedArray()).all { it.error == null }
-//
-//            if (isNoError) {
-//                _isKlgValid.emit(true)
-//            } else {
-//                _isKlgValid.emit(false)
-//            }
-//        Log.d(TAG, "validateKlg: isKlgValid=${isKlgValid.value}")
-////        }
-//    }
-
     suspend fun validateRuta(
         rt: Ruta,
         indexKlg: Int,
         indexRuta: Int
     ) {
-        getRuta(rt.kodeRuta)
+        getRuta(rt.idBS, rt.noSegmen, rt.kodeRuta)
         delay(500L)
 
         var tempState = state.value
@@ -1303,11 +1480,19 @@ class IsiRutaViewModel @Inject constructor(
             Message()
         }
 
+        val newListIsEnableMsg = tempState.listIsEnableMsg.map { it.toMutableList() }.toMutableList()
+        newListIsEnableMsg[indexKlg][indexRuta] = if (rt.isEnable == "-1") {
+            Message(null, "Error: Pertanyaan ini harus diisi!")
+        } else {
+            Message()
+        }
+
         // Perbarui tempState dengan list baru
         tempState = tempState.copy(
             listNoUrutRutaMsg = newListNoUrutRutaMsg,
             listKkOrKrtMsg = newListKkOrKrtMsg,
-            listNamaKrtMsg = newListNamaKrtMsg
+            listNamaKrtMsg = newListNamaKrtMsg,
+            listIsEnableMsg = newListIsEnableMsg
         )
 
         // Emit state yang sudah diperbarui
@@ -1316,7 +1501,8 @@ class IsiRutaViewModel @Inject constructor(
         // Cek apakah ada error di pesan yang baru diperbarui
         val isNoError = tempState.listNoUrutRutaMsg.flatten().all { it.error == null } &&
                 tempState.listKkOrKrtMsg.flatten().all { it.error == null } &&
-                tempState.listNamaKrtMsg.flatten().all { it.error == null }
+                tempState.listNamaKrtMsg.flatten().all { it.error == null } &&
+                tempState.listIsEnableMsg.flatten().all { it.error == null }
 
         // Set _isRutaValid berdasarkan hasil pengecekan error
         _isRutaValid.emit(isNoError)

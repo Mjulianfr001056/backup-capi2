@@ -1,11 +1,14 @@
 package com.polstat.pkl.ui.event
 
+import com.polstat.pkl.model.domain.Ruta
+
 sealed class IsiRutaScreenEvent {
     data class SLSChanged(val sls: String) : IsiRutaScreenEvent()
     data class NoSegmenChanged(val noSegmen: String) : IsiRutaScreenEvent()
     data class NoBgFisikChanged(val noBgFisik: String) : IsiRutaScreenEvent()
     data class NoBgSensusChanged(val noBgSensus: String) : IsiRutaScreenEvent()
     data class JmlKlgChanged(val jmlKlg: Int) : IsiRutaScreenEvent()
+    data class AnotherRutaChanged(val anotherRuta: Ruta) : IsiRutaScreenEvent()
     data class NoUrutKlgChanged(val noUrutKlg: String) : IsiRutaScreenEvent()
     data class NamaKKChanged(val namaKK: String) : IsiRutaScreenEvent()
     data class AlamatChanged(val alamat: String) : IsiRutaScreenEvent()
@@ -18,6 +21,7 @@ sealed class IsiRutaScreenEvent {
     data class JmlGenzAnakChanged(val jmlGenzAnak: Int) : IsiRutaScreenEvent()
     data class JmlGenzDewasaChanged(val jmlGenzDewasa: Int) : IsiRutaScreenEvent()
     data class KatGenzChanged(val katGenz: Int) : IsiRutaScreenEvent()
+    data class IsEnableChanged(val isEnable: String) : IsiRutaScreenEvent()
     data class CatatanChanged(val catatan: String) : IsiRutaScreenEvent()
     object submit : IsiRutaScreenEvent()
     object edit : IsiRutaScreenEvent()

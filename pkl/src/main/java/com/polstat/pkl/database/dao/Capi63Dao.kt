@@ -60,7 +60,7 @@ interface Capi63Dao {
     @Query("SELECT * FROM wilayah WHERE idBS = :idBS")
     suspend fun getWilayah(idBS: String) : WilayahEntity
 
-    @Query("SELECT * FROM wilayah")
+    @Query("SELECT * FROM wilayah ORDER BY noBS ASC")
     suspend fun getAllWilayah(): List<WilayahEntity>
 
     @Query("DELETE FROM wilayah")
@@ -77,8 +77,8 @@ interface Capi63Dao {
     @Update
     suspend fun updateKeluarga(keluargaEntity: KeluargaEntity)
 
-    @Query("SELECT * FROM keluarga WHERE kodeKlg = :kodeKlg AND status != 'delete'")
-    suspend fun getKeluarga(kodeKlg: String) : KeluargaEntity
+    @Query("SELECT * FROM keluarga WHERE idBS = :idBS AND noSegmen = :noSegmen AND kodeKlg = :kodeKlg AND status != 'delete'")
+    suspend fun getKeluarga(idBS: String, noSegmen: String, kodeKlg: String) : KeluargaEntity
 
     @Query("SELECT * FROM keluarga WHERE idBS = :idBS ORDER BY CAST(noUrutKlg AS INTEGER) ASC")
     suspend fun getAllKeluargaByWilayah(idBS: String) : List<KeluargaEntity>
@@ -87,11 +87,14 @@ interface Capi63Dao {
     @Query("SELECT * FROM keluarga INNER JOIN KeluargaAndRutaEntity ON keluarga.kodeKlg = KeluargaAndRutaEntity.kodeKlg WHERE KeluargaAndRutaEntity.kodeRuta = :kodeRuta ORDER BY CAST(keluarga.noUrutKlg AS INTEGER) ASC")
     suspend fun getAllKeluargaByRuta(kodeRuta: String): List<KeluargaEntity>
 
-    @Query("SELECT * FROM keluarga WHERE idBS = :idBS AND status != 'delete' ORDER BY CAST(noUrutKlg AS INTEGER) DESC LIMIT 1")
-    suspend fun getLastKeluarga(idBS: String): KeluargaEntity
+    @Query("SELECT * FROM keluarga WHERE idBS = :idBS AND status != 'delete' ORDER BY noSegmen DESC LIMIT 1")
+    suspend fun getKeluargaWithLastNoSegmen(idBS: String): KeluargaEntity
 
-    @Query("SELECT * FROM keluarga WHERE idBS = :idBS AND status != 'delete' ORDER BY CAST(noUrutKlgEgb AS INTEGER) DESC LIMIT 1")
-    suspend fun getLastKeluargaEgb(idBS: String): KeluargaEntity
+    @Query("SELECT * FROM keluarga WHERE idBS = :idBS AND noSegmen = :noSegmen AND status != 'delete' ORDER BY CAST(noUrutKlg AS INTEGER) DESC LIMIT 1")
+    suspend fun getLastKeluarga(idBS: String, noSegmen: String): KeluargaEntity
+
+    @Query("SELECT * FROM keluarga WHERE idBS = :idBS AND noSegmen = :noSegmen AND status != 'delete' ORDER BY CAST(noUrutKlgEgb AS INTEGER) DESC LIMIT 1")
+    suspend fun getLastKeluargaEgb(idBS: String, noSegmen: String): KeluargaEntity
 
     @Query("DELETE FROM keluarga")
     suspend fun deleteAllKeluarga()
@@ -110,14 +113,14 @@ interface Capi63Dao {
     @Update
     suspend fun updateRuta(rutaEntity: RutaEntity)
 
-    @Query("SELECT * FROM ruta WHERE kodeRuta = :kodeRuta AND status != 'delete'")
-    suspend fun getRuta(kodeRuta: String) : RutaEntity
+    @Query("SELECT * FROM ruta WHERE idBS = :idBS AND noSegmen = :noSegmen AND kodeRuta = :kodeRuta AND status != 'delete'")
+    suspend fun getRuta(idBS: String, noSegmen: String, kodeRuta: String) : RutaEntity
 
-    @Query("SELECT * FROM ruta WHERE idBS = :idBS ORDER BY CAST(noUrutRuta AS INTEGER) ASC")
-    suspend fun getAllRutaByWilayah(idBS: String) : List<RutaEntity>
+    @Query("SELECT * FROM ruta WHERE idBS = :idBS AND noSegmen = :noSegmen ORDER BY CAST(noUrutRuta AS INTEGER) ASC")
+    suspend fun getAllRutaByWilayahAndNoSegmen(idBS: String, noSegmen: String) : List<RutaEntity>
 
-    @Query("SELECT * FROM ruta WHERE idBS = :idBS AND status != 'delete' ORDER BY CAST(noUrutRuta AS INTEGER) DESC LIMIT 1")
-    suspend fun getLastRuta(idBS: String): RutaEntity
+    @Query("SELECT * FROM ruta WHERE idBS = :idBS AND noSegmen = :noSegmen AND status != 'delete' ORDER BY CAST(noUrutRuta AS INTEGER) DESC LIMIT 1")
+    suspend fun getLastRuta(idBS: String, noSegmen: String): RutaEntity
 
     @Query("DELETE FROM ruta")
     suspend fun deleteAllRuta()
@@ -128,16 +131,15 @@ interface Capi63Dao {
     @Transaction
     @Query("SELECT * FROM ruta INNER JOIN KeluargaAndRutaEntity ON ruta.kodeRuta = KeluargaAndRutaEntity.kodeRuta WHERE KeluargaAndRutaEntity.kodeKlg = :kodeKlg ORDER BY ruta.noUrutRuta ASC")
     suspend fun getAllRutaByKeluarga(kodeKlg: String): List<RutaEntity>
-
-
+    
     // Operasi database untuk entitas berelasi
 
     @Transaction
-    @Query("SELECT * FROM keluarga WHERE idBS = :idBS ORDER BY CAST(keluarga.noUrutKlg AS INTEGER) ASC")
+    @Query("SELECT * FROM keluarga WHERE idBS = :idBS ORDER BY keluarga.noSegmen, CAST(keluarga.noUrutKlg AS INTEGER) ASC")
     fun getListKeluargaWithRuta(idBS: String): List<KeluargaWithRuta>
 
     @Transaction
-    @Query("SELECT * FROM ruta WHERE idBS = :idBS ORDER BY CAST(ruta.noUrutRuta AS INTEGER) ASC")
+    @Query("SELECT * FROM ruta WHERE idBS = :idBS ORDER BY ruta.noSegmen, CAST(ruta.noUrutRuta AS INTEGER) ASC")
     fun getListRutaWithKeluarga(idBS: String): List<RutaWithKeluarga>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -263,11 +263,13 @@ class ListRutaViewModel @Inject constructor(
     }
 
     suspend fun deleteRuta(
+        idBS: String,
+        noSegmen: String,
         kodeRuta: String
     ) {
         viewModelScope.launch {
             val job = launch {
-                localRutaRepository.getRuta(kodeRuta).collectLatest { result ->
+                localRutaRepository.getRuta(idBS, noSegmen, kodeRuta).collectLatest { result ->
                     when (result) {
                         is Result.Success -> {
                             result.data?.let { response ->
@@ -333,10 +335,14 @@ class ListRutaViewModel @Inject constructor(
         }
     }
 
-    suspend fun deleteKeluarga(kodeKlg: String) {
+    suspend fun deleteKeluarga(
+        idBS: String,
+        noSegmen: String,
+        kodeKlg: String
+    ) {
         viewModelScope.launch {
             val getKeluargaJob = async {
-                keluargaRepository.getKeluarga(kodeKlg).collectLatest { result ->
+                keluargaRepository.getKeluarga(idBS, noSegmen, kodeKlg).collectLatest { result ->
                     when(result) {
                         is Result.Error -> {
                             result.message?.let { error ->

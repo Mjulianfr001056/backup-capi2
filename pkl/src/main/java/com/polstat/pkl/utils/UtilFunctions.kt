@@ -65,5 +65,43 @@ class UtilFunctions {
         fun isDuplicateElementFromNestedList(nestedList: List<List<String>>, element: String) : Boolean {
             return nestedList.any { it.contains(element) }
         }
+
+//        fun getIndex1AndIndex2FromNestedList(nestedList: List<List<String>>, element: String) : List<Int> {
+//            var index1 = 0
+//            var index2 = 0
+//            var isFound = false
+//
+//            for (i in 0..nestedList.size - 1) {
+//                for (j in 0..nestedList[i].size - 1) {
+//                    if (nestedList[i][j] == element) {
+//                        index2 = j
+//                        isFound = true
+//                        break
+//                    }
+//                }
+//                if (isFound) {
+//                    index1 = i
+//                    break
+//                }
+//            }
+//
+//            if (!isFound) {
+//                index1 = -1
+//                index2 = -1
+//            }
+//
+//            return listOf(index1, index2)
+//        }
+
+        fun getIndex1AndIndex2FromNestedList(nestedList: List<List<String>>, element: String) : List<Int> {
+            for ((index1, list) in nestedList.withIndex()) {
+                val index2 = list.indexOf(element)
+                if (index2 != -1) {
+                    return listOf(index1, index2)
+                }
+            }
+            return listOf(-1, -1)
+        }
+
     }
 }

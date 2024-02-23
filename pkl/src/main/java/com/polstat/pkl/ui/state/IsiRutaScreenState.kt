@@ -1,10 +1,12 @@
 package com.polstat.pkl.ui.state
 
+import com.polstat.pkl.model.domain.Ruta
 
 data class Message(
     val warning: String? = null,
     val error: String? = null
 )
+
 data class IsiRutaScreenState(
     /**
      * Ini adalah state nilai tunggal untuk informasi bangunan yang merupakan atribut dari entitas keluarga
@@ -18,6 +20,7 @@ data class IsiRutaScreenState(
     val noBgSensus: String = "",
     val noBgSensusMsg: Message = Message(),
     val jmlKlg: Int = 0,
+    val jmlKlgMsg: Message = Message(),
 
     /**
      * Ini adalah state untuk menyimpan data beberapa keluarga
@@ -34,6 +37,8 @@ data class IsiRutaScreenState(
     val listNoUrutKlgEgbMsg: List<Message> = emptyList(),
     val listPenglMkn: List<Int> = emptyList(),
     val listPenglMknMsg: List<Message> = emptyList(),
+    val listAnotherRuta: List<Ruta> = emptyList(),
+    val listAnotherRutaMsg: List<Message> = emptyList(),
 
     /**
      * Ini adalah state untuk menyimpan data beberapa ruta dalam list dua dimensi
@@ -50,6 +55,8 @@ data class IsiRutaScreenState(
     val listJmlGenzDewasaMsg: List<List<Message>> = emptyList(),
     val listKatGenz: List<List<Int>> = emptyList(),
     val listKatGenzMsg: List<List<Message>> = emptyList(),
+    val listIsEnable: List<List<String>> = emptyList(),
+    val listIsEnableMsg: List<List<Message>> = emptyList(),
     val listLat: List<List<Double>> = emptyList(),
     val listLong: List<List<Double>> = emptyList(),
     val listCatatan: List<List<String>> = emptyList()

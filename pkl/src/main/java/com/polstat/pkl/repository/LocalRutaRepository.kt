@@ -29,11 +29,11 @@ interface LocalRutaRepository {
 
     suspend fun fakeDeleteRuta(ruta: Ruta) : Flow<String>
 
-    suspend fun getRuta(kodeRuta: String) : Flow<Result<RutaEntity>>
+    suspend fun getRuta(idBS: String, noSegmen: String, kodeRuta: String) : Flow<Result<RutaEntity>>
 
-    suspend fun getAllRutaByWilayah(idBS: String) : Flow<Result<List<RutaEntity>>>
+    suspend fun getAllRutaByWilayahAndNoSegmen(idBS: String, noSegmen: String) : Flow<Result<List<RutaEntity>>>
 
-    suspend fun getLastRuta(idBS: String) : Flow<Result<RutaEntity>>
+    suspend fun getLastRuta(idBS: String, noSegmen: String) : Flow<Result<RutaEntity>>
 
     suspend fun getAllRutaByKeluarga(kodeKlg: String) : Flow<Result<List<RutaEntity>>>
 

@@ -12,7 +12,7 @@ interface KeluargaRepository {
 
 //    suspend fun fetchKeluargaFromServer(keluarga: Keluarga) : Flow<String>
 
-    suspend fun getKeluarga(kodeKlg: String) : Flow<Result<KeluargaEntity>>
+    suspend fun getKeluarga(idBS: String, noSegmen: String, kodeKlg: String) : Flow<Result<KeluargaEntity>>
 
     suspend fun fakeDeleteKeluarga(keluarga: Keluarga) : Flow<String>
 
@@ -20,9 +20,10 @@ interface KeluargaRepository {
 
     suspend fun getAllKeluargaByRuta(kodeRuta: String) : Flow<Result<List<KeluargaEntity>>>
 
-    suspend fun getLastKeluarga(idBS: String) : Flow<Result<KeluargaEntity>>
+    suspend fun getKeluargaWithLastNoSegmen(idBS: String) : Flow<Result<KeluargaEntity>>
+    suspend fun getLastKeluarga(idBS: String, noSegmen: String) : Flow<Result<KeluargaEntity>>
 
-    suspend fun getLastKeluargaEgb(idBS: String) : Flow<Result<KeluargaEntity>>
+    suspend fun getLastKeluargaEgb(idBS: String, noSegmen: String) : Flow<Result<KeluargaEntity>>
 
     suspend fun updateKeluarga(keluarga: Keluarga) : Flow<String>
 
