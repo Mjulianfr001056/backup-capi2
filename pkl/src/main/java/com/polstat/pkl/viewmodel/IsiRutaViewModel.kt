@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polstat.pkl.database.entity.KeluargaEntity
 import com.polstat.pkl.database.entity.RutaEntity
-import com.polstat.pkl.database.relation.RutaWithKeluarga
 import com.polstat.pkl.mapper.toRutaEntity
 import com.polstat.pkl.mapper.toRutaList
 import com.polstat.pkl.model.domain.Keluarga
@@ -1162,10 +1161,14 @@ class IsiRutaViewModel @Inject constructor(
                                         state.value.listJmlGenzAnak[indexKlg][indexRuta] > 0 && state.value.listJmlGenzDewasa[indexKlg][indexRuta] > 0 -> 3
                                         else -> 0
                                     },
-                                    isEnable = when (state.value.listIsEnable[indexKlg][indexRuta]) {
-                                        "Ya" -> "1"
-                                        "Tidak" -> "0"
-                                        else -> "-1"
+                                    isEnable = if (state.value.listNoUrutKlg[indexKlg] == "" || state.value.listNoUrutKlg[indexKlg] == "0") {
+                                        "0"
+                                    } else {
+                                        when (state.value.listIsEnable[indexKlg][indexRuta]) {
+                                            "Ya" -> "1"
+                                            "Tidak" -> "0"
+                                            else -> "-1"
+                                        }
                                     },
                                     long = lokasi.value.longitude,
                                     lat = lokasi.value.latitude,
@@ -1213,7 +1216,7 @@ class IsiRutaViewModel @Inject constructor(
                         }
                     }
                 }
-                delay(2000L)
+                delay(1000L)
                 isSubmitted.value = false
             }
 
