@@ -1222,23 +1222,6 @@ class IsiRutaViewModel @Inject constructor(
 
             IsiRutaScreenEvent.edit -> {
                 if (isListRuta == true) {
-//                    var keluarga = Keluarga(
-//                        SLS = state.value.SLS,
-//                        noSegmen = state.value.noSegmen,
-//                        noBgFisik = state.value.noBgFisik,
-//                        noBgSensus = state.value.noBgSensus,
-//                        noUrutKlg = state.value.listNoUrutKlg[0],
-//                        namaKK = state.value.listNamaKK[0],
-//                        alamat = state.value.listAlamat[0],
-//                        isGenzOrtu = state.value.listIsGenzOrtu[0],
-//                        noUrutKlgEgb = state.value.listNoUrutKlgEgb[0],
-//                        penglMkn = state.value.listPenglMkn[0],
-//                        idBS = idBS,
-//                        kodeKlg = "K${idBS}${state.value.noSegmen}${UtilFunctions.padWithZeros(state.value.listNoUrutKlg[0], 3)}",
-//                        nimPencacah = session?.nim ?: "",
-//                        status = "update"
-//                    )
-
                     val ruta = Ruta(
                         kodeRuta = ruta.value.kodeRuta,
                         noUrutRuta = state.value.listNoUrutRuta[0][0],

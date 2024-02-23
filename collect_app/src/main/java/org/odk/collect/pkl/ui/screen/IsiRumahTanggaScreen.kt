@@ -152,19 +152,19 @@ fun IsiRumahTanggaScreen(
         Timber.tag("ISI RUTA SCREEN").d("JmlKlgChanged: setAllExistingRuta executed!")
     }
 
-    LaunchedEffect(hasMovedToError) {
-        Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen: Masuk launched!")
-        Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen: hasError=$hasError && hasMovedToError=$hasMovedToError")
-        if (hasError && !hasMovedToError) {
-            coroutineScope.launch {
-                scrollState.animateScrollTo(errorItemsPosition[0].toInt())
-                delay(1000L)
-//                hasError = false
-                hasMovedToError = true
-                Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen: Sudah pindah ke error!")
-            }
-        }
-    }
+//    LaunchedEffect(hasMovedToError) {
+//        Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen: Masuk launched!")
+//        Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen: hasError=$hasError && hasMovedToError=$hasMovedToError")
+//        if (hasError && !hasMovedToError) {
+//            coroutineScope.launch {
+//                scrollState.animateScrollTo(errorItemsPosition[0].toInt())
+//                delay(1000L)
+////                hasError = false
+//                hasMovedToError = true
+//                Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen: Sudah pindah ke error!")
+//            }
+//        }
+//    }
 
     Scaffold(
         topBar = {
@@ -639,19 +639,19 @@ fun KeteranganKeluarga(
     val listRutaDropdown = viewModel.listRutaDropdown.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(isSubmitted.value) {
-        Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen Klg: Masuk launched!")
-        Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen Klg: hasErrorKlg=$hasErrorKlg && isSubmitted=${isSubmitted.value}")
-        if (hasErrorKlg && isSubmitted.value) {
-            coroutineScope.launch {
-                Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen Klg: errorItemsPosition $errorItemsPosition!")
-                scrollState.animateScrollTo(errorItemsPosition[0].toInt())
-                delay(1000L)
-//                hasMovedToErrorKlg = true
-                Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen Klg: Sudah pindah ke error!")
-            }
-        }
-    }
+//    LaunchedEffect(isSubmitted.value) {
+//        Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen Klg: Masuk launched!")
+//        Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen Klg: hasErrorKlg=$hasErrorKlg && isSubmitted=${isSubmitted.value}")
+//        if (hasErrorKlg && isSubmitted.value) {
+//            coroutineScope.launch {
+//                Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen Klg: errorItemsPosition $errorItemsPosition!")
+//                scrollState.animateScrollTo(errorItemsPosition[0].toInt())
+//                delay(1000L)
+////                hasMovedToErrorKlg = true
+//                Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen Klg: Sudah pindah ke error!")
+//            }
+//        }
+//    }
 
     LaunchedEffect(
         key1 = state.value.listNoUrutRuta
@@ -1108,18 +1108,18 @@ fun KeteranganRuta(
         listOf("Kepala Keluarga (KK) saja", "Kepala Rumah Tangga (KRT) saja", "KK Sekaligus KRT")
     val isEnableOptions = listOf("Ya", "Tidak")
 
-    LaunchedEffect(hasMovedToErrorRuta) {
-        Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen Ruta: Masuk launched!")
-        Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen Ruta: hasErrorRuta=$hasErrorRuta && hasMovedToErrorRuta=$hasMovedToErrorRuta")
-        if (hasErrorRuta && !hasMovedToErrorRuta) {
-            coroutineScope.launch {
-                scrollState.animateScrollTo(errorItemsPosition[0].toInt())
-                delay(1000L)
-                hasMovedToErrorRuta = true
-                Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen Ruta: Sudah pindah ke error!")
-            }
-        }
-    }
+//    LaunchedEffect(hasMovedToErrorRuta) {
+//        Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen Ruta: Masuk launched!")
+//        Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen Ruta: hasErrorRuta=$hasErrorRuta && hasMovedToErrorRuta=$hasMovedToErrorRuta")
+//        if (hasErrorRuta && !hasMovedToErrorRuta) {
+//            coroutineScope.launch {
+//                scrollState.animateScrollTo(errorItemsPosition[0].toInt())
+//                delay(1000L)
+//                hasMovedToErrorRuta = true
+//                Timber.tag("ISI RUTA SCREEN").d("IsiRumahTanggaScreen Ruta: Sudah pindah ke error!")
+//            }
+//        }
+//    }
 
     InputNomorHuruf(
         value = state.value.listNoUrutRuta[indexKlg][indexRuta],
