@@ -77,6 +77,9 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.Locale;
 
+import dagger.hilt.android.HiltAndroidApp;
+
+@HiltAndroidApp
 @SuppressWarnings("PMD.CouplingBetweenObjects")
 public class Collect extends Application implements
         LocalizedApplication,
