@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -108,11 +109,20 @@ fun ListSampleScreen(
 
     LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
         viewModel.updateShowLoading(isDataInserted.value)
-
-        viewModel.showErrorToastChannel.collectLatest { show ->
-            if (show) {
+        viewModel.showErrorToastChannel.collectLatest { isError ->
+            if (isError) {
                 delay(1500)
                 Toast.makeText(context, viewModel.errorMessage.value, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    LaunchedEffect(key1 = viewModel.showSuccessToastChannel) {
+        viewModel.updateShowLoading(isDataInserted.value)
+        viewModel.showSuccessToastChannel.collectLatest { isSuccess ->
+            if (isSuccess) {
+                delay(1500)
+                Toast.makeText(context, viewModel.successMessage.value, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -317,37 +327,69 @@ private fun ListSample(
     context: Context,
     isDescending: Boolean
 ){
-    LazyColumn(
-        modifier
-            .fillMaxSize()
+    if (!listSampelRuta.isEmpty()){
+        LazyColumn(
+            modifier
+                .fillMaxSize()
 //            .background(color = com.polstat.pkl.ui.theme.PklBase)
-            .paint(
-                painter = painterResource(id = R.drawable.pb_bg_background),
-                contentScale = ContentScale.Crop
-            )
-        ,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ){
-        val filteredList = viewModel.filteredList(searchText, listSampelRuta)
+                .paint(
+                    painter = painterResource(id = R.drawable.pb_bg_background),
+                    contentScale = ContentScale.Crop
+                )
+            ,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ){
+            val filteredList = viewModel.filteredList(searchText, listSampelRuta)
 
-        val sortedList = if (isDescending) {
-            viewModel.sortedListByRutaDescending(filteredList)
-        } else {
-            viewModel.sortedListByRutaAscending(filteredList)
+            val sortedList = if (isDescending) {
+                viewModel.sortedListByRutaDescending(filteredList)
+            } else {
+                viewModel.sortedListByRutaAscending(filteredList)
+            }
+
+            items(sortedList.size) { index ->
+                val sampelRuta = sortedList[index]
+                Sample(
+                    onPetunjukArahClicked = {},
+                    sampelRuta = sampelRuta,
+                    context,
+                    navController,
+                    viewModel
+                )
+            }
+
         }
-
-        items(sortedList.size) { index ->
-            val sampelRuta = sortedList[index]
-            Sample(
-                onPetunjukArahClicked = {},
-                sampelRuta = sampelRuta,
-                context,
-                navController,
-                viewModel
-            )
+    } else {
+        Row(
+            modifier = modifier
+                .fillMaxSize()
+                .background(color = Color.Transparent),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.dokumen_hilang),
+                    contentDescription = "Empty List Image",
+                    modifier = Modifier
+                        .size(250.dp, 250.dp)
+                        .padding(16.dp),
+                    contentScale = ContentScale.Crop
+                )
+                Text(
+                    text = "Tidak Ditemukan!",
+                    fontFamily = PoppinsFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    color = Color.Black
+                )
+            }
         }
-
     }
 }
 

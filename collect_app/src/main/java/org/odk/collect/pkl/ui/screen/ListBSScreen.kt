@@ -2,6 +2,7 @@ package org.odk.collect.pkl.ui.screen
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -102,10 +103,20 @@ fun ListBSScreen(
 
     LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
         viewModel.updateShowLoading(isSuccessed.value)
-        viewModel.showErrorToastChannel.collectLatest { show ->
-            if (show) {
+        viewModel.showErrorToastChannel.collectLatest { isError ->
+            if (isError) {
                 delay(1500)
                 Toast.makeText(context, viewModel.errorMessage.value, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    LaunchedEffect(key1 = viewModel.showSuccessToastChannel) {
+        viewModel.updateShowLoading(isSuccessed.value)
+        viewModel.showSuccessToastChannel.collectLatest { isSuccess ->
+            if (isSuccess) {
+                delay(1500)
+                Toast.makeText(context, viewModel.successMessage.value, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -564,38 +575,71 @@ private fun ListBS(
     modifier: Modifier = Modifier,
     viewModel: ListBSViewModel
 ) {
-    LazyColumn(
-        modifier
-            .fillMaxSize()
+    if (!listWilayah?.isEmpty()!!){
+        LazyColumn(
+            modifier
+                .fillMaxSize()
 //            .background(color = PklBase)
-            .paint(
-                painter = painterResource(id = R.drawable.pb_bg_background),
-                contentScale = ContentScale.Crop
-            )
-        ,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
-        listWilayah?.let { wilayahList ->
-            val sortedList = wilayahList.sortedBy { it.noBS }
+                .paint(
+                    painter = painterResource(id = R.drawable.pb_bg_background),
+                    contentScale = ContentScale.Crop
+                )
+            ,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            listWilayah?.let { wilayahList ->
+                val sortedList = wilayahList.sortedBy { it.noBS }
 
-            items(sortedList.size) { index ->
-                val wilayah = listWilayah[index]
-                BlokSensus(
-                    onLihatRutaClicked = {
-                        val isListRuta = true
-                        navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${wilayah.idBS}/$isMonitoring/$isListRuta")
-                    },
-                    onLihatSampleClicked = {
-                        navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${wilayah.idBS}/$isMonitoring")
-                    },
-                    wilayah = wilayah,
-                    viewModel = viewModel,
-                    navController = navController
+                items(sortedList.size) { index ->
+                    val wilayah = listWilayah[index]
+                    BlokSensus(
+                        onLihatRutaClicked = {
+                            val isListRuta = true
+                            navController.navigate(CapiScreen.Listing.LIST_RUTA + "/${wilayah.idBS}/$isMonitoring/$isListRuta")
+                        },
+                        onLihatSampleClicked = {
+                            navController.navigate(CapiScreen.Listing.LIST_SAMPLE + "/${wilayah.idBS}/$isMonitoring")
+                        },
+                        wilayah = wilayah,
+                        viewModel = viewModel,
+                        navController = navController
+                    )
+                }
+            }
+        }
+    } else {
+        Row(
+            modifier = modifier
+                .fillMaxSize()
+                .background(color = Color.Transparent),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.dokumen_hilang),
+                    contentDescription = "Empty List Image",
+                    modifier = Modifier
+                        .size(250.dp, 250.dp)
+                        .padding(16.dp),
+                    contentScale = ContentScale.Crop
+                )
+                Text(
+                    text = "Tidak Ditemukan!",
+                    fontFamily = PoppinsFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    color = Color.Black
                 )
             }
         }
     }
+
 }
 
 @Preview

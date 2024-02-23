@@ -3,10 +3,12 @@ package org.odk.collect.pkl.ui.screen
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -16,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -40,10 +41,12 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -91,6 +94,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.odk.collect.pkl.navigation.CapiScreen
+import org.odk.collect.pkl.ui.screen.components.LoadingDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("UNUSED_EXPRESSION")
@@ -111,8 +115,21 @@ fun ListRutaScreen(
     val isMonitoring = viewModel.isMonitoring?: false
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val showLoading by viewModel.showLoadingChannel.collectAsState(true)
+    val isSuccessed = viewModel.isSuccesed.collectAsState()
+
+    LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
+        viewModel.updateShowLoading(isSuccessed.value)
+        viewModel.showErrorToastChannel.collectLatest { isError ->
+            if (isError) {
+                delay(1500)
+                Toast.makeText(context, viewModel.errorMessage.value, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     LaunchedEffect(key1 = viewModel.showSuccessToastChannel) {
+        viewModel.updateShowLoading(isSuccessed.value)
         viewModel.showSuccessToastChannel.collectLatest { isSuccess ->
             if (isSuccess) {
                 delay(1500)
@@ -121,14 +138,9 @@ fun ListRutaScreen(
         }
     }
 
-    LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
-        viewModel.showErrorToastChannel.collectLatest { isError ->
-            if (isError) {
-                delay(1500)
-                Toast.makeText(context, viewModel.errorMessage.value, Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
+    LoadingDialog(
+        showDialog = showLoading
+    )
 
     Scaffold(
         topBar = {
@@ -300,9 +312,40 @@ fun ListRutaScreen(
 
             val filteredKeluargaList = listKeluargaWithRuta.value.filter { it.keluarga.status != "delete" && it.keluarga.namaKK != "" }.filter { it.keluarga.kodeKlg.contains(text, ignoreCase = true) || it.keluarga.namaKK.contains(text, ignoreCase = true) }
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
+            if (filteredRutaList.isNullOrEmpty() && isListRuta || filteredKeluargaList.isNullOrEmpty() &&!isListRuta ){
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = Color.Transparent),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.dokumen_hilang),
+                            contentDescription = "Empty List Image",
+                            modifier = Modifier
+                                .size(250.dp, 250.dp)
+                                .padding(16.dp),
+                            contentScale = ContentScale.Crop
+                        )
+                        Text(
+                            text = "Tidak Ditemukan!",
+                            fontFamily = PoppinsFontFamily,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            color = Color.Black
+                        )
+                    }
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
 //                    .background(color = PklBase)
                     .paint(
                         painter = painterResource(id = R.drawable.pb_bg_background),
@@ -334,33 +377,34 @@ fun ListRutaScreen(
                             TableCell(text = stringResource(id = R.string.no_urut_klg), color = Color.White, fontSize = 14.sp, weight = colWeight1)
                             TableCell(text = stringResource(id = R.string.nama_kepala_keluarga), color = Color.White, fontSize = 14.sp, weight = colWeight3)
 //                        TableCell(text = stringResource(id = R.string.detail_list_ruta_klg), color = Color.White, fontSize = 12.sp, weight = colWeight1)
+                            }
                         }
                     }
-                }
 
-                val itemsList = if (isListRuta) filteredRutaList else filteredKeluargaList
+                    val itemsList = if (isListRuta) filteredRutaList else filteredKeluargaList
 
-                items(itemsList.size) { index ->
-                    if (isListRuta) {
-                        val rutaWithKeluargaItem = itemsList[index] as RutaWithKeluarga
-                        RutaOrKlgRow(
-                            rutaWithKeluarga = rutaWithKeluargaItem,
-                            viewModel = viewModel,
-                            navController = navController,
-                            userNim = session?.nim ?: "",
-                            isMonitoring = isMonitoring,
-                            isListRuta = true
-                        )
-                    } else {
-                        val keluargaWithRutaItem = itemsList[index] as KeluargaWithRuta
-                        RutaOrKlgRow(
-                            keluargaWithRuta = keluargaWithRutaItem,
-                            viewModel = viewModel,
-                            navController = navController,
-                            userNim = session?.nim ?: "",
-                            isMonitoring = isMonitoring,
-                            isListRuta = false
-                        )
+                    items(itemsList.size) { index ->
+                        if (isListRuta) {
+                            val rutaWithKeluargaItem = itemsList[index] as RutaWithKeluarga
+                            RutaOrKlgRow(
+                                rutaWithKeluarga = rutaWithKeluargaItem,
+                                viewModel = viewModel,
+                                navController = navController,
+                                userNim = session?.nim ?: "",
+                                isMonitoring = isMonitoring,
+                                isListRuta = true
+                            )
+                        } else {
+                            val keluargaWithRutaItem = itemsList[index] as KeluargaWithRuta
+                            RutaOrKlgRow(
+                                keluargaWithRuta = keluargaWithRutaItem,
+                                viewModel = viewModel,
+                                navController = navController,
+                                userNim = session?.nim ?: "",
+                                isMonitoring = isMonitoring,
+                                isListRuta = false
+                            )
+                        }
                     }
                 }
             }
@@ -497,7 +541,7 @@ fun RutaOrKlgRow(
                                                 value = rutaWithKeluarga.ruta.kodeRuta
                                             )
                                             DetailRutaTextField(
-                                                label = R.string.kode_ruta,
+                                                label = R.string.no_segmen,
                                                 value = rutaWithKeluarga.ruta.noSegmen
                                             )
                                             DetailRutaTextField(

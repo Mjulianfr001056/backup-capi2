@@ -105,9 +105,15 @@ class ListBSViewModel @Inject constructor(
                         result.data?.let {
                             _listWilayah.value = it
                             Log.d(TAG, "getAllWilayah: $listWilayah")
+                            _successMessage.value = "Data berhasil ditampilkan"
                             _isSuccesed.value = true
                         }
+                        _showSuccessToastChannel.send(true)
                     }
+                }
+                if (_listWilayah.value.isNullOrEmpty()){
+                    _successMessage.value = "Data tidak ditemukan"
+                    _showSuccessToastChannel.send(true)
                 }
             }
         }
