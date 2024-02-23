@@ -1161,7 +1161,7 @@ class IsiRutaViewModel @Inject constructor(
                                         state.value.listJmlGenzAnak[indexKlg][indexRuta] > 0 && state.value.listJmlGenzDewasa[indexKlg][indexRuta] > 0 -> 3
                                         else -> 0
                                     },
-                                    isEnable = if (state.value.listNoUrutKlg[indexKlg] == "" || state.value.listNoUrutKlg[indexKlg] == "0") {
+                                    isEnable = if (state.value.listNoUrutKlg[indexKlg] == "" || state.value.listNoUrutKlg[indexKlg] == "0" || state.value.listIsGenzOrtu[indexKlg] == 0) {
                                         "0"
                                     } else {
                                         when (state.value.listIsEnable[indexKlg][indexRuta]) {
